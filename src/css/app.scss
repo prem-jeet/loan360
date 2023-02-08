@@ -1,1 +1,8 @@
 // app global css in SCSS form
+.child-take-fullheight {
+  display: flex;
+  flex-direction: column;
+  & > div:first-child {
+    flex-grow: 1;
+  }
+}
