@@ -26,7 +26,9 @@
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+import { login } from 'src/utils/auth/login';
+</script>
 
 <style lang="scss" scoped>
 #main {
