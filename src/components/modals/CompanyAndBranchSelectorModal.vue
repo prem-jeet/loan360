@@ -74,8 +74,7 @@ const submit = () => {
   if (!(company.value && branch.value && financialYear.value)) {
     error.value = true;
   }
-  /* TODO:  */
-  /* TODO: redirect to module selector page */
+  /* TODO: save the data and redirect to module selector page */
 };
 
 const close = () => {

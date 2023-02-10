@@ -32,7 +32,7 @@
 <script setup>
 import CompanyAndBranchSelectorModal from 'src/components/modals/CompanyAndBranchSelectorModal.vue';
 import { login } from 'src/utils/auth/login';
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
@@ -40,6 +40,13 @@ const route = useRoute();
 const isCompanyAndBranchSelectorModalActive = computed(
   () => !!route.query.code
 );
+
+onMounted(async () => {
+  if (route.query.code) {
+    /* TODO: call get getAuthTokenFromAws */
+    /*  retrieve the auth token */
+  }
+});
 </script>
 
 <style lang="scss" scoped>

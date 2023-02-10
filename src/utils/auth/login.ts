@@ -59,6 +59,7 @@ const awsValues = {
 export const getAwsConfig = () => awsValues;
 
 export const getAuthTokenFromAws = async function (callbackCode: string) {
+  /* TODO: fix the function to make a succesful post request */
   const formBody =
     'grant_type=authorization_code&code=' +
     encodeURIComponent(callbackCode) +
