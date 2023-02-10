@@ -23,11 +23,23 @@
         </h1>
       </div>
     </div>
+    <CompanyAndBranchSelectorModal
+      v-if="isCompanyAndBranchSelectorModalActive"
+    />
   </div>
 </template>
 
 <script setup>
+import CompanyAndBranchSelectorModal from 'src/components/modals/CompanyAndBranchSelectorModal.vue';
 import { login } from 'src/utils/auth/login';
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
+
+const isCompanyAndBranchSelectorModalActive = computed(
+  () => !!route.query.code
+);
 </script>
 
 <style lang="scss" scoped>
