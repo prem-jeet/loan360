@@ -1,5 +1,4 @@
 import { RouteRecordRaw } from 'vue-router';
-import MainLayout from 'layouts/ProductsLayout.vue';
 
 const routes: RouteRecordRaw[] = [
   {
@@ -12,11 +11,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import('pages/Login.vue'),
   },
   {
-    path: '/main',
-    name: 'main',
-    // meta: { layout: MainLayout },
-    component: () => import('pages/MainPage.vue'),
+    path: '/moduleselector',
+    name: 'moduleSelector',
+    component: () => import('pages/ModuleSelector.vue'),
   },
+
   // Always leave this as last one,
   // but you can also remove it
   {
