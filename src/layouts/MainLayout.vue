@@ -4,7 +4,9 @@
       <NavBar />
     </q-header>
     <q-page-container>
-      <slot />
+      <q-page>
+        <slot />
+      </q-page>
     </q-page-container>
   </q-layout>
 </template>

@@ -9,7 +9,11 @@
       </q-card>
 
       <q-card class="module-card">
-        <img src="src/assets/img/lms.jpeg" class="q-pa-md" style="height: 175px" />
+        <img
+          src="src/assets/img/lms.jpeg"
+          class="q-pa-md"
+          style="height: 175px"
+        />
         <q-card-section>
           <p class="text-subtitle2 text-center">Loan Management System - L</p>
         </q-card-section>
@@ -23,28 +27,44 @@
       </q-card>
 
       <q-card class="module-card">
-        <img src="src/assets/img/Accounts.png" class="q-pa-md" style="height: 175px" />
+        <img
+          src="src/assets/img/Accounts.png"
+          class="q-pa-md"
+          style="height: 175px"
+        />
         <q-card-section>
           <p class="text-subtitle2 text-center">Financial Accounting - A</p>
         </q-card-section>
       </q-card>
 
       <q-card class="module-card">
-        <img src="src/assets/img/dep.jpeg" class="q-pa-md" style="height: 175px" />
+        <img
+          src="src/assets/img/dep.jpeg"
+          class="q-pa-md"
+          style="height: 175px"
+        />
         <q-card-section>
           <p class="text-subtitle2 text-center">Term Deposits - D</p>
         </q-card-section>
       </q-card>
 
       <q-card class="module-card">
-        <img src="src/assets/img/mnt.png" class="q-pa-md" style="height: 175px" />
+        <img
+          src="src/assets/img/mnt.png"
+          class="q-pa-md"
+          style="height: 175px"
+        />
         <q-card-section>
           <p class="text-subtitle2 text-center">Maintenance - M</p>
         </q-card-section>
       </q-card>
 
       <q-card class="module-card">
-        <img src="src/assets/img/set.png" class="q-pa-md" style="height: 175px" />
+        <img
+          src="src/assets/img/set.png"
+          class="q-pa-md"
+          style="height: 175px"
+        />
         <q-card-section>
           <p class="text-subtitle2 text-center">Settings - S</p>
         </q-card-section>
@@ -67,7 +87,5 @@ import MainLayout from 'src/layouts/MainLayout.vue';
     margin: 10px;
     width: auto;
   }
-
-
 }
 </style>
