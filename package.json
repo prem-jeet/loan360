@@ -9,7 +9,8 @@
     "start": "quasar dev -p 4200",
     "lint": "eslint --ext .js,.ts,.vue ./",
     "format": "prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
-    "test": "echo \"No test specified\" && exit 0"
+    "test": "echo \"No test specified\" && exit 0",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",
@@ -30,6 +31,7 @@
     "eslint": "^8.10.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-vue": "^9.0.0",
+    "husky": "^8.0.0",
     "prettier": "^2.5.1",
     "pretty-quick": "^3.1.3",
     "typescript": "^4.5.4"
