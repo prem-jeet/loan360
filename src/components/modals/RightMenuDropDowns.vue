@@ -10,7 +10,9 @@
         <q-item-section>Full Screen</q-item-section>
       </q-item>
       <q-item clickable>
-        <q-item-section>Calender</q-item-section>
+        <q-item-section @click="DialogCalendar = !DialogCalendar"
+          >Calender</q-item-section
+        >
       </q-item>
       <q-item clickable>
         <q-item-section>Contacts</q-item-section>
@@ -41,11 +43,17 @@
   <q-dialog v-model="DialogModule" full-width>
     <ModulesDialog />
   </q-dialog>
+  <q-dialog v-model="DialogCalendar">
+    <CalendarDialog />
+  </q-dialog>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';
 import ModulesDialog from 'src/components/modals/RightSideNabBarMenuDialogs/ModulesDialog.vue';
+import CalendarDialog from 'src/components/modals/RightSideNabBarMenuDialogs/CalendarDialog.vue';
+
 const DialogModule = ref(false);
+const DialogCalendar = ref(false);
 </script>
 <style scoped>
 .q-item {
