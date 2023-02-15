@@ -10,18 +10,22 @@
       <q-badge color="red" text-color="white" floating> 4 </q-badge>
       <q-tooltip>email</q-tooltip>
     </q-btn>
+    &nbsp;
     <q-btn round dense flat color="white" icon="fa-solid fa-message">
       <q-badge color="red" text-color="white" floating> 3 </q-badge>
       <q-tooltip>messages</q-tooltip>
     </q-btn>
+    &nbsp;
     <q-btn round dense flat color="white" icon="fa-solid fa-comments">
       <q-badge color="red" text-color="white" floating> 4 </q-badge>
       <q-tooltip>sms</q-tooltip>
     </q-btn>
+    &nbsp;
     <q-btn round dense flat color="white" icon="fa-solid fa-bell">
       <q-badge color="red" text-color="white" floating> 2 </q-badge>
       <q-tooltip>Notifications</q-tooltip>
     </q-btn>
+    &nbsp;
     <q-btn flat :ripple="false" class="bg-purple-6">
       Jaguar software india
       <RightMenuDropDowns />
