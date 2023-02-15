@@ -2,9 +2,7 @@
   <q-menu fit>
     <q-list style="min-width: 100px">
       <q-item clickable>
-        <q-item-section @click="DialogModule = !DialogModule"
-          >Modules</q-item-section
-        >
+        <q-item-section @click="DialogModule">Modules</q-item-section>
       </q-item>
       <q-item clickable>
         <q-item-section>Full Screen</q-item-section>
@@ -40,20 +38,22 @@
       </q-item>
     </q-list>
   </q-menu>
-  <q-dialog v-model="DialogModule" full-width>
-    <ModulesDialog />
-  </q-dialog>
   <q-dialog v-model="DialogCalendar">
-    <CalendarDialog />
+    <CalendarModule />
   </q-dialog>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';
-import ModulesDialog from 'src/components/modals/RightSideNabBarMenuDialogs/ModulesDialog.vue';
-import CalendarDialog from 'src/components/modals/RightSideNabBarMenuDialogs/CalendarDialog.vue';
+import CalendarModule from 'src/components/modals/RightSideNabBarMenuDialogs/CalendarModule.vue';
+import { useRouter } from 'vue-router';
 
-const DialogModule = ref(false);
+const router = useRouter();
+
 const DialogCalendar = ref(false);
+
+const DialogModule = () => {
+  router.push({ name: 'moduleSelector' });
+};
 </script>
 <style scoped>
 .q-item {
