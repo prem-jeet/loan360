@@ -30,7 +30,9 @@
     </q-drawer>
 
     <q-page-container>
-      <router-view />
+      <q-page>
+        <RouterView></RouterView>
+      </q-page>
     </q-page-container>
   </q-layout>
 </template>
