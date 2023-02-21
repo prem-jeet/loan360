@@ -1,12 +1,19 @@
 //! Request URL: https://loan-get.lms-app.in/app/rest/allowedCompany
-const allowedCompany = [
+export type allowedCompanyType = { code: string; name: string };
+const allowedCompany: allowedCompanyType[] = [
   { code: 'SRT', name: '(TALLY) SHRI RAM FINANCE CORPORATION' },
   { code: 'SRF', name: 'SHRI RAM FINANCE CORPORATION PVT LTD' },
 ];
 
-//! Request URL: https://loan-get.lms-app.in/app/rest/allowedBranch
-
-const allowedBranch = [
+//! Request URL: https://loan-get.lms-app.in/app/rest/allowedBranch\
+export type allowedBranchType = {
+  code: string;
+  name: string;
+  inactive: boolean | null;
+  inactiveOn: string | null;
+  headOffice: boolean | null;
+};
+const allowedBranch: allowedBranchType[] = [
   {
     code: 'ADG',
     name: 'Adegaon(Chhapara)(Mp)',
@@ -2790,7 +2797,18 @@ const allowedBranch = [
 
 //! Request URL: https://loan-get.lms-app.in/app/rest/company/SRF/allowedFinancialYear
 //* get financial year for SRF
-const allowedFinancialYear_SRF = [
+export type allowedFinencialYearType = {
+  id: number;
+  companyCode: string;
+  name: string;
+  fromDate: string;
+  toDate: string;
+  createdOn: string | null;
+  updatedOn: string | null;
+  inactive: boolean | null;
+  inactiveOn: string | null;
+};
+const allowedFinancialYear_SRF: allowedFinencialYearType[] = [
   {
     id: 3,
     companyCode: 'SRF',
@@ -2861,7 +2879,7 @@ const allowedFinancialYear_SRF = [
 
 //! Request URL: https://loan-get.lms-app.in/app/rest/company/SRT/allowedFinancialYear
 //* get financial year for SRT
-const allowedFinancialYear_SRT = [
+const allowedFinancialYear_SRT: allowedFinencialYearType[] = [
   {
     id: 4,
     companyCode: 'SRT',
@@ -2886,16 +2904,24 @@ const allowedFinancialYear_SRT = [
   },
 ];
 
-export const fetchAllowedCompany = () =>
+export const fetchAllowedCompany = (): Promise<allowedCompanyType[]> =>
   new Promise((resolve) => setTimeout(() => resolve(allowedCompany), 250));
 
-export const fetchAllowedBranch = () =>
+export const fetchAllowedBranch = (): Promise<allowedBranchType[]> =>
   new Promise((resolve) => setTimeout(() => resolve(allowedBranch), 250));
 
-type allowedCompanycode = 'SRF' | 'SRT';
-const financialYear = {
-  SRF: allowedFinancialYear_SRF,
-  SRT: allowedFinancialYear_SRT,
+export const fetchAllowedFinancialYear = (
+  code: string
+): Promise<allowedFinencialYearType[] | []> => {
+  let data: allowedFinencialYearType[] | [] = [];
+  switch (code) {
+    case 'SRT':
+      data = allowedFinancialYear_SRT;
+      break;
+    case 'SRF':
+      data = allowedFinancialYear_SRF;
+      break;
+  }
+
+  return new Promise((resolve) => setTimeout(() => resolve(data), 250));
 };
-export const fetchAllowedFinancialYear = (code: allowedCompanycode) =>
-  new Promise((resolve) => setTimeout(() => resolve(financialYear[code]), 250));
