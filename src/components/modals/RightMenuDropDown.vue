@@ -66,10 +66,14 @@
           <q-item-section>Menu Rights</q-item-section>
         </q-item>
         <q-separator />
-        <q-item clickable>
+        <q-item
+          href="https://jaguarsoftwareindia.freshdesk.com/support/login"
+          target="_blank"
+          clickable
+        >
           <q-item-section avatar>
-            <q-icon name="fa-solid fa-circle-question"
-          /></q-item-section>
+            <q-icon name="fa-solid fa-circle-question" />
+          </q-item-section>
           <q-item-section>Helpdesk</q-item-section>
         </q-item>
         <q-separator />
