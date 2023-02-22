@@ -26,12 +26,10 @@
       <q-tooltip>Notifications</q-tooltip>
     </q-btn>
     &nbsp;
-    <q-btn flat :ripple="false" class="bg-purple-6">
-      Jaguar software india
-      <RightMenuDropDowns />
-    </q-btn>
+
+    <RightMenuDropDown />
   </q-toolbar>
 </template>
 <script setup>
-import RightMenuDropDowns from 'src/components/modals/RightMenuDropDowns.vue';
+import RightMenuDropDown from 'src/components/modals/RightMenuDropDown.vue';
 </script>
