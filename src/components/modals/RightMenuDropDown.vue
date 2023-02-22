@@ -9,62 +9,70 @@
           </q-item-section>
           <q-item-section>Full Screen</q-item-section>
         </q-item>
-
+        <q-separator />
         <q-item to="/moduleselector">
           <q-item-section avatar>
             <q-icon name="fa-solid fa-home" />
           </q-item-section>
           <q-item-section avatar> Modules</q-item-section>
         </q-item>
-
+        <q-separator />
         <q-item clickable>
           <q-item-section avatar>
             <q-icon name="fa-solid fa-calendar" />
           </q-item-section>
           <q-item-section>Calender</q-item-section>
         </q-item>
+        <q-separator />
         <q-item clickable>
           <q-item-section avatar>
             <q-icon name="fa-solid fa-address-card" />
           </q-item-section>
           <q-item-section>Contacts</q-item-section>
         </q-item>
+        <q-separator />
         <q-item clickable>
           <q-item-section avatar>
             <q-icon name="fa-solid fa-calculator" />
           </q-item-section>
           <q-item-section>IRR Calculator</q-item-section>
         </q-item>
+        <q-separator />
         <q-item clickable>
           <q-item-section avatar>
             <q-icon name="fa-solid fa-calculator" />
           </q-item-section>
           <q-item-section>Eligibility Calculator</q-item-section>
         </q-item>
+        <q-separator />
         <q-item clickable>
           <q-item-section avatar>
             <q-icon name="fa-solid fa-calculator" />
           </q-item-section>
           <q-item-section>Calculator</q-item-section>
         </q-item>
+        <q-separator />
         <q-item clickable>
           <q-item-section avatar>
             <q-icon name="fa-solid fa-users" />
           </q-item-section>
           <q-item-section>Users</q-item-section>
         </q-item>
+        <q-separator />
         <q-item clickable>
           <q-item-section avatar>
             <q-icon name="fa-solid fa-gears" />
           </q-item-section>
           <q-item-section>Menu Rights</q-item-section>
         </q-item>
+        <q-separator />
         <q-item clickable>
           <q-item-section avatar>
             <q-icon name="fa-solid fa-circle-question"
           /></q-item-section>
           <q-item-section>Helpdesk</q-item-section>
         </q-item>
+        <q-separator />
         <q-item clickable>
           <q-item-section avatar>
             <q-icon name="fa-solid fa-right-from-bracket" />
