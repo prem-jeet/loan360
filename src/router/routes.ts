@@ -12,8 +12,14 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/moduleselector',
-    name: 'moduleSelector',
-    component: () => import('pages/ModuleSelector.vue'),
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      {
+        path: '',
+        name: 'moduleSelector',
+        component: () => import('pages/ModuleSelector.vue'),
+      },
+    ],
   },
 
   {
