@@ -10,6 +10,6 @@
     </q-page-container>
   </q-layout>
 </template>
-<script setup>
+<script setup lang="ts">
 import NavBar from 'src/components/modals/NavBar.vue';
 </script>

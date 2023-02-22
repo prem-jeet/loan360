@@ -72,7 +72,7 @@
     </div>
   </MainLayout>
 </template>
-<script setup>
+<script setup lang="ts">
 import MainLayout from 'src/layouts/MainLayout.vue';
 </script>
 <style scoped>

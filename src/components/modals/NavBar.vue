@@ -9,6 +9,6 @@
     <RightMenuDropDown />
   </q-toolbar>
 </template>
-<script setup>
+<script setup lang="ts">
 import RightMenuDropDown from 'src/components/modals/RightMenuDropDown.vue';
 </script>
