@@ -5,7 +5,7 @@
     </q-header>
     <q-page-container>
       <q-page>
-        <slot />
+        <RouterView></RouterView>
       </q-page>
     </q-page-container>
   </q-layout>

@@ -16,10 +16,39 @@ const routes: RouteRecordRaw[] = [
     component: () => import('pages/ModuleSelector.vue'),
   },
 
+  {
+    path: '/module',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      {
+        path: ':module',
+        name: 'moule',
+        component: () => import('pages/Module.vue'),
+        props: ({ params }) => ({ module: params.module }),
+        beforeEnter: (to) => {
+          const module = to.params.module as string;
+          const availableModules = [
+            'los',
+            'lms',
+            'td',
+            'collection',
+            'settings',
+            'maintanance',
+            'fa',
+          ];
+          if (!availableModules.includes(module)) {
+            return { name: 'notFound' };
+          }
+        },
+      },
+    ],
+  },
+
   // Always leave this as last one,
   // but you can also remove it
   {
     path: '/:catchAll(.*)*',
+    name: 'notFound',
     component: () => import('pages/ErrorNotFound.vue'),
   },
 ];
