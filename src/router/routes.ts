@@ -16,44 +16,25 @@ const routes: RouteRecordRaw[] = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       {
-        path: 'los',
-        name: 'loanOrganizationSystem',
-        component: () =>
-          import(
-            'pages/modules/loanOrganizationSystem/LoanOrganizationSystem.vue'
-          ),
-      },
-      {
-        path: 'lms',
-        name: 'loanManagementSystem',
-        component: () =>
-          import('pages/modules/loanManagementSystem/LoanManagementSystem.vue'),
-      },
-      {
-        path: 'collection',
-        name: 'collection',
-        component: () => import('pages/modules/collection/Collection.vue'),
-      },
-      {
-        path: 'fa',
-        name: 'financialAccounting',
-        component: () =>
-          import('pages/modules/financialAccounting/FinancialAccounting.vue'),
-      },
-      {
-        path: 'td',
-        name: 'termDeposit',
-        component: () => import('pages/modules/termDeposit/TermDeposit.vue'),
-      },
-      {
-        path: 'maintenance',
-        name: 'maintenance',
-        component: () => import('pages/modules/maintenance/Maintenance.vue'),
-      },
-      {
-        path: 'settings',
-        name: 'settings',
-        component: () => import('pages/modules/settings/Settings.vue'),
+        path: ':module',
+        name: 'moule',
+        component: () => import('pages/Module.vue'),
+        props: ({ params }) => ({ module: params.module }),
+        beforeEnter: (to) => {
+          const module = to.params.module as string;
+          const availableModules = [
+            'los',
+            'lms',
+            'td',
+            'collection',
+            'settings',
+            'maintanance',
+            'fa',
+          ];
+          if (!availableModules.includes(module)) {
+            return { name: 'notFound' };
+          }
+        },
       },
     ],
   },
@@ -62,6 +43,7 @@ const routes: RouteRecordRaw[] = [
   // but you can also remove it
   {
     path: '/:catchAll(.*)*',
+    name: 'notFound',
     component: () => import('pages/ErrorNotFound.vue'),
   },
 ];
