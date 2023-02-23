@@ -92,20 +92,10 @@ const toggleFullscreen = (): void => {
   const doc = window.document;
   const docEl = doc.documentElement;
 
-  const requestFullscreen =
-    docEl.requestFullscreen ||
-    docEl.requestFullscreen ||
-    docEl.requestFullscreen ||
-    docEl.requestFullscreen;
-  const exitFullscreen =
-    doc.exitFullscreen || doc.exitFullscreen || doc.exitFullscreen;
+  const requestFullscreen = docEl.requestFullscreen;
+  const exitFullscreen = doc.exitFullscreen;
 
-  if (
-    !doc.fullscreenElement &&
-    !doc.fullscreenElement &&
-    !doc.fullscreenElement &&
-    !doc.fullscreenElement
-  ) {
+  if (!doc.fullscreenElement) {
     if (requestFullscreen) {
       requestFullscreen.call(docEl);
     }
