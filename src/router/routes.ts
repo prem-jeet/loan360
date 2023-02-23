@@ -39,7 +39,7 @@ const routes: RouteRecordRaw[] = [
             'td',
             'collection',
             'settings',
-            'maintanance',
+            'maintenance',
             'fa',
           ];
           if (!availableModules.includes(module)) {
