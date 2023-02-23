@@ -88,7 +88,7 @@
   </q-btn>
 </template>
 <script setup lang="ts">
-const toggleFullscreen = (): void => {
+const toggleFullscreen = () => {
   const doc = window.document;
   const docEl = doc.documentElement;
 
