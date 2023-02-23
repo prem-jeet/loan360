@@ -62,7 +62,14 @@
     </q-card>
   </div>
 </template>
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useModuleSelectorKeyboardListener } from 'src/composables/moduleSelectorKeyboardListener';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+useModuleSelectorKeyboardListener(router.push);
+</script>
 <style scoped>
 .module-card {
   width: 100%;
