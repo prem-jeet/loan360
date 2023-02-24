@@ -243,12 +243,12 @@ const ExpensesAmount = ref('');
 
 const ExpensTotal = ref(0);
 interface MyObject {
-  instalments: number;
-  advInstalments: number;
-  monthlyRevenue: number;
-  marginPercent: number;
-  netAvailableIncome: number;
-  tenure: number;
+  instalments: number | null;
+  advInstalments: number | null;
+  monthlyRevenue: number | null;
+  marginPercent: number | null;
+  netAvailableIncome: number | null;
+  tenure: number | null;
   rate: any;
   calculatedLoanAmount: any;
   ltvCostValue: any;
@@ -259,17 +259,17 @@ interface MyObject {
 }
 
 const modalObj = reactive<MyObject>({
-  instalments: 0,
-  advInstalments: 0,
-  monthlyRevenue: 0,
-  marginPercent: 0,
-  netAvailableIncome: 0,
-  tenure: 0,
-  rate: 0,
-  calculatedLoanAmount: 0,
-  ltvCostValue: 0,
-  ltvPercent: 0,
-  ltvLoanAmount: 0,
+  instalments: null,
+  advInstalments: null,
+  monthlyRevenue: null,
+  marginPercent: null,
+  netAvailableIncome: null,
+  tenure: null,
+  rate: null,
+  calculatedLoanAmount: null,
+  ltvCostValue: null,
+  ltvPercent: null,
+  ltvLoanAmount: null,
 });
 
 const Expenses = ref([
@@ -345,7 +345,8 @@ const calculateAmount = (value: MyObject) => {
       (modalObj.instalments ? modalObj.instalments : 0) +
       (modalObj.advInstalments ? modalObj.advInstalments : 0);
   modalObj.marginAmount =
-    (modalObj.monthlyRevenue * modalObj.marginPercent) / 100;
+    ((modalObj.monthlyRevenue as number) * (modalObj.marginPercent as number)) /
+    100;
   modalObj.netAvailableIncome =
     modalObj.marginAmount - (ExpensTotal.value > 0 ? ExpensTotal.value : 0);
   modalObj.calculatedLoanAmount =
