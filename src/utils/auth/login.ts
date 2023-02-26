@@ -19,11 +19,10 @@ import axios from 'axios';
 // var mySecret = "cjnhmlqqhe9gf1u9b6rqot94f45ikp9hq2mg5bru4e1ori42nv3";
 
 // development
-const myAuth =
-  'https://jaguar-loan-development.auth.ap-south-1.amazoncognito.com';
-const myClientId = 'a3eb8ogt9ibc88oej2d9n4vnp';
-const myHost = 'http://localhost:4200';
-const mySecret = 'e2hj0bentgtvjdggbgg1g9d9803cgrudsggag2g54lkic67fvq2';
+const myAuth = 'https://quasar-dev.auth.ap-south-1.amazoncognito.com';
+const myClientId = '5cqfis5pa3mh65l5qtf6t5u3ai';
+const myHost = 'http://localhost:9000';
+const mySecret = '11fr6aqv0ot8ng5hvrud99rfqlo0iq1kp7dp5fvk7qkikb4phksq';
 
 const loginURL =
   myAuth +
