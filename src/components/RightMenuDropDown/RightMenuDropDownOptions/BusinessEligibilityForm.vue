@@ -39,8 +39,8 @@
     <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
       <q-input
         outlined
-        v-model="modalObj.marginAmount"
         disable
+        v-model="modalObj.marginAmount"
         label="Margin in Amt"
       />
     </div>
@@ -113,6 +113,7 @@
     <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
       <q-input
         outlined
+        disable
         v-model="modalObj.netAvailableIncome"
         label="Net Income Available for EMI"
       />
@@ -120,6 +121,7 @@
     <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
       <q-input
         outlined
+        disable
         v-model="modalObj.calculatedLoanAmount"
         label="Loan Amount"
       />
@@ -144,6 +146,7 @@
     <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
       <q-input
         outlined
+        disable
         v-model="modalObj.ltvLoanAmount"
         label="LTV Loan Amount"
       />
@@ -151,6 +154,7 @@
     <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
       <q-input
         outlined
+        disable
         v-model="modalObj.maxLoanAmount"
         label="Max Loan Amount"
       />
