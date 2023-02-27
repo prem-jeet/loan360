@@ -1,15 +1,34 @@
+import { Company, DecodedIdToken, State, Token } from './userStoreTypes';
 import { defineStore } from 'pinia';
 import jwt_decode from 'jwt-decode';
+import { api } from 'src/boot/axios';
+
 export const useUserStore = defineStore('userStore', {
-  state: (): state => ({
+  state: (): State => ({
     token: { id_token: '', expires_in: 0 },
+    accessToken: '',
     isAuthenticated: false,
+    allowedCompany: [],
+    allowedBranch: [],
+    selectedCompany: { code: '', name: '' },
+    selectedBranch: {
+      code: '',
+      name: '',
+      inactive: null,
+      headOffice: null,
+      inactiveOn: null,
+    },
   }),
   getters: {
     idToken: (state): string => state.token.id_token,
     expiresIn: (state): number => state.token.expires_in,
-    decodedIdToken: (state): decodedIdToken => jwt_decode(state.token.id_token),
-    isLoggedIn: () => !!localStorage.getItem('jaguar'),
+    decodedIdToken: (state): DecodedIdToken => {
+      if (state.token.id_token) {
+        return jwt_decode(state.token.id_token);
+      }
+      return {} as DecodedIdToken;
+    },
+
     name(): string {
       return this.decodedIdToken['cognito:username'];
     },
@@ -21,42 +40,26 @@ export const useUserStore = defineStore('userStore', {
     },
   },
   actions: {
-    setToken(token: token) {
+    setToken(token: Token) {
       this.token = token;
       this.isAuthenticated = true;
 
       localStorage.setItem('jaguar', JSON.stringify(token));
     },
+    setAccessToken(token: string) {
+      this.accessToken = token;
+    },
+    async fetchAllowedCompany(): Promise<Company[] | []> {
+      const rsp = await api.get('/allowedCompany', {
+        headers: { Authorization: `Bearer ${this.idToken}` },
+      });
+
+      if (!rsp.data) {
+        return [];
+      }
+      console.log(rsp);
+
+      return rsp.data;
+    },
   },
 });
-
-interface token {
-  id_token: string;
-  expires_in: number;
-}
-
-interface decodedIdToken {
-  at_hash: string;
-  aud: string;
-  auth_time: number;
-  'cognito:username': string;
-  email: string;
-  email_verified: boolean;
-  exp: number;
-  family_name: string;
-  given_name: string;
-  iat: number;
-  iss: string;
-  jti: string;
-  middle_name: string;
-  origin_jti: string;
-  phone_number: string;
-  phone_number_verified: boolean;
-  sub: string;
-  token_use: string;
-}
-
-interface state {
-  token: token;
-  isAuthenticated: boolean;
-}
