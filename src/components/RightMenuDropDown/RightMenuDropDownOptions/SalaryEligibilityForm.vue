@@ -183,7 +183,7 @@ interface MyObject {
   monthlyRevenue: number | null;
   marginPercent: number | null;
   netAvailableIncome: number | null;
-  tenure: number | null;
+  tenure: any;
   rate: any;
   calculatedLoanAmount: any;
   ltvCostValue: any;
@@ -243,7 +243,7 @@ const add = () => {
     ExpensTotal.value += num;
     ExpensesSelected.value = '';
     ExpensesAmount.value = '';
-    calculateAmount(modalObj);
+    calculateAmount();
   }
 };
 const remove = (index: number) => {
@@ -251,7 +251,7 @@ const remove = (index: number) => {
   const val = parseInt(obj['value'] as keyof typeof number);
   ExpensTotal.value -= val;
   data.ExpensesArray.splice(index, 1);
-  calculateAmount(modalObj);
+  calculateAmount();
 };
 const edit = (index: number) => {
   const obj = data.ExpensesArray[index];
@@ -261,18 +261,14 @@ const edit = (index: number) => {
   ExpensesAmount.value = obj['value'] as keyof typeof String;
 
   data.ExpensesArray.splice(index, 1);
-  calculateAmount(modalObj);
+  calculateAmount();
 };
 
 const refresh = () => {
   (ExpensesSelected.value = ''), (ExpensesAmount.value = '');
 };
 
-const calculateAmount = (value: MyObject) => {
-  if (!modalObj.tenure)
-    modalObj.tenure =
-      (modalObj.instalments ? modalObj.instalments : 0) +
-      (modalObj.advInstalments ? modalObj.advInstalments : 0);
+const calculateAmount = () => {
   modalObj.marginAmount =
     ((modalObj.monthlyRevenue as number) * (modalObj.marginPercent as number)) /
     100;
