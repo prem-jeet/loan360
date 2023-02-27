@@ -1,161 +1,171 @@
 <template>
-  <div class="row q-col-gutter-xs">
-    <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
-      <q-input
-        outlined
-        v-model="modalObj.monthlyRevenue"
-        label="Monthly Salary"
-      />
+  <q-form @submit.prevent="calculateAmount()">
+    <div class="row q-col-gutter-xs">
+      <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
+        <q-input
+          outlined
+          v-model="modalObj.monthlyRevenue"
+          :rules="[(val) => !!val || 'Field is required']"
+          label="Monthly Salary"
+        />
+      </div>
+
+      <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
+        <q-input
+          outlined
+          v-model="modalObj.rate"
+          :rules="[(val) => !!val || 'Field is required']"
+          label="Interest Rate"
+        />
+      </div>
+    </div>
+    <p></p>
+    <div class="row q-col-gutter-xs">
+      <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
+        <q-input
+          outlined
+          v-model="modalObj.tenure"
+          :rules="[(val) => !!val || 'Field is required']"
+          label="Tenure"
+        />
+      </div>
+      <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
+        <q-input outlined v-model="modalObj.instalments" label="Instalments" />
+      </div>
     </div>
 
-    <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
-      <q-input outlined v-model="modalObj.rate" label="Interest Rate" />
-    </div>
-  </div>
-  <p></p>
-  <div class="row q-col-gutter-xs">
-    <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
-      <q-input outlined v-model="modalObj.tenure" label="Tenure" />
-    </div>
-    <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
-      <q-input outlined v-model="modalObj.instalments" label="Instalments" />
-    </div>
-  </div>
+    <p></p>
+    <div class="row q-col-gutter-xs">
+      <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
+        <q-input
+          outlined
+          v-model="modalObj.advInstalments"
+          label="Adv Instalments"
+        />
+      </div>
 
-  <p></p>
-  <div class="row q-col-gutter-xs">
-    <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
-      <q-input
-        outlined
-        v-model="modalObj.advInstalments"
-        label="Adv Instalments"
-      />
+      <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
+        <q-input
+          outlined
+          v-model="modalObj.marginPercent"
+          :rules="[(val) => !!val || 'Field is required']"
+          label="Net Salary Eligle for EMI  %"
+        />
+      </div>
     </div>
+    <p></p>
 
-    <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
-      <q-input
-        outlined
-        v-model="modalObj.marginPercent"
-        label="Net Salary Eligle for EMI  %"
-      />
+    <div class="row q-col-gutter-xs">
+      <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
+        <q-input
+          outlined
+          v-model="modalObj.marginAmount"
+          disable
+          label="Net Salary In Amt"
+        />
+      </div>
     </div>
-  </div>
-  <p></p>
+    <p></p>
+    <div class="row q-col-gutter-xs">
+      <div class="col-xs-12 col-sm-12 col-md-4 q-px-sm">
+        <q-select
+          outlined
+          v-model="ExpensesSelected"
+          :options="Expenses"
+          label="Expenses"
+        />
+      </div>
+      <div class="col-xs-12 col-sm-12 col-md-4 q-px-sm">
+        <q-input
+          outlined
+          v-model="ExpensesAmount"
+          ref="inputRef"
+          :error="error && !ExpensesAmount"
+          error-message="Enter amount"
+          label="Enter amount"
+        />
+      </div>
+      <div class="col-xs-12 col-sm-12 col-md-4 q-px-sm q-pt-sm">
+        <q-btn color="light-blue" @click="add()" icon="fa-solid fa-check" />
+        &nbsp;
+        <q-btn
+          color="light-blue"
+          @click="refresh()"
+          icon="fa-solid fa-arrow-rotate-left"
+        />
+      </div>
+    </div>
+    <div
+      class="row q-col-gutter-xs text-center q-pa-md"
+      v-for="(item, index) in data.ExpensesArray"
+      :key="index"
+    >
+      <div class="col-xs-12 col-sm-12 col-md-4 q-px-sm">
+        {{ item.field }}
+      </div>
 
-  <div class="row q-col-gutter-xs">
-    <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
-      <q-input
-        outlined
-        v-model="modalObj.marginAmount"
-        disable
-        label="Net Salary In Amt"
-      />
+      <div class="col-xs-12 col-sm-12 col-md-4 q-px-sm">{{ item.value }}</div>
+      <div class="col-xs-12 col-sm-12 col-md-4 q-px-sm">
+        <q-btn
+          color="light-blue"
+          @click="edit(index)"
+          icon="fa-solid fa-pen-to-square"
+        />
+        &nbsp;
+        <q-btn
+          color="light-blue"
+          @click="remove(index)"
+          icon="fa-solid fa-xmark"
+        />
+      </div>
     </div>
-  </div>
-  <p></p>
-  <div class="row q-col-gutter-xs">
-    <div class="col-xs-12 col-sm-12 col-md-4 q-px-sm">
-      <q-select
-        outlined
-        v-model="ExpensesSelected"
-        :options="Expenses"
-        label="Expenses"
-      />
+    <div
+      v-if="data.ExpensesArray.length > 0"
+      class="row q-col-gutter-xs text-center q-pa-md"
+    >
+      <div class="col-xs-12 col-sm-12 col-md-4 q-px-sm">Total Expenses</div>
+      <div class="col-xs-12 col-sm-12 col-md-4 q-px-sm">
+        {{ ExpensTotal }}
+      </div>
     </div>
-    <div class="col-xs-12 col-sm-12 col-md-4 q-px-sm">
-      <q-input
-        outlined
-        v-model="ExpensesAmount"
-        ref="inputRef"
-        :error="error && !ExpensesAmount"
-        error-message="Enter amount"
-        label="Enter amount"
-      />
+    <p></p>
+    <div class="row q-col-gutter-xs">
+      <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
+        <q-input
+          outlined
+          disable
+          v-model="modalObj.netAvailableIncome"
+          label="Net Income Available for EMI"
+        />
+      </div>
+      <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
+        <q-input
+          outlined
+          disable
+          v-model="modalObj.calculatedLoanAmount"
+          label="Loan Amount"
+        />
+      </div>
     </div>
-    <div class="col-xs-12 col-sm-12 col-md-4 q-px-sm q-pt-sm">
-      <q-btn color="light-blue" @click="add()" icon="fa-solid fa-check" />
+    <p></p>
+    <div class="row q-col-gutter-xs">
+      <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
+        <q-input
+          outlined
+          disable
+          v-model="modalObj.maxLoanAmount"
+          label="Max Loan Amount"
+        />
+      </div>
+    </div>
+    <p></p>
+
+    <div class="row justify-center">
+      <q-btn color="light-blue" label="Check" type="submit" />
       &nbsp;
-      <q-btn
-        color="light-blue"
-        @click="refresh()"
-        icon="fa-solid fa-arrow-rotate-left"
-      />
+      <q-btn color="light-blue" label="Close" v-close-popup />
     </div>
-  </div>
-  <div
-    class="row q-col-gutter-xs text-center q-pa-md"
-    v-for="(item, index) in data.ExpensesArray"
-    :key="index"
-  >
-    <div class="col-xs-12 col-sm-12 col-md-4 q-px-sm">
-      {{ item.field }}
-    </div>
-
-    <div class="col-xs-12 col-sm-12 col-md-4 q-px-sm">{{ item.value }}</div>
-    <div class="col-xs-12 col-sm-12 col-md-4 q-px-sm">
-      <q-btn
-        color="light-blue"
-        @click="edit(index)"
-        icon="fa-solid fa-pen-to-square"
-      />
-      &nbsp;
-      <q-btn
-        color="light-blue"
-        @click="remove(index)"
-        icon="fa-solid fa-xmark"
-      />
-    </div>
-  </div>
-  <div
-    v-if="data.ExpensesArray.length > 0"
-    class="row q-col-gutter-xs text-center q-pa-md"
-  >
-    <div class="col-xs-12 col-sm-12 col-md-4 q-px-sm">Total Expenses</div>
-    <div class="col-xs-12 col-sm-12 col-md-4 q-px-sm">
-      {{ ExpensTotal }}
-    </div>
-  </div>
-  <p></p>
-  <div class="row q-col-gutter-xs">
-    <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
-      <q-input
-        outlined
-        disable
-        v-model="modalObj.netAvailableIncome"
-        label="Net Income Available for EMI"
-      />
-    </div>
-    <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
-      <q-input
-        outlined
-        disable
-        v-model="modalObj.calculatedLoanAmount"
-        label="Loan Amount"
-      />
-    </div>
-  </div>
-  <p></p>
-  <div class="row q-col-gutter-xs">
-    <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
-      <q-input
-        outlined
-        disable
-        v-model="modalObj.maxLoanAmount"
-        label="Max Loan Amount"
-      />
-    </div>
-  </div>
-  <p></p>
-
-  <div class="row justify-center">
-    <q-btn
-      color="light-blue"
-      label="Check"
-      @click="calculateAmount(modalObj)"
-    />
-    &nbsp;
-    <q-btn color="light-blue" label="Close" v-close-popup />
-  </div>
+  </q-form>
 </template>
 <script setup lang="ts">
 import { number } from '@intlify/core-base';
