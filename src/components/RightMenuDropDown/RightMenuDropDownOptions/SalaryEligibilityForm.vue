@@ -1,7 +1,7 @@
 <template>
   <q-form @submit.prevent="calculateAmount()">
     <div class="row q-col-gutter-xs">
-      <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
+      <div class="col-xs-12 col-sm-12 col-md-6">
         <q-input
           outlined
           v-model="modalObj.monthlyRevenue"
@@ -10,7 +10,7 @@
         />
       </div>
 
-      <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
+      <div class="col-xs-12 col-sm-12 col-md-6">
         <q-input
           outlined
           v-model="modalObj.rate"
@@ -18,10 +18,7 @@
           label="Interest Rate"
         />
       </div>
-    </div>
-    <p></p>
-    <div class="row q-col-gutter-xs">
-      <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
+      <div class="col-xs-12 col-sm-12 col-md-6">
         <q-input
           outlined
           v-model="modalObj.tenure"
@@ -29,14 +26,10 @@
           label="Tenure"
         />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
+      <div class="col-xs-12 col-sm-12 col-md-6">
         <q-input outlined v-model="modalObj.instalments" label="Instalments" />
       </div>
-    </div>
-
-    <p></p>
-    <div class="row q-col-gutter-xs">
-      <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
+      <div class="col-xs-12 col-sm-12 col-md-6">
         <q-input
           outlined
           v-model="modalObj.advInstalments"
@@ -44,7 +37,7 @@
         />
       </div>
 
-      <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
+      <div class="col-xs-12 col-sm-12 col-md-6">
         <q-input
           outlined
           v-model="modalObj.marginPercent"
@@ -52,11 +45,7 @@
           label="Net Salary Eligle for EMI  %"
         />
       </div>
-    </div>
-    <p></p>
-
-    <div class="row q-col-gutter-xs">
-      <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
+      <div class="col-xs-12 col-sm-12 col-md-6">
         <q-input
           outlined
           v-model="modalObj.marginAmount"
@@ -67,7 +56,7 @@
     </div>
     <p></p>
     <div class="row q-col-gutter-xs">
-      <div class="col-xs-12 col-sm-12 col-md-4 q-px-sm">
+      <div class="col-xs-12 col-sm-12 col-md-4">
         <q-select
           outlined
           v-model="ExpensesSelected"
@@ -75,7 +64,7 @@
           label="Expenses"
         />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-4 q-px-sm">
+      <div class="col-xs-12 col-sm-12 col-md-4">
         <q-input
           outlined
           v-model="ExpensesAmount"
@@ -85,7 +74,7 @@
           label="Enter amount"
         />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-4 q-px-sm q-pt-sm">
+      <div class="col-xs-12 col-sm-12 col-md-4 q-pt-sm">
         <q-btn color="light-blue" @click="add()" icon="fa-solid fa-check" />
         &nbsp;
         <q-btn
@@ -100,12 +89,12 @@
       v-for="(item, index) in data.ExpensesArray"
       :key="index"
     >
-      <div class="col-xs-12 col-sm-12 col-md-4 q-px-sm">
+      <div class="col-xs-12 col-sm-12 col-md-4">
         {{ item.field }}
       </div>
 
-      <div class="col-xs-12 col-sm-12 col-md-4 q-px-sm">{{ item.value }}</div>
-      <div class="col-xs-12 col-sm-12 col-md-4 q-px-sm">
+      <div class="col-xs-12 col-sm-12 col-md-4">{{ item.value }}</div>
+      <div class="col-xs-12 col-sm-12 col-md-4">
         <q-btn
           color="light-blue"
           @click="edit(index)"
@@ -123,14 +112,14 @@
       v-if="data.ExpensesArray.length > 0"
       class="row q-col-gutter-xs text-center q-pa-md"
     >
-      <div class="col-xs-12 col-sm-12 col-md-4 q-px-sm">Total Expenses</div>
-      <div class="col-xs-12 col-sm-12 col-md-4 q-px-sm">
+      <div class="col-xs-12 col-sm-12 col-md-4">Total Expenses</div>
+      <div class="col-xs-12 col-sm-12 col-md-4">
         {{ ExpensTotal }}
       </div>
     </div>
     <p></p>
     <div class="row q-col-gutter-xs">
-      <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
+      <div class="col-xs-12 col-sm-12 col-md-6">
         <q-input
           outlined
           disable
@@ -138,7 +127,7 @@
           label="Net Income Available for EMI"
         />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
+      <div class="col-xs-12 col-sm-12 col-md-6">
         <q-input
           outlined
           disable
@@ -146,10 +135,7 @@
           label="Loan Amount"
         />
       </div>
-    </div>
-    <p></p>
-    <div class="row q-col-gutter-xs">
-      <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
+      <div class="col-xs-12 col-sm-12 col-md-6">
         <q-input
           outlined
           disable
@@ -159,7 +145,6 @@
       </div>
     </div>
     <p></p>
-
     <div class="row justify-center">
       <q-btn color="light-blue" label="Check" type="submit" />
       &nbsp;
@@ -296,5 +281,8 @@ const calculateAmount = () => {
 }
 .e-card {
   width: 1000px;
+}
+.q-field--with-bottom {
+  padding-bottom: 0px;
 }
 </style>
