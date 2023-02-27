@@ -31,20 +31,32 @@
 
 <script setup>
 import CompanyAndBranchSelectorModal from 'src/components/modals/CompanyAndBranchSelectorModal.vue';
-import { login } from 'src/utils/auth/login';
+import { useUserStore } from 'src/stores/user/userStore';
+import { getAuthTokenFromAws, login } from 'src/utils/auth/login';
 import { computed, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
+const router = useRouter();
+
+const userStore = useUserStore();
 
 const isCompanyAndBranchSelectorModalActive = computed(
-  () => !!route.query.code
+  () => route.name === 'authenticated'
 );
 
 onMounted(async () => {
   if (route.query.code) {
-    /* TODO: call get getAuthTokenFromAws */
-    /*  retrieve the auth token */
+    const rsp = await getAuthTokenFromAws(route.query.code);
+    if (rsp.access_token) {
+      userStore.setToken({
+        id_token: rsp.id_token,
+        expires_in: rsp.expires_in,
+      });
+      router.push({ name: 'authenticated' });
+    } else {
+      router.push({ name: 'noFound' });
+    }
   }
 });
 </script>
