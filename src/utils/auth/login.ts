@@ -68,7 +68,6 @@ export const getAwsConfig = () => awsValues;
 export const getAuthTokenFromAws = async function (
   callbackCode: string
 ): Promise<authTokenType> {
-  /* TODO: fix the function to make a succesful post request */
   const formBody =
     encodeURIComponent('grant_type') +
     '=' +
@@ -78,7 +77,13 @@ export const getAuthTokenFromAws = async function (
     '=' +
     encodeURIComponent(callbackCode) +
     '&' +
-    +encodeURIComponent('redirect_uri') +
+    encodeURIComponent('scope') +
+    '=' +
+    encodeURIComponent(
+      'openid+profile+aws.cognito.signin.user.admin+email+phone'
+    ) +
+    '&' +
+    encodeURIComponent('redirect_uri') +
     '=' +
     encodeURIComponent(getAwsConfig().redirectURL);
 

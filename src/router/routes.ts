@@ -1,3 +1,4 @@
+import { useUserStore } from 'src/stores/user/userStore';
 import { RouteRecordRaw } from 'vue-router';
 
 const routes: RouteRecordRaw[] = [
@@ -8,6 +9,21 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'login',
+    beforeEnter: () => {
+      const userStore = useUserStore();
+
+      if (userStore.isLoggedIn && userStore.idToken === '') {
+        userStore.setToken(
+          JSON.parse(localStorage.getItem('jaguar') as string) as {
+            id_token: string;
+            expires_in: number;
+          }
+        );
+        return {
+          name: 'authenticated',
+        };
+      }
+    },
     component: () => import('pages/Login.vue'),
     children: [
       {
