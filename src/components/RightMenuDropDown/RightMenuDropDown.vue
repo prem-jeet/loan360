@@ -95,7 +95,7 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';
-import EligibilityCalculator from 'src/components/modals/RightMenuDropDownOptions/EligibilityCalculator.vue';
+import EligibilityCalculator from 'src/components/RightMenuDropDown/RightMenuDropDownOptions/EligibilityCalculator.vue';
 const showEligibilityCalculator = ref(false);
 </script>
 <style scoped>
