@@ -11,5 +11,5 @@
   </q-layout>
 </template>
 <script setup lang="ts">
-import NavBar from 'src/components/modals/NavBar.vue';
+import NavBar from 'src/components/NavBar.vue';
 </script>
