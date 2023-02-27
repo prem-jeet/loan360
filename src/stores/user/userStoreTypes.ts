@@ -36,12 +36,26 @@ export interface Branch {
   headOffice: boolean | null;
 }
 
+export interface FinancialYear {
+  id: number;
+  companyCode: string;
+  name: string;
+  fromDate: string;
+  toDate: string;
+  createdOn: string | null;
+  updatedOn: string | null;
+  inactive: boolean | null;
+  inactiveOn: string | null;
+}
+
 export interface State {
   token: Token;
   accessToken: string;
   isAuthenticated: boolean;
   allowedCompany: Company[] | [];
   allowedBranch: Branch[] | [];
+  allowedFinancialYear: FinancialYear[] | [];
   selectedCompany: Company;
   selectedBranch: Branch;
+  selectedFinancialYear: FinancialYear;
 }

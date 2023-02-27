@@ -10,12 +10,24 @@ export const useUserStore = defineStore('userStore', {
     isAuthenticated: false,
     allowedCompany: [],
     allowedBranch: [],
+    allowedFinancialYear: [],
     selectedCompany: { code: '', name: '' },
     selectedBranch: {
       code: '',
       name: '',
       inactive: null,
       headOffice: null,
+      inactiveOn: null,
+    },
+    selectedFinancialYear: {
+      id: 0,
+      companyCode: '',
+      name: '',
+      fromDate: '',
+      toDate: '',
+      createdOn: null,
+      updatedOn: null,
+      inactive: null,
       inactiveOn: null,
     },
   }),
@@ -50,7 +62,7 @@ export const useUserStore = defineStore('userStore', {
       this.accessToken = token;
     },
     async fetchAllowedCompany(): Promise<Company[] | []> {
-      const rsp = await api.get('/allowedCompany', {
+      const rsp = await api.get('allowedCompany', {
         headers: { Authorization: `Bearer ${this.idToken}` },
       });
 
@@ -60,6 +72,13 @@ export const useUserStore = defineStore('userStore', {
       console.log(rsp);
 
       return rsp.data;
+    },
+    async fetchAllowedFinancialYear(company: Company) {
+      const rsp = await api.get(`company/${company.code}/allowedFinancialYear`);
+
+      if (rsp.data) {
+        this.allowedFinancialYear = rsp.data;
+      }
     },
   },
 });
