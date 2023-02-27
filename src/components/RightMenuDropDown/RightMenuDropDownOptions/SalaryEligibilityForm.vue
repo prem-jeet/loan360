@@ -74,10 +74,16 @@
           label="Enter amount"
         />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-4 q-pt-sm">
-        <q-btn color="light-blue" @click="add()" icon="fa-solid fa-check" />
+      <div class="col-xs-12 col-sm-12 col-md-4 q-pt-md">
+        <q-btn
+          size="sm"
+          color="light-blue"
+          @click="add()"
+          icon="fa-solid fa-check"
+        />
         &nbsp;
         <q-btn
+          size="sm"
           color="light-blue"
           @click="refresh()"
           icon="fa-solid fa-arrow-rotate-left"
@@ -96,12 +102,14 @@
       <div class="col-xs-12 col-sm-12 col-md-4">{{ item.value }}</div>
       <div class="col-xs-12 col-sm-12 col-md-4">
         <q-btn
+          size="sm"
           color="light-blue"
           @click="edit(index)"
           icon="fa-solid fa-pen-to-square"
         />
         &nbsp;
         <q-btn
+          size="sm"
           color="light-blue"
           @click="remove(index)"
           icon="fa-solid fa-xmark"
