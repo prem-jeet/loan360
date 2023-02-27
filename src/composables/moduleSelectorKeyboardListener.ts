@@ -1,3 +1,4 @@
+import { Platform } from 'quasar';
 import { onMounted, onUnmounted } from 'vue';
 
 type moduleUrlKeys =
@@ -74,11 +75,15 @@ export function useModuleSelectorKeyboardListener(
   };
 
   onMounted(() => {
-    console.log('Listening for keypress....');
-    window.addEventListener('keydown', callback);
+    if (Platform.is.desktop) {
+      console.log('Listening for keypress....');
+      window.addEventListener('keydown', callback);
+    }
   });
   onUnmounted(() => {
-    console.log('Stopped listening for keypress....');
-    document.removeEventListener('keydown', callback);
+    if (Platform.is.desktop) {
+      console.log('Stopped listening for keypress....');
+      document.removeEventListener('keydown', callback);
+    }
   });
 }
