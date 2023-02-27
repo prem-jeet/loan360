@@ -42,7 +42,7 @@
             <div class="q-mt-lg">
               <q-btn label="Submit" type="submit" color="primary" />
               <q-btn
-                v-if="route.name !== 'login'"
+                v-if="route.name !== 'authenticated'"
                 class="q-ml-lg"
                 label="Close"
                 type="button"
