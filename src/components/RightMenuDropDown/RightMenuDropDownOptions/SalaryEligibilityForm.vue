@@ -1,5 +1,5 @@
 <template>
-  <div class="row">
+  <div class="row q-col-gutter-xs">
     <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
       <q-input
         outlined
@@ -13,7 +13,7 @@
     </div>
   </div>
   <p></p>
-  <div class="row">
+  <div class="row q-col-gutter-xs">
     <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
       <q-input outlined v-model="modalObj.tenure" label="Tenure" />
     </div>
@@ -23,7 +23,7 @@
   </div>
 
   <p></p>
-  <div class="row">
+  <div class="row q-col-gutter-xs">
     <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
       <q-input
         outlined
@@ -42,7 +42,7 @@
   </div>
   <p></p>
 
-  <div class="row">
+  <div class="row q-col-gutter-xs">
     <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
       <q-input
         outlined
@@ -53,7 +53,7 @@
     </div>
   </div>
   <p></p>
-  <div class="row">
+  <div class="row q-col-gutter-xs">
     <div class="col-xs-12 col-sm-12 col-md-4 q-px-sm">
       <q-select
         outlined
@@ -83,7 +83,7 @@
     </div>
   </div>
   <div
-    class="row text-center q-pa-md"
+    class="row q-col-gutter-xs text-center q-pa-md"
     v-for="(item, index) in data.ExpensesArray"
     :key="index"
   >
@@ -106,14 +106,17 @@
       />
     </div>
   </div>
-  <div v-if="data.ExpensesArray.length > 0" class="row text-center q-pa-md">
+  <div
+    v-if="data.ExpensesArray.length > 0"
+    class="row q-col-gutter-xs text-center q-pa-md"
+  >
     <div class="col-xs-12 col-sm-12 col-md-4 q-px-sm">Total Expenses</div>
     <div class="col-xs-12 col-sm-12 col-md-4 q-px-sm">
       {{ ExpensTotal }}
     </div>
   </div>
   <p></p>
-  <div class="row">
+  <div class="row q-col-gutter-xs">
     <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
       <q-input
         outlined
@@ -129,7 +132,8 @@
       />
     </div>
   </div>
-  <div class="row">
+  <p></p>
+  <div class="row q-col-gutter-xs">
     <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
       <q-input
         outlined
