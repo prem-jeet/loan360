@@ -1,5 +1,13 @@
 import axios from 'axios';
 
+interface authTokenType {
+  id_token: string;
+  access_token: string;
+  refresh_token: string;
+  expires_in: number;
+  token_type: 'Bearer';
+}
+
 // SRFC AWS
 // var myHost = "https://srfc-app.online";
 // var myAuth = "https://nbfc-users.auth.ap-south-1.amazoncognito.com";
@@ -57,19 +65,20 @@ const awsValues = {
 
 export const getAwsConfig = () => awsValues;
 
-export const getAuthTokenFromAws = async function (callbackCode: string) {
+export const getAuthTokenFromAws = async function (
+  callbackCode: string
+): Promise<authTokenType> {
   /* TODO: fix the function to make a succesful post request */
   const formBody =
-    'grant_type=authorization_code&code=' +
+    encodeURIComponent('grant_type') +
+    '=' +
+    encodeURIComponent('authorization_code') +
+    '&' +
+    encodeURIComponent('code') +
+    '=' +
     encodeURIComponent(callbackCode) +
     '&' +
-    encodeURIComponent('scope') +
-    '=' +
-    encodeURIComponent(
-      'openid+profile+aws.cognito.signin.user.admin+email+phone'
-    ) +
-    '&' +
-    encodeURIComponent('redirect_uri') +
+    +encodeURIComponent('redirect_uri') +
     '=' +
     encodeURIComponent(getAwsConfig().redirectURL);
 
@@ -85,7 +94,7 @@ export const getAuthTokenFromAws = async function (callbackCode: string) {
     },
   });
 
-  return res;
+  return res.data;
 };
 
 export const login = () => {
