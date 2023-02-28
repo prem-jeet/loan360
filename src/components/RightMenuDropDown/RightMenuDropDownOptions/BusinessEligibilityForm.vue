@@ -2,67 +2,68 @@
   <q-form @submit.prevent="calculateAmount()">
     <div class="row q-col-gutter-xs">
       <div class="col-xs-12 col-sm-12 col-md-6">
+        Monthly Business Sales / Receipt
+      </div>
+      <div class="col-xs-12 col-sm-12 col-md-6">
         <q-input
           outlined
+          dense
           v-model="modalObj.monthlyRevenue"
           :rules="[(val) => !!val || 'Field is required']"
-          label="Monthly Business Sales / Receipt"
         />
       </div>
+      <div class="col-xs-12 col-sm-12 col-md-6">Interest Rate</div>
       <div class="col-xs-12 col-sm-12 col-md-6">
         <q-input
           outlined
+          dense
           v-model="modalObj.rate"
-          label="Interest Rate"
           :rules="[(val) => !!val || 'Field is required']"
         />
       </div>
+      <div class="col-xs-12 col-sm-12 col-md-6">Tenure</div>
       <div class="col-xs-12 col-sm-12 col-md-6">
         <q-input
           outlined
+          dense
           v-model="modalObj.tenure"
           :rules="[(val) => !!val || 'Field is required']"
-          label="Tenure"
         />
       </div>
+      <div class="col-xs-12 col-sm-12 col-md-6">Instalments</div>
       <div class="col-xs-12 col-sm-12 col-md-6">
-        <q-input outlined v-model="modalObj.instalments" label="Instalments" />
+        <q-input outlined dense v-model="modalObj.instalments" />
       </div>
+      <div class="col-xs-12 col-sm-12 col-md-6">Adv Instalments</div>
+      <div class="col-xs-12 col-sm-12 col-md-6">
+        <q-input outlined dense v-model="modalObj.advInstalments" />
+      </div>
+      <div class="col-xs-12 col-sm-12 col-md-6">Margin %</div>
       <div class="col-xs-12 col-sm-12 col-md-6">
         <q-input
           outlined
-          v-model="modalObj.advInstalments"
-          label="Adv Instalments"
-        />
-      </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
-        <q-input
-          outlined
+          dense
           v-model="modalObj.marginPercent"
           :rules="[(val) => !!val || 'Field is required']"
-          label="Margin %"
         />
+      </div>
+      <div class="col-xs-12 col-sm-12 col-md-6">Margin in Amt</div>
+      <div class="col-xs-12 col-sm-12 col-md-6">
+        <q-input outlined dense disable v-model="modalObj.marginAmount" />
       </div>
       <div class="col-xs-12 col-sm-12 col-md-6">
-        <q-input
-          outlined
-          disable
-          v-model="modalObj.marginAmount"
-          label="Margin in Amt"
-        />
-      </div>
-      <div class="col-xs-12 col-sm-12 col-md-4"></div>
-      <div class="col-xs-12 col-sm-12 col-md-4">
         <q-select
           outlined
+          dense
           v-model="ExpensesSelected"
           :options="Expenses"
           label="Expenses"
         />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-4">
+      <div class="col-xs-12 col-sm-12 col-md-3">
         <q-input
           outlined
+          dense
           v-model="ExpensesAmount"
           ref="inputRef"
           :error="error && !ExpensesAmount"
@@ -70,7 +71,7 @@
           label="Enter amount"
         />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-4 q-pt-md">
+      <div class="col-xs-12 col-sm-12 col-md-3 q-pt-sm">
         <q-btn
           size="sm"
           color="light-blue"
@@ -128,46 +129,35 @@
     </div>
     <div class="row q-col-gutter-xs">
       <div class="col-xs-12 col-sm-12 col-md-6">
-        <q-input
-          outlined
-          disable
-          v-model="modalObj.netAvailableIncome"
-          label="Net Income Available for EMI"
-        />
+        Net Income Available for EMI
       </div>
+      <div class="col-xs-12 col-sm-12 col-md-6">
+        <q-input outlined dense disable v-model="modalObj.netAvailableIncome" />
+      </div>
+      <div class="col-xs-12 col-sm-12 col-md-6">Loan Amount</div>
       <div class="col-xs-12 col-sm-12 col-md-6">
         <q-input
           outlined
+          dense
           disable
           v-model="modalObj.calculatedLoanAmount"
-          label="Loan Amount"
         />
       </div>
+      <div class="col-xs-12 col-sm-12 col-md-6">LTV Cost Value</div>
       <div class="col-xs-12 col-sm-12 col-md-6">
-        <q-input
-          outlined
-          v-model="modalObj.ltvCostValue"
-          label="LTV Cost Value"
-        />
+        <q-input outlined dense v-model="modalObj.ltvCostValue" />
       </div>
+      <div class="col-xs-12 col-sm-12 col-md-6">"LTV %</div>
       <div class="col-xs-12 col-sm-12 col-md-6">
-        <q-input outlined v-model="modalObj.ltvPercent" label="LTV %" />
+        <q-input outlined dense v-model="modalObj.ltvPercent" />
       </div>
+      <div class="col-xs-12 col-sm-12 col-md-6">LTV Loan Amount</div>
       <div class="col-xs-12 col-sm-12 col-md-6">
-        <q-input
-          outlined
-          disable
-          v-model="modalObj.ltvLoanAmount"
-          label="LTV Loan Amount"
-        />
+        <q-input outlined disable dense v-model="modalObj.ltvLoanAmount" />
       </div>
+      <div class="col-xs-12 col-sm-12 col-md-6">Max Loan Amount</div>
       <div class="col-xs-12 col-sm-12 col-md-6">
-        <q-input
-          outlined
-          disable
-          v-model="modalObj.maxLoanAmount"
-          label="Max Loan Amount"
-        />
+        <q-input outlined dense disable v-model="modalObj.maxLoanAmount" />
       </div>
     </div>
 
@@ -182,43 +172,24 @@
 </template>
 <script setup lang="ts">
 import { number } from '@intlify/core-base';
-import { ref, reactive } from 'vue';
+import { ref, reactive, defineProps } from 'vue';
 const error = ref(false);
 
 const ExpensesSelected = ref('');
 const ExpensesAmount = ref('');
 // const ExpensesArray = ref([]);
-
-const ExpensTotal = ref(0);
-interface MyObject {
-  instalments: number | null;
-  advInstalments: number | null;
-  monthlyRevenue: number | null;
-  marginPercent: number | null;
-  netAvailableIncome: number | null;
-  tenure: any;
-  rate: any;
-  calculatedLoanAmount: any;
-  ltvCostValue: any;
-  ltvPercent: any;
-  ltvLoanAmount: any;
-
+const props = defineProps({
+  EligibilitymodalObj: {
+    type: Object,
+    required: true,
+  },
+});
+interface EligibilityObject {
   [key: string]: string | number | null;
 }
+const modalObj = reactive<EligibilityObject>({ ...props.EligibilitymodalObj });
 
-const modalObj = reactive<MyObject>({
-  instalments: null,
-  advInstalments: null,
-  monthlyRevenue: null,
-  marginPercent: null,
-  netAvailableIncome: null,
-  tenure: null,
-  rate: null,
-  calculatedLoanAmount: null,
-  ltvCostValue: null,
-  ltvPercent: null,
-  ltvLoanAmount: null,
-});
+const ExpensTotal = ref(0);
 
 const Expenses = ref([
   'Existing EMI',
@@ -289,32 +260,34 @@ const calculateAmount = () => {
   modalObj.netAvailableIncome =
     modalObj.marginAmount - (ExpensTotal.value > 0 ? ExpensTotal.value : 0);
   modalObj.calculatedLoanAmount =
-    (modalObj.netAvailableIncome * modalObj.tenure) /
-    (1 + (modalObj.rate / 100) * (modalObj.tenure / 12));
+    (modalObj.netAvailableIncome * (modalObj.tenure as number)) /
+    (1 +
+      ((modalObj.rate as number) / 100) * ((modalObj.tenure as number) / 12));
   modalObj.calculatedLoanAmount = modalObj.calculatedLoanAmount / 1000;
   modalObj.calculatedLoanAmount = Number(
-    parseFloat(modalObj.calculatedLoanAmount).toFixed(0)
+    parseFloat(modalObj.calculatedLoanAmount as unknown as string).toFixed(0)
   );
   modalObj.calculatedLoanAmount = modalObj.calculatedLoanAmount * 1000;
 
   if (modalObj.ltvPercent !== null) {
     modalObj.ltvLoanAmount =
-      (modalObj.ltvCostValue * modalObj.ltvPercent) / 100;
+      ((modalObj.ltvCostValue as number) * (modalObj.ltvPercent as number)) /
+      100;
     modalObj.ltvLoanAmount = modalObj.ltvLoanAmount / 1000;
     modalObj.ltvLoanAmount = Number(
-      parseFloat(modalObj.ltvLoanAmount).toFixed(0)
+      parseFloat(modalObj.ltvLoanAmount as unknown as string).toFixed(0)
     );
     modalObj.ltvLoanAmount = modalObj.ltvLoanAmount * 1000;
+    modalObj.maxLoanAmount =
+      modalObj.ltvLoanAmount >= modalObj.calculatedLoanAmount
+        ? modalObj.calculatedLoanAmount
+        : modalObj.ltvLoanAmount;
     modalObj.maxLoanAmount = Number(
-      parseFloat(
-        modalObj.ltvLoanAmount >= modalObj.calculatedLoanAmount
-          ? modalObj.calculatedLoanAmount
-          : modalObj.ltvLoanAmount
-      ).toFixed(2)
+      parseFloat(modalObj.maxLoanAmount as unknown as string).toFixed(2)
     );
   } else {
     modalObj.maxLoanAmount = Number(
-      parseFloat(modalObj.calculatedLoanAmount).toFixed(2)
+      parseFloat(modalObj.calculatedLoanAmount as unknown as string).toFixed(2)
     );
   }
 };
