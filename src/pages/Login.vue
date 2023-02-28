@@ -3,11 +3,7 @@
     <div id="main" class="fullscreen child-take-fullheight bg-grey-1">
       <div id="main-content" class="column flex-center q-pa-md-md">
         <div id="logo-container">
-          <q-img
-            src="src/assets/img/JaguarCloud.png"
-            spinner-color="white"
-            fir="cover"
-          />
+          <q-img :src="logo" spinner-color="white" fir="cover" />
         </div>
         <q-btn
           push
@@ -30,6 +26,7 @@
 </template>
 
 <script setup>
+import logo from 'src/assets/img/JaguarCloud.png';
 import CompanyAndBranchSelectorModal from 'src/components/modals/CompanyAndBranchSelectorModal.vue';
 import { login } from 'src/utils/auth/login';
 import { computed, onMounted } from 'vue';
