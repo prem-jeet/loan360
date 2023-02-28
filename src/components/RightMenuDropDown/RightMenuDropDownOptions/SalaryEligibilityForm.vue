@@ -53,9 +53,7 @@
           label="Net Salary In Amt"
         />
       </div>
-    </div>
-    <p></p>
-    <div class="row q-col-gutter-xs">
+      <div class="col-xs-12 col-sm-12 col-md-4"></div>
       <div class="col-xs-12 col-sm-12 col-md-4">
         <q-select
           outlined
@@ -64,6 +62,7 @@
           label="Expenses"
         />
       </div>
+
       <div class="col-xs-12 col-sm-12 col-md-4">
         <q-input
           outlined
@@ -91,16 +90,18 @@
       </div>
     </div>
     <div
-      class="row q-col-gutter-xs text-center q-pa-md"
+      class="column q-pl-lg-lg q-pt-sm"
       v-for="(item, index) in data.ExpensesArray"
       :key="index"
+      style="height: 30px"
     >
-      <div class="col-xs-12 col-sm-12 col-md-4">
+      <div class="col-6 col-md-6">
         {{ item.field }}
       </div>
-
-      <div class="col-xs-12 col-sm-12 col-md-4">{{ item.value }}</div>
-      <div class="col-xs-12 col-sm-12 col-md-4">
+      <div class="col-4 col-md-6"></div>
+      <div class="col-6 col-md-6 text-right">
+        {{ item.value }}
+        &emsp;
         <q-btn
           size="sm"
           color="light-blue"
@@ -116,13 +117,15 @@
         />
       </div>
     </div>
+
     <div
+      class="column q-pl-lg-lg"
       v-if="data.ExpensesArray.length > 0"
-      class="row q-col-gutter-xs text-center q-pa-md"
+      style="height: 30px"
     >
-      <div class="col-xs-12 col-sm-12 col-md-4">Total Expenses</div>
-      <div class="col-xs-12 col-sm-12 col-md-4">
-        {{ ExpensTotal }}
+      <div class="col-12 col-md-12">Total Expenses</div>
+      <div class="col-12 col-md-12 text-center">
+        <p class="q-pr-xl">&nbsp;{{ ExpensTotal }}</p>
       </div>
     </div>
     <p></p>
@@ -237,6 +240,7 @@ const add = () => {
     ExpensesSelected.value = '';
     ExpensesAmount.value = '';
     calculateAmount();
+    error.value = false;
   }
 };
 const remove = (index: number) => {
