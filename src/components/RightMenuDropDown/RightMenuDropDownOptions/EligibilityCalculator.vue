@@ -13,7 +13,7 @@
     </q-item>
     <q-separator />
 
-    <q-card-section>
+    <q-card-section style="max-height: 85vh" class="scroll">
       <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
           <q-radio
