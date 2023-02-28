@@ -9,6 +9,7 @@
           size="sm"
           v-model="modalObj.monthlyRevenue"
           :rules="[(val) => !!val || 'Field is required']"
+          @blur="blur()"
         />
       </div>
       <div class="col-xs-12 col-sm-12 col-md-6">Interest Rate</div>
@@ -18,6 +19,7 @@
           dense
           v-model="modalObj.rate"
           :rules="[(val) => !!val || 'Field is required']"
+          @blur="blur()"
         />
       </div>
       <div class="col-xs-12 col-sm-12 col-md-6">Tenure</div>
@@ -27,6 +29,7 @@
           dense
           v-model="modalObj.tenure"
           :rules="[(val) => !!val || 'Field is required']"
+          @blur="blur()"
         />
       </div>
       <div class="col-xs-12 col-sm-12 col-md-6">Instalments</div>
@@ -46,6 +49,7 @@
           dense
           v-model="modalObj.marginPercent"
           :rules="[(val) => !!val || 'Field is required']"
+          @blur="blur()"
         />
       </div>
       <div class="col-xs-12 col-sm-12 col-md-6">Net Salary In Amt</div>
@@ -209,7 +213,14 @@ interface MyComponentData {
 const data = reactive<MyComponentData>({
   ExpensesArray: [],
 });
-
+const blur = () => {
+  if (
+    (modalObj.monthlyRevenue as number) > 0 &&
+    (modalObj.marginPercent as number) > 0
+  ) {
+    calculateAmount();
+  }
+};
 const add = () => {
   if (!ExpensesAmount.value) {
     error.value = true;
