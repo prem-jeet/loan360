@@ -1,10 +1,10 @@
 <template>
   <q-form @submit.prevent="calculateAmount()">
     <div class="row q-col-gutter-xs">
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">
         Monthly Business Sales / Receipt <span class="text-red"> &nbsp;*</span>
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">
         <q-input
           outlined
           dense
@@ -12,10 +12,10 @@
           :rules="[(val) => !!val || '']"
         />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">
         Interest Rate<span class="text-red"> &nbsp;*</span>
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">
         <q-input
           outlined
           dense
@@ -24,10 +24,8 @@
           @blur="blur()"
         />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
-        Tenure<span class="text-red"> &nbsp;*</span>
-      </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">Tenure<span class="text-red"> &nbsp;*</span></div>
+      <div :class="colcss">
         <q-input
           outlined
           dense
@@ -36,18 +34,16 @@
           @blur="blur()"
         />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">Instalments</div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">Instalments</div>
+      <div :class="colcss">
         <q-input outlined dense v-model="modalObj.instalments" />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">Adv Instalments</div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">Adv Instalments</div>
+      <div :class="colcss">
         <q-input outlined dense v-model="modalObj.advInstalments" />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
-        Margin %<span class="text-red"> &nbsp;*</span>
-      </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">Margin %<span class="text-red"> &nbsp;*</span></div>
+      <div :class="colcss">
         <q-input
           outlined
           dense
@@ -56,11 +52,11 @@
           @blur="blur()"
         />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">Margin in Amt</div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">Margin in Amt</div>
+      <div :class="colcss">
         <q-input outlined dense disable v-model="modalObj.marginAmount" />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">
         <q-select
           outlined
           dense
@@ -137,14 +133,12 @@
       </div>
     </div>
     <div class="row q-col-gutter-xs">
-      <div class="col-xs-12 col-sm-12 col-md-6">
-        Net Income Available for EMI
-      </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">Net Income Available for EMI</div>
+      <div :class="colcss">
         <q-input outlined dense disable v-model="modalObj.netAvailableIncome" />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">Loan Amount</div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">Loan Amount</div>
+      <div :class="colcss">
         <q-input
           outlined
           dense
@@ -152,20 +146,20 @@
           v-model="modalObj.calculatedLoanAmount"
         />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">LTV Cost Value</div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">LTV Cost Value</div>
+      <div :class="colcss">
         <q-input outlined dense v-model="modalObj.ltvCostValue" />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">"LTV %</div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">"LTV %</div>
+      <div :class="colcss">
         <q-input outlined dense v-model="modalObj.ltvPercent" />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">LTV Loan Amount</div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">LTV Loan Amount</div>
+      <div :class="colcss">
         <q-input outlined disable dense v-model="modalObj.ltvLoanAmount" />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">Max Loan Amount</div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">Max Loan Amount</div>
+      <div :class="colcss">
         <q-input outlined dense disable v-model="modalObj.maxLoanAmount" />
       </div>
     </div>
@@ -183,6 +177,7 @@
 import { number } from '@intlify/core-base';
 import { ref, reactive, defineProps } from 'vue';
 const error = ref(false);
+const colcss = ref('col-xs-12 col-sm-12 col-md-6');
 
 const ExpensesSelected = ref('');
 const ExpensesAmount = ref('');

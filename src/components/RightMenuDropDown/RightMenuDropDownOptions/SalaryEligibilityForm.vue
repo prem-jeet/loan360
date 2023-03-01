@@ -1,10 +1,10 @@
 <template>
   <q-form @submit.prevent="calculateAmount()">
     <div class="row q-col-gutter-xs">
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">
         Monthly Salary<span class="text-red"> &nbsp;*</span>
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">
         <q-input
           outlined
           dense
@@ -14,10 +14,10 @@
           @blur="blur()"
         />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">
         Interest Rate<span class="text-red"> &nbsp;*</span>
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">
         <q-input
           outlined
           dense
@@ -26,10 +26,8 @@
           @blur="blur()"
         />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
-        Tenure<span class="text-red"> &nbsp;*</span>
-      </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">Tenure<span class="text-red"> &nbsp;*</span></div>
+      <div :class="colcss">
         <q-input
           outlined
           dense
@@ -38,18 +36,18 @@
           @blur="blur()"
         />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">Instalments</div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">Instalments</div>
+      <div :class="colcss">
         <q-input outlined dense v-model="modalObj.instalments" />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">Adv Instalments</div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">Adv Instalments</div>
+      <div :class="colcss">
         <q-input outlined dense v-model="modalObj.advInstalments" />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">
         Net Salary Eligle for EMI %<span class="text-red"> &nbsp;*</span>
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">
         <q-input
           outlined
           dense
@@ -58,11 +56,11 @@
           @blur="blur()"
         />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">Net Salary In Amt</div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">Net Salary In Amt</div>
+      <div :class="colcss">
         <q-input outlined dense v-model="modalObj.marginAmount" disable />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">
         <q-select
           outlined
           dense
@@ -140,14 +138,12 @@
     </div>
     <p></p>
     <div class="row q-col-gutter-xs">
-      <div class="col-xs-12 col-sm-12 col-md-6">
-        Net Income Available for EMI
-      </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">Net Income Available for EMI</div>
+      <div :class="colcss">
         <q-input outlined dense disable v-model="modalObj.netAvailableIncome" />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">Loan Amount</div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">Loan Amount</div>
+      <div :class="colcss">
         <q-input
           outlined
           dense
@@ -155,8 +151,8 @@
           v-model="modalObj.calculatedLoanAmount"
         />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">Max Loan Amount</div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div :class="colcss">Max Loan Amount</div>
+      <div :class="colcss">
         <q-input outlined dense disable v-model="modalObj.maxLoanAmount" />
       </div>
     </div>
@@ -171,7 +167,7 @@
 import { number } from '@intlify/core-base';
 import { ref, reactive, defineProps } from 'vue';
 const error = ref(false);
-
+const colcss = ref('col-xs-12 col-sm-12 col-md-6');
 const ExpensesSelected = ref('');
 const ExpensesAmount = ref('');
 // const ExpensesArray = ref([]);
