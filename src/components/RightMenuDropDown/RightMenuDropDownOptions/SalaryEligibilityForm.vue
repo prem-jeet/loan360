@@ -8,7 +8,7 @@
           dense
           size="sm"
           v-model="modalObj.monthlyRevenue"
-          :rules="[(val) => !!val || 'Field is required']"
+          :rules="[(val) => !!val || '']"
           @blur="blur()"
         />
       </div>
@@ -18,7 +18,7 @@
           outlined
           dense
           v-model="modalObj.rate"
-          :rules="[(val) => !!val || 'Field is required']"
+          :rules="[(val) => !!val || '']"
           @blur="blur()"
         />
       </div>
@@ -28,7 +28,7 @@
           outlined
           dense
           v-model="modalObj.tenure"
-          :rules="[(val) => !!val || 'Field is required']"
+          :rules="[(val) => !!val || '']"
           @blur="blur()"
         />
       </div>
@@ -48,7 +48,7 @@
           outlined
           dense
           v-model="modalObj.marginPercent"
-          :rules="[(val) => !!val || 'Field is required']"
+          :rules="[(val) => !!val || '']"
           @blur="blur()"
         />
       </div>
@@ -79,7 +79,7 @@
           v-model="ExpensesAmount"
           ref="inputRef"
           :error="error && !ExpensesAmount"
-          error-message="Enter amount"
+          error-message=""
           label="Enter amount"
         />
       </div>
