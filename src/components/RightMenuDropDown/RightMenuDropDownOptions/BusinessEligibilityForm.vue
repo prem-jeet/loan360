@@ -75,7 +75,7 @@
         />
       </div>
     </div>
-    <div class="row q-col-gutter-xs">
+    <div class="row q-col-gutter-xs q-pb-sm">
       <div :class="colcss">Expenses</div>
     </div>
 
@@ -89,7 +89,7 @@
           label="Expenses"
         />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-3">
+      <div class="col-xs-12 col-sm-12 col-md-6">
         <q-input
           outlined
           dense
@@ -100,49 +100,56 @@
           label="Enter amount"
         />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-3 q-pt-sm">
-        <q-btn
-          size="sm"
-          color="light-blue"
-          @click="add()"
-          icon="fa-solid fa-check"
-        />
-        &nbsp;
-        <q-btn
-          size="sm"
-          color="light-blue"
-          @click="refresh()"
-          icon="fa-solid fa-arrow-rotate-left"
-        />
-      </div>
     </div>
-    <p></p>
+
+    <div class="row q-col-gutter-xs q-pt-sm justify-end">
+      <q-btn
+        size="sm"
+        class="q-pl-md"
+        color="light-blue"
+        @click="add()"
+        icon="fa-solid fa-plus"
+      >
+        <q-tooltip> Add amount</q-tooltip>
+      </q-btn>
+      &nbsp;
+      <q-btn
+        size="sm"
+        class="q-pl-md"
+        color="light-blue"
+        @click="refresh()"
+        icon="fa-solid fa-arrow-rotate-left"
+        ><q-tooltip> Reset amount</q-tooltip></q-btn
+      >
+    </div>
     <div
-      class="column q-pl-lg-lg"
+      class="column q-pl-lg-lg q-pt-sm"
       v-for="(item, index) in data.ExpensesArray"
       :key="index"
       style="height: 30px"
     >
-      <div class="col-6 col-md-6">
+      <div class="text-label col-6 col-md-6">
         {{ item.field }}
       </div>
       <div class="col-4 col-md-6"></div>
-      <div class="col-6 col-md-6 text-right">
+      <div class="text-label col-6 col-md-6 text-right">
         {{ item.value }}
         &emsp;
         <q-btn
-          size="sm"
-          color="light-blue"
+          size="xs"
+          color="brown-5"
           @click="edit(index)"
           icon="fa-solid fa-pen-to-square"
-        />
+          ><q-tooltip> Edit amount</q-tooltip></q-btn
+        >
         &nbsp;
         <q-btn
-          size="sm"
-          color="light-blue"
+          size="xs"
+          color="red"
           @click="remove(index)"
           icon="fa-solid fa-xmark"
-        />
+          ><q-tooltip> Delete amount</q-tooltip></q-btn
+        >
       </div>
     </div>
 
@@ -151,9 +158,9 @@
       v-if="data.ExpensesArray.length > 0"
       style="height: 30px"
     >
-      <div class="col-12 col-md-12">Total Expenses</div>
+      <div class="text-label col-12 col-md-12">Total Expenses</div>
       <div class="col-12 col-md-12 text-center">
-        <p class="q-pr-xl">{{ ExpensTotal }}&nbsp;&nbsp;&nbsp;</p>
+        <p class="text-label q-pr-xl">{{ ExpensTotal }}&nbsp;&nbsp;&nbsp;</p>
       </div>
     </div>
     <div :class="rowcss">
@@ -381,5 +388,9 @@ const calculateAmount = () => {
 }
 .q-field--with-bottom {
   padding-bottom: 0px;
+}
+
+.text-label {
+  font-size: calc(0.5vw + 8px);
 }
 </style>
