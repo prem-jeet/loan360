@@ -60,13 +60,7 @@
       </div>
       <div class="col-xs-12 col-sm-12 col-md-6">Net Salary In Amt</div>
       <div class="col-xs-12 col-sm-12 col-md-6">
-        <q-input
-          outlined
-          dense
-          v-model="modalObj.marginAmount"
-          disable
-          label="Net Salary In Amt"
-        />
+        <q-input outlined dense v-model="modalObj.marginAmount" disable />
       </div>
       <div class="col-xs-12 col-sm-12 col-md-6">
         <q-select
