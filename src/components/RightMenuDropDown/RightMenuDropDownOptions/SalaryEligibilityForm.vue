@@ -58,7 +58,13 @@
       </div>
       <div :class="colcss">Net Salary In Amt</div>
       <div :class="colcss">
-        <q-input outlined dense v-model="modalObj.marginAmount" disable />
+        <q-input
+          filled
+          outlined
+          dense
+          v-model="modalObj.marginAmount"
+          disable
+        />
       </div>
       <div :class="colcss">
         <q-select
@@ -140,12 +146,19 @@
     <div class="row q-col-gutter-xs">
       <div :class="colcss">Net Income Available for EMI</div>
       <div :class="colcss">
-        <q-input outlined dense disable v-model="modalObj.netAvailableIncome" />
+        <q-input
+          filled
+          outlined
+          dense
+          disable
+          v-model="modalObj.netAvailableIncome"
+        />
       </div>
       <div :class="colcss">Loan Amount</div>
       <div :class="colcss">
         <q-input
           outlined
+          filled
           dense
           disable
           v-model="modalObj.calculatedLoanAmount"
@@ -153,7 +166,13 @@
       </div>
       <div :class="colcss">Max Loan Amount</div>
       <div :class="colcss">
-        <q-input outlined dense disable v-model="modalObj.maxLoanAmount" />
+        <q-input
+          filled
+          outlined
+          dense
+          disable
+          v-model="modalObj.maxLoanAmount"
+        />
       </div>
     </div>
     <div class="row justify-center q-pt-sm">
