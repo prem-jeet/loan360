@@ -1,6 +1,6 @@
 <template>
   <q-btn flat :ripple="false" class="bg-purple-6">
-    Jaguar software india.
+    Jaguar software india
     <q-menu fit>
       <q-list style="min-width: 100px">
         <q-item @click="toggleFullscreen" clickable>
