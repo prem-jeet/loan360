@@ -10,7 +10,7 @@
           <q-item-section>Full Screen</q-item-section>
         </q-item>
         <q-separator />
-        <q-item to="/moduleselector">
+        <q-item to="/moduleselector" class="text-black">
           <q-item-section avatar>
             <q-icon name="fa-solid fa-home" />
           </q-item-section>
@@ -111,8 +111,8 @@ const toggleFullscreen = () => {
   min-height: 20px;
 }
 
-.q-item.q-router-link--active,
+/* .q-item.q-router-link--active,
 .q-item--active {
   color: #1b1c1d;
-}
+} */
 </style>
