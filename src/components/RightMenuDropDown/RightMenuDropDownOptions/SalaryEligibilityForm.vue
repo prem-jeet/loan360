@@ -132,11 +132,11 @@
       :key="index"
       style="height: 30px"
     >
-      <div class="col-6 col-md-6">
+      <div class="text-label col-6 col-md-6">
         {{ item.field }}
       </div>
       <div class="col-4 col-md-6"></div>
-      <div class="col-6 col-md-6 text-right">
+      <div class="text-label col-6 col-md-6 text-right">
         {{ item.value }}
         &emsp;
         <q-btn
@@ -162,9 +162,9 @@
       v-if="data.ExpensesArray.length > 0"
       style="height: 30px"
     >
-      <div class="col-12 col-md-12">Total Expenses</div>
+      <div class="text-label col-12 col-md-12">Total Expenses</div>
       <div class="col-12 col-md-12 text-center">
-        <p class="q-pr-xl">{{ ExpensTotal }}</p>
+        <p class="text-label q-pr-xl">{{ ExpensTotal }}</p>
       </div>
     </div>
     <div :class="rowcss">
@@ -347,5 +347,8 @@ const calculateAmount = () => {
 }
 .q-field--with-bottom {
   padding-bottom: 0px;
+}
+.text-label {
+  font-size: calc(0.5vw + 8px);
 }
 </style>
