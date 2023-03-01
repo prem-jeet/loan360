@@ -1,7 +1,9 @@
 <template>
   <q-form @submit.prevent="calculateAmount()">
     <div class="row q-col-gutter-xs">
-      <div class="col-xs-12 col-sm-12 col-md-6">Monthly Salary</div>
+      <div class="col-xs-12 col-sm-12 col-md-6">
+        Monthly Salary<span class="text-red"> &nbsp;*</span>
+      </div>
       <div class="col-xs-12 col-sm-12 col-md-6">
         <q-input
           outlined
@@ -12,7 +14,9 @@
           @blur="blur()"
         />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">Interest Rate</div>
+      <div class="col-xs-12 col-sm-12 col-md-6">
+        Interest Rate<span class="text-red"> &nbsp;*</span>
+      </div>
       <div class="col-xs-12 col-sm-12 col-md-6">
         <q-input
           outlined
@@ -22,7 +26,9 @@
           @blur="blur()"
         />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">Tenure</div>
+      <div class="col-xs-12 col-sm-12 col-md-6">
+        Tenure<span class="text-red"> &nbsp;*</span>
+      </div>
       <div class="col-xs-12 col-sm-12 col-md-6">
         <q-input
           outlined
@@ -41,7 +47,7 @@
         <q-input outlined dense v-model="modalObj.advInstalments" />
       </div>
       <div class="col-xs-12 col-sm-12 col-md-6">
-        Net Salary Eligle for EMI %
+        Net Salary Eligle for EMI %<span class="text-red"> &nbsp;*</span>
       </div>
       <div class="col-xs-12 col-sm-12 col-md-6">
         <q-input

@@ -2,7 +2,7 @@
   <q-form @submit.prevent="calculateAmount()">
     <div class="row q-col-gutter-xs">
       <div class="col-xs-12 col-sm-12 col-md-6">
-        Monthly Business Sales / Receipt
+        Monthly Business Sales / Receipt <span class="text-red"> &nbsp;*</span>
       </div>
       <div class="col-xs-12 col-sm-12 col-md-6">
         <q-input
@@ -12,7 +12,9 @@
           :rules="[(val) => !!val || '']"
         />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">Interest Rate</div>
+      <div class="col-xs-12 col-sm-12 col-md-6">
+        Interest Rate<span class="text-red"> &nbsp;*</span>
+      </div>
       <div class="col-xs-12 col-sm-12 col-md-6">
         <q-input
           outlined
@@ -22,7 +24,9 @@
           @blur="blur()"
         />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">Tenure</div>
+      <div class="col-xs-12 col-sm-12 col-md-6">
+        Tenure<span class="text-red"> &nbsp;*</span>
+      </div>
       <div class="col-xs-12 col-sm-12 col-md-6">
         <q-input
           outlined
@@ -40,7 +44,9 @@
       <div class="col-xs-12 col-sm-12 col-md-6">
         <q-input outlined dense v-model="modalObj.advInstalments" />
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">Margin %</div>
+      <div class="col-xs-12 col-sm-12 col-md-6">
+        Margin %<span class="text-red"> &nbsp;*</span>
+      </div>
       <div class="col-xs-12 col-sm-12 col-md-6">
         <q-input
           outlined
