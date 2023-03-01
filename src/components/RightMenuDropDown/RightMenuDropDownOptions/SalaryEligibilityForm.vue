@@ -160,8 +160,7 @@
         <q-input outlined dense disable v-model="modalObj.maxLoanAmount" />
       </div>
     </div>
-    <p></p>
-    <div class="row justify-center">
+    <div class="row justify-center q-pt-sm">
       <q-btn color="light-blue" label="reset" @click="reset" />
       &nbsp;
       <q-btn color="light-blue" label="Close" v-close-popup />

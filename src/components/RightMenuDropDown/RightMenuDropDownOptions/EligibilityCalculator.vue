@@ -18,13 +18,14 @@
         <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
           <q-radio
             v-model="radio"
+            dense
             val="bs"
             label="Business LoanSalaried Loan
 "
           />
         </div>
         <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
-          <q-radio v-model="radio" val="salary" label="Salaried Loan" />
+          <q-radio v-model="radio" dense val="salary" label="Salaried Loan" />
         </div>
       </div>
       <p></p>
