@@ -1,6 +1,6 @@
 <template>
   <q-form @submit.prevent="calculateAmount()">
-    <div class="row q-col-gutter-xs">
+    <div :class="rowcss">
       <div :class="colcss">
         Monthly Business Sales / Receipt <span class="text-red"> &nbsp;*</span>
       </div>
@@ -12,6 +12,8 @@
           :rules="[(val) => !!val || '']"
         />
       </div>
+    </div>
+    <div :class="rowcss">
       <div :class="colcss">
         Interest Rate<span class="text-red"> &nbsp;*</span>
       </div>
@@ -24,6 +26,8 @@
           @blur="blur()"
         />
       </div>
+    </div>
+    <div :class="rowcss">
       <div :class="colcss">Tenure<span class="text-red"> &nbsp;*</span></div>
       <div :class="colcss">
         <q-input
@@ -34,14 +38,20 @@
           @blur="blur()"
         />
       </div>
+    </div>
+    <div :class="rowcss">
       <div :class="colcss">Instalments</div>
       <div :class="colcss">
         <q-input outlined dense v-model="modalObj.instalments" />
       </div>
+    </div>
+    <div :class="rowcss">
       <div :class="colcss">Adv Instalments</div>
       <div :class="colcss">
         <q-input outlined dense v-model="modalObj.advInstalments" />
       </div>
+    </div>
+    <div :class="rowcss">
       <div :class="colcss">Margin %<span class="text-red"> &nbsp;*</span></div>
       <div :class="colcss">
         <q-input
@@ -52,6 +62,8 @@
           @blur="blur()"
         />
       </div>
+    </div>
+    <div :class="rowcss">
       <div :class="colcss">Margin in Amt</div>
       <div :class="colcss">
         <q-input
@@ -62,6 +74,12 @@
           v-model="modalObj.marginAmount"
         />
       </div>
+    </div>
+    <div class="row q-col-gutter-xs">
+      <div :class="colcss">Expenses</div>
+    </div>
+
+    <div class="row q-col-gutter-xs">
       <div :class="colcss">
         <q-select
           outlined
@@ -135,10 +153,10 @@
     >
       <div class="col-12 col-md-12">Total Expenses</div>
       <div class="col-12 col-md-12 text-center">
-        <p class="q-pr-xl">&nbsp;{{ ExpensTotal }}</p>
+        <p class="q-pr-xl">{{ ExpensTotal }}&nbsp;&nbsp;&nbsp;</p>
       </div>
     </div>
-    <div class="row q-col-gutter-xs">
+    <div :class="rowcss">
       <div :class="colcss">Net Income Available for EMI</div>
       <div :class="colcss">
         <q-input
@@ -149,6 +167,8 @@
           v-model="modalObj.netAvailableIncome"
         />
       </div>
+    </div>
+    <div :class="rowcss">
       <div :class="colcss">Loan Amount</div>
       <div :class="colcss">
         <q-input
@@ -159,14 +179,20 @@
           v-model="modalObj.calculatedLoanAmount"
         />
       </div>
+    </div>
+    <div :class="rowcss">
       <div :class="colcss">LTV Cost Value</div>
       <div :class="colcss">
         <q-input outlined dense v-model="modalObj.ltvCostValue" />
       </div>
+    </div>
+    <div :class="rowcss">
       <div :class="colcss">"LTV %</div>
       <div :class="colcss">
         <q-input outlined dense v-model="modalObj.ltvPercent" />
       </div>
+    </div>
+    <div :class="rowcss">
       <div :class="colcss">LTV Loan Amount</div>
       <div :class="colcss">
         <q-input
@@ -177,6 +203,8 @@
           v-model="modalObj.ltvLoanAmount"
         />
       </div>
+    </div>
+    <div :class="rowcss">
       <div :class="colcss">Max Loan Amount</div>
       <div :class="colcss">
         <q-input
@@ -188,10 +216,7 @@
         />
       </div>
     </div>
-
-    <p></p>
-
-    <div class="row justify-center">
+    <div class="row justify-center q-pt-sm">
       <q-btn color="light-blue" label="reset" @click="reset" />
       &nbsp;
       <q-btn color="light-blue" label="Close" v-close-popup />
@@ -203,6 +228,7 @@ import { number } from '@intlify/core-base';
 import { ref, reactive, defineProps } from 'vue';
 const error = ref(false);
 const colcss = ref('col-xs-12 col-sm-12 col-md-6');
+const rowcss = ref('row q-col-gutter-xs q-pt-sm');
 
 const ExpensesSelected = ref('');
 const ExpensesAmount = ref('');

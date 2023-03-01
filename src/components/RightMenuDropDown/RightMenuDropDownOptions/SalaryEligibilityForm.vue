@@ -1,6 +1,6 @@
 <template>
   <q-form @submit.prevent="calculateAmount()">
-    <div class="row q-col-gutter-xs">
+    <div :class="rowcss">
       <div :class="colcss">
         Monthly Salary<span class="text-red"> &nbsp;*</span>
       </div>
@@ -14,6 +14,8 @@
           @blur="blur()"
         />
       </div>
+    </div>
+    <div :class="rowcss">
       <div :class="colcss">
         Interest Rate<span class="text-red"> &nbsp;*</span>
       </div>
@@ -26,6 +28,8 @@
           @blur="blur()"
         />
       </div>
+    </div>
+    <div :class="rowcss">
       <div :class="colcss">Tenure<span class="text-red"> &nbsp;*</span></div>
       <div :class="colcss">
         <q-input
@@ -36,14 +40,20 @@
           @blur="blur()"
         />
       </div>
+    </div>
+    <div :class="rowcss">
       <div :class="colcss">Instalments</div>
       <div :class="colcss">
         <q-input outlined dense v-model="modalObj.instalments" />
       </div>
+    </div>
+    <div :class="rowcss">
       <div :class="colcss">Adv Instalments</div>
       <div :class="colcss">
         <q-input outlined dense v-model="modalObj.advInstalments" />
       </div>
+    </div>
+    <div :class="rowcss">
       <div :class="colcss">
         Net Salary Eligle for EMI %<span class="text-red"> &nbsp;*</span>
       </div>
@@ -56,6 +66,8 @@
           @blur="blur()"
         />
       </div>
+    </div>
+    <div :class="rowcss">
       <div :class="colcss">Net Salary In Amt</div>
       <div :class="colcss">
         <q-input
@@ -66,6 +78,11 @@
           disable
         />
       </div>
+    </div>
+    <div :class="rowcss">
+      <div :class="colcss">Expenses</div>
+    </div>
+    <div class="row q-col-gutter-xs">
       <div :class="colcss">
         <q-select
           outlined
@@ -139,11 +156,10 @@
     >
       <div class="col-12 col-md-12">Total Expenses</div>
       <div class="col-12 col-md-12 text-center">
-        <p class="q-pr-xl">&nbsp;{{ ExpensTotal }}</p>
+        <p class="q-pr-xl">{{ ExpensTotal }}&nbsp;&nbsp;&nbsp;</p>
       </div>
     </div>
-    <p></p>
-    <div class="row q-col-gutter-xs">
+    <div :class="rowcss">
       <div :class="colcss">Net Income Available for EMI</div>
       <div :class="colcss">
         <q-input
@@ -154,6 +170,8 @@
           v-model="modalObj.netAvailableIncome"
         />
       </div>
+    </div>
+    <div :class="rowcss">
       <div :class="colcss">Loan Amount</div>
       <div :class="colcss">
         <q-input
@@ -164,6 +182,8 @@
           v-model="modalObj.calculatedLoanAmount"
         />
       </div>
+    </div>
+    <div :class="rowcss">
       <div :class="colcss">Max Loan Amount</div>
       <div :class="colcss">
         <q-input
@@ -187,6 +207,7 @@ import { number } from '@intlify/core-base';
 import { ref, reactive, defineProps } from 'vue';
 const error = ref(false);
 const colcss = ref('col-xs-12 col-sm-12 col-md-6');
+const rowcss = ref('row q-col-gutter-xs q-pt-sm');
 const ExpensesSelected = ref('');
 const ExpensesAmount = ref('');
 // const ExpensesArray = ref([]);
