@@ -162,7 +162,7 @@
     </div>
     <p></p>
     <div class="row justify-center">
-      <q-btn color="light-blue" label="Check" type="submit" />
+      <q-btn color="light-blue" label="reset" @click="reset" />
       &nbsp;
       <q-btn color="light-blue" label="Close" v-close-popup />
     </div>
@@ -213,6 +213,19 @@ interface MyComponentData {
 const data = reactive<MyComponentData>({
   ExpensesArray: [],
 });
+
+const reset = () => {
+  modalObj.monthlyRevenue = null;
+  modalObj.rate = null;
+  modalObj.tenure = null;
+  modalObj.instalments = null;
+  modalObj.advInstalments = null;
+  modalObj.marginPercent = null;
+  modalObj.netAvailableIncome = null;
+  modalObj.marginAmount = null;
+  modalObj.calculatedLoanAmount = null;
+  modalObj.maxLoanAmount = null;
+};
 const blur = () => {
   if (
     (modalObj.monthlyRevenue as number) > 0 &&
