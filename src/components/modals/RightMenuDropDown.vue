@@ -3,14 +3,14 @@
     Jaguar software india
     <q-menu fit>
       <q-list style="min-width: 100px">
-        <q-item clickable>
+        <q-item @click="toggleFullscreen" clickable>
           <q-item-section avatar>
             <q-icon name="fa-solid fa-expand" />
           </q-item-section>
           <q-item-section>Full Screen</q-item-section>
         </q-item>
         <q-separator />
-        <q-item to="/moduleselector">
+        <q-item to="/moduleselector" class="text-black">
           <q-item-section avatar>
             <q-icon name="fa-solid fa-home" />
           </q-item-section>
@@ -87,14 +87,27 @@
     </q-menu>
   </q-btn>
 </template>
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const toggleFullscreen = () => {
+  const doc = window.document;
+  const docEl = doc.documentElement;
+
+  const requestFullscreen = docEl.requestFullscreen;
+  const exitFullscreen = doc.exitFullscreen;
+
+  if (!doc.fullscreenElement) {
+    if (requestFullscreen) {
+      requestFullscreen.call(docEl);
+    }
+  } else {
+    if (exitFullscreen) {
+      exitFullscreen.call(doc);
+    }
+  }
+};
+</script>
 <style scoped>
 .q-item {
   min-height: 20px;
-}
-
-.q-item.q-router-link--active,
-.q-item--active {
-  color: #1b1c1d;
 }
 </style>
