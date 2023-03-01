@@ -82,11 +82,14 @@
     <div :class="rowcss" class="q-pb-sm">
       <div :class="colcss">Expenses</div>
     </div>
-    <div class="row q-col-gutter-xs">
+    <div class="row q-col-gutter-xs q-pb-xs">
       <div :class="colcss">
         <q-select
           outlined
           dense
+          ref="inputRef"
+          :error="error && !ExpensesSelected"
+          error-message=""
           v-model="ExpensesSelected"
           :options="Expenses"
           label="Expenses"
@@ -114,7 +117,7 @@
         @click="add()"
         icon="fa-solid fa-plus"
       >
-        <q-tooltip> Add amount</q-tooltip>
+        <q-tooltip> Add Expenses</q-tooltip>
       </q-btn>
       &nbsp;
       <q-btn
@@ -123,7 +126,7 @@
         color="light-blue"
         @click="refresh()"
         icon="fa-solid fa-arrow-rotate-left"
-        ><q-tooltip> Reset amount</q-tooltip></q-btn
+        ><q-tooltip> clear</q-tooltip></q-btn
       >
     </div>
     <div
@@ -141,7 +144,7 @@
         &emsp;
         <q-btn
           size="xs"
-          color="brown-5"
+          color="blue"
           @click="edit(index)"
           icon="fa-solid fa-pen-to-square"
           ><q-tooltip> Edit amount</q-tooltip></q-btn
@@ -152,7 +155,39 @@
           color="red"
           @click="remove(index)"
           icon="fa-solid fa-xmark"
-          ><q-tooltip> Delete amount</q-tooltip></q-btn
+          ><q-tooltip> Delete</q-tooltip></q-btn
+        >
+      </div>
+    </div>
+
+    <div
+      v-if="editCondition"
+      class="column q-pl-lg-lg q-pt-sm q-my-lg-md"
+      style="height: 30px"
+    >
+      <div class="text-label col-6 col-md-6">{{ editExpensesSelected }}</div>
+      <div class="text-label col-6 col-md-6"></div>
+      <div class="text-label col-6 col-md-6 text-right">
+        <input
+          type="text"
+          v-model="editExpensesAmount"
+          placeholder="Enter your username"
+        />
+        &nbsp;
+        <q-btn
+          size="xs"
+          color="blue"
+          @click="editSave()"
+          icon="fa-solid fa-check"
+          ><q-tooltip> Edit amount</q-tooltip></q-btn
+        >
+        &nbsp;
+        <q-btn
+          size="xs"
+          color="red"
+          @click="editCondition = !editCondition"
+          icon="fa-solid fa-xmark"
+          ><q-tooltip> Delete</q-tooltip></q-btn
         >
       </div>
     </div>
@@ -218,6 +253,10 @@ const colcss = ref('col-xs-12 col-sm-12 col-md-6');
 const rowcss = ref('row q-col-gutter-xs q-pt-sm');
 const ExpensesSelected = ref('');
 const ExpensesAmount = ref('');
+const editExpensesSelected = ref('');
+const editExpensesAmount = ref('');
+const editCondition = ref(false);
+const saveIndex = ref(0);
 // const ExpensesArray = ref([]);
 
 const ExpensTotal = ref(0);
@@ -278,9 +317,7 @@ const blur = () => {
   }
 };
 const add = () => {
-  if (!ExpensesAmount.value) {
-    error.value = true;
-  } else {
+  if (ExpensesAmount.value && ExpensesSelected.value) {
     data.ExpensesArray.push({
       field: ExpensesSelected.value,
       value: ExpensesAmount.value,
@@ -291,6 +328,8 @@ const add = () => {
     ExpensesAmount.value = '';
     calculateAmount();
     error.value = false;
+  } else {
+    error.value = true;
   }
 };
 const remove = (index: number) => {
@@ -304,11 +343,23 @@ const edit = (index: number) => {
   const obj = data.ExpensesArray[index];
   const val = parseInt(obj['value'] as keyof typeof number);
   ExpensTotal.value -= val;
-  ExpensesSelected.value = obj['field'] as keyof typeof String;
-  ExpensesAmount.value = obj['value'] as keyof typeof String;
+  editExpensesSelected.value = obj['field'] as keyof typeof String;
+  editExpensesAmount.value = obj['value'] as keyof typeof String;
+  saveIndex.value = index;
+  editCondition.value = true;
 
-  data.ExpensesArray.splice(index, 1);
+  // data.ExpensesArray.splice(index, 1);
   calculateAmount();
+};
+
+const editSave = () => {
+  const obj = data.ExpensesArray[saveIndex.value];
+  obj.value = editExpensesAmount.value;
+  data.ExpensesArray.splice(saveIndex.value, 1, obj);
+  let num = parseInt(editExpensesAmount.value);
+  ExpensTotal.value += num;
+  calculateAmount();
+  editCondition.value = false;
 };
 
 const refresh = () => {
