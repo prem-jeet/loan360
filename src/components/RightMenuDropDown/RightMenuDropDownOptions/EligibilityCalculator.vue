@@ -3,8 +3,11 @@
     <q-item class="bg-light-blue-5 text-white q-pa-none q-ma-none">
       <q-item-section>
         <q-toolbar class="q-pa-none q-ma-none bg-purple-6">
-          <p class="text-weight-medium q-pt-md q-px-md">
-            Eligibility Calculator
+          <p v-if="radio == 'bs'" class="text-subtitle2 q-pt-md q-px-md">
+            Business Loan
+          </p>
+          <p v-if="radio == 'salary'" class="text-subtitle2 q-pt-md q-px-md">
+            Salaried Loan
           </p>
           <q-space />
           <q-btn icon="close" flat round dense v-close-popup />
@@ -20,7 +23,7 @@
             v-model="radio"
             dense
             val="bs"
-            label="Business LoanSalaried Loan
+            label="Business Loan
 "
           />
         </div>
