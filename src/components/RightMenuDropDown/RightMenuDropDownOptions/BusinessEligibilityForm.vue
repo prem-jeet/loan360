@@ -131,11 +131,14 @@
       :key="index"
       style="height: 30px"
     >
-      <div class="text-label col-6 col-md-6">
+      <div v-if="editIndex !== index" class="text-label col-6 col-md-6">
         {{ item.field }}
       </div>
-      <div class="col-4 col-md-6"></div>
-      <div class="text-label col-6 col-md-6 text-right">
+      <div v-if="editIndex !== index" class="col-4 col-md-6"></div>
+      <div
+        v-if="editIndex !== index"
+        class="text-label col-6 col-md-6 text-right"
+      >
         {{ item.value }}
         &emsp;
         <q-btn
@@ -154,43 +157,45 @@
           ><q-tooltip> Delete</q-tooltip></q-btn
         >
       </div>
-    </div>
 
-    <!-- <p></p> ....................................................... -->
+      <!-- <p></p> ....................................................... -->
 
-    <div
-      v-if="editCondition"
-      class="column q-pl-lg-lg q-pt-sm q-my-lg-md"
-      style="height: 30px"
-    >
-      <div class="text-label col-6 col-md-6">{{ editExpensesSelected }}</div>
-      <div class="text-label col-6 col-md-6"></div>
-      <div class="text-label col-6 col-md-6 text-right">
-        <input
-          type="text"
-          v-model="editExpensesAmount"
-          placeholder="Enter your username"
-        />
-        &nbsp;
-        <q-btn
-          size="xs"
-          color="blue"
-          @click="editSave()"
-          icon="fa-solid fa-check"
-          ><q-tooltip> Edit amount</q-tooltip></q-btn
-        >
-        &nbsp;
-        <q-btn
-          size="xs"
-          color="red"
-          @click="editCondition = !editCondition"
-          icon="fa-solid fa-xmark"
-          ><q-tooltip> Delete</q-tooltip></q-btn
-        >
+      <div v-else class="column">
+        <div class="text-label col-6 col-md-6 q-pt-xs">
+          <select id="colors" v-model="editExpensesSelected">
+            <option v-for="item in Expenses" :key="item" :value="item">
+              {{ item }}
+            </option>
+          </select>
+        </div>
+        <div class="text-label col-6 col-md-6"></div>
+        <div class="text-label col-6 col-md-6 text-right">
+          <input
+            type="text"
+            v-model="editExpensesAmount"
+            placeholder="Enter your username"
+          />
+          &nbsp;
+          <q-btn
+            size="xs"
+            color="blue"
+            @click="editSave()"
+            icon="fa-solid fa-check"
+            ><q-tooltip> Edit amount</q-tooltip></q-btn
+          >
+          &nbsp;
+          <q-btn
+            size="xs"
+            color="red"
+            @click="Editremove(index)"
+            icon="fa-solid fa-xmark"
+            ><q-tooltip> Delete</q-tooltip></q-btn
+          >
+        </div>
       </div>
-    </div>
 
-    <!-- <p></p> ...................................................-->
+      <!-- <p></p> ...................................................-->
+    </div>
 
     <div
       class="column q-pl-lg-lg"
@@ -280,8 +285,10 @@ const ExpensesSelected = ref('');
 const ExpensesAmount = ref('');
 const editExpensesSelected = ref('');
 const editExpensesAmount = ref('');
-const editCondition = ref(false);
 const saveIndex = ref(0);
+
+const editIndex = ref();
+const EditCondition = ref(true);
 
 // const ExpensesArray = ref([]);
 const props = defineProps({
@@ -365,19 +372,33 @@ const remove = (index: number) => {
   const val = parseInt(obj['value'] as keyof typeof number);
   ExpensTotal.value -= val;
   data.ExpensesArray.splice(index, 1);
+  editExpensesSelected.value = '';
+  editExpensesAmount.value = '';
+  editIndex.value = -1;
   calculateAmount();
+  // editIndex.value = null;
+};
+const Editremove = (index: number) => {
+  data.ExpensesArray.splice(index, 1);
+  editExpensesSelected.value = '';
+  editExpensesAmount.value = '';
+  editIndex.value = -1;
+  calculateAmount();
+  // editIndex.value = null;
 };
 const edit = (index: number) => {
-  const obj = data.ExpensesArray[index];
-  const val = parseInt(obj['value'] as keyof typeof number);
-  ExpensTotal.value -= val;
-  editExpensesSelected.value = obj['field'] as keyof typeof String;
-  editExpensesAmount.value = obj['value'] as keyof typeof String;
-  saveIndex.value = index;
-  editCondition.value = true;
-
-  // data.ExpensesArray.splice(index, 1);
-  calculateAmount();
+  if (EditCondition.value) {
+    const obj = data.ExpensesArray[index];
+    const val = parseInt(obj['value'] as keyof typeof number);
+    ExpensTotal.value -= val;
+    editExpensesSelected.value = obj['field'] as keyof typeof String;
+    editExpensesAmount.value = obj['value'] as keyof typeof String;
+    saveIndex.value = index;
+    editIndex.value = index;
+    EditCondition.value = false;
+    // data.ExpensesArray.splice(index, 1);
+    calculateAmount();
+  }
 };
 
 const editSave = () => {
@@ -387,7 +408,8 @@ const editSave = () => {
   let num = parseInt(editExpensesAmount.value);
   ExpensTotal.value += num;
   calculateAmount();
-  editCondition.value = false;
+  editIndex.value = -1;
+  EditCondition.value = true;
 };
 
 const refresh = () => {
