@@ -101,10 +101,17 @@ useModuleSelectorKeyboardListener(router.push);
 
 <style scoped lang="scss">
 .module-card {
-  height: 300px;
+  height: 35vh;
   background-size: cover;
   background-position: center;
 }
+
+@media screen and (max-width: 600px) {
+  .module-card {
+    height: 25vh;
+  }
+}
+
 .card-label {
   font-size: calc(1vw + 12px);
   color: black;
