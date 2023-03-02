@@ -105,7 +105,7 @@
       </div>
     </div>
 
-    <div class="row q-col-gutter-xs q-pt-sm justify-end">
+    <div class="row q-col-gutter-xs q-pt-sm justify-end q-pr-lg">
       <q-btn
         size="sm"
         class="q-pl-md"
@@ -125,84 +125,83 @@
         ><q-tooltip>clear</q-tooltip></q-btn
       >
     </div>
+
     <div
-      class="column q-pl-lg-lg q-pt-sm"
+      class="row q-pt-xs q-mx-lg-lg q-col-gutter-sm"
       v-for="(item, index) in data.ExpensesArray"
       :key="index"
-      style="height: 30px"
     >
-      <div v-if="editIndex !== index" class="text-label col-6 col-md-6">
+      <div v-if="editIndex !== index" class="col-4 col-md-4">
         {{ item.field }}
       </div>
-      <div v-if="editIndex !== index" class="col-4 col-md-6"></div>
-      <div
-        v-if="editIndex !== index"
-        class="text-label col-6 col-md-6 text-right"
-      >
+      <div v-else class="col-4 col-md-5">
+        <q-select
+          outlined
+          dense
+          ref="inputRef"
+          :error="errormsg && !editExpensesSelected"
+          error-message=""
+          v-model="editExpensesSelected"
+          :options="Expenses"
+        ></q-select>
+      </div>
+      <div v-if="editIndex !== index" class="col-3 col-md-4 text-right">
         {{ item.value }}
-        &emsp;
+      </div>
+      <div v-else class="col-3 col-md-4 text-right">
+        <q-input
+          :error="errormsg && !editExpensesAmount"
+          error-message=""
+          outlined
+          dense
+          v-model="editExpensesAmount"
+        ></q-input>
+      </div>
+      <div v-if="editIndex !== index" class="col-5 col-md-4 text-right">
         <q-btn
           size="xs"
           color="blue"
           @click="edit(index)"
           icon="fa-solid fa-pen-to-square"
-          ><q-tooltip> Edit amount</q-tooltip></q-btn
         >
+          <q-tooltip> Edit </q-tooltip>
+        </q-btn>
         &nbsp;
         <q-btn
           size="xs"
           color="red"
           @click="remove(index)"
           icon="fa-solid fa-xmark"
-          ><q-tooltip> Delete</q-tooltip></q-btn
-        >
+          ><q-tooltip> Delete</q-tooltip>
+        </q-btn>
       </div>
-
-      <div v-else class="column">
-        <div class="text-label col-6 col-md-6 q-pt-xs">
-          <select id="colors" v-model="editExpensesSelected">
-            <option v-for="item in Expenses" :key="item" :value="item">
-              {{ item }}
-            </option>
-          </select>
-        </div>
-        <div class="text-label col-6 col-md-6"></div>
-        <div class="text-label col-6 col-md-6 text-right">
-          <input
-            type="text"
-            :placeholder="errormsg"
-            v-model="editExpensesAmount"
-          />
-          &nbsp;
-          <q-btn
-            size="xs"
-            color="blue"
-            @click="editSave()"
-            icon="fa-solid fa-check"
-            ><q-tooltip> Edit amount</q-tooltip></q-btn
-          >
-          &nbsp;
-          <q-btn
-            size="xs"
-            color="red"
-            @click="Editremove(index)"
-            icon="fa-solid fa-xmark"
-            ><q-tooltip> Delete</q-tooltip></q-btn
-          >
-        </div>
+      <div v-else class="col-5 col-md-3 q-pt-md text-center">
+        <q-btn
+          size="xs"
+          color="blue"
+          @click="editSave()"
+          icon="fa-solid fa-check"
+          ><q-tooltip> save</q-tooltip>
+        </q-btn>
+        &nbsp;
+        <q-btn
+          size="xs"
+          color="red"
+          @click="Editremove(index)"
+          icon="fa-solid fa-xmark"
+          ><q-tooltip> Delete</q-tooltip>
+        </q-btn>
       </div>
     </div>
-
     <div
-      class="column q-pl-lg-lg q-pt-sm"
       v-if="data.ExpensesArray.length > 0"
-      style="height: 30px"
+      class="row q-pt-xs q-mx-lg-lg q-col-gutter-sm"
     >
-      <div class="text-label col-12 col-md-12">Total Expenses</div>
-      <div class="col-12 col-md-12 text-center">
-        <p class="text-label q-pr-xl">{{ ExpensTotal }}&nbsp;&nbsp;&nbsp;</p>
-      </div>
+      <div class="col-4 col-md-4">Total Expenses</div>
+      <div class="col-4 col-md-4 text-right">{{ ExpensTotal }}</div>
+      <div class="col-4 col-md-4"></div>
     </div>
+
     <div :class="rowcss">
       <div :class="colcss">Net Income Available for EMI</div>
       <div :class="colcss">
@@ -272,7 +271,7 @@
 </template>
 <script setup lang="ts">
 import { number } from '@intlify/core-base';
-import { ref, reactive, defineProps } from 'vue';
+import { ref, reactive, defineProps, onUnmounted } from 'vue';
 const error = ref(false);
 const colcss = ref('col-xs-12 col-sm-12 col-md-6');
 const rowcss = ref('row q-col-gutter-xs q-pt-sm');
@@ -285,7 +284,7 @@ const saveIndex = ref(0);
 
 const editIndex = ref();
 const EditCondition = ref(true);
-const errormsg = ref('');
+const errormsg = ref(false);
 // const ExpensesArray = ref([]);
 const props = defineProps({
   EligibilitymodalObj: {
@@ -339,6 +338,13 @@ const reset = () => {
   modalObj.ltvLoanAmount = null;
   modalObj.maxLoanAmount = null;
 };
+
+const emits = defineEmits(['ModalObjectData']);
+const ModalObjectData = () => emits('ModalObjectData', modalObj);
+onUnmounted(() => {
+  ModalObjectData();
+});
+
 const blur = () => {
   if (
     (modalObj.monthlyRevenue as number) > 0 &&
@@ -422,7 +428,7 @@ const editSave = () => {
     editIndex.value = -1;
     EditCondition.value = true;
   } else {
-    errormsg.value = 'required number';
+    errormsg.value = true;
   }
 };
 

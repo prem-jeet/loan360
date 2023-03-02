@@ -33,6 +33,7 @@
       </div>
       <BusinessEligibilityForm
         class="q-mt-sm"
+        @ModalObjectData="UpdateModalObjectData($event)"
         :EligibilitymodalObj="EligibilitymodalObj"
         v-if="radio == 'bs'"
       />
@@ -62,7 +63,6 @@ interface EligibilityObject {
   ltvPercent: number | null;
   ltvLoanAmount: number | null;
   maxLoanAmount: number | null;
-  [key: string]: number | null;
 }
 
 const EligibilitymodalObj = reactive<EligibilityObject>({
@@ -80,6 +80,14 @@ const EligibilitymodalObj = reactive<EligibilityObject>({
   marginAmount: null,
   maxLoanAmount: null,
 });
+
+const UpdateModalObjectData = (event: EligibilityObject) => {
+  EligibilitymodalObj.instalments = event.instalments;
+  for (let key in event) {
+    EligibilitymodalObj[key as keyof EligibilityObject] =
+      event[key as keyof EligibilityObject];
+  }
+};
 </script>
 <style scoped>
 .row-with-border {
