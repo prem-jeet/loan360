@@ -31,8 +31,8 @@
           <q-radio v-model="radio" dense val="salary" label="Salaried Loan" />
         </div>
       </div>
-      <p></p>
       <BusinessEligibilityForm
+        class="q-mt-sm"
         :EligibilitymodalObj="EligibilitymodalObj"
         v-if="radio == 'bs'"
       />

@@ -162,8 +162,6 @@
         >
       </div>
 
-      <!-- <p></p> ....................................................... -->
-
       <div v-else class="column">
         <div class="text-label col-6 col-md-6 q-pt-xs">
           <select id="colors" v-model="editExpensesSelected">
@@ -197,12 +195,10 @@
           >
         </div>
       </div>
-
-      <!-- <p></p> ...................................................-->
     </div>
 
     <div
-      class="column q-pl-lg-lg"
+      class="column q-pl-lg-lg q-pt-sm"
       v-if="data.ExpensesArray.length > 0"
       style="height: 30px"
     >
@@ -247,7 +243,7 @@
         />
       </div>
     </div>
-    <div class="row justify-center q-pt-sm">
+    <div class="row justify-center q-pt-md">
       <q-btn color="light-blue" label="reset" @click="reset" />
       &nbsp;
       <q-btn color="light-blue" label="Close" v-close-popup />
@@ -264,7 +260,6 @@ const ExpensesSelected = ref('');
 const ExpensesAmount = ref('');
 const editExpensesSelected = ref('');
 const editExpensesAmount = ref('');
-const editCondition = ref(false);
 const saveIndex = ref(0);
 const editIndex = ref();
 // const ExpensesArray = ref([]);
