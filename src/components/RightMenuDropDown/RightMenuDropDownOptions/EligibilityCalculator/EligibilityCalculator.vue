@@ -204,21 +204,11 @@
 // import BusinessEligibilityForm from 'src/components/RightMenuDropDown/RightMenuDropDownOptions/EligibilityCalculator/BusinessEligibilityForm.vue';
 import ExpensesCalulation from 'src/components/RightMenuDropDown/RightMenuDropDownOptions/EligibilityCalculator/ExpensesCalulation.vue';
 
-import { number } from '@intlify/core-base';
 import { ref, reactive } from 'vue';
 const radio = ref('bs');
-const error = ref(false);
 const colcss = ref('col-xs-12 col-sm-12 col-md-6');
 const rowcss = ref('row q-col-gutter-xs q-pt-sm');
-const ExpensesSelected = ref('');
-const ExpensesAmount = ref('');
-const editExpensesSelected = ref('');
-const editExpensesAmount = ref('');
-const saveIndex = ref(0);
 
-const editIndex = ref();
-const EditCondition = ref(true);
-const errormsg = ref(false);
 interface EligibilityObject {
   [x: string]: any;
   monthlyRevenue: number | null;
@@ -318,7 +308,7 @@ const calculateAmount = () => {
   );
   modalObj.calculatedLoanAmount = modalObj.calculatedLoanAmount * 1000;
 
-  if (modalObj.ltvPercent !== null) {
+  if (modalObj.ltvPercent !== null && radio.value === 'bs') {
     modalObj.ltvLoanAmount =
       ((modalObj.ltvCostValue as number) * (modalObj.ltvPercent as number)) /
       100;
