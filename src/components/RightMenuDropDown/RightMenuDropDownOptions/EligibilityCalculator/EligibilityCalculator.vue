@@ -277,30 +277,6 @@ const modalObj = reactive<EligibilityObject>({
 
 const ExpensTotal = ref(0);
 
-const Expenses = ref([
-  'Existing EMI',
-  'House Hold Expenses',
-  'Labour Expenses',
-  'Other',
-  'Purchase Expenses',
-  'Rent',
-  'Salary Expenses',
-  'Third Party',
-  'Transpotation',
-  'Utility Bills',
-]);
-
-interface ArrayObject {
-  [key: string]: string | number | null;
-}
-
-interface MyComponentData {
-  ExpensesArray: ArrayObject[];
-}
-const data = reactive<MyComponentData>({
-  ExpensesArray: [],
-});
-
 const reset = () => {
   modalObj.monthlyRevenue = null;
   modalObj.rate = null;
