@@ -234,7 +234,6 @@
   </q-card>
 </template>
 <script setup lang="ts">
-// import BusinessEligibilityForm from 'src/components/RightMenuDropDown/RightMenuDropDownOptions/EligibilityCalculator/BusinessEligibilityForm.vue';
 import ExpensesCalulation from 'src/components/RightMenuDropDown/RightMenuDropDownOptions/EligibilityCalculator/ExpensesCalulation.vue';
 
 import { ref, reactive } from 'vue';
