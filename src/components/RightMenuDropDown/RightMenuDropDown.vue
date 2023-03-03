@@ -95,7 +95,7 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';
-import EligibilityCalculator from 'src/components/RightMenuDropDown/RightMenuDropDownOptions/EligibilityCalculator.vue';
+import EligibilityCalculator from 'src/components/RightMenuDropDown/RightMenuDropDownOptions/EligibilityCalculator/EligibilityCalculator.vue';
 const showEligibilityCalculator = ref(false);
 
 const toggleFullscreen = () => {

@@ -46,8 +46,8 @@
   </q-card>
 </template>
 <script setup lang="ts">
-import BusinessEligibilityForm from 'src/components/RightMenuDropDown/RightMenuDropDownOptions/BusinessEligibilityForm.vue';
-import SalaryEligibilityForm from 'src/components/RightMenuDropDown/RightMenuDropDownOptions/SalaryEligibilityForm.vue';
+import BusinessEligibilityForm from 'src/components/RightMenuDropDown/RightMenuDropDownOptions/EligibilityCalculator/BusinessEligibilityForm.vue';
+import SalaryEligibilityForm from 'src/components/RightMenuDropDown/RightMenuDropDownOptions/EligibilityCalculator/SalaryEligibilityForm.vue';
 import { ref, reactive } from 'vue';
 const radio = ref('bs');
 interface EligibilityObject {
