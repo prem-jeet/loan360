@@ -1,5 +1,5 @@
 <template>
-  <div class="row q-col-gutter-xs q-pb-sm">
+  <div class="row q-col-gutter-xs q-pb-sm q-pt-sm">
     <div :class="colcss">Expenses</div>
   </div>
 
@@ -30,7 +30,7 @@
     </div>
   </div>
 
-  <div class="row q-col-gutter-xs q-pt-sm justify-end q-pr-lg">
+  <div class="row q-col-gutter-xs q-pt-sm justify-end q-pr-md-lg q-pr-xs-none">
     <q-btn
       size="sm"
       class="q-pl-md"
@@ -52,14 +52,14 @@
   </div>
 
   <div
-    class="row q-pt-xs q-mx-lg-lg q-col-gutter-sm"
+    class="row q-mx-lg-lg q-col-gutter-sm q-pt-xs-md q-pt-sm-xs q-pt-md-xs"
     v-for="(item, index) in data.ExpensesArray"
     :key="index"
   >
     <div v-if="editIndex !== index" class="col-4 col-md-4">
       {{ item.field }}
     </div>
-    <div v-else class="col-4 col-md-5">
+    <div v-else class="col-xs-12 col-sm-12 col-md-5">
       <q-select
         outlined
         dense
@@ -73,7 +73,7 @@
     <div v-if="editIndex !== index" class="col-3 col-md-4 text-right">
       {{ item.value }}
     </div>
-    <div v-else class="col-3 col-md-4 text-right">
+    <div v-else class="col-xs-12 col-sm-12 col-md-4 text-right">
       <q-input
         :error="errormsg && !editExpensesAmount"
         error-message=""
@@ -102,7 +102,7 @@
         ><q-tooltip> Delete</q-tooltip>
       </q-btn>
     </div>
-    <div v-else class="col-5 col-md-3 q-pt-md text-center">
+    <div v-else class="col-xs-12 col-sm-12 col-md-3 text-right">
       <q-btn size="xs" color="blue" @click="editSave()" icon="fa-solid fa-check"
         ><q-tooltip> save</q-tooltip>
       </q-btn>
@@ -120,9 +120,13 @@
     v-if="data.ExpensesArray.length > 0"
     class="row q-pt-xs q-mx-lg-lg q-col-gutter-sm"
   >
-    <div class="col-4 col-md-4">Total Expenses</div>
-    <div class="col-4 col-md-4 text-right">{{ ExpensTotal }}</div>
-    <div class="col-4 col-md-4"></div>
+    <div class="col-4 col-md-4 col-xs-4 col-sm-4">Total Expenses</div>
+    <div
+      class="col-4 col-md-4 col-xs-4 col-sm-3 text-right q-pr-xs-lg q-pr-sm-none q-pr-md-none"
+    >
+      {{ ExpensTotal }}
+    </div>
+    <div class="col-4 col-md-4 col-xs-4 col-sm-5"></div>
   </div>
 </template>
 <script setup lang="ts">

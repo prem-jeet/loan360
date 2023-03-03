@@ -16,7 +16,7 @@
     </q-item>
     <q-card-section style="max-height: 85vh" class="scroll">
       <div class="row q-pb-sm">
-        <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
+        <div class="col-xs-6 col-sm-6 col-md-6 q-px-sm">
           <q-radio
             v-model="radio"
             dense
@@ -25,7 +25,7 @@
 "
           />
         </div>
-        <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
+        <div class="col-xs-6 col-sm-6 col-md-6 q-px-sm">
           <q-radio v-model="radio" dense val="salary" label="Salaried Loan" />
         </div>
       </div>
@@ -63,6 +63,7 @@
               :rules="[(val: any) => !!val || '']"
               input-class="text-right"
               @blur="blur()"
+              @update:model-value="(v) => test('rate', v)"
             />
           </div>
         </div>
@@ -120,6 +121,7 @@
               :rules="[(val: any) => !!val || '']"
               input-class="text-right"
               @blur="blur()"
+              @update:model-value="(v) => test('marginPercent', v)"
             />
           </div>
         </div>
@@ -195,6 +197,7 @@
               v-model="modalObj.ltvPercent"
               input-class="text-right"
               @blur="blur()"
+              @update:model-value="(v) => test('ltvPercent', v)"
             />
           </div>
         </div>
@@ -234,7 +237,7 @@
   </q-card>
 </template>
 <script setup lang="ts">
-import ExpensesCalulation from 'src/components/RightMenuDropDown/RightMenuDropDownOptions/EligibilityCalculator/ExpensesCalulation.vue';
+import ExpensesCalulation from './ExpensesCalulation.vue';
 
 import { ref, reactive } from 'vue';
 const radio = ref('bs');
@@ -275,6 +278,9 @@ const modalObj = reactive<EligibilityObject>({
 });
 
 const ExpensTotal = ref(0);
+const test = (key: string, value: number) => {
+  if (value > 100) modalObj[key] = 100;
+};
 
 const reset = () => {
   modalObj.monthlyRevenue = null;
