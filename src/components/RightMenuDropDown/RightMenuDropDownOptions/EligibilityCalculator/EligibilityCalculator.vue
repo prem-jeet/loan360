@@ -42,9 +42,11 @@
           <div :class="colcss">
             <q-input
               outlined
+              mask="#################"
               dense
               v-model="modalObj.monthlyRevenue"
               :rules="[(val: any) => !!val || '']"
+              input-class="text-right"
             />
           </div>
         </div>
@@ -56,8 +58,10 @@
             <q-input
               outlined
               dense
+              mask="###"
               v-model="modalObj.rate"
               :rules="[(val: any) => !!val || '']"
+              input-class="text-right"
               @blur="blur()"
             />
           </div>
@@ -70,8 +74,10 @@
             <q-input
               outlined
               dense
+              mask="###"
               v-model="modalObj.tenure"
               :rules="[(val: any) => !!val || '']"
+              input-class="text-right"
               @blur="blur()"
             />
           </div>
@@ -79,13 +85,25 @@
         <div :class="rowcss">
           <div :class="colcss">Instalments</div>
           <div :class="colcss">
-            <q-input outlined dense v-model="modalObj.instalments" />
+            <q-input
+              outlined
+              dense
+              mask="###"
+              v-model="modalObj.instalments"
+              input-class="text-right"
+            />
           </div>
         </div>
         <div :class="rowcss">
           <div :class="colcss">Adv Instalments</div>
           <div :class="colcss">
-            <q-input outlined dense v-model="modalObj.advInstalments" />
+            <q-input
+              outlined
+              dense
+              mask="###"
+              v-model="modalObj.advInstalments"
+              input-class="text-right"
+            />
           </div>
         </div>
         <div :class="rowcss">
@@ -97,8 +115,10 @@
             <q-input
               outlined
               dense
+              mask="###"
               v-model="modalObj.marginPercent"
               :rules="[(val: any) => !!val || '']"
+              input-class="text-right"
               @blur="blur()"
             />
           </div>
@@ -114,6 +134,7 @@
               dense
               disable
               v-model="modalObj.marginAmount"
+              input-class="text-right"
             />
           </div>
         </div>
@@ -135,6 +156,7 @@
               dense
               disable
               v-model="modalObj.netAvailableIncome"
+              input-class="text-right"
             />
           </div>
         </div>
@@ -147,13 +169,20 @@
               dense
               disable
               v-model="modalObj.calculatedLoanAmount"
+              input-class="text-right"
             />
           </div>
         </div>
         <div v-if="radio === 'bs'" :class="rowcss">
           <div :class="colcss">LTV Cost Value</div>
           <div :class="colcss">
-            <q-input outlined dense v-model="modalObj.ltvCostValue" />
+            <q-input
+              outlined
+              mask="############"
+              dense
+              v-model="modalObj.ltvCostValue"
+              input-class="text-right"
+            />
           </div>
         </div>
         <div v-if="radio === 'bs'" :class="rowcss">
@@ -162,7 +191,9 @@
             <q-input
               outlined
               dense
+              mask="###"
               v-model="modalObj.ltvPercent"
+              input-class="text-right"
               @blur="blur()"
             />
           </div>
@@ -176,6 +207,7 @@
               disable
               dense
               v-model="modalObj.ltvLoanAmount"
+              input-class="text-right"
             />
           </div>
         </div>
@@ -188,6 +220,7 @@
               dense
               disable
               v-model="modalObj.maxLoanAmount"
+              input-class="text-right"
             />
           </div>
         </div>

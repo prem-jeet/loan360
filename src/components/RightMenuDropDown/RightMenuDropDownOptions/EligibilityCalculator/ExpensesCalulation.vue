@@ -21,10 +21,11 @@
         outlined
         dense
         v-model="ExpensesAmount"
+        mask="#################"
         ref="inputRef"
         :error="error && !ExpensesAmount"
         error-message=""
-        label="Enter amount"
+        input-class="text-right"
       />
     </div>
   </div>
@@ -79,6 +80,8 @@
         outlined
         dense
         v-model="editExpensesAmount"
+        mask="#################"
+        input-class="text-right"
       ></q-input>
     </div>
     <div v-if="editIndex !== index" class="col-5 col-md-4 text-right">
