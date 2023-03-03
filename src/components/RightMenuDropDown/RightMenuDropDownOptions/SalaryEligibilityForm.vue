@@ -8,10 +8,10 @@
         <q-input
           outlined
           dense
-          size="sm"
           v-model="modalObj.monthlyRevenue"
           :rules="[(val) => !!val || '']"
           @blur="blur()"
+          @update:model-value="(v) => updateValue('monthlyRevenue', v as number)"
         />
       </div>
     </div>
@@ -26,6 +26,7 @@
           v-model="modalObj.rate"
           :rules="[(val) => !!val || '']"
           @blur="blur()"
+          @update:model-value="(v) => updateValue('rate', v as number)"
         />
       </div>
     </div>
@@ -38,19 +39,30 @@
           v-model="modalObj.tenure"
           :rules="[(val) => !!val || '']"
           @blur="blur()"
+          @update:model-value="(v) => updateValue('tenure', v as number)"
         />
       </div>
     </div>
     <div :class="rowcss">
       <div :class="colcss">Instalments</div>
       <div :class="colcss">
-        <q-input outlined dense v-model="modalObj.instalments" />
+        <q-input
+          outlined
+          dense
+          v-model="modalObj.instalments"
+          @update:model-value="(v) => updateValue('instalments', v as number)"
+        />
       </div>
     </div>
     <div :class="rowcss">
       <div :class="colcss">Adv Instalments</div>
       <div :class="colcss">
-        <q-input outlined dense v-model="modalObj.advInstalments" />
+        <q-input
+          outlined
+          dense
+          v-model="modalObj.advInstalments"
+          @update:model-value="(v) => updateValue('advInstalments', v as number)"
+        />
       </div>
     </div>
     <div :class="rowcss">
@@ -64,6 +76,7 @@
           v-model="modalObj.marginPercent"
           :rules="[(val) => !!val || '']"
           @blur="blur()"
+          @update:model-value="(v) => updateValue('marginPercent', v as number)"
         />
       </div>
     </div>
@@ -277,7 +290,7 @@ interface EligibilityObject {
   [key: string]: string | number | null;
 }
 const modalObj = reactive<EligibilityObject>({ ...props.EligibilitymodalObj });
-
+console.log('obj', props.EligibilitymodalObj);
 const Expenses = ref([
   'Existing EMI',
   'House Hold Expenses',
@@ -321,6 +334,10 @@ const blur = () => {
   ) {
     calculateAmount();
   }
+};
+const emits = defineEmits(['update']);
+const updateValue = (key: unknown, value: unknown) => {
+  emits('update', { key, value });
 };
 const add = () => {
   if (ExpensesAmount.value && ExpensesSelected.value) {

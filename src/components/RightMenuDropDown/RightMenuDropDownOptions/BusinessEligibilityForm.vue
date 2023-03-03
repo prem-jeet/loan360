@@ -9,7 +9,8 @@
           outlined
           dense
           v-model="modalObj.monthlyRevenue"
-          :rules="[(val) => !!val || '']"
+          :rules="[(val: any) => !!val || '']"
+          @update:model-value="(v) => updateValue('monthlyRevenue', v as number)"
         />
       </div>
     </div>
@@ -22,8 +23,9 @@
           outlined
           dense
           v-model="modalObj.rate"
-          :rules="[(val) => !!val || '']"
+          :rules="[(val: any) => !!val || '']"
           @blur="blur()"
+          @update:model-value="(v) => updateValue('rate', v as number)"
         />
       </div>
     </div>
@@ -34,21 +36,32 @@
           outlined
           dense
           v-model="modalObj.tenure"
-          :rules="[(val) => !!val || '']"
+          :rules="[(val: any) => !!val || '']"
           @blur="blur()"
+          @update:model-value="(v) => updateValue('tenure', v as number)"
         />
       </div>
     </div>
     <div :class="rowcss">
       <div :class="colcss">Instalments</div>
       <div :class="colcss">
-        <q-input outlined dense v-model="modalObj.instalments" />
+        <q-input
+          outlined
+          dense
+          v-model="modalObj.instalments"
+          @update:model-value="(v) => updateValue('instalments', v as number)"
+        />
       </div>
     </div>
     <div :class="rowcss">
       <div :class="colcss">Adv Instalments</div>
       <div :class="colcss">
-        <q-input outlined dense v-model="modalObj.advInstalments" />
+        <q-input
+          outlined
+          dense
+          v-model="modalObj.advInstalments"
+          @update:model-value="(v) => updateValue('advInstalments', v as number)"
+        />
       </div>
     </div>
     <div :class="rowcss">
@@ -58,8 +71,9 @@
           outlined
           dense
           v-model="modalObj.marginPercent"
-          :rules="[(val) => !!val || '']"
+          :rules="[(val: any) => !!val || '']"
           @blur="blur()"
+          @update:model-value="(v) => updateValue('marginPercent', v as number)"
         />
       </div>
     </div>
@@ -229,13 +243,23 @@
     <div :class="rowcss">
       <div :class="colcss">LTV Cost Value</div>
       <div :class="colcss">
-        <q-input outlined dense v-model="modalObj.ltvCostValue" />
+        <q-input
+          outlined
+          dense
+          v-model="modalObj.ltvCostValue"
+          @update:model-value="(v) => updateValue('ltvCostValue', v as number)"
+        />
       </div>
     </div>
     <div :class="rowcss">
       <div :class="colcss">"LTV %</div>
       <div :class="colcss">
-        <q-input outlined dense v-model="modalObj.ltvPercent" />
+        <q-input
+          outlined
+          dense
+          v-model="modalObj.ltvPercent"
+          @update:model-value="(v) => updateValue('ltvPercent', v as number)"
+        />
       </div>
     </div>
     <div :class="rowcss">
@@ -271,7 +295,7 @@
 </template>
 <script setup lang="ts">
 import { number } from '@intlify/core-base';
-import { ref, reactive, defineProps, onUnmounted } from 'vue';
+import { ref, reactive, defineProps } from 'vue';
 const error = ref(false);
 const colcss = ref('col-xs-12 col-sm-12 col-md-6');
 const rowcss = ref('row q-col-gutter-xs q-pt-sm');
@@ -339,11 +363,11 @@ const reset = () => {
   modalObj.maxLoanAmount = null;
 };
 
-const emits = defineEmits(['ModalObjectData']);
-const ModalObjectData = () => emits('ModalObjectData', modalObj);
-onUnmounted(() => {
-  ModalObjectData();
-});
+const emits = defineEmits(['update']);
+// const ModalObjectData = () => emits('ModalObjectData', modalObj);
+const updateValue = (key: unknown, value: unknown) => {
+  emits('update', { key, value });
+};
 
 const blur = () => {
   if (

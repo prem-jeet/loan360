@@ -33,11 +33,12 @@
       </div>
       <BusinessEligibilityForm
         class="q-mt-sm"
-        @ModalObjectData="UpdateModalObjectData($event)"
+        @update="updateData($event)"
         :EligibilitymodalObj="EligibilitymodalObj"
         v-if="radio == 'bs'"
       />
       <SalaryEligibilityForm
+        @update="updateData($event)"
         :EligibilitymodalObj="EligibilitymodalObj"
         v-if="radio == 'salary'"
       />
@@ -50,6 +51,7 @@ import SalaryEligibilityForm from 'src/components/RightMenuDropDown/RightMenuDro
 import { ref, reactive } from 'vue';
 const radio = ref('bs');
 interface EligibilityObject {
+  [x: string]: any;
   monthlyRevenue: number | null;
   rate: number | null;
   tenure: number | null;
@@ -81,12 +83,10 @@ const EligibilitymodalObj = reactive<EligibilityObject>({
   maxLoanAmount: null,
 });
 
-const UpdateModalObjectData = (event: EligibilityObject) => {
-  EligibilitymodalObj.instalments = event.instalments;
-  for (let key in event) {
-    EligibilitymodalObj[key as keyof EligibilityObject] =
-      event[key as keyof EligibilityObject];
-  }
+const updateData = (event: EligibilityObject) => {
+  let key = event.key;
+  let value = event.value;
+  EligibilitymodalObj[key] = value;
 };
 </script>
 <style scoped>
