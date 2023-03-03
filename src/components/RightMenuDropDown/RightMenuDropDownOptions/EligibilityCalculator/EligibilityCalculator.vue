@@ -14,10 +14,8 @@
         </q-toolbar>
       </q-item-section>
     </q-item>
-    <q-separator />
-
     <q-card-section style="max-height: 85vh" class="scroll">
-      <div class="row">
+      <div class="row q-pb-sm">
         <div class="col-xs-12 col-sm-12 col-md-6 q-px-sm">
           <q-radio
             v-model="radio"
@@ -31,25 +29,196 @@
           <q-radio v-model="radio" dense val="salary" label="Salaried Loan" />
         </div>
       </div>
-      <BusinessEligibilityForm
-        class="q-mt-sm"
-        @update="updateData($event)"
-        :EligibilitymodalObj="EligibilitymodalObj"
-        v-if="radio == 'bs'"
-      />
-      <SalaryEligibilityForm
-        @update="updateData($event)"
-        :EligibilitymodalObj="EligibilitymodalObj"
-        v-if="radio == 'salary'"
-      />
+      <q-form @submit.prevent="calculateAmount()">
+        <div :class="rowcss">
+          <div :class="colcss">
+            {{
+              radio === 'bs'
+                ? ' Monthly Business Sales / Receipt'
+                : ' Monthly Salary'
+            }}
+            <span class="text-red"> &nbsp;*</span>
+          </div>
+          <div :class="colcss">
+            <q-input
+              outlined
+              dense
+              v-model="modalObj.monthlyRevenue"
+              :rules="[(val: any) => !!val || '']"
+            />
+          </div>
+        </div>
+        <div :class="rowcss">
+          <div :class="colcss">
+            Interest Rate<span class="text-red"> &nbsp;*</span>
+          </div>
+          <div :class="colcss">
+            <q-input
+              outlined
+              dense
+              v-model="modalObj.rate"
+              :rules="[(val: any) => !!val || '']"
+              @blur="blur()"
+            />
+          </div>
+        </div>
+        <div :class="rowcss">
+          <div :class="colcss">
+            Tenure<span class="text-red"> &nbsp;*</span>
+          </div>
+          <div :class="colcss">
+            <q-input
+              outlined
+              dense
+              v-model="modalObj.tenure"
+              :rules="[(val: any) => !!val || '']"
+              @blur="blur()"
+            />
+          </div>
+        </div>
+        <div :class="rowcss">
+          <div :class="colcss">Instalments</div>
+          <div :class="colcss">
+            <q-input outlined dense v-model="modalObj.instalments" />
+          </div>
+        </div>
+        <div :class="rowcss">
+          <div :class="colcss">Adv Instalments</div>
+          <div :class="colcss">
+            <q-input outlined dense v-model="modalObj.advInstalments" />
+          </div>
+        </div>
+        <div :class="rowcss">
+          <div :class="colcss">
+            {{ radio === 'bs' ? 'Margin %' : ' Net Salary Eligle for EMI %' }}
+            <span class="text-red"> &nbsp;*</span>
+          </div>
+          <div :class="colcss">
+            <q-input
+              outlined
+              dense
+              v-model="modalObj.marginPercent"
+              :rules="[(val: any) => !!val || '']"
+              @blur="blur()"
+            />
+          </div>
+        </div>
+        <div :class="rowcss">
+          <div :class="colcss">
+            {{ radio === 'bs' ? 'Margin in Amt' : 'Net Salary In Amt' }}
+          </div>
+          <div :class="colcss">
+            <q-input
+              filled
+              outlined
+              dense
+              disable
+              v-model="modalObj.marginAmount"
+            />
+          </div>
+        </div>
+
+        <ExpensesCalulation @updateToatal="ToatlUpdate" />
+
+        <div :class="rowcss">
+          <div :class="colcss">
+            {{
+              radio === 'bs'
+                ? 'Net Income Available for EMI'
+                : 'Net Salary Available for EMI'
+            }}
+          </div>
+          <div :class="colcss">
+            <q-input
+              filled
+              outlined
+              dense
+              disable
+              v-model="modalObj.netAvailableIncome"
+            />
+          </div>
+        </div>
+        <div :class="rowcss">
+          <div :class="colcss">Loan Amount</div>
+          <div :class="colcss">
+            <q-input
+              outlined
+              filled
+              dense
+              disable
+              v-model="modalObj.calculatedLoanAmount"
+            />
+          </div>
+        </div>
+        <div v-if="radio === 'bs'" :class="rowcss">
+          <div :class="colcss">LTV Cost Value</div>
+          <div :class="colcss">
+            <q-input outlined dense v-model="modalObj.ltvCostValue" />
+          </div>
+        </div>
+        <div v-if="radio === 'bs'" :class="rowcss">
+          <div :class="colcss">"LTV %</div>
+          <div :class="colcss">
+            <q-input
+              outlined
+              dense
+              v-model="modalObj.ltvPercent"
+              @blur="blur()"
+            />
+          </div>
+        </div>
+        <div v-if="radio === 'bs'" :class="rowcss">
+          <div :class="colcss">LTV Loan Amount</div>
+          <div :class="colcss">
+            <q-input
+              outlined
+              filled
+              disable
+              dense
+              v-model="modalObj.ltvLoanAmount"
+            />
+          </div>
+        </div>
+        <div :class="rowcss">
+          <div :class="colcss">Max Loan Amount</div>
+          <div :class="colcss">
+            <q-input
+              outlined
+              filled
+              dense
+              disable
+              v-model="modalObj.maxLoanAmount"
+            />
+          </div>
+        </div>
+        <div class="row justify-center q-pt-md">
+          <q-btn color="light-blue" label="reset" @click="reset" />
+          &nbsp;
+          <q-btn color="light-blue" label="Close" v-close-popup />
+        </div>
+      </q-form>
     </q-card-section>
   </q-card>
 </template>
 <script setup lang="ts">
-import BusinessEligibilityForm from 'src/components/RightMenuDropDown/RightMenuDropDownOptions/EligibilityCalculator/BusinessEligibilityForm.vue';
-import SalaryEligibilityForm from 'src/components/RightMenuDropDown/RightMenuDropDownOptions/EligibilityCalculator/SalaryEligibilityForm.vue';
+// import BusinessEligibilityForm from 'src/components/RightMenuDropDown/RightMenuDropDownOptions/EligibilityCalculator/BusinessEligibilityForm.vue';
+import ExpensesCalulation from 'src/components/RightMenuDropDown/RightMenuDropDownOptions/EligibilityCalculator/ExpensesCalulation.vue';
+
+import { number } from '@intlify/core-base';
 import { ref, reactive } from 'vue';
 const radio = ref('bs');
+const error = ref(false);
+const colcss = ref('col-xs-12 col-sm-12 col-md-6');
+const rowcss = ref('row q-col-gutter-xs q-pt-sm');
+const ExpensesSelected = ref('');
+const ExpensesAmount = ref('');
+const editExpensesSelected = ref('');
+const editExpensesAmount = ref('');
+const saveIndex = ref(0);
+
+const editIndex = ref();
+const EditCondition = ref(true);
+const errormsg = ref(false);
 interface EligibilityObject {
   [x: string]: any;
   monthlyRevenue: number | null;
@@ -67,7 +236,7 @@ interface EligibilityObject {
   maxLoanAmount: number | null;
 }
 
-const EligibilitymodalObj = reactive<EligibilityObject>({
+const modalObj = reactive<EligibilityObject>({
   instalments: null,
   advInstalments: null,
   monthlyRevenue: null,
@@ -83,10 +252,98 @@ const EligibilitymodalObj = reactive<EligibilityObject>({
   maxLoanAmount: null,
 });
 
-const updateData = (event: EligibilityObject) => {
-  let key = event.key;
-  let value = event.value;
-  EligibilitymodalObj[key] = value;
+const ExpensTotal = ref(0);
+
+const Expenses = ref([
+  'Existing EMI',
+  'House Hold Expenses',
+  'Labour Expenses',
+  'Other',
+  'Purchase Expenses',
+  'Rent',
+  'Salary Expenses',
+  'Third Party',
+  'Transpotation',
+  'Utility Bills',
+]);
+
+interface ArrayObject {
+  [key: string]: string | number | null;
+}
+
+interface MyComponentData {
+  ExpensesArray: ArrayObject[];
+}
+const data = reactive<MyComponentData>({
+  ExpensesArray: [],
+});
+
+const reset = () => {
+  modalObj.monthlyRevenue = null;
+  modalObj.rate = null;
+  modalObj.tenure = null;
+  modalObj.instalments = null;
+  modalObj.advInstalments = null;
+  modalObj.marginPercent = null;
+  modalObj.netAvailableIncome = null;
+  modalObj.marginAmount = null;
+  modalObj.calculatedLoanAmount = null;
+  modalObj.ltvCostValue = null;
+  modalObj.ltvPercent = null;
+  modalObj.ltvLoanAmount = null;
+  modalObj.maxLoanAmount = null;
+};
+const blur = () => {
+  if (
+    (modalObj.monthlyRevenue as number) > 0 &&
+    (modalObj.marginPercent as number) > 0
+  ) {
+    calculateAmount();
+  }
+};
+
+const calculateAmount = () => {
+  modalObj.marginAmount =
+    ((modalObj.monthlyRevenue as number) * (modalObj.marginPercent as number)) /
+    100;
+  modalObj.netAvailableIncome =
+    modalObj.marginAmount - (ExpensTotal.value > 0 ? ExpensTotal.value : 0);
+  modalObj.calculatedLoanAmount =
+    (modalObj.netAvailableIncome * (modalObj.tenure as number)) /
+    (1 +
+      ((modalObj.rate as number) / 100) * ((modalObj.tenure as number) / 12));
+  modalObj.calculatedLoanAmount = modalObj.calculatedLoanAmount / 1000;
+  modalObj.calculatedLoanAmount = Number(
+    parseFloat(modalObj.calculatedLoanAmount as unknown as string).toFixed(0)
+  );
+  modalObj.calculatedLoanAmount = modalObj.calculatedLoanAmount * 1000;
+
+  if (modalObj.ltvPercent !== null) {
+    modalObj.ltvLoanAmount =
+      ((modalObj.ltvCostValue as number) * (modalObj.ltvPercent as number)) /
+      100;
+    modalObj.ltvLoanAmount = modalObj.ltvLoanAmount / 1000;
+    modalObj.ltvLoanAmount = Number(
+      parseFloat(modalObj.ltvLoanAmount as unknown as string).toFixed(0)
+    );
+    modalObj.ltvLoanAmount = modalObj.ltvLoanAmount * 1000;
+    modalObj.maxLoanAmount =
+      modalObj.ltvLoanAmount >= modalObj.calculatedLoanAmount
+        ? modalObj.calculatedLoanAmount
+        : modalObj.ltvLoanAmount;
+    modalObj.maxLoanAmount = Number(
+      parseFloat(modalObj.maxLoanAmount as unknown as string).toFixed(2)
+    );
+  } else {
+    modalObj.maxLoanAmount = Number(
+      parseFloat(modalObj.calculatedLoanAmount as unknown as string).toFixed(2)
+    );
+  }
+};
+
+const ToatlUpdate = (val: any) => {
+  ExpensTotal.value = val;
+  calculateAmount();
 };
 </script>
 <style scoped>
@@ -97,5 +354,8 @@ const updateData = (event: EligibilityObject) => {
 }
 .e-card {
   width: 1000px;
+}
+.q-field--with-bottom {
+  padding-bottom: 0px;
 }
 </style>
