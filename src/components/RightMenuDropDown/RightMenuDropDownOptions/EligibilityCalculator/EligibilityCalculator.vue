@@ -63,7 +63,7 @@
               :rules="[(val: any) => !!val || '']"
               input-class="text-right"
               @blur="blur()"
-              @update:model-value="(v) => test('rate', v)"
+              @update:model-value="(v) => test('rate', v as number)"
             />
           </div>
         </div>
@@ -121,7 +121,7 @@
               :rules="[(val: any) => !!val || '']"
               input-class="text-right"
               @blur="blur()"
-              @update:model-value="(v) => test('marginPercent', v)"
+              @update:model-value="(v) => test('marginPercent',  v as number)"
             />
           </div>
         </div>
@@ -197,7 +197,7 @@
               v-model="modalObj.ltvPercent"
               input-class="text-right"
               @blur="blur()"
-              @update:model-value="(v) => test('ltvPercent', v)"
+              @update:model-value="(v) => test('ltvPercent', v as number)"
             />
           </div>
         </div>
