@@ -1,4 +1,3 @@
-import { useUserStore } from 'src/stores/user/userStore';
 import { RouteRecordRaw } from 'vue-router';
 
 const routes: RouteRecordRaw[] = [
