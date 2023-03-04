@@ -11,18 +11,18 @@
               autofocus
               outlined
               v-model="selectedCompany"
-              :options="company"
+              :options="userStore.allowedCompany"
               option-value="code"
               option-label="name"
               label="Company"
               :error="error && !selectedCompany"
               error-message="select a company"
-              @update:model-value="fetchFinancialYear"
+              @update:model-value="userStore.fetchAllowedFinancialYear"
             />
             <q-select
               outlined
               v-model="selectedBranch"
-              :options="branch"
+              :options="userStore.allowedBranch"
               option-value="code"
               option-label="name"
               label="Brach"
@@ -32,7 +32,7 @@
             <q-select
               outlined
               v-model="selectedFinancialYear"
-              :options="financialYear"
+              :options="userStore.allowedFinancialYear"
               option-value="name"
               option-label="name"
               label="Financial Year"
@@ -42,7 +42,7 @@
             <div class="q-mt-lg">
               <q-btn label="Submit" type="submit" color="primary" />
               <q-btn
-                v-if="route.name !== 'login'"
+                v-if="route.name !== 'authenticated'"
                 class="q-ml-lg"
                 label="Close"
                 type="button"
@@ -59,27 +59,22 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { storeToRefs } from 'pinia';
-import { useCompanySelectorStore } from 'src/stores/companySelectoreStore';
+import { useRoute } from 'vue-router';
+
+import { useUserStore } from 'src/stores/user/userStore';
 
 const emit = defineEmits(['close']);
 
 const route = useRoute();
-const router = useRouter();
-const companySelectorStore = useCompanySelectorStore();
+
+const userStore = useUserStore();
 
 const active = true;
 
-const { company, branch, financialYear } = storeToRefs(companySelectorStore);
 const selectedCompany = ref(null);
 const selectedBranch = ref(null);
 const selectedFinancialYear = ref(null);
 const error = ref(false);
-
-const fetchFinancialYear = ({ code }: { code: string }) => {
-  companySelectorStore.fetchFinancialYear(code);
-};
 
 const submit = () => {
   if (
@@ -93,15 +88,11 @@ const submit = () => {
     return;
   }
 
-  companySelectorStore.setSelectedData(
-    {
-      selectedCompany: selectedCompany.value,
-      selectedBranch: selectedBranch.value,
-      selectedFinancialYear: selectedFinancialYear.value,
-    },
-    // replace => redirect to module selector
-    () => router.push({ name: 'login' })
-  );
+  userStore.selectedCompany = selectedCompany.value;
+  userStore.selectedBranch = selectedBranch.value;
+  userStore.selectedFinancialYear = selectedFinancialYear.value;
+
+  /* todo: go to module slector */
 };
 
 const close = () => {
@@ -114,7 +105,10 @@ watch(
 );
 
 onMounted(async () => {
-  companySelectorStore.fetchData();
+  if (!(userStore.allowedCompany.length && userStore.allowedBranch.length)) {
+    await userStore.fetchAllowedCompany();
+    await userStore.fetchAllowedBranch();
+  }
 });
 </script>
 
