@@ -59,14 +59,13 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 
 import { useUserStore } from 'src/stores/user/userStore';
 
 const emit = defineEmits(['close']);
 
 const route = useRoute();
-const router = useRouter();
 
 const userStore = useUserStore();
 
@@ -93,7 +92,7 @@ const submit = () => {
   userStore.selectedBranch = selectedBranch.value;
   userStore.selectedFinancialYear = selectedFinancialYear.value;
 
-  router.push({ name: 'moduleSelectore' });
+  /* todo: go to module slector */
 };
 
 const close = () => {
@@ -106,8 +105,10 @@ watch(
 );
 
 onMounted(async () => {
-  const rsp = await userStore.fetchAllowedCompany();
-  //* also fetch allowed branches
+  if (!(userStore.allowedCompany.length && userStore.allowedBranch.length)) {
+    await userStore.fetchAllowedCompany();
+    await userStore.fetchAllowedBranch();
+  }
 });
 </script>
 
