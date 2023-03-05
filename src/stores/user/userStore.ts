@@ -12,6 +12,7 @@ import { api } from 'src/boot/axios';
 export const useUserStore = defineStore('userStore', {
   state: (): State => ({
     token: { id_token: '', expires_in: 0 },
+    appRole: [],
     accessToken: '',
     isAuthenticated: false,
     allowedCompany: [],
@@ -98,6 +99,16 @@ export const useUserStore = defineStore('userStore', {
       }
 
       this.allowedFinancialYear = rsp.data;
+      return rsp.data;
+    },
+    async fetchAppRole() {
+      const rsp = await api.get('userAppRole/login/jaguar');
+
+      if (!rsp.data) {
+        return [];
+      }
+
+      this.appRole = rsp.data;
       return rsp.data;
     },
   },
