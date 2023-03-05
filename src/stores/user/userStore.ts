@@ -8,6 +8,7 @@ import {
 import { defineStore } from 'pinia';
 import jwt_decode from 'jwt-decode';
 import { api } from 'src/boot/axios';
+import { extractIdentifiers } from 'vue/compiler-sfc';
 
 export const useUserStore = defineStore('userStore', {
   state: (): State => ({
@@ -77,7 +78,13 @@ export const useUserStore = defineStore('userStore', {
         return [];
       }
 
+      if (rsp.data.length === 1) {
+        this.selectedCompany = rsp.data[0];
+        await this.fetchAllowedFinancialYear(rsp.data[0]);
+      }
+
       this.allowedCompany = rsp.data;
+
       return rsp.data;
     },
 
@@ -88,6 +95,10 @@ export const useUserStore = defineStore('userStore', {
         return [];
       }
 
+      if (rsp.data.length === 1) {
+        this.selectedBranch = rsp.data[0];
+      }
+
       this.allowedBranch = rsp.data;
       return rsp.data;
     },
@@ -96,6 +107,10 @@ export const useUserStore = defineStore('userStore', {
 
       if (!rsp.data) {
         return [];
+      }
+
+      if (rsp.data.length === 1) {
+        this.selectedFinancialYear = rsp.data[0];
       }
 
       this.allowedFinancialYear = rsp.data;
