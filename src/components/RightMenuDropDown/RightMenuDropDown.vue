@@ -31,7 +31,7 @@
           <q-item-section>Contacts</q-item-section>
         </q-item>
         <q-separator />
-        <q-item clickable>
+        <q-item clickable @click="showIRRCalculator = !showIRRCalculator">
           <q-item-section avatar>
             <q-icon name="fa-solid fa-calculator" />
           </q-item-section>
@@ -86,8 +86,14 @@
       </q-list>
     </q-menu>
   </q-btn>
+  <q-dialog v-model="showIRRCalculator">
+    <IRRCalculator />
+  </q-dialog>
 </template>
 <script setup lang="ts">
+import { ref } from 'vue';
+import IRRCalculator from 'src/components/RightMenuDropDown/RightMenuDropDownOptions/IRRCalculator/IRRCalculator.vue';
+const showIRRCalculator = ref(false);
 const toggleFullscreen = () => {
   const doc = window.document;
   const docEl = doc.documentElement;
