@@ -17,7 +17,7 @@ export const useMenuStore = defineStore('menuStore', {
   state: (): State => ({
     menu: [],
     userMenuRights: [],
-    onModule: '',
+    currentModule: '',
   }),
   getters: {
     orderedUserMenuRights: (state) => {
@@ -31,7 +31,7 @@ export const useMenuStore = defineStore('menuStore', {
     },
     moduleMenuItems(state): MenuItem[] | [] {
       return this.orderedUserMenuRights.filter((item) =>
-        item.modules?.includes(state.onModule)
+        item.modules?.includes(state.currentModule)
       );
     },
   },
@@ -62,15 +62,13 @@ export const useMenuStore = defineStore('menuStore', {
 
       this.userMenuRights = rsp.data;
 
-      console.log(this.filter('parentCode', null));
-
       return rsp.data;
     },
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     filter(key: keyof MenuItem, value: any) {
-      const onModule = this.onModule;
-      if (onModule === '') return [];
+      const currentModule = this.currentModule;
+      if (currentModule === '') return [];
 
       return this.moduleMenuItems.filter((item) => item[key] === value);
     },

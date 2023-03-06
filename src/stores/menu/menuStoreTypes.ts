@@ -1,7 +1,7 @@
 export interface State {
   menu: MenuItem[] | [];
   userMenuRights: MenuItem[] | [];
-  onModule: Modules | '';
+  currentModule: Modules | '';
 }
 
 export type MenuTypes =
