@@ -1,5 +1,4 @@
 interface EligibilityObject {
-  [x: string]: any;
   monthlyRevenue: number | null;
   rate: number | null;
   tenure: number | null;

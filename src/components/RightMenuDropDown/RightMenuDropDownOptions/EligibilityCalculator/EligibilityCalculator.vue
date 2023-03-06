@@ -245,7 +245,6 @@ const colcss = ref('col-xs-12 col-sm-12 col-md-6');
 const rowcss = ref('row q-col-gutter-xs q-pt-sm');
 
 interface EligibilityObject {
-  [x: string]: any;
   monthlyRevenue: number | null;
   rate: number | null;
   tenure: number | null;
@@ -279,7 +278,7 @@ const modalObj = reactive<EligibilityObject>({
 
 const ExpensTotal = ref(0);
 const test = (key: string, value: number) => {
-  if (value > 100) modalObj[key] = 100;
+  if (value > 100) modalObj[key as keyof EligibilityObject] = 100;
 };
 
 const reset = () => {
