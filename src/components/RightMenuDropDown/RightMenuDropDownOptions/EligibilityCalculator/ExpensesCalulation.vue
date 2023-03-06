@@ -9,10 +9,10 @@
         outlined
         dense
         ref="inputRef"
-        :error="error && !ExpensesSelected"
+        :error="error && !expensesSelected"
         error-message=""
-        v-model="ExpensesSelected"
-        :options="Expenses"
+        v-model="expensesSelected"
+        :options="expenses"
         label="Expenses"
       />
     </div>
@@ -20,10 +20,10 @@
       <q-input
         outlined
         dense
-        v-model="ExpensesAmount"
+        v-model="expensesAmount"
         mask="#################"
         ref="inputRef"
-        :error="error && !ExpensesAmount"
+        :error="error && !expensesAmount"
         error-message=""
         input-class="text-right"
       />
@@ -66,7 +66,7 @@
         :error="errormsg && !editExpensesSelected"
         error-message=""
         v-model="editExpensesSelected"
-        :options="Expenses"
+        :options="expenses"
       >
       </q-select>
     </div>
@@ -129,25 +129,27 @@
     <div
       class="col-4 col-md-4 col-xs-4 col-sm-3 text-right q-pr-xs-lg q-pr-sm-none q-pr-md-none"
     >
-      {{ ExpensTotal }}
+      {{ expensTotal }}
     </div>
     <div class="col-4 col-md-4 col-xs-4 col-sm-5"></div>
   </div>
 </template>
 <script setup lang="ts">
 import { ref, reactive } from 'vue';
+import { ExpensesData } from './type';
+
 const error = ref(false);
-const colcss = ref('col-xs-12 col-sm-12 col-md-6');
-const ExpensesSelected = ref('');
-const ExpensesAmount = ref('');
+const colcss = 'col-xs-12 col-sm-12 col-md-6';
+const expensesSelected = ref('');
+const expensesAmount = ref('');
 const editExpensesSelected = ref('');
 const editExpensesAmount = ref('');
 const saveIndex = ref(0);
 const editIndex = ref();
-const EditCondition = ref(true);
+const editCondition = ref(true);
 const errormsg = ref(false);
-const ExpensTotal = ref(0);
-const Expenses = ref([
+const expensTotal = ref(0);
+const expenses = ref([
   'Existing EMI',
   'House Hold Expenses',
   'Labour Expenses',
@@ -160,28 +162,20 @@ const Expenses = ref([
   'Utility Bills',
 ]);
 
-interface ArrayObject {
-  field?: string;
-  value?: number;
-}
-
-interface MyComponentData {
-  ExpensesArray: ArrayObject[];
-}
-const data = reactive<MyComponentData>({
+const data = reactive<ExpensesData>({
   ExpensesArray: [],
 });
 
 const add = () => {
-  if (ExpensesAmount.value && ExpensesSelected.value) {
+  if (expensesAmount.value && expensesSelected.value) {
     data.ExpensesArray.push({
-      field: ExpensesSelected.value,
-      value: parseInt(ExpensesAmount.value),
+      field: expensesSelected.value,
+      value: parseInt(expensesAmount.value),
     });
-    let num = parseInt(ExpensesAmount.value);
-    ExpensTotal.value += num;
-    ExpensesSelected.value = '';
-    ExpensesAmount.value = '';
+    let num = parseInt(expensesAmount.value);
+    expensTotal.value += num;
+    expensesSelected.value = '';
+    expensesAmount.value = '';
     calculateAmount();
     error.value = false;
   } else {
@@ -191,7 +185,7 @@ const add = () => {
 const remove = (index: number) => {
   const obj = data.ExpensesArray[index];
   const val = obj.value;
-  ExpensTotal.value -= val as number;
+  expensTotal.value -= val as number;
   data.ExpensesArray.splice(index, 1);
   editExpensesSelected.value = '';
   editExpensesAmount.value = '';
@@ -208,31 +202,31 @@ const Editremove = (index: number) => {
   // editIndex.value = null;
 };
 const edit = (index: number) => {
-  if (EditCondition.value) {
+  if (editCondition.value) {
     const obj = data.ExpensesArray[index];
     const val = obj.value;
-    ExpensTotal.value -= val as number;
+    expensTotal.value -= val as number;
     editExpensesSelected.value = obj.field as string;
     editExpensesAmount.value = (obj.value as number).toString();
     saveIndex.value = index;
     editIndex.value = index;
-    EditCondition.value = false;
+    editCondition.value = false;
     // data.ExpensesArray.splice(index, 1);
     calculateAmount();
   } else {
-    EditCondition.value = true;
+    editCondition.value = true;
     const obj = data.ExpensesArray[saveIndex.value];
     const val = obj.value;
-    ExpensTotal.value += val as number;
+    expensTotal.value += val as number;
 
     const obj2 = data.ExpensesArray[index];
     const val2 = obj2.value;
-    ExpensTotal.value -= val2 as number;
+    expensTotal.value -= val2 as number;
     editExpensesSelected.value = obj2.field as string;
     editExpensesAmount.value = (obj2.value as number).toString();
     saveIndex.value = index;
     editIndex.value = index;
-    EditCondition.value = false;
+    editCondition.value = false;
     calculateAmount();
   }
 };
@@ -243,22 +237,22 @@ const editSave = () => {
     obj.value = parseInt(editExpensesAmount.value);
     data.ExpensesArray.splice(saveIndex.value, 1, obj);
     let num = parseInt(editExpensesAmount.value);
-    ExpensTotal.value += num;
+    expensTotal.value += num;
     calculateAmount();
     editIndex.value = -1;
-    EditCondition.value = true;
+    editCondition.value = true;
   } else {
     errormsg.value = true;
   }
 };
 
 const refresh = () => {
-  (ExpensesSelected.value = ''), (ExpensesAmount.value = '');
+  (expensesSelected.value = ''), (expensesAmount.value = '');
 };
 
 const emits = defineEmits(['updateToatal']);
 const calculateAmount = () => {
-  emits('updateToatal', ExpensTotal.value);
+  emits('updateToatal', expensTotal.value);
 };
 </script>
 <style scoped>

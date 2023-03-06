@@ -1,4 +1,4 @@
-interface EligibilityObject {
+export interface EligibilityObject {
   monthlyRevenue: number | null;
   rate: number | null;
   tenure: number | null;
@@ -13,5 +13,11 @@ interface EligibilityObject {
   ltvLoanAmount: number | null;
   maxLoanAmount: number | null;
 }
+export interface ExpensesObject {
+  field?: string;
+  value?: number;
+}
 
-export default EligibilityObject;
+export interface ExpensesData {
+  ExpensesArray: ExpensesObject[];
+}

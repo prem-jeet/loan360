@@ -24,8 +24,8 @@
         </div>
       </div>
       <q-form @submit.prevent="calculateAmount()">
-        <div :class="rowcss">
-          <div :class="colcss">
+        <div :class="rowCss">
+          <div :class="colCss">
             {{
               radio === 'bs'
                 ? ' Monthly Business Sales / Receipt'
@@ -33,7 +33,7 @@
             }}
             <span class="text-red"> &nbsp;*</span>
           </div>
-          <div :class="colcss">
+          <div :class="colCss">
             <q-input
               outlined
               mask="#################"
@@ -44,11 +44,11 @@
             />
           </div>
         </div>
-        <div :class="rowcss">
-          <div :class="colcss">
+        <div :class="rowCss">
+          <div :class="colCss">
             Interest Rate<span class="text-red"> &nbsp;*</span>
           </div>
-          <div :class="colcss">
+          <div :class="colCss">
             <q-input
               outlined
               dense
@@ -61,11 +61,11 @@
             />
           </div>
         </div>
-        <div :class="rowcss">
-          <div :class="colcss">
+        <div :class="rowCss">
+          <div :class="colCss">
             Tenure<span class="text-red"> &nbsp;*</span>
           </div>
-          <div :class="colcss">
+          <div :class="colCss">
             <q-input
               outlined
               dense
@@ -77,9 +77,9 @@
             />
           </div>
         </div>
-        <div :class="rowcss">
-          <div :class="colcss">Instalments</div>
-          <div :class="colcss">
+        <div :class="rowCss">
+          <div :class="colCss">Instalments</div>
+          <div :class="colCss">
             <q-input
               outlined
               dense
@@ -89,9 +89,9 @@
             />
           </div>
         </div>
-        <div :class="rowcss">
-          <div :class="colcss">Adv Instalments</div>
-          <div :class="colcss">
+        <div :class="rowCss">
+          <div :class="colCss">Adv Instalments</div>
+          <div :class="colCss">
             <q-input
               outlined
               dense
@@ -101,12 +101,12 @@
             />
           </div>
         </div>
-        <div :class="rowcss">
-          <div :class="colcss">
+        <div :class="rowCss">
+          <div :class="colCss">
             {{ radio === 'bs' ? 'Margin %' : ' Net Salary Eligle for EMI %' }}
             <span class="text-red"> &nbsp;*</span>
           </div>
-          <div :class="colcss">
+          <div :class="colCss">
             <q-input
               outlined
               dense
@@ -119,11 +119,11 @@
             />
           </div>
         </div>
-        <div :class="rowcss">
-          <div :class="colcss">
+        <div :class="rowCss">
+          <div :class="colCss">
             {{ radio === 'bs' ? 'Margin in Amt' : 'Net Salary In Amt' }}
           </div>
-          <div :class="colcss">
+          <div :class="colCss">
             <q-input
               filled
               outlined
@@ -137,15 +137,15 @@
 
         <ExpensesCalulation @updateToatal="ToatlUpdate" />
 
-        <div :class="rowcss">
-          <div :class="colcss">
+        <div :class="rowCss">
+          <div :class="colCss">
             {{
               radio === 'bs'
                 ? 'Net Income Available for EMI'
                 : 'Net Salary Available for EMI'
             }}
           </div>
-          <div :class="colcss">
+          <div :class="colCss">
             <q-input
               mask="############.##"
               filled
@@ -157,9 +157,9 @@
             />
           </div>
         </div>
-        <div :class="rowcss">
-          <div :class="colcss">Loan Amount</div>
-          <div :class="colcss">
+        <div :class="rowCss">
+          <div :class="colCss">Loan Amount</div>
+          <div :class="colCss">
             <q-input
               outlined
               filled
@@ -170,9 +170,9 @@
             />
           </div>
         </div>
-        <div v-if="radio === 'bs'" :class="rowcss">
-          <div :class="colcss">LTV Cost Value</div>
-          <div :class="colcss">
+        <div v-if="radio === 'bs'" :class="rowCss">
+          <div :class="colCss">LTV Cost Value</div>
+          <div :class="colCss">
             <q-input
               outlined
               mask="############"
@@ -182,9 +182,9 @@
             />
           </div>
         </div>
-        <div v-if="radio === 'bs'" :class="rowcss">
-          <div :class="colcss">"LTV %</div>
-          <div :class="colcss">
+        <div v-if="radio === 'bs'" :class="rowCss">
+          <div :class="colCss">"LTV %</div>
+          <div :class="colCss">
             <q-input
               outlined
               dense
@@ -196,9 +196,9 @@
             />
           </div>
         </div>
-        <div v-if="radio === 'bs'" :class="rowcss">
-          <div :class="colcss">LTV Loan Amount</div>
-          <div :class="colcss">
+        <div v-if="radio === 'bs'" :class="rowCss">
+          <div :class="colCss">LTV Loan Amount</div>
+          <div :class="colCss">
             <q-input
               outlined
               filled
@@ -209,9 +209,9 @@
             />
           </div>
         </div>
-        <div :class="rowcss">
-          <div :class="colcss">Max Loan Amount</div>
-          <div :class="colcss">
+        <div :class="rowCss">
+          <div :class="colCss">Max Loan Amount</div>
+          <div :class="colCss">
             <q-input
               outlined
               filled
@@ -237,27 +237,11 @@
 </template>
 <script setup lang="ts">
 import ExpensesCalulation from './ExpensesCalulation.vue';
-
+import { EligibilityObject } from './type';
 import { ref, reactive } from 'vue';
 const radio = ref('bs');
-const colcss = ref('col-xs-12 col-sm-12 col-md-6');
-const rowcss = ref('row q-col-gutter-xs q-pt-sm');
-
-interface EligibilityObject {
-  monthlyRevenue: number | null;
-  rate: number | null;
-  tenure: number | null;
-  instalments: number | null;
-  advInstalments: number | null;
-  marginPercent: number | null;
-  netAvailableIncome: number | null;
-  marginAmount: number | null;
-  calculatedLoanAmount: number | null;
-  ltvCostValue: number | null;
-  ltvPercent: number | null;
-  ltvLoanAmount: number | null;
-  maxLoanAmount: number | null;
-}
+const colCss = 'col-xs-12 col-sm-12 col-md-6';
+const rowCss = 'row q-col-gutter-xs q-pt-sm';
 
 const modalObj = reactive<EligibilityObject>({
   instalments: null,
@@ -275,7 +259,7 @@ const modalObj = reactive<EligibilityObject>({
   maxLoanAmount: null,
 });
 
-const ExpensTotal = ref(0);
+const expensTotal = ref(0);
 const test = (key: string, value: number) => {
   if (value > 100) modalObj[key as keyof EligibilityObject] = 100;
 };
@@ -309,7 +293,7 @@ const calculateAmount = () => {
     ((modalObj.monthlyRevenue as number) * (modalObj.marginPercent as number)) /
     100;
   modalObj.netAvailableIncome =
-    modalObj.marginAmount - (ExpensTotal.value > 0 ? ExpensTotal.value : 0);
+    modalObj.marginAmount - (expensTotal.value > 0 ? expensTotal.value : 0);
   modalObj.calculatedLoanAmount =
     (modalObj.netAvailableIncome * (modalObj.tenure as number)) /
     (1 +
@@ -336,7 +320,7 @@ const calculateAmount = () => {
 };
 
 const ToatlUpdate = (val: number) => {
-  ExpensTotal.value = val;
+  expensTotal.value = val;
   calculateAmount();
 };
 </script>
