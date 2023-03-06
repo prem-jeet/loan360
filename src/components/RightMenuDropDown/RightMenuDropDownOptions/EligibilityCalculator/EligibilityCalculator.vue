@@ -153,6 +153,7 @@
           </div>
           <div :class="colcss">
             <q-input
+              mask="############.##"
               filled
               outlined
               dense
