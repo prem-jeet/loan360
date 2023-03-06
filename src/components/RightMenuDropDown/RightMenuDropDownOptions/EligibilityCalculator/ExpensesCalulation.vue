@@ -135,7 +135,6 @@
   </div>
 </template>
 <script setup lang="ts">
-import { number } from '@intlify/core-base';
 import { ref, reactive } from 'vue';
 const error = ref(false);
 const colcss = ref('col-xs-12 col-sm-12 col-md-6');
@@ -162,7 +161,8 @@ const Expenses = ref([
 ]);
 
 interface ArrayObject {
-  [key: string]: string | number | null;
+  field?: string;
+  value?: number;
 }
 
 interface MyComponentData {
@@ -176,7 +176,7 @@ const add = () => {
   if (ExpensesAmount.value && ExpensesSelected.value) {
     data.ExpensesArray.push({
       field: ExpensesSelected.value,
-      value: ExpensesAmount.value,
+      value: parseInt(ExpensesAmount.value),
     });
     let num = parseInt(ExpensesAmount.value);
     ExpensTotal.value += num;
@@ -190,8 +190,8 @@ const add = () => {
 };
 const remove = (index: number) => {
   const obj = data.ExpensesArray[index];
-  const val = parseInt(obj['value'] as keyof typeof number);
-  ExpensTotal.value -= val;
+  const val = obj.value;
+  ExpensTotal.value -= val as number;
   data.ExpensesArray.splice(index, 1);
   editExpensesSelected.value = '';
   editExpensesAmount.value = '';
@@ -210,10 +210,10 @@ const Editremove = (index: number) => {
 const edit = (index: number) => {
   if (EditCondition.value) {
     const obj = data.ExpensesArray[index];
-    const val = parseInt(obj['value'] as keyof typeof number);
-    ExpensTotal.value -= val;
-    editExpensesSelected.value = obj['field'] as keyof typeof String;
-    editExpensesAmount.value = obj['value'] as keyof typeof String;
+    const val = obj.value;
+    ExpensTotal.value -= val as number;
+    editExpensesSelected.value = obj.field as string;
+    editExpensesAmount.value = (obj.value as number).toString();
     saveIndex.value = index;
     editIndex.value = index;
     EditCondition.value = false;
@@ -222,24 +222,25 @@ const edit = (index: number) => {
   } else {
     EditCondition.value = true;
     const obj = data.ExpensesArray[saveIndex.value];
-    const val = parseInt(obj['value'] as keyof typeof number);
-    ExpensTotal.value += val;
+    const val = obj.value;
+    ExpensTotal.value += val as number;
 
     const obj2 = data.ExpensesArray[index];
-    const val2 = parseInt(obj2['value'] as keyof typeof number);
-    ExpensTotal.value -= val2;
-    editExpensesSelected.value = obj2['field'] as keyof typeof String;
-    editExpensesAmount.value = obj2['value'] as keyof typeof String;
+    const val2 = obj2.value;
+    ExpensTotal.value -= val2 as number;
+    editExpensesSelected.value = obj2.field as string;
+    editExpensesAmount.value = (obj2.value as number).toString();
     saveIndex.value = index;
     editIndex.value = index;
     EditCondition.value = false;
+    calculateAmount();
   }
 };
 
 const editSave = () => {
   if (parseInt(editExpensesAmount.value) >= 0) {
     const obj = data.ExpensesArray[saveIndex.value];
-    obj.value = editExpensesAmount.value;
+    obj.value = parseInt(editExpensesAmount.value);
     data.ExpensesArray.splice(saveIndex.value, 1, obj);
     let num = parseInt(editExpensesAmount.value);
     ExpensTotal.value += num;
