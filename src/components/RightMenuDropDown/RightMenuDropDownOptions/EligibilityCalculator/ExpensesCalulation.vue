@@ -33,22 +33,21 @@
   <div class="row q-col-gutter-xs q-pt-sm justify-end q-pr-md-lg q-pr-xs-none">
     <q-btn
       size="sm"
-      class="q-pl-md"
+      class="q-pl-md q-mr-sm"
       color="light-blue"
       @click="add()"
       icon="fa-solid fa-plus"
     >
       <q-tooltip> Add Expenses</q-tooltip>
     </q-btn>
-    &nbsp;
     <q-btn
       size="sm"
       class="q-pl-md"
       color="light-blue"
       @click="refresh()"
       icon="fa-solid fa-arrow-rotate-left"
-      ><q-tooltip>clear</q-tooltip></q-btn
-    >
+      ><q-tooltip>clear</q-tooltip>
+    </q-btn>
   </div>
 
   <div
@@ -68,7 +67,8 @@
         error-message=""
         v-model="editExpensesSelected"
         :options="Expenses"
-      ></q-select>
+      >
+      </q-select>
     </div>
     <div v-if="editIndex !== index" class="col-3 col-md-4 text-right">
       {{ item.value }}
@@ -86,6 +86,7 @@
     </div>
     <div v-if="editIndex !== index" class="col-5 col-md-4 text-right">
       <q-btn
+        class="q-mr-sm"
         size="xs"
         color="blue"
         @click="edit(index)"
@@ -93,7 +94,6 @@
       >
         <q-tooltip> Edit </q-tooltip>
       </q-btn>
-      &nbsp;
       <q-btn
         size="xs"
         color="red"
@@ -103,11 +103,16 @@
       </q-btn>
     </div>
     <div v-else class="col-xs-12 col-sm-12 col-md-3 text-right">
-      <q-btn size="xs" color="blue" @click="editSave()" icon="fa-solid fa-check"
-        ><q-tooltip> save</q-tooltip>
-      </q-btn>
-      &nbsp;
       <q-btn
+        size="xs"
+        color="blue"
+        @click="editSave()"
+        icon="fa-solid fa-check"
+      >
+        <q-tooltip> save</q-tooltip>
+      </q-btn>
+      <q-btn
+        class="q-ml-sm"
         size="xs"
         color="red"
         @click="Editremove(index)"
@@ -118,9 +123,9 @@
   </div>
   <div
     v-if="data.ExpensesArray.length > 0"
-    class="row q-pt-xs q-mx-lg-lg q-col-gutter-sm"
+    class="row q-pt-md q-mx-lg-lg q-col-gutter-sm"
   >
-    <div class="col-4 col-md-4 col-xs-4 col-sm-4">Total Expenses</div>
+    <div class="col-4 col-md-4 col-xs-4 col-sm-4 text-bold">Total Expenses</div>
     <div
       class="col-4 col-md-4 col-xs-4 col-sm-3 text-right q-pr-xs-lg q-pr-sm-none q-pr-md-none"
     >

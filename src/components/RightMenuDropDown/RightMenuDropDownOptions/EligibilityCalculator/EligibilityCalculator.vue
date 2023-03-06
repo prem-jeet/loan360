@@ -17,13 +17,7 @@
     <q-card-section style="max-height: 85vh" class="scroll">
       <div class="row q-pb-sm">
         <div class="col-xs-6 col-sm-6 col-md-6 q-px-sm">
-          <q-radio
-            v-model="radio"
-            dense
-            val="bs"
-            label="Business Loan
-"
-          />
+          <q-radio v-model="radio" dense val="bs" label="Business Loan" />
         </div>
         <div class="col-xs-6 col-sm-6 col-md-6 q-px-sm">
           <q-radio v-model="radio" dense val="salary" label="Salaried Loan" />
@@ -229,8 +223,12 @@
           </div>
         </div>
         <div class="row justify-center q-pt-md">
-          <q-btn color="light-blue" label="reset" @click="reset" />
-          &nbsp;
+          <q-btn
+            class="q-mr-sm"
+            color="light-blue"
+            label="reset"
+            @click="reset"
+          />
           <q-btn color="light-blue" label="Close" v-close-popup />
         </div>
       </q-form>
@@ -317,9 +315,7 @@ const calculateAmount = () => {
     (1 +
       ((modalObj.rate as number) / 100) * ((modalObj.tenure as number) / 12));
   modalObj.calculatedLoanAmount = modalObj.calculatedLoanAmount / 1000;
-  modalObj.calculatedLoanAmount = Number(
-    parseFloat(modalObj.calculatedLoanAmount as unknown as string).toFixed(0)
-  );
+  modalObj.calculatedLoanAmount = +modalObj.calculatedLoanAmount.toFixed(0);
   modalObj.calculatedLoanAmount = modalObj.calculatedLoanAmount * 1000;
 
   if (modalObj.ltvPercent !== null && radio.value === 'bs') {
@@ -327,25 +323,19 @@ const calculateAmount = () => {
       ((modalObj.ltvCostValue as number) * (modalObj.ltvPercent as number)) /
       100;
     modalObj.ltvLoanAmount = modalObj.ltvLoanAmount / 1000;
-    modalObj.ltvLoanAmount = Number(
-      parseFloat(modalObj.ltvLoanAmount as unknown as string).toFixed(0)
-    );
+    modalObj.ltvLoanAmount = +modalObj.ltvLoanAmount.toFixed(0);
     modalObj.ltvLoanAmount = modalObj.ltvLoanAmount * 1000;
     modalObj.maxLoanAmount =
       modalObj.ltvLoanAmount >= modalObj.calculatedLoanAmount
         ? modalObj.calculatedLoanAmount
         : modalObj.ltvLoanAmount;
-    modalObj.maxLoanAmount = Number(
-      parseFloat(modalObj.maxLoanAmount as unknown as string).toFixed(2)
-    );
+    modalObj.maxLoanAmount = +modalObj.maxLoanAmount.toFixed(2);
   } else {
-    modalObj.maxLoanAmount = Number(
-      parseFloat(modalObj.calculatedLoanAmount as unknown as string).toFixed(2)
-    );
+    modalObj.maxLoanAmount = +modalObj.calculatedLoanAmount.toFixed(2);
   }
 };
 
-const ToatlUpdate = (val: any) => {
+const ToatlUpdate = (val: number) => {
   ExpensTotal.value = val;
   calculateAmount();
 };
