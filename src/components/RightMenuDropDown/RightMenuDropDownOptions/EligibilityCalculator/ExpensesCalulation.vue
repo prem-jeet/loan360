@@ -1,6 +1,6 @@
 <template>
   <div class="row q-col-gutter-xs q-pb-sm q-pt-sm">
-    <div :class="colcss">Expenses</div>
+    <div :class="colcss">Expense</div>
   </div>
 
   <div class="row q-col-gutter-xs q-pb-xs">
@@ -21,11 +21,11 @@
         outlined
         dense
         v-model="expensesAmount"
-        mask="#################"
+        type="number"
         ref="inputRef"
         :error="error && !expensesAmount"
         error-message=""
-        input-class="text-right"
+        input-class="text-right remove-input-number-indicator"
       />
     </div>
   </div>
@@ -46,7 +46,7 @@
       color="light-blue"
       @click="refresh()"
       icon="fa-solid fa-arrow-rotate-left"
-      ><q-tooltip>clear</q-tooltip>
+      ><q-tooltip>Clear</q-tooltip>
     </q-btn>
   </div>
 
@@ -79,9 +79,9 @@
         error-message=""
         outlined
         dense
+        type="number"
         v-model="editExpensesAmount"
-        mask="#################"
-        input-class="text-right"
+        input-class="text-right remove-input-number-indicator"
       ></q-input>
     </div>
     <div v-if="editIndex !== index" class="col-5 col-md-4 text-right">
@@ -109,7 +109,7 @@
         @click="editSave()"
         icon="fa-solid fa-check"
       >
-        <q-tooltip> save</q-tooltip>
+        <q-tooltip> Save</q-tooltip>
       </q-btn>
       <q-btn
         class="q-ml-sm"

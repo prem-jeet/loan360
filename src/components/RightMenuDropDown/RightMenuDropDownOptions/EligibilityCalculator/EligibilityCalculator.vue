@@ -14,7 +14,7 @@
         </q-toolbar>
       </q-item-section>
     </q-item>
-    <q-card-section style="max-height: 85vh" class="scroll">
+    <q-card-section style="max-height: 80vh" class="scroll">
       <div class="row q-pb-sm">
         <div class="col-xs-6 col-sm-6 col-md-6 q-px-sm">
           <q-radio v-model="radio" dense val="bs" label="Business Loan" />
@@ -36,11 +36,12 @@
           <div :class="colCss">
             <q-input
               outlined
-              mask="#################"
+              type="number"
               dense
+              hide-bottom-space
               v-model="modalObj.monthlyRevenue"
               :rules="[(val: any) => !!val || '']"
-              input-class="text-right"
+              input-class="text-right remove-input-number-indicator"
             />
           </div>
         </div>
@@ -51,11 +52,12 @@
           <div :class="colCss">
             <q-input
               outlined
+              type="number"
               dense
-              mask="###"
-              v-model="modalObj.rate"
+              hide-bottom-space
+              v-model.number="modalObj.rate"
               :rules="[(val: any) => !!val || '']"
-              input-class="text-right"
+              input-class="text-right remove-input-number-indicator"
               @blur="blur()"
               @update:model-value="(v) => test('rate', v as number)"
             />
@@ -68,11 +70,12 @@
           <div :class="colCss">
             <q-input
               outlined
+              type="number"
               dense
-              mask="###"
+              hide-bottom-space
               v-model="modalObj.tenure"
               :rules="[(val: any) => !!val || '']"
-              input-class="text-right"
+              input-class="text-right remove-input-number-indicator"
               @blur="blur()"
             />
           </div>
@@ -83,9 +86,9 @@
             <q-input
               outlined
               dense
-              mask="###"
+              type="number"
               v-model="modalObj.instalments"
-              input-class="text-right"
+              input-class="text-right remove-input-number-indicator"
             />
           </div>
         </div>
@@ -94,10 +97,10 @@
           <div :class="colCss">
             <q-input
               outlined
+              type="number"
               dense
-              mask="###"
               v-model="modalObj.advInstalments"
-              input-class="text-right"
+              input-class="text-right remove-input-number-indicator"
             />
           </div>
         </div>
@@ -110,12 +113,13 @@
             <q-input
               outlined
               dense
-              mask="###"
+              type="number"
+              hide-bottom-space
               v-model="modalObj.marginPercent"
               :rules="[(val: any) => !!val || '']"
-              input-class="text-right"
+              input-class="text-right remove-input-number-indicator"
               @blur="blur()"
-              @update:model-value="(v) => test('marginPercent',  v as number)"
+              @update:model-value="(v) => test('marginPercent', v as number)"
             />
           </div>
         </div>
@@ -126,11 +130,12 @@
           <div :class="colCss">
             <q-input
               filled
+              type="number"
               outlined
               dense
               disable
               v-model="modalObj.marginAmount"
-              input-class="text-right"
+              input-class="text-right remove-input-number-indicator"
             />
           </div>
         </div>
@@ -150,10 +155,11 @@
               mask="############.##"
               filled
               outlined
+              type="number"
               dense
               disable
               v-model="modalObj.netAvailableIncome"
-              input-class="text-right"
+              input-class="text-right remove-input-number-indicator"
             />
           </div>
         </div>
@@ -165,8 +171,9 @@
               filled
               dense
               disable
+              type="number"
               v-model="modalObj.calculatedLoanAmount"
-              input-class="text-right"
+              input-class="text-right remove-input-number-indicator"
             />
           </div>
         </div>
@@ -175,10 +182,10 @@
           <div :class="colCss">
             <q-input
               outlined
-              mask="############"
+              type="number"
               dense
               v-model="modalObj.ltvCostValue"
-              input-class="text-right"
+              input-class="text-right remove-input-number-indicator"
             />
           </div>
         </div>
@@ -188,9 +195,9 @@
             <q-input
               outlined
               dense
-              mask="###"
+              type="number"
               v-model="modalObj.ltvPercent"
-              input-class="text-right"
+              input-class="text-right remove-input-number-indicator"
               @blur="blur()"
               @update:model-value="(v) => test('ltvPercent', v as number)"
             />
@@ -204,8 +211,9 @@
               filled
               disable
               dense
+              type="number"
               v-model="modalObj.ltvLoanAmount"
-              input-class="text-right"
+              input-class="text-right remove-input-number-indicator"
             />
           </div>
         </div>
@@ -217,8 +225,9 @@
               filled
               dense
               disable
+              type="number"
               v-model="modalObj.maxLoanAmount"
-              input-class="text-right"
+              input-class="text-right remove-input-number-indicator"
             />
           </div>
         </div>
@@ -261,6 +270,7 @@ const modalObj = reactive<EligibilityObject>({
 
 const expensTotal = ref(0);
 const test = (key: string, value: number) => {
+  console.log('value', value, typeof value);
   if (value > 100) modalObj[key as keyof EligibilityObject] = 100;
 };
 
@@ -325,15 +335,7 @@ const ToatlUpdate = (val: number) => {
 };
 </script>
 <style scoped>
-.row-with-border {
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 10px;
-}
 .e-card {
   width: 1000px;
-}
-.q-field--with-bottom {
-  padding-bottom: 0px;
 }
 </style>
