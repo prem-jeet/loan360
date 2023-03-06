@@ -8,7 +8,6 @@ import {
 import { defineStore } from 'pinia';
 import jwt_decode from 'jwt-decode';
 import { api } from 'src/boot/axios';
-import { extractIdentifiers } from 'vue/compiler-sfc';
 
 export const useUserStore = defineStore('userStore', {
   state: (): State => ({
@@ -84,7 +83,6 @@ export const useUserStore = defineStore('userStore', {
       }
 
       this.allowedCompany = rsp.data;
-
       return rsp.data;
     },
 
