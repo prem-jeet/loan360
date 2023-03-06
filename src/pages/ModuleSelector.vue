@@ -43,11 +43,14 @@
 import { useQuasar } from 'quasar';
 import { useModuleSelectorKeyboardListener } from 'src/composables/moduleSelectorKeyboardListener';
 import { useRouter } from 'vue-router';
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
+import { useUserStore } from 'src/stores/user/userStore';
+import { useMenuStore } from 'src/stores/menu/menuStore';
 
 const router = useRouter();
-
 const $q = useQuasar();
+const userStore = useUserStore();
+const menuStore = useMenuStore();
 
 const width = computed(() => $q.screen.width);
 
@@ -97,6 +100,15 @@ const moduleCardData = [
 ];
 
 useModuleSelectorKeyboardListener(router.push);
+
+onMounted(async () => {
+  if (!userStore.appRole.length) {
+    await userStore.fetchAppRole();
+    await menuStore.fetchMenu();
+  }
+
+  menuStore.onModule = '';
+});
 </script>
 
 <style scoped lang="scss">
