@@ -30,7 +30,7 @@
           <q-input
             outlined
             dense
-            v-model="name"
+            v-model="irr.amount"
             type="number"
             input-class="text-right remove-input-number-indicator"
           />
@@ -46,7 +46,7 @@
           <q-input
             outlined
             dense
-            v-model="name"
+            v-model="irr.rate"
             type="number"
             input-class="text-right remove-input-number-indicator"
           />
@@ -56,7 +56,7 @@
           <q-input
             outlined
             dense
-            v-model="name"
+            v-model="irr.irr"
             type="number"
             input-class="text-right remove-input-number-indicator"
           />
@@ -70,7 +70,7 @@
           <q-input
             outlined
             dense
-            v-model="name"
+            v-model="irr.inttMonths"
             type="number"
             input-class="text-right remove-input-number-indicator"
           />
@@ -83,14 +83,14 @@
           <q-input
             outlined
             dense
-            v-model="name"
+            v-model="irr.installments"
             type="number"
             input-class="text-right remove-input-number-indicator"
           />
         </div>
         <div :class="colCssL">Name</div>
         <div :class="colCssR">
-          <q-input outlined dense v-model="name" />
+          <q-input outlined dense v-model="irr.name" />
         </div>
       </div>
 
@@ -111,7 +111,7 @@
           <q-input
             outlined
             dense
-            v-model="name"
+            v-model="irr.advInstallments"
             type="number"
             input-class="text-right remove-input-number-indicator"
           />
@@ -121,7 +121,7 @@
           <q-input
             outlined
             dense
-            v-model="name"
+            v-model="irr.commission"
             type="number"
             input-class="text-right remove-input-number-indicator"
           />
@@ -134,7 +134,7 @@
           <q-input
             outlined
             dense
-            v-model="name"
+            v-model="irr.charges"
             type="number"
             input-class="text-right remove-input-number-indicator"
           />
@@ -144,7 +144,7 @@
           <q-input
             outlined
             dense
-            v-model="name"
+            v-model="irr.rebate"
             type="number"
             input-class="text-right remove-input-number-indicator"
           />
@@ -157,7 +157,7 @@
           <q-input
             outlined
             dense
-            v-model="name"
+            v-model="irr.security"
             type="number"
             input-class="text-right remove-input-number-indicator"
           />
@@ -175,20 +175,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, reactive } from 'vue';
+import { IrrObject } from './types';
 const rowCss = 'row q-col-gutter-sm justify-center q-pt-xs';
 const colCssL =
   'col-12 col-xs-12 col-sm-6 col-md-2 q-mt-xs-sm q-mt-sm-none q-mt-md-sm';
 const colCssR = 'col-12 col-xs-12 col-sm-6 col-md-4';
 const mode = ref('IRR');
 const modes = ref(['IRR', 'ReverseIRR']);
-const name = ref(0);
 const date = new Date();
 const day = date.getDate().toString().padStart(2, '0');
 const month = (date.getMonth() + 1).toString().padStart(2, '0');
 const year = date.getFullYear().toString();
 const formattedDate = ref(`${year}-${month}-${day}`);
 const nextMonth = ref('h');
+
+const irr = reactive<IrrObject>({});
+
+irr.firstEmi = formattedDate.value;
 </script>
 
 <style scoped></style>
