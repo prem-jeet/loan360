@@ -6,3 +6,13 @@
     flex-grow: 1;
   }
 }
+.remove-input-number-indicator::-webkit-outer-spin-button,
+.remove-input-number-indicator::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+.remove-input-number-indicator[type='number'] {
+  -moz-appearance: textfield;
+}
