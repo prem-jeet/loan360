@@ -176,7 +176,8 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue';
 import { IrrObject } from './types';
-const rowCss = 'row q-col-gutter-md justify-center q-pt-sm';
+const rowCss =
+  'row q-col-gutter-md-md q-col-gutter-sm-sm q-col-gutter-xs-sm justify-center q-pt-sm';
 const colCssL =
   'col-12 col-xs-12 col-sm-6 col-md-2 q-mt-xs-sm q-mt-sm-none q-mt-md-sm';
 const colCssR = 'col-12 col-xs-12 col-sm-6 col-md-4';
