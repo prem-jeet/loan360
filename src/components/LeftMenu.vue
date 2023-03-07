@@ -56,8 +56,6 @@ const createSubmenu = (parentCode: string): Tree[] => {
 };
 
 const treeStructure = createTreeStructure();
-
-console.log(treeStructure);
 </script>
 
 <style scoped></style>
