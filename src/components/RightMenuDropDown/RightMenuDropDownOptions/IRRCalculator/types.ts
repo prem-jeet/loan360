@@ -6,7 +6,7 @@ export interface IrrObject {
   installments?: number | null;
   name?: string | null;
   firstEmi?: string | null;
-  nextEmi?: number | null;
+  nextEmi?: string | null;
   advInstallments?: number | null;
   commission?: number | null;
   charges?: number | null;

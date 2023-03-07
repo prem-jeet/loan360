@@ -30,7 +30,6 @@
             dense
             v-model="irr.amount"
             type="number"
-            @update:model-value="test"
             input-class="text-right remove-input-number-indicator"
           />
         </div>
@@ -92,14 +91,27 @@
         </div>
         <div :class="colCssL">1st EMI Date</div>
         <div :class="colCssR">
-          <q-input outlined dense v-model="formattedDate" type="date" />
+          <q-input
+            outlined
+            dense
+            v-model="irr.firstEmi"
+            type="date"
+            @update:model-value="nextEmi"
+          />
         </div>
       </div>
 
       <div :class="rowCss">
         <div :class="colCssL">2nd EMI Date</div>
         <div :class="colCssR">
-          <q-input outlined dense disable filled v-model="nextMonth" />
+          <q-input
+            outlined
+            dense
+            disable
+            filled
+            v-model="irr.nextEmi"
+            type="date"
+          />
         </div>
         <div v-if="mode === 'IRR'" :class="colCssL">Advance EMIs</div>
         <div v-else :class="colCssL"></div>
@@ -187,10 +199,8 @@ const day = date.getDate().toString().padStart(2, '0');
 const month = (date.getMonth() + 1).toString().padStart(2, '0');
 const year = date.getFullYear().toString();
 const formattedDate = ref(`${year}-${month}-${day}`);
-const nextMonth = ref('h');
 
 const irr = reactive<IrrObject>({});
-
 irr.firstEmi = formattedDate.value;
 
 const autoFill = () => {
@@ -208,8 +218,37 @@ const autoFill = () => {
     irr.firstEmi = formattedDate.value;
   }
 };
-const test = (v: any) => {
-  console.log(v);
+const nextEmi = (v: any) => {
+  const today = new Date(Date.parse(v));
+  const day = today.getDate().toString().padStart(2, '0');
+  const month = (today.getMonth() + 1).toString().padStart(2, '0');
+
+  if (month === '01' && (day === '29' || day === '30' || day === '31')) {
+    const day = '28';
+    const month = '02';
+    const year = today.getFullYear().toString();
+    irr.nextEmi = `${year}-${month}-${day}`;
+  } else if (day === '31') {
+    const nextMonth = new Date(
+      today.getFullYear(),
+      today.getMonth() + 1,
+      today.getDate() - 1
+    );
+    const day = nextMonth.getDate().toString().padStart(2, '0');
+    const month = (nextMonth.getMonth() + 1).toString().padStart(2, '0');
+    const year = nextMonth.getFullYear().toString();
+    irr.nextEmi = `${year}-${month}-${day}`;
+  } else {
+    const nextMonth = new Date(
+      today.getFullYear(),
+      today.getMonth() + 1,
+      today.getDate()
+    );
+    const day = nextMonth.getDate().toString().padStart(2, '0');
+    const month = (nextMonth.getMonth() + 1).toString().padStart(2, '0');
+    const year = nextMonth.getFullYear().toString();
+    irr.nextEmi = `${year}-${month}-${day}`;
+  }
 };
 </script>
 
