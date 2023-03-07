@@ -1,5 +1,14 @@
 <template>
   <q-toolbar class="bg-purple-6">
+    <q-btn
+      flat
+      @click="openMenu"
+      round
+      dense
+      icon="menu"
+      class="gt-xs"
+      v-if="route.name !== 'moduleSelector'"
+    />
     <q-avatar>
       <img :src="logo" />
     </q-avatar>
@@ -17,4 +26,10 @@
 <script setup lang="ts">
 import RightMenuDropDown from 'src/components/modals/RightMenuDropDown.vue';
 import logo from 'src/assets/img/JaguarWhite.png';
+import { useRoute } from 'vue-router';
+
+const emits = defineEmits(['openMenu']);
+
+const route = useRoute();
+const openMenu = () => emits('openMenu');
 </script>
