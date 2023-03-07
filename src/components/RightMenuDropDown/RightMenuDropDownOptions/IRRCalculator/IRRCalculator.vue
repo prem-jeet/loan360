@@ -38,8 +38,11 @@
       </div>
 
       <div :class="rowCss">
-        <div :class="colCssL">Rate <span class="text-red">*</span></div>
-        <div :class="colCssR">
+        <div v-if="mode == 'IRR'" :class="colCssL">
+          Rate <span class="text-red">*</span>
+        </div>
+        <div v-else :class="colCssL">IRR <span class="text-red">*</span></div>
+        <div v-if="mode == 'IRR'" :class="colCssR">
           <q-input
             outlined
             dense
@@ -48,6 +51,17 @@
             input-class="text-right remove-input-number-indicator"
           />
         </div>
+
+        <div v-else :class="colCssR">
+          <q-input
+            outlined
+            dense
+            v-model="name"
+            type="number"
+            input-class="text-right remove-input-number-indicator"
+          />
+        </div>
+
         <div :class="colCssL">
           Intt.for Mnths
           <span class="text-red">*</span>
@@ -87,11 +101,11 @@
         </div>
         <div :class="colCssL">2nd EMI Date</div>
         <div :class="colCssR">
-          <q-input outlined dense v-model="nextMonth" />
+          <q-input outlined dense disable filled v-model="nextMonth" />
         </div>
       </div>
 
-      <div :class="rowCss">
+      <div v-if="mode == 'IRR'" :class="rowCss">
         <div :class="colCssL">Advance EMIs</div>
         <div :class="colCssR">
           <q-input
@@ -114,7 +128,7 @@
         </div>
       </div>
 
-      <div :class="rowCss">
+      <div v-if="mode == 'IRR'" :class="rowCss">
         <div :class="colCssL">Doc.Charges</div>
         <div :class="colCssR">
           <q-input
@@ -137,7 +151,7 @@
         </div>
       </div>
 
-      <div :class="rowCss">
+      <div v-if="mode == 'IRR'" :class="rowCss">
         <div :class="colCssL">Security</div>
         <div :class="colCssR">
           <q-input
@@ -166,7 +180,7 @@ const rowCss = 'row q-col-gutter-sm justify-center q-pt-xs';
 const colCssL =
   'col-12 col-xs-12 col-sm-6 col-md-2 q-mt-xs-sm q-mt-sm-none q-mt-md-sm';
 const colCssR = 'col-12 col-xs-12 col-sm-6 col-md-4';
-const mode = ref('');
+const mode = ref('IRR');
 const modes = ref(['IRR', 'ReverseIRR']);
 const name = ref(0);
 const date = new Date();
