@@ -167,7 +167,12 @@
       </div>
 
       <div class="row justify-center q-pt-md">
-        <q-btn class="q-mr-sm" color="light-blue" label="Auto-Fill" />
+        <q-btn
+          class="q-mr-sm"
+          color="light-blue"
+          label="Auto-Fill"
+          @click="autoFill()"
+        />
         <q-btn color="light-blue" label="Next" v-close-popup />
       </div>
     </q-card-section>
@@ -193,6 +198,22 @@ const nextMonth = ref('h');
 const irr = reactive<IrrObject>({});
 
 irr.firstEmi = formattedDate.value;
+
+const autoFill = () => {
+  if (mode.value === 'IRR') {
+    irr.amount = 10000;
+    irr.rate = 18;
+    irr.inttMonths = 12;
+    irr.installments = 12;
+    irr.firstEmi = formattedDate.value;
+  } else {
+    irr.amount = 10000;
+    irr.irr = 31.726;
+    irr.inttMonths = 12;
+    irr.installments = 12;
+    irr.firstEmi = formattedDate.value;
+  }
+};
 </script>
 
 <style scoped></style>
