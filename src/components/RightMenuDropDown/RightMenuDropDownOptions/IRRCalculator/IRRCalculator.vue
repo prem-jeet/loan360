@@ -11,17 +11,15 @@
       </q-item-section>
     </q-item>
     <q-card-section class="scroll">
-      <div :class="rowCss">
-        <div :class="colCssL">Mode</div>
-        <div :class="colCssR">
-          <q-select
-            outlined
-            dense
-            v-model="mode"
-            :options="modes"
-            label="Mode"
-          />
+      <div class="row justify-center q-mb-sm">
+        <div class="col-xs-6 col-sm-6 col-md-6">
+          <q-radio v-model="mode" dense val="IRR" label="IRR" />
         </div>
+        <div class="col-xs-6 col-sm-6 col-md-6">
+          <q-radio v-model="mode" dense val="ReverseIRR" label="Reverse IRR" />
+        </div>
+      </div>
+      <div :class="rowCss">
         <div :class="colCssL">
           Amount
           <span class="text-red">*</span>
@@ -32,12 +30,10 @@
             dense
             v-model="irr.amount"
             type="number"
+            @update:model-value="test"
             input-class="text-right remove-input-number-indicator"
           />
         </div>
-      </div>
-
-      <div :class="rowCss">
         <div v-if="mode == 'IRR'" :class="colCssL">
           Rate <span class="text-red">*</span>
         </div>
@@ -61,7 +57,9 @@
             input-class="text-right remove-input-number-indicator"
           />
         </div>
+      </div>
 
+      <div :class="rowCss">
         <div :class="colCssL">
           Intt.for Mnths
           <span class="text-red">*</span>
@@ -75,9 +73,6 @@
             input-class="text-right remove-input-number-indicator"
           />
         </div>
-      </div>
-
-      <div :class="rowCss">
         <div :class="colCssL">Installments <span class="text-red">*</span></div>
         <div :class="colCssR">
           <q-input
@@ -88,26 +83,27 @@
             input-class="text-right remove-input-number-indicator"
           />
         </div>
+      </div>
+
+      <div :class="rowCss">
         <div :class="colCssL">Name</div>
         <div :class="colCssR">
           <q-input outlined dense v-model="irr.name" />
         </div>
-      </div>
-
-      <div :class="rowCss">
         <div :class="colCssL">1st EMI Date</div>
         <div :class="colCssR">
           <q-input outlined dense v-model="formattedDate" type="date" />
         </div>
+      </div>
+
+      <div :class="rowCss">
         <div :class="colCssL">2nd EMI Date</div>
         <div :class="colCssR">
           <q-input outlined dense disable filled v-model="nextMonth" />
         </div>
-      </div>
-
-      <div v-if="mode == 'IRR'" :class="rowCss">
-        <div :class="colCssL">Advance EMIs</div>
-        <div :class="colCssR">
+        <div v-if="mode === 'IRR'" :class="colCssL">Advance EMIs</div>
+        <div v-else :class="colCssL"></div>
+        <div v-if="mode === 'IRR'" :class="colCssR">
           <q-input
             outlined
             dense
@@ -116,6 +112,10 @@
             input-class="text-right remove-input-number-indicator"
           />
         </div>
+        <div v-else :class="colCssR"></div>
+      </div>
+
+      <div v-if="mode == 'IRR'" :class="rowCss">
         <div :class="colCssL">Commission</div>
         <div :class="colCssR">
           <q-input
@@ -126,9 +126,6 @@
             input-class="text-right remove-input-number-indicator"
           />
         </div>
-      </div>
-
-      <div v-if="mode == 'IRR'" :class="rowCss">
         <div :class="colCssL">Doc.Charges</div>
         <div :class="colCssR">
           <q-input
@@ -139,6 +136,9 @@
             input-class="text-right remove-input-number-indicator"
           />
         </div>
+      </div>
+
+      <div v-if="mode == 'IRR'" :class="rowCss">
         <div :class="colCssL">Rebate</div>
         <div :class="colCssR">
           <q-input
@@ -149,9 +149,6 @@
             input-class="text-right remove-input-number-indicator"
           />
         </div>
-      </div>
-
-      <div v-if="mode == 'IRR'" :class="rowCss">
         <div :class="colCssL">Security</div>
         <div :class="colCssR">
           <q-input
@@ -162,10 +159,7 @@
             input-class="text-right remove-input-number-indicator"
           />
         </div>
-        <div :class="colCssL"></div>
-        <div :class="colCssR"></div>
       </div>
-
       <div class="row justify-center q-pt-md">
         <q-btn
           class="q-mr-sm"
@@ -182,12 +176,11 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue';
 import { IrrObject } from './types';
-const rowCss = 'row q-col-gutter-sm justify-center q-pt-xs';
+const rowCss = 'row q-col-gutter-md justify-center q-pt-sm';
 const colCssL =
   'col-12 col-xs-12 col-sm-6 col-md-2 q-mt-xs-sm q-mt-sm-none q-mt-md-sm';
 const colCssR = 'col-12 col-xs-12 col-sm-6 col-md-4';
 const mode = ref('IRR');
-const modes = ref(['IRR', 'ReverseIRR']);
 const date = new Date();
 const day = date.getDate().toString().padStart(2, '0');
 const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -213,6 +206,9 @@ const autoFill = () => {
     irr.installments = 12;
     irr.firstEmi = formattedDate.value;
   }
+};
+const test = (v: any) => {
+  console.log(v);
 };
 </script>
 
