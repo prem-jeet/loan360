@@ -29,10 +29,33 @@ export const useMenuStore = defineStore('menuStore', {
 
       return [];
     },
+    filter() {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (key: keyof MenuItem, value: any): MenuItem[] | [] => {
+        const currentModule = this.currentModule;
+        if (currentModule === '') return [];
+
+        return this.moduleMenuItems.filter((item) => item[key] === value);
+      };
+      // eslint-enable-next-line @typescript-eslint/no-explicit-any
+    },
+
     moduleMenuItems(state): MenuItem[] | [] {
-      return this.orderedUserMenuRights.filter((item) =>
-        item.modules?.includes(state.currentModule)
+      return this.orderedUserMenuRights.filter(
+        (item) => item.modules?.includes(state.currentModule) && item.roleType
       );
+    },
+
+    topLevelMenu(): MenuItem[] | [] {
+      if (!this.moduleMenuItems.length) return [];
+
+      return this.filter('parentCode', null);
+    },
+    subMenu() {
+      return (parenMenuItem: MenuItem): MenuItem[] | [] =>
+        this.moduleMenuItems.filter(
+          (item) => item.parentCode === parenMenuItem.code
+        );
     },
   },
   actions: {
@@ -64,14 +87,5 @@ export const useMenuStore = defineStore('menuStore', {
 
       return rsp.data;
     },
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    filter(key: keyof MenuItem, value: any) {
-      const currentModule = this.currentModule;
-      if (currentModule === '') return [];
-
-      return this.moduleMenuItems.filter((item) => item[key] === value);
-    },
-    // eslint-enable-next-line @typescript-eslint/no-explicit-any
   },
 });
