@@ -36,7 +36,7 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         path: ':module',
-        name: 'moule',
+        name: 'module',
         component: () => import('pages/Module.vue'),
         props: ({ params }) => ({ module: params.module }),
         beforeEnter: (to) => {
