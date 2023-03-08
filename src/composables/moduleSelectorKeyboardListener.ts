@@ -83,7 +83,7 @@ export function useModuleSelectorKeyboardListener(
   onUnmounted(() => {
     if (Platform.is.desktop) {
       console.log('Stopped listening for keypress....');
-      document.removeEventListener('keydown', callback);
+      window.removeEventListener('keydown', callback);
     }
   });
 }
