@@ -31,7 +31,12 @@ const props = defineProps({
   data: {
     type: Object,
   },
+  select: {
+    type: String,
+    required: true,
+  },
 });
+
 const calcInterest = () => {
   if (irr.amount && irr.rate && irr.inttMonths) {
     irr.interest = ((irr.amount * irr.rate) / 100 / 12) * irr.inttMonths;
@@ -40,7 +45,11 @@ const calcInterest = () => {
 };
 const irr = reactive<IrrObject>({ ...props.data });
 onMounted(() => {
-  calcInterest();
+  if (props.select === 'IRR') {
+    calcInterest();
+  } else {
+    alert('hi');
+  }
 });
 </script>
 

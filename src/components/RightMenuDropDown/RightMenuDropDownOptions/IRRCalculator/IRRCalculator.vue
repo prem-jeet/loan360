@@ -198,7 +198,7 @@
       </div>
     </q-card-section>
     <q-card-section v-else class="scroll">
-      <IRRCalculation :data="irr" @back="back" />
+      <IRRCalculation :data="irr" :select="mode" @back="back" />
     </q-card-section>
   </q-card>
 </template>
