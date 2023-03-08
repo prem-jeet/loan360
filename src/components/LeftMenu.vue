@@ -18,7 +18,8 @@
     >
       <q-tree
         :nodes="treeStructure"
-        node-key="label"
+        node-key="code"
+        label-key="name"
         no-connectors
         accordion
         :filter="treeFilter"
@@ -37,13 +38,15 @@ import { MenuItem } from 'src/stores/menu/menuStoreTypes';
 import { debounce } from 'quasar';
 
 interface TreeNode {
-  label: string;
+  name: string;
   icon?: string;
   children: TreeNode[] | [];
+  code: string;
+  // remove this later
   data: MenuItem;
 }
 const iconSet = {
-  MG: 'fa-solid fa-folder',
+  MG: 'fa-regular fa-folder-open',
   MR: 'fa-regular fa-rectangle-list',
   MD: 'fa-regular fa-pen-to-square',
   MP: 'fa-regular fa-pen-to-square',
@@ -66,10 +69,11 @@ const reduceFn = (
       ? createSubmenu(menuItem.code)
       : [];
   const temp = {
-    label: menuItem.name,
+    name: menuItem.name,
     children,
     icon: iconSet[menuItem.menuType as keyof typeof iconSet],
     data: menuItem,
+    code: menuItem.code,
   };
 
   if (menuItem.menuType !== 'MG' || children.length !== 0) {
@@ -108,8 +112,6 @@ watch(treeFilter, () => {
     treeRef.value?.collapseAll();
   }
 });
-
-console.log(treeStructure);
 </script>
 
 <style scoped></style>
