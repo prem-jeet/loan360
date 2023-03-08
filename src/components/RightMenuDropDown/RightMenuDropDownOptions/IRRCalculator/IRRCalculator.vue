@@ -10,7 +10,7 @@
         </q-toolbar>
       </q-item-section>
     </q-item>
-    <q-card-section class="scroll">
+    <q-card-section v-if="next" class="scroll">
       <div class="row justify-center q-mb-sm">
         <div class="col-xs-6 col-sm-6 col-md-6">
           <q-radio v-model="mode" dense val="IRR" label="IRR" />
@@ -179,13 +179,17 @@
           label="Auto-Fill"
           @click="autoFill()"
         />
-        <q-btn color="light-blue" label="Next" v-close-popup />
+        <q-btn color="light-blue" label="Next" @click="next = !next" />
       </div>
+    </q-card-section>
+    <q-card-section v-else class="scroll">
+      <IRRCalculation @back="back" />
     </q-card-section>
   </q-card>
 </template>
 
 <script setup lang="ts">
+import IRRCalculation from './IRRCalculation.vue';
 import { ref, reactive } from 'vue';
 import { IrrObject } from './types';
 const rowCss =
@@ -200,6 +204,7 @@ const month = (date.getMonth() + 1).toString().padStart(2, '0');
 const year = date.getFullYear().toString();
 const formattedDate = ref(`${year}-${month}-${day}`);
 const nextEmiDisable = ref(true);
+const next = ref(true);
 
 const irr = reactive<IrrObject>({});
 irr.firstEmi = formattedDate.value;
@@ -225,6 +230,7 @@ const nextEmi = (v: any) => {
   const month = (today.getMonth() + 1).toString().padStart(2, '0');
 
   if (month === '01' && (day === '29' || day === '30' || day === '31')) {
+    console.log(day.includes('29'));
     const year = today.getFullYear().toString();
     const checkYear = parseInt(year);
     if (
@@ -256,6 +262,10 @@ const nextEmi = (v: any) => {
   } else {
     nextEmiDisable.value = true;
   }
+};
+
+const back = () => {
+  next.value = !next.value;
 };
 </script>
 
