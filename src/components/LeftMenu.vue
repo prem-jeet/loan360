@@ -36,10 +36,10 @@ import { ref, watch } from 'vue';
 import { MenuItem } from 'src/stores/menu/menuStoreTypes';
 import { debounce } from 'quasar';
 
-interface Tree {
+interface TreeNode {
   label: string;
   icon?: string;
-  children: Tree[] | [];
+  children: TreeNode[] | [];
   data: MenuItem;
 }
 const iconSet = {
@@ -57,7 +57,10 @@ const resetFilter = () => {
   filter.value = '';
 };
 
-const reduceFn = (acc: Tree[] | [], menuItem: MenuItem): Tree[] | [] => {
+const reduceFn = (
+  acc: TreeNode[] | [],
+  menuItem: MenuItem
+): TreeNode[] | [] => {
   const children =
     menuItem.url === '' || menuItem.url === null
       ? createSubmenu(menuItem.code)
@@ -81,7 +84,7 @@ const createTreeStructure = () => {
   return topLevelMenuItems.reduce(reduceFn, []);
 };
 
-const createSubmenu = (parentCode: string): Tree[] => {
+const createSubmenu = (parentCode: string): TreeNode[] => {
   const subMenuItems = [...menuStore.filter('parentCode', parentCode)];
   return subMenuItems.reduce(reduceFn, []);
 };
@@ -105,6 +108,8 @@ watch(treeFilter, () => {
     treeRef.value?.collapseAll();
   }
 });
+
+console.log(treeStructure);
 </script>
 
 <style scoped></style>
