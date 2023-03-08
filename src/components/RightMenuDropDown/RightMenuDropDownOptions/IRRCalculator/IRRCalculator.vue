@@ -29,7 +29,10 @@
             outlined
             dense
             v-model="irr.amount"
+            hide-bottom-space
             type="number"
+            :error="error && !irr.amount"
+            error-message=""
             input-class="text-right remove-input-number-indicator"
           />
         </div>
@@ -42,7 +45,10 @@
             outlined
             dense
             v-model="irr.rate"
+            hide-bottom-space
             type="number"
+            :error="error && !irr.rate"
+            error-message=""
             input-class="text-right remove-input-number-indicator"
           />
         </div>
@@ -52,7 +58,10 @@
             outlined
             dense
             v-model="irr.irr"
+            hide-bottom-space
             type="number"
+            :error="error && !irr.irr"
+            error-message=""
             input-class="text-right remove-input-number-indicator"
           />
         </div>
@@ -68,7 +77,10 @@
             outlined
             dense
             v-model="irr.inttMonths"
+            hide-bottom-space
             type="number"
+            :error="error && !irr.inttMonths"
+            error-message=""
             input-class="text-right remove-input-number-indicator"
           />
         </div>
@@ -78,7 +90,10 @@
             outlined
             dense
             v-model="irr.installments"
+            hide-bottom-space
             type="number"
+            :error="error && !irr.installments"
+            error-message=""
             input-class="text-right remove-input-number-indicator"
           />
         </div>
@@ -179,11 +194,11 @@
           label="Auto-Fill"
           @click="autoFill()"
         />
-        <q-btn color="light-blue" label="Next" @click="next = !next" />
+        <q-btn color="light-blue" label="Next" @click="nextcal" />
       </div>
     </q-card-section>
     <q-card-section v-else class="scroll">
-      <IRRCalculation @back="back" />
+      <IRRCalculation :data="irr" @back="back" />
     </q-card-section>
   </q-card>
 </template>
@@ -205,6 +220,7 @@ const year = date.getFullYear().toString();
 const formattedDate = ref(`${year}-${month}-${day}`);
 const nextEmiDisable = ref(true);
 const next = ref(true);
+const error = ref(false);
 
 const irr = reactive<IrrObject>({});
 irr.firstEmi = formattedDate.value;
@@ -230,7 +246,6 @@ const nextEmi = (v: any) => {
   const month = (today.getMonth() + 1).toString().padStart(2, '0');
 
   if (month === '01' && (day === '29' || day === '30' || day === '31')) {
-    console.log(day.includes('29'));
     const year = today.getFullYear().toString();
     const checkYear = parseInt(year);
     if (
@@ -263,7 +278,16 @@ const nextEmi = (v: any) => {
     nextEmiDisable.value = true;
   }
 };
-
+const nextcal = () => {
+  if (
+    !(irr.amount && irr.inttMonths && irr.installments && (irr.rate || irr.irr))
+  ) {
+    error.value = true;
+    return;
+  } else {
+    next.value = !next.value;
+  }
+};
 const back = () => {
   next.value = !next.value;
 };
