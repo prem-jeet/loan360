@@ -107,8 +107,8 @@
           <q-input
             outlined
             dense
-            disable
-            filled
+            :disable="nextEmiDisable"
+            :filled="nextEmiDisable"
             v-model="irr.nextEmi"
             type="date"
           />
@@ -199,6 +199,7 @@ const day = date.getDate().toString().padStart(2, '0');
 const month = (date.getMonth() + 1).toString().padStart(2, '0');
 const year = date.getFullYear().toString();
 const formattedDate = ref(`${year}-${month}-${day}`);
+const nextEmiDisable = ref(true);
 
 const irr = reactive<IrrObject>({});
 irr.firstEmi = formattedDate.value;
@@ -248,6 +249,12 @@ const nextEmi = (v: any) => {
     const month = (today.getMonth() + 2).toString().padStart(2, '0');
     const year = today.getFullYear().toString();
     irr.nextEmi = `${year}-${month}-${day}`;
+  }
+
+  if (month === '02' && (day === '28' || day === '29')) {
+    nextEmiDisable.value = false;
+  } else {
+    nextEmiDisable.value = true;
   }
 };
 </script>
