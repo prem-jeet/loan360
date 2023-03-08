@@ -1,5 +1,5 @@
 <template>
-  <div class="q-py-md q-pl-md q-pr-sm q-gutter-y-lg fit">
+  <div class="q-pa-md q-gutter-y-lg fit">
     <q-input v-model="filter" label="Filter" standout="bg-blue-grey text-white">
       <template v-slot:append>
         <q-icon
@@ -24,6 +24,7 @@
         :filter="treeFilter"
         ref="treeRef"
         no-results-label="No result found"
+        icon="navigate_next"
       />
     </q-scroll-area>
   </div>
