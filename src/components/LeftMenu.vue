@@ -1,13 +1,39 @@
 <template>
-  <q-scroll-area class="fit" :visible="scrollbarVisible">
-    <q-tree :nodes="treeStructure" node-key="label" />
-  </q-scroll-area>
+  <div class="q-py-md q-pl-md q-pr-sm q-gutter-y-lg fit">
+    <q-input v-model="filter" label="Filter" standout="bg-blue-grey text-white">
+      <template v-slot:append>
+        <q-icon
+          v-if="filter !== ''"
+          name="clear"
+          class="cursor-pointer"
+          @click="resetFilter"
+        />
+        <q-icon name="search" v-else />
+      </template>
+    </q-input>
+
+    <q-scroll-area
+      :visible="scrollbarVisible"
+      style="height: calc(100% - 70px)"
+    >
+      <q-tree
+        :nodes="treeStructure"
+        node-key="label"
+        no-connectors
+        accordion
+        :filter="treeFilter"
+        ref="treeRef"
+        no-results-label="No result found"
+      />
+    </q-scroll-area>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { useMenuStore } from 'src/stores/menu/menuStore';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { MenuItem } from 'src/stores/menu/menuStoreTypes';
+import { debounce } from 'quasar';
 
 interface Tree {
   label: string;
@@ -25,6 +51,10 @@ const iconSet = {
 
 const scrollbarVisible = ref(false);
 const menuStore = useMenuStore();
+
+const resetFilter = () => {
+  filter.value = '';
+};
 
 const reduceFn = (acc: Tree[] | [], menuItem: MenuItem): Tree[] | [] => {
   const children =
@@ -56,6 +86,24 @@ const createSubmenu = (parentCode: string): Tree[] => {
 };
 
 const treeStructure = createTreeStructure();
+const filter = ref('');
+const treeFilter = ref('');
+const treeRef = ref(null);
+
+watch(
+  filter,
+  debounce(() => (treeFilter.value = filter.value), 200)
+);
+
+watch(treeFilter, () => {
+  if (treeFilter.value) {
+    // @ts-expect-error expandAll is function provided by Quasar
+    treeRef.value?.expandAll();
+  } else {
+    // @ts-expect-error collapseAll is function provided by Quasar
+    treeRef.value?.collapseAll();
+  }
+});
 </script>
 
 <style scoped></style>
