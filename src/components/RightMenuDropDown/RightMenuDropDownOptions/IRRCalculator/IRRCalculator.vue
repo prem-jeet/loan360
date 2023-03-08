@@ -224,29 +224,29 @@ const nextEmi = (v: any) => {
   const month = (today.getMonth() + 1).toString().padStart(2, '0');
 
   if (month === '01' && (day === '29' || day === '30' || day === '31')) {
-    const day = '28';
-    const month = '02';
+    const year = today.getFullYear().toString();
+    const checkYear = parseInt(year);
+    if (
+      (checkYear % 4 === 0 && checkYear % 100 !== 0) ||
+      checkYear % 400 === 0
+    ) {
+      const day = '29';
+      const month = (today.getMonth() + 2).toString().padStart(2, '0');
+      irr.nextEmi = `${year}-${month}-${day}`;
+    } else {
+      const day = '28';
+      const month = (today.getMonth() + 2).toString().padStart(2, '0');
+      irr.nextEmi = `${year}-${month}-${day}`;
+    }
+  } else if (day === '31') {
+    const day = (today.getDate() - 1).toString().padStart(2, '0');
+    const month = (today.getMonth() + 2).toString().padStart(2, '0');
     const year = today.getFullYear().toString();
     irr.nextEmi = `${year}-${month}-${day}`;
-  } else if (day === '31') {
-    const nextMonth = new Date(
-      today.getFullYear(),
-      today.getMonth() + 1,
-      today.getDate() - 1
-    );
-    const day = nextMonth.getDate().toString().padStart(2, '0');
-    const month = (nextMonth.getMonth() + 1).toString().padStart(2, '0');
-    const year = nextMonth.getFullYear().toString();
-    irr.nextEmi = `${year}-${month}-${day}`;
   } else {
-    const nextMonth = new Date(
-      today.getFullYear(),
-      today.getMonth() + 1,
-      today.getDate()
-    );
-    const day = nextMonth.getDate().toString().padStart(2, '0');
-    const month = (nextMonth.getMonth() + 1).toString().padStart(2, '0');
-    const year = nextMonth.getFullYear().toString();
+    const day = today.getDate().toString().padStart(2, '0');
+    const month = (today.getMonth() + 2).toString().padStart(2, '0');
+    const year = today.getFullYear().toString();
     irr.nextEmi = `${year}-${month}-${day}`;
   }
 };
