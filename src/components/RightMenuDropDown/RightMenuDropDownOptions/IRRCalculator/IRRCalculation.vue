@@ -11,12 +11,12 @@
     </div>
   </div>
   <div class="row justify-start q-pa-sm">
-    <div class="col">Amount+Intt. NaN</div>
+    <div class="col">Amount+Intt. {{ irr.agreedAmount }}</div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, onMounted } from 'vue';
 import { IrrObject } from './types';
 const rowCss =
   'row q-col-gutter-md-md q-col-gutter-sm-sm q-col-gutter-xs-sm justify-center';
@@ -32,8 +32,16 @@ const props = defineProps({
     type: Object,
   },
 });
+const calcInterest = () => {
+  if (irr.amount && irr.rate && irr.inttMonths) {
+    irr.interest = ((irr.amount * irr.rate) / 100 / 12) * irr.inttMonths;
+    irr.agreedAmount = irr.amount + irr.interest;
+  }
+};
 const irr = reactive<IrrObject>({ ...props.data });
-console.log(irr);
+onMounted(() => {
+  calcInterest();
+});
 </script>
 
 <style scoped></style>
