@@ -244,8 +244,10 @@ const nextEmi = (v: any) => {
   const today = new Date(Date.parse(v));
   const day = today.getDate().toString().padStart(2, '0');
   const month = (today.getMonth() + 1).toString().padStart(2, '0');
+  const days = ['29', '30', '31'];
+  const febdays = ['28', '29'];
 
-  if (month === '01' && (day === '29' || day === '30' || day === '31')) {
+  if (month === '01' && days.includes(day)) {
     const year = today.getFullYear().toString();
     const checkYear = parseInt(year);
     if (
@@ -272,7 +274,7 @@ const nextEmi = (v: any) => {
     irr.nextEmi = `${year}-${month}-${day}`;
   }
 
-  if (month === '02' && (day === '28' || day === '29')) {
+  if (month === '02' && febdays.includes(day)) {
     nextEmiDisable.value = false;
   } else {
     nextEmiDisable.value = true;
