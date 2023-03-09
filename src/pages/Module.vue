@@ -3,6 +3,7 @@
     class="absolute full-width full-height column"
     :class="[$q.platform.is.mobile ? mobileClass : 'flex-center']"
     :key="module"
+    v-if="route.name === 'module'"
   >
     <div class="col-auto text-center">
       <p class="text-medium" id="module-label">{{ moduleLabel }} Module</p>
@@ -36,6 +37,7 @@
       </q-btn>
     </div>
   </div>
+  <RouterView />
 </template>
 
 <script setup lang="ts">
@@ -44,13 +46,14 @@ import { onMounted, computed } from 'vue';
 import { Modules } from 'src/stores/menu/menuStoreTypes';
 import { useQuasar } from 'quasar';
 import LeftMenu from 'src/components/LeftMenu.vue';
+import { useRoute } from 'vue-router';
 
 const props = defineProps<{
   module: Modules;
 }>();
 
 const mobileClass = 'items-stretch q-pt-lg';
-
+const route = useRoute();
 const emits = defineEmits(['openMenu']);
 const $q = useQuasar();
 
@@ -75,7 +78,7 @@ onMounted(() => {
   menuStore.currentModule = modules[currentModule.value as keyof typeof modules]
     .key as Modules;
 
-  if (!$q.platform.is.mobile) {
+  if (!$q.platform.is.mobile && route.name === 'module') {
     openMenu();
   }
 });
