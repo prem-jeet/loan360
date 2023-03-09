@@ -10,7 +10,7 @@
     </div>
 
     <div class="col" v-if="$q.platform.is.mobile">
-      <LeftMenu />
+      <LeftMenu :key="menuStore.currentModule" />
     </div>
 
     <div class="q-mt-lg" v-else>

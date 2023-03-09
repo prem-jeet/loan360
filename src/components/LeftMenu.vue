@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md q-gutter-y-lg fit" :key="menuStore.currentModule">
+  <div class="q-pa-md q-gutter-y-lg fit">
     <q-input v-model="filter" label="Filter" standout="bg-blue-grey text-white">
       <template v-slot:append>
         <q-icon
