@@ -54,6 +54,13 @@ const routes: RouteRecordRaw[] = [
             return { name: 'notFound' };
           }
         },
+        children: [
+          {
+            path: 'accountCode',
+            name: 'accountCode',
+            component: import('pages/settings/accounts/AccountCode.vue'),
+          },
+        ],
       },
     ],
   },
