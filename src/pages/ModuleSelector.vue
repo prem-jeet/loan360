@@ -26,6 +26,13 @@
               <span class="text-bold q-pa-sm">{{ data.key }}</span> or click
             </p>
           </div>
+          <q-tooltip
+            anchor="top middle"
+            self="bottom middle"
+            class="bg-blue-4 text-dark text-weight-medium text-subtitle1 text-center q-px-lg q-py-md"
+          >
+            <div style="max-width: 40ch">{{ data.tooltip }}</div>
+          </q-tooltip>
         </q-card>
       </router-link>
       <q-card v-else>
@@ -60,42 +67,50 @@ const moduleCardData = [
     label: 'Loan Origination System',
     to: '/module/los',
     key: 'O',
+    tooltip: 'Application to Approval.',
   },
   {
     img: 'src/assets/img/modules/lms.jpg',
     label: 'Loan Management System',
     to: '/module/lms',
     key: 'L',
+    tooltip: 'Loan lifecycle management.',
   },
   {
     img: 'src/assets/img/modules/collection.jpg',
     label: 'Collection',
     to: '/module/collection',
     key: 'C',
+    tooltip: 'Delinquency classification, Allocation, Repossession.',
   },
   {
     img: 'src/assets/img/modules/fa.jpg',
     label: 'Financial Accounting',
     to: '/module/fa',
     key: 'A',
+    tooltip: 'General Ledger/ Financial Accounting module.',
   },
   {
     img: 'src/assets/img/modules/td.jpg',
     label: 'Term Deposits',
     to: '/module/td',
     key: 'D',
+    tooltip: 'Management of Deposits & Debentures accepted from Customers.',
   },
   {
     img: 'src/assets/img/modules/maintenance.jpg',
     label: 'Maintenance',
     to: '/module/maintenance',
     key: 'M',
+    tooltip:
+      'Master Lists maintenance & End of Day/Month handled by System Admins.',
   },
   {
     img: 'src/assets/img/modules/settings.jpg',
     label: 'Settings',
     to: '/module/settings',
     key: 'S',
+    tooltip: 'Configurations & Settings handled only by the Solution provider.',
   },
 ];
 
@@ -107,7 +122,7 @@ onMounted(async () => {
     await menuStore.fetchMenu();
   }
 
-  menuStore.onModule = '';
+  menuStore.currentModule = '';
 });
 </script>
 
