@@ -58,7 +58,7 @@ const routes: RouteRecordRaw[] = [
           {
             path: 'accountCode',
             name: 'accountCode',
-            component: import('pages/settings/accounts/AccountCode.vue'),
+            component: () => import('pages/settings/accounts/AccountCode.vue'),
           },
         ],
       },
