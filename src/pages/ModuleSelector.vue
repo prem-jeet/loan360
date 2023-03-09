@@ -26,6 +26,13 @@
               <span class="text-bold q-pa-sm">{{ data.key }}</span> or click
             </p>
           </div>
+          <q-tooltip
+            anchor="top middle"
+            self="bottom middle"
+            class="bg-blue-4 text-dark text-weight-medium text-subtitle1 text-center q-px-lg q-py-md"
+          >
+            <div style="max-width: 40ch">{{ data.tooltip }}</div>
+          </q-tooltip>
         </q-card>
       </router-link>
       <q-card v-else>
@@ -43,11 +50,14 @@
 import { useQuasar } from 'quasar';
 import { useModuleSelectorKeyboardListener } from 'src/composables/moduleSelectorKeyboardListener';
 import { useRouter } from 'vue-router';
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
+import { useUserStore } from 'src/stores/user/userStore';
+import { useMenuStore } from 'src/stores/menu/menuStore';
 
 const router = useRouter();
-
 const $q = useQuasar();
+const userStore = useUserStore();
+const menuStore = useMenuStore();
 
 const width = computed(() => $q.screen.width);
 
@@ -57,54 +67,78 @@ const moduleCardData = [
     label: 'Loan Origination System',
     to: '/module/los',
     key: 'O',
+    tooltip: 'Application to Approval.',
   },
   {
     img: 'src/assets/img/modules/lms.jpg',
     label: 'Loan Management System',
     to: '/module/lms',
     key: 'L',
+    tooltip: 'Loan lifecycle management.',
   },
   {
     img: 'src/assets/img/modules/collection.jpg',
     label: 'Collection',
     to: '/module/collection',
     key: 'C',
+    tooltip: 'Delinquency classification, Allocation, Repossession.',
   },
   {
     img: 'src/assets/img/modules/fa.jpg',
     label: 'Financial Accounting',
     to: '/module/fa',
     key: 'A',
+    tooltip: 'General Ledger/ Financial Accounting module.',
   },
   {
     img: 'src/assets/img/modules/td.jpg',
     label: 'Term Deposits',
     to: '/module/td',
     key: 'D',
+    tooltip: 'Management of Deposits & Debentures accepted from Customers.',
   },
   {
     img: 'src/assets/img/modules/maintenance.jpg',
     label: 'Maintenance',
     to: '/module/maintenance',
     key: 'M',
+    tooltip:
+      'Master Lists maintenance & End of Day/Month handled by System Admins.',
   },
   {
     img: 'src/assets/img/modules/settings.jpg',
     label: 'Settings',
     to: '/module/settings',
     key: 'S',
+    tooltip: 'Configurations & Settings handled only by the Solution provider.',
   },
 ];
 
 useModuleSelectorKeyboardListener(router.push);
+
+onMounted(async () => {
+  if (!userStore.appRole.length) {
+    await userStore.fetchAppRole();
+    await menuStore.fetchMenu();
+  }
+
+  menuStore.currentModule = '';
+});
 </script>
 
 <style scoped lang="scss">
 .module-card {
-  height: 300px;
+  height: 35vh;
   background-size: cover;
   background-position: center;
 }
+
+@media screen and (max-width: 600px) {
+  .module-card {
+    height: 25vh;
+  }
+}
+
 .card-label {
   font-size: calc(1vw + 12px);
   color: black;

@@ -1,67 +1,67 @@
 <template>
   <q-btn flat :ripple="false" class="bg-purple-6">
     Jaguar software india
-    <q-menu fit>
+    <q-menu fit auto-close>
       <q-list style="min-width: 100px">
         <q-item @click="toggleFullscreen" clickable>
           <q-item-section avatar>
-            <q-icon name="fa-solid fa-expand" />
+            <q-icon size="xs" name="fa-solid fa-expand" />
           </q-item-section>
           <q-item-section>Full Screen</q-item-section>
         </q-item>
         <q-separator />
         <q-item to="/moduleselector" class="text-black">
           <q-item-section avatar>
-            <q-icon name="fa-solid fa-home" />
+            <q-icon size="xs" name="fa-solid fa-home" />
           </q-item-section>
           <q-item-section avatar> Modules</q-item-section>
         </q-item>
         <q-separator />
         <q-item clickable>
           <q-item-section avatar>
-            <q-icon name="fa-solid fa-calendar" />
+            <q-icon size="xs" name="fa-solid fa-calendar" />
           </q-item-section>
           <q-item-section>Calender</q-item-section>
         </q-item>
         <q-separator />
         <q-item clickable>
           <q-item-section avatar>
-            <q-icon name="fa-solid fa-address-card" />
+            <q-icon size="xs" name="fa-solid fa-address-card" />
           </q-item-section>
           <q-item-section>Contacts</q-item-section>
         </q-item>
         <q-separator />
         <q-item clickable>
           <q-item-section avatar>
-            <q-icon name="fa-solid fa-calculator" />
+            <q-icon size="xs" name="fa-solid fa-calculator" />
           </q-item-section>
           <q-item-section>IRR Calculator</q-item-section>
         </q-item>
         <q-separator />
         <q-item clickable>
           <q-item-section avatar>
-            <q-icon name="fa-solid fa-calculator" />
+            <q-icon size="xs" name="fa-solid fa-calculator" />
           </q-item-section>
           <q-item-section>Eligibility Calculator</q-item-section>
         </q-item>
         <q-separator />
         <q-item clickable>
           <q-item-section avatar>
-            <q-icon name="fa-solid fa-calculator" />
+            <q-icon size="xs" name="fa-solid fa-calculator" />
           </q-item-section>
           <q-item-section>Calculator</q-item-section>
         </q-item>
         <q-separator />
         <q-item clickable>
           <q-item-section avatar>
-            <q-icon name="fa-solid fa-users" />
+            <q-icon size="xs" name="fa-solid fa-users" />
           </q-item-section>
           <q-item-section>Users</q-item-section>
         </q-item>
         <q-separator />
         <q-item clickable>
           <q-item-section avatar>
-            <q-icon name="fa-solid fa-gears" />
+            <q-icon size="xs" name="fa-solid fa-gears" />
           </q-item-section>
           <q-item-section>Menu Rights</q-item-section>
         </q-item>
@@ -72,14 +72,14 @@
           clickable
         >
           <q-item-section avatar>
-            <q-icon name="fa-solid fa-circle-question" />
+            <q-icon size="xs" name="fa-solid fa-circle-question" />
           </q-item-section>
           <q-item-section>Helpdesk</q-item-section>
         </q-item>
         <q-separator />
         <q-item clickable>
           <q-item-section avatar>
-            <q-icon name="fa-solid fa-right-from-bracket" />
+            <q-icon size="xs" name="fa-solid fa-right-from-bracket" />
           </q-item-section>
           <q-item-section>Log Out</q-item-section>
         </q-item>

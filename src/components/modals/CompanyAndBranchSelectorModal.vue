@@ -62,6 +62,7 @@ import { ref, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 
 import { useUserStore } from 'src/stores/user/userStore';
+import { Branch, Company, FinancialYear } from 'src/stores/user/userStoreTypes';
 
 const emit = defineEmits(['close']);
 
@@ -71,9 +72,9 @@ const userStore = useUserStore();
 
 const active = true;
 
-const selectedCompany = ref(null);
-const selectedBranch = ref(null);
-const selectedFinancialYear = ref(null);
+const selectedCompany = ref<Company | null>(null);
+const selectedBranch = ref<Branch | null>(null);
+const selectedFinancialYear = ref<FinancialYear | null>(null);
 const error = ref(false);
 
 const submit = () => {
@@ -91,8 +92,6 @@ const submit = () => {
   userStore.selectedCompany = selectedCompany.value;
   userStore.selectedBranch = selectedBranch.value;
   userStore.selectedFinancialYear = selectedFinancialYear.value;
-
-  /* todo: go to module slector */
 };
 
 const close = () => {
@@ -109,6 +108,9 @@ onMounted(async () => {
     await userStore.fetchAllowedCompany();
     await userStore.fetchAllowedBranch();
   }
+  selectedCompany.value = userStore.selectedCompany;
+  selectedBranch.value = userStore.selectedBranch;
+  selectedFinancialYear.value = userStore.selectedFinancialYear;
 });
 </script>
 
