@@ -27,7 +27,17 @@
         no-results-label="No result found"
         icon="navigate_next"
         class="q-pb-md"
-      />
+      >
+        <template v-slot:default-header="prop">
+          <div
+            class="row items-center q-gutter-x-sm cursor-pointer"
+            @click="() => menuItemClickHandler(prop.node.data)"
+          >
+            <q-icon :name="prop.node.icon" />
+            <span>{{ prop.node.name }}</span>
+          </div>
+        </template>
+      </q-tree>
     </q-scroll-area>
   </div>
 </template>
@@ -37,6 +47,7 @@ import { useMenuStore } from 'src/stores/menu/menuStore';
 import { ref, watch } from 'vue';
 import { MenuItem } from 'src/stores/menu/menuStoreTypes';
 import { debounce } from 'quasar';
+import { useRoute, useRouter } from 'vue-router';
 
 interface TreeNode {
   name: string;
@@ -94,10 +105,18 @@ const createSubmenu = (parentCode: string): TreeNode[] => {
   return subMenuItems.reduce(reduceFn, []);
 };
 
+const menuItemClickHandler = (menuItem: MenuItem) => {
+  if (menuItem.url) {
+    router.push(`${route.path}${menuItem.url}`);
+  }
+};
+
 const treeStructure = createTreeStructure();
 const filter = ref('');
 const treeFilter = ref('');
 const treeRef = ref(null);
+const router = useRouter();
+const route = useRoute();
 
 watch(
   filter,
