@@ -198,7 +198,7 @@
       </div>
     </q-card-section>
     <q-card-section v-else class="scroll">
-      <IRRCalculation :data="irr" :select="mode" @back="back" />
+      <IRRCalculation :data="irr" :select="mode" @back="back" @reset="reset" />
     </q-card-section>
   </q-card>
 </template>
@@ -292,6 +292,23 @@ const nextcal = () => {
 };
 const back = () => {
   next.value = !next.value;
+};
+const reset = () => {
+  next.value = !next.value;
+  irr.amount = null;
+  irr.rate = null;
+  irr.irr = null;
+  irr.inttMonths = null;
+  irr.installments = null;
+  irr.name = '';
+  irr.nextEmi = '';
+  irr.advInstallments = null;
+  irr.commission = null;
+  irr.charges = null;
+  irr.rebate = null;
+  irr.security = null;
+  irr.agreedAmount = null;
+  irr.interest = null;
 };
 </script>
 
