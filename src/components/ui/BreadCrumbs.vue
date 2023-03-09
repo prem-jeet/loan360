@@ -1,10 +1,10 @@
 <template>
-  <q-breadcrumbs gutter="sm">
+  <q-breadcrumbs gutter="md">
     <template v-slot:separator>
       <q-icon size="1rem" name="fa-solid fa-location-arrow" color="primary" />
     </template>
 
-    <q-breadcrumbs-el to="/moduleSelector" label="Home" icon="home" />
+    <q-breadcrumbs-el to="/moduleSelector" label="Home" />
     <q-breadcrumbs-el
       v-for="{ path, label } in orderedPaths"
       :key="label"
