@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{
+defineProps<{
   orderedPaths: { path: string; label: string }[];
 }>();
 </script>
