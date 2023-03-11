@@ -11,8 +11,9 @@
     behavior="menu"
     options-selected-class="bg-primary text-white"
     placeholder="hello"
-    :label="selected?.length ? '' : 'None Selected'"
+    :label-slot="!selected || selected.length === 0"
   >
+    <template v-slot:label>None Selected</template>
     <template v-slot:selected-item="scope">
       <q-chip
         removable
