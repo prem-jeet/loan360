@@ -14,26 +14,26 @@ type Positions =
 
 export const onSuccess = (data: {
   msg: string;
-  icon: string;
+  icon?: string;
   position?: Positions;
 }) => {
   Notify.create({
     message: data.msg,
     color: 'green-8',
     position: data.position || 'top',
-    icon: data.icon,
+    icon: data.icon || '',
   });
 };
 
 export const onFailure = (data: {
   msg: string;
-  icon: string;
+  icon?: string;
   position?: Positions;
 }) => {
   Notify.create({
     message: data.msg,
     color: 'red-8',
     position: data.position || 'top',
-    icon: data.icon,
+    icon: data.icon || '',
   });
 };
