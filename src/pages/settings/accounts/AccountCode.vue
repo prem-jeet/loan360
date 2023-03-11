@@ -4,7 +4,7 @@
       <BreadCrumbs :ordered-paths="breadcrumbs" />
     </q-chip>
 
-    <div class="row q-mt-lg">
+    <div class="row q-mt-lg q-pb-xl">
       <div class="col">
         <q-table
           :rows="accountCodes"
@@ -17,6 +17,7 @@
           title="Account codes"
           no-data-label="Select a section Loan/Deposit"
           :rows-per-page-options="[0]"
+          hide-bottom
         >
           <template v-slot:header-cell="props">
             <q-th :props="props" style="font-size: 1.1rem">
@@ -172,10 +173,41 @@
                   dense
                   outlined
                   :color="props.row.name ? 'green' : 'red'"
+                  autofocus
                 />
               </q-td>
-              <q-td key="visible" :props="props">{{ props.row.visible }}</q-td>
-              <q-td key="vtype" :props="props">{{ props.row.vtype }}</q-td>
+              <q-td key="visible" :props="props">
+                <template v-if="!props.row.isEditing">
+                  {{ props.row.visible }}
+                </template>
+                <MultiSelectInput
+                  :options="visibleOptions"
+                  :selected-options="
+                    getSelectedOptions(visibleOptions, props.row.visible)
+                  "
+                  @updated="
+                    (val) =>
+                      updateTableMultiselectValue(props.row, 'visible', val)
+                  "
+                  v-else
+                />
+              </q-td>
+              <q-td key="vtype" :props="props">
+                <template v-if="!props.row.isEditing">
+                  {{ props.row.vtype }}
+                </template>
+                <MultiSelectInput
+                  :options="vtypeOptions"
+                  :selected-options="
+                    getSelectedOptions(vtypeOptions, props.row.vtype)
+                  "
+                  @updated="
+                    (val) =>
+                      updateTableMultiselectValue(props.row, 'vtype', val)
+                  "
+                  v-else
+                />
+              </q-td>
             </q-tr>
           </template>
         </q-table>
@@ -184,7 +216,13 @@
   </div>
 
   <q-dialog v-model="addCodeDialog" persistent>
-    <q-card style="min-width: 40vw">
+    <q-card
+      style="
+        width: 100vw !important;
+        max-width: 700px !important;
+        min-width: 350px !important;
+      "
+    >
       <q-form @submit.prevent="addNewCode" @reset="resetNewcodeForm">
         <q-card-section class="bg-grey-2">
           <div class="flex items-center">
@@ -195,8 +233,8 @@
         </q-card-section>
         <q-card-section class="q-gutter-y-md">
           <div class="row items-center">
-            <div class="col-5 text-body-1 text-weight-medium">Code:</div>
-            <div class="col-5">
+            <div :class="addCodeLabelContainerClasses">Code:</div>
+            <div :class="addCodeInputContainerClasses">
               <q-input
                 v-model="newCode.code"
                 placeholder="code"
@@ -208,8 +246,8 @@
             </div>
           </div>
           <div class="row items-center">
-            <div class="col-5 text-body-1 text-weight-medium">Name:</div>
-            <div class="col-5">
+            <div :class="addCodeLabelContainerClasses">Name:</div>
+            <div :class="addCodeInputContainerClasses">
               <q-input
                 v-model="newCode.name"
                 placeholder="name"
@@ -221,14 +259,26 @@
             </div>
           </div>
           <div class="row items-center">
-            <div class="col-5 text-body-1 text-weight-medium">Visible:</div>
-            <div class="col-5"></div>
+            <div :class="addCodeLabelContainerClasses">Visible:</div>
+            <div :class="addCodeInputContainerClasses">
+              <MultiSelectInput
+                :options="visibleOptions"
+                :selected-options="newCode.visible"
+                @updated="(val) => (newCode.visible = val)"
+                ref="visibleSelectRef"
+              />
+            </div>
           </div>
           <div class="row items-center">
-            <div class="col-5 text-body-1 text-weight-medium">
-              Voucher type:
+            <div :class="addCodeLabelContainerClasses">Voucher type:</div>
+            <div :class="addCodeInputContainerClasses">
+              <MultiSelectInput
+                :options="vtypeOptions"
+                :selected-options="newCode.vtype"
+                @updated="(val) => (newCode.vtype = val)"
+                ref="vtypeSelectRef"
+              />
             </div>
-            <div class="col-5"></div>
           </div>
         </q-card-section>
         <q-separator />
@@ -245,15 +295,46 @@
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, watch, reactive } from 'vue';
-import { onSuccess } from 'src/utils/notification';
+import { onFailure, onSuccess } from 'src/utils/notification';
+import MultiSelectInput from 'src/components/forms/MultiSelectInput.vue';
+
 interface AccountCode {
   code: string;
   name: string;
-  section: 'D' | 'L';
+  section: 'D' | 'L' | null;
   visible: string | null;
   vtype: string | null;
   isEditing?: boolean;
 }
+
+const breadcrumbs = [
+  { path: '/module/settings', label: 'Settings' },
+  { path: '/module/settings/accountcode', label: 'Account Code' },
+];
+
+const visibleOptions = [
+  { value: 'CC', label: 'CC Sheet Receivable' },
+  { value: 'XC', label: 'xIrr Credit' },
+  { value: 'XD', label: 'xIrr Debit' },
+  { value: 'CH', label: 'Charges' },
+  { value: 'CB', label: 'CIBIL Balances' },
+  { value: 'CT', label: 'Charges Taxable' },
+  { value: 'CI', label: 'Charges Initial Overdue' },
+  { value: 'CO', label: 'Collection Overdue' },
+  { value: 'SC', label: 'SCF Charges' },
+];
+const vtypeOptions = [
+  { value: 'P', label: 'Payment' },
+  { value: 'R', label: 'Receipt' },
+  { value: 'J', label: 'Journal' },
+  { value: 'C', label: 'Contra' },
+  { value: 'N', label: 'Notional' },
+];
+
+const addCodeLabelContainerClasses =
+  'col-5 col-sm-3 text-body-1 text-weight-medium';
+const addCodeInputContainerClasses =
+  'col-12 col-sm-9 col-md-7 q-mt-sm q-mt-sm-none';
 
 const fetchAccountcodebySection = async (
   code: 'D' | 'L'
@@ -266,11 +347,6 @@ const fetchAccountcodebySection = async (
 
   return rsp.data;
 };
-
-const breadcrumbs = [
-  { path: '/module/settings', label: 'Settings' },
-  { path: '/module/settings/accountcode', label: 'Account Code' },
-];
 
 const reset = () => {
   accountCodes.value = [];
@@ -371,16 +447,19 @@ const deleteCode = async (data: AccountCode) => {
 };
 
 const addNewCode = async () => {
-  if (newCode.code && newCode.name) {
-    const rsp = await api.post('accountCode', { ...newCode });
+  if (!(newCode.code && newCode.name)) return;
 
-    if (rsp.data) {
-      onSuccess({ msg: rsp.data.displayMessage, icon: 'check' });
-
-      accountCodes.value.push({ ...newCode, isEditing: false });
-      resetNewcodeForm();
-    }
+  if (accountCodes.value.some((item) => item.code === newCode.code)) {
+    onFailure({ msg: 'Code must be unique' });
+    return;
   }
+
+  const formData = preocessNewCodedata();
+  const rsp = await api.post('accountCode', formData);
+
+  onSuccess({ msg: rsp.data.displayMessage, icon: 'check' });
+
+  accountCodes.value.push({ ...formData, isEditing: false });
 };
 
 const removeFromEditingTempStorage = (code: string) => {
@@ -390,24 +469,84 @@ const removeFromEditingTempStorage = (code: string) => {
 const resetNewcodeForm = () => {
   newCode.code = '';
   newCode.name = '';
-  newCode.visible = '';
+  newCode.visible = null;
   newCode.section = 'D';
-  newCode.vtype = '';
+  newCode.vtype = null;
+
+  // @ts-expect-error method provided by q-select
+  vtypeSelectRef.value.reset();
+  // @ts-expect-error method provided by q-select
+  visibleSelectRef.value.reset();
 };
 
+const preocessNewCodedata = (): AccountCode => {
+  const visible = !newCode.visible
+    ? null
+    : newCode.visible!.map((item) => item.value).join(',');
+  const vtype = !newCode.vtype
+    ? null
+    : newCode.vtype!.map((item) => item.value).join(',');
+  const temp = {
+    code: newCode.code,
+    name: newCode.name,
+    section: sectionCode.value,
+    visible,
+    vtype,
+  };
+
+  return temp;
+};
+
+const getSelectedOptions = (
+  arr: typeof visibleOptions,
+  selectedStr: string
+) => {
+  if (!selectedStr) {
+    return null;
+  }
+  return arr.filter((item) => selectedStr.includes(item.value));
+};
+
+const updateTableMultiselectValue = (
+  row: AccountCode,
+  key: 'visible' | 'vtype',
+  selectedOptions: typeof visibleOptions
+) => {
+  if (!selectedOptions) {
+    row[key] = null;
+    return;
+  }
+
+  row[key] = selectedOptions.map((item) => item.value).join(',');
+};
+
+let editingTempStorage: AccountCode[] = [];
+const vtypeSelectRef = ref(null);
+const visibleSelectRef = ref(null);
 const sectionCode = ref(null);
 const accountCodes = ref<AccountCode[]>([]);
 const fetchingData = ref(false);
 const codeSearchQuery = ref('');
 const nameSearchQuery = ref('');
 const addCodeDialog = ref(false);
-let editingTempStorage: AccountCode[] = [];
-const newCode = reactive<AccountCode>({
+const newCode = reactive<{
+  code: string;
+  name: string;
+  section: 'D' | 'L';
+  visible: { label: string; value: string }[] | null;
+  vtype: { label: string; value: string }[] | null;
+}>({
   code: '',
   name: '',
-  visible: '',
+  visible: null,
   section: 'D',
-  vtype: '',
+  vtype: null,
+});
+
+watch(newCode, () => {
+  if (newCode.code) {
+    newCode.code = newCode.code.toUpperCase();
+  }
 });
 
 watch(sectionCode, async () => {
