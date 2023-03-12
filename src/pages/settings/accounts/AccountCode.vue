@@ -7,7 +7,7 @@
     <div class="row q-mt-lg q-pb-xl">
       <div class="col">
         <q-table
-          :rows="accountCodes"
+          :rows="filteredAccountCode"
           :columns="columns"
           row-key="name"
           :loading="fetchingData"
@@ -15,9 +15,13 @@
           separator="cell"
           bordered
           title="Account codes"
-          no-data-label="Select a section Loan/Deposit"
+          :no-data-label="
+            accountCodes.length
+              ? 'No result found'
+              : 'Select a section Loan/Deposit'
+          "
           :rows-per-page-options="[0]"
-          :hide-bottom="!!accountCodes.length"
+          :hide-bottom="!!filteredAccountCode.length"
         >
           <template v-slot:header-cell="props">
             <q-th :props="props" style="font-size: 1.1rem">
@@ -294,7 +298,7 @@
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { ref, watch, reactive } from 'vue';
+import { ref, watch, reactive, computed } from 'vue';
 import { onFailure, onSuccess, confirmDialog } from 'src/utils/notification';
 import MultiSelectInput from 'src/components/forms/MultiSelectInput.vue';
 
@@ -562,6 +566,41 @@ watch(sectionCode, async () => {
     newCode.section = sectionCode.value;
     fetchingData.value = false;
   }
+});
+
+const filteredAccountCode = computed(() => {
+  const _codeSearchQuery = codeSearchQuery.value;
+  const _nameSearchQuery = nameSearchQuery.value;
+  if (_codeSearchQuery && _nameSearchQuery) {
+    return accountCodes.value.filter(
+      (item) =>
+        item.code.includes(_codeSearchQuery) &&
+        item.name.includes(_nameSearchQuery)
+    );
+  }
+  if (_codeSearchQuery) {
+    return accountCodes.value.filter((item) =>
+      item.code.includes(_codeSearchQuery)
+    );
+  }
+  if (_nameSearchQuery) {
+    return accountCodes.value.filter((item) =>
+      item.name.includes(_nameSearchQuery)
+    );
+  }
+  return accountCodes.value;
+});
+
+watch([codeSearchQuery, nameSearchQuery], () => {
+  if (codeSearchQuery.value) {
+    codeSearchQuery.value = codeSearchQuery.value.toUpperCase();
+  }
+
+  console.log({
+    codeSearchQuery: codeSearchQuery.value,
+    nameSearchQuery: nameSearchQuery.value,
+    filteredAccountCode: filteredAccountCode.value,
+  });
 });
 </script>
 
