@@ -17,7 +17,7 @@
           title="Account codes"
           no-data-label="Select a section Loan/Deposit"
           :rows-per-page-options="[0]"
-          hide-bottom
+          :hide-bottom="!!accountCodes.length"
         >
           <template v-slot:header-cell="props">
             <q-th :props="props" style="font-size: 1.1rem">
@@ -217,11 +217,11 @@
 
   <q-dialog v-model="addCodeDialog" persistent>
     <q-card
-      style="
-        width: 100vw !important;
-        max-width: 700px !important;
-        min-width: 350px !important;
-      "
+      :style="{
+        width: '100vw !important',
+        maxWidth: '700px !important',
+        minWidth: '350px !important',
+      }"
     >
       <q-form @submit.prevent="addNewCode" @reset="resetNewcodeForm">
         <q-card-section class="bg-grey-2">
@@ -295,7 +295,7 @@
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, watch, reactive } from 'vue';
-import { onFailure, onSuccess } from 'src/utils/notification';
+import { onFailure, onSuccess, confirmDialog } from 'src/utils/notification';
 import MultiSelectInput from 'src/components/forms/MultiSelectInput.vue';
 
 interface AccountCode {
@@ -429,7 +429,11 @@ const cancelEdit = (data: AccountCode) => {
   data.isEditing = false;
 };
 
-const deleteCode = async (data: AccountCode) => {
+const deleteCode = (data: AccountCode) => {
+  confirmDialog(() => deleteCodeConfirmed(data), {});
+};
+
+const deleteCodeConfirmed = async (data: AccountCode) => {
   const rsp = await api.delete(`accountCode/${data.code}`);
 
   if (!rsp.data) {
