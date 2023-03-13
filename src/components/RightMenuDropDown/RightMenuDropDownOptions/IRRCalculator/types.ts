@@ -15,3 +15,11 @@ export interface IrrObject {
   agreedAmount?: number | null;
   interest?: number | null;
 }
+export interface installmentObject {
+  amount?: number | null;
+  no?: number | null;
+}
+
+export interface installmentData {
+  installmentStructure: installmentObject[];
+}

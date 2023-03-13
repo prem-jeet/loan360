@@ -16,18 +16,18 @@
       <div v-if="irr.name" class="col-3">Name: {{ irr.name }}</div>
     </div>
     <div
-      v-if="installmentStructure.length > 0"
+      v-if="installmentArray.installmentStructure.length > 0"
       class="row justify-start q-pa-sm"
     >
       <div class="col">
         <b>PDC/ACH : </b> {{ totalInst }} of Rs.{{
-          installmentStructure[0].amount
+          installmentArray.installmentStructure[0].amount
         }}
         each
       </div>
     </div>
     <div
-      v-for="(item, index) in installmentStructure"
+      v-for="(item, index) in installmentArray.installmentStructure"
       :key="index"
       class="row justify-start q-pa-sm"
       style="border: 1px solid rgba(164, 219, 232)"
@@ -48,19 +48,19 @@
   </div>
   <div v-else>
     <div
-      v-if="installmentStructure.length > 0"
+      v-if="installmentArray.installmentStructure.length > 0"
       class="row justify-start q-pa-sm"
     >
       <div class="col">
         <b>PDC/ACH : </b> {{ totalInst }} of Rs.{{
-          installmentStructure[0].amount
+          installmentArray.installmentStructure[0].amount
         }}
         each
       </div>
     </div>
     <div
-      v-for="item in installmentStructure"
-      :key="item"
+      v-for="item in installmentArray.installmentStructure"
+      :key="item as number"
       class="row justify-start q-pa-sm"
       style="border: 1px solid rgba(164, 219, 232)"
     >
@@ -94,15 +94,18 @@
 
 <script setup lang="ts">
 import { reactive, onMounted, ref } from 'vue';
-import { IrrObject } from './types';
+import { IrrObject, installmentData } from './types';
 const rowCss =
   'row q-col-gutter-md-md q-col-gutter-sm-sm q-col-gutter-xs-sm justify-center';
 const colCssL = 'col-12 col-xs-4 col-sm-4 col-md-4';
 const emits = defineEmits(['back', 'reset']);
-let installmentStructure: any[] = [];
+// let installmentArray.installmentStructure: any[] = [];
 let entries: any[] = [];
 const totalInst = ref(0);
 const totalAmt = ref(0);
+const installmentArray = reactive<installmentData>({
+  installmentStructure: [],
+});
 
 const props = defineProps({
   data: {
@@ -122,9 +125,9 @@ const reset = () => {
   emits('reset');
 };
 const remove = (index: number) => {
-  console.log('index', installmentStructure);
-  installmentStructure.splice(index, 1);
-  console.log('af', installmentStructure);
+  console.log('index', installmentArray.installmentStructure);
+  installmentArray.installmentStructure.splice(index, 1);
+  console.log('af', installmentArray.installmentStructure);
 };
 const calcInterest = () => {
   if (irr.amount && irr.rate && irr.inttMonths) {
@@ -134,10 +137,10 @@ const calcInterest = () => {
 };
 
 const calcIntallments = () => {
-  if (installmentStructure.length > 0) {
+  if (installmentArray.installmentStructure.length > 0) {
     return;
   }
-  installmentStructure = [];
+  installmentArray.installmentStructure = [];
   let inst1 = {
     no: (irr.installments as number) - 1,
     amount: Math.ceil(
@@ -148,9 +151,9 @@ const calcIntallments = () => {
     no: 1,
     amount: Math.ceil((irr.agreedAmount as number) - inst1.amount * inst1.no),
   };
-  installmentStructure = [];
-  installmentStructure.push(inst1);
-  installmentStructure.push(inst2);
+  installmentArray.installmentStructure = [];
+  installmentArray.installmentStructure.push(inst1);
+  installmentArray.installmentStructure.push(inst2);
   calcTotals();
 };
 
@@ -169,17 +172,23 @@ const makeEntries = () => {
   entries.push(ent);
   let advanceLeft = irr.advInstallments || 0;
   let ino = 1;
-  for (let i = 0; i < installmentStructure.length; i++) {
-    for (let j = 1; j <= installmentStructure[i].no; j++) {
+  for (let i = 0; i < installmentArray.installmentStructure.length; i++) {
+    for (
+      let j = 1;
+      j <= (installmentArray.installmentStructure[i].no as number);
+      j++
+    ) {
       // ent = {};
       ent.dt = new Date(dt.getTime());
       if (advanceLeft > 0) {
         --advanceLeft;
-        entries[0].amount -= installmentStructure[i].amount;
+        entries[0].amount -= installmentArray.installmentStructure[i]
+          .amount as number;
       } else {
         ent.dt.setMonth(dt.getMonth() + ino);
         ent.ino = ino;
-        ent.amount = -installmentStructure[i].amount;
+        ent.amount = -(installmentArray.installmentStructure[i]
+          .amount as number);
         entries.push(ent);
       }
       ino++;
@@ -247,9 +256,12 @@ const calcTotals = () => {
   let ti = 0,
     ta = 0;
 
-  for (let i = 0; i < installmentStructure.length; i++) {
-    ti = ti + installmentStructure[i].no;
-    ta = ta + installmentStructure[i].amount * installmentStructure[i].no;
+  for (let i = 0; i < installmentArray.installmentStructure.length; i++) {
+    ti = ti + (installmentArray.installmentStructure[i].no as number);
+    ta =
+      ta +
+      (installmentArray.installmentStructure[i].amount as number) *
+        (installmentArray.installmentStructure[i].no as number);
   }
   totalInst.value = ti;
   totalAmt.value = ta;
@@ -270,12 +282,12 @@ const calcRate = () => {
       (Math.pow(1 + e3, pd as number) - 1)) *
       100) /
     100;
-  installmentStructure = [];
+  installmentArray.installmentStructure = [];
   const inst1 = {
     no: (irr.installments as number) - 1,
     amount: Math.ceil(inst),
   };
-  installmentStructure.push(inst1);
+  installmentArray.installmentStructure.push(inst1);
   const inst2 = {
     no: 1,
     amount: Math.ceil(
@@ -283,7 +295,7 @@ const calcRate = () => {
         ((irr.installments as number) - 1) * Math.ceil(inst)
     ),
   };
-  installmentStructure.push(inst2);
+  installmentArray.installmentStructure.push(inst2);
   calcTotals();
   irr.agreedAmount = Math.round((irr.installments as number) * inst);
   irr.interest = Math.round(
