@@ -18,6 +18,7 @@ export interface IrrObject {
 export interface installmentObject {
   amount?: number | null;
   no?: number | null;
+  percent?: number | null;
 }
 
 export interface installmentData {

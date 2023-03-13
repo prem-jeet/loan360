@@ -79,6 +79,7 @@
             type="number"
             placeholder="%age of Agreed amount"
             input-class="remove-input-number-indicator"
+            @update:model-value="calcAmount()"
           />
         </div>
       </div>
@@ -96,11 +97,21 @@
           />
         </div>
         <div :class="colCssLL"></div>
-        <div :class="colCssR" class="text-right">
-          <q-btn icon="fa-solid fa-check" color="blue" class="q-mr-sm"></q-btn>
+        <div
+          :class="colCssR"
+          class="text-right q-mt-xs-none q-mt-sm-sm q-mt-md-sm"
+        >
+          <q-btn
+            icon="fa-solid fa-check"
+            color="blue"
+            size="sm"
+            class="q-mr-sm"
+            @click="addInst()"
+          ></q-btn>
           <q-btn
             icon="fa-solid fa-xmark"
             color="red"
+            size="sm"
             @click="adding = !adding"
           ></q-btn>
         </div>
@@ -190,8 +201,11 @@ const back = () => {
 const reset = () => {
   emits('reset');
 };
-const addInstallments = () => {
-  console.log('hi');
+const addInst = () => {
+  installmentArray.installmentStructure.push(addInstallment);
+  console.log('in', installmentArray.installmentStructure);
+  calcTotals();
+  adding.value = true;
 };
 const remove = (index: number) => {
   installmentArray.installmentStructure.splice(index, 1);
@@ -202,7 +216,13 @@ const calcInterest = () => {
     irr.agreedAmount = irr.amount + irr.interest;
   }
 };
-
+const calcAmount = () => {
+  addInstallment.amount = Math.round(
+    ((irr.agreedAmount as number) * (addInstallment.percent as number)) /
+      100 /
+      (addInstallment.no as number)
+  );
+};
 const calcIntallments = () => {
   if (installmentArray.installmentStructure.length > 0) {
     return;
