@@ -14,6 +14,28 @@
     <div class="row justify-start q-pa-sm">
       <div class="col">Amount+Intt. {{ irr.agreedAmount }}</div>
     </div>
+    <div
+      v-if="installmentStructure.length > 0"
+      class="row justify-start q-pa-sm"
+    >
+      <div class="col">
+        <b>PDC/ACH : </b> {{ totalInst }} of Rs.{{
+          installmentStructure[0].amount
+        }}
+        each
+      </div>
+    </div>
+    <div
+      v-for="item in installmentStructure"
+      :key="item"
+      class="row justify-start q-pa-sm"
+      style="border: 1px solid rgba(164, 219, 232)"
+    >
+      <div class="col">{{ item.no }} Insts. of Rs.{{ item.amount }} each</div>
+    </div>
+    <div class="row justify-start q-pa-sm">
+      <div class="col">Total {{ totalInst }} Insts of Rs.{{ totalAmt }}</div>
+    </div>
   </div>
   <div v-else>
     <div
@@ -47,7 +69,7 @@
   </div>
   <div class="row">
     <div class="col text-right">
-      <q-btn color="light-blue" label="back" @click="reset" />
+      <q-btn color="light-blue" label="reset" @click="reset" />
     </div>
   </div>
 </template>
@@ -59,7 +81,8 @@ const rowCss =
   'row q-col-gutter-md-md q-col-gutter-sm-sm q-col-gutter-xs-sm justify-center';
 const colCssL = 'col-12 col-xs-4 col-sm-4 col-md-4';
 const emits = defineEmits(['back', 'reset']);
-let installmentStructure: any[] = [{ nn: 'nn' }];
+let installmentStructure: any[] = [];
+let entries: any[] = [];
 const totalInst = ref(0);
 const totalAmt = ref(0);
 
@@ -88,10 +111,48 @@ const calcInterest = () => {
   }
 };
 
+const calcIntallments = () => {
+  if (installmentStructure.length > 0) {
+    return;
+  }
+  installmentStructure = [];
+  let inst1 = {
+    no: (irr.installments as number) - 1,
+    amount: Math.ceil(
+      (irr.agreedAmount as number) / (irr.installments as number)
+    ),
+  };
+  let inst2 = {
+    no: 1,
+    amount: Math.ceil((irr.agreedAmount as number) - inst1.amount * inst1.no),
+  };
+  installmentStructure = [];
+  installmentStructure.push(inst1);
+  installmentStructure.push(inst2);
+  console.log('hi', installmentStructure);
+  calcTotals();
+};
+
+const makeEntries = () => {
+  let dt = new Date(2000, 0, 1);
+  let ent = {};
+  entries = [];
+};
+
+const calcIRR = () => {
+  makeEntries();
+};
+
 const calcTotals = () => {
   let ti = 0,
     ta = 0;
+
   for (let i = 0; i < installmentStructure.length; i++) {
+    console.log(
+      'hi',
+      installmentStructure[i].amount,
+      installmentStructure[i].no
+    );
     ti = ti + installmentStructure[i].no;
     ta = ta + installmentStructure[i].amount * installmentStructure[i].no;
   }
@@ -143,6 +204,8 @@ const calcRate = () => {
 onMounted(() => {
   if (props.select === 'IRR') {
     calcInterest();
+    calcIntallments();
+    calcIRR();
   } else {
     calcRate();
   }
