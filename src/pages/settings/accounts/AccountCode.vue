@@ -81,7 +81,7 @@
                     </template>
                   </q-input>
                 </div>
-                <div class="col-auto">
+                <div class="col-auto q-mt-xs-md q-mt-sm-none">
                   <q-input
                     v-model="nameSearchQuery"
                     outlined
