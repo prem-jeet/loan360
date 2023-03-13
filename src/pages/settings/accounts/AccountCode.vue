@@ -608,14 +608,15 @@ const resetAccountCodeSection = () => {
   sectionCode.value = null;
 };
 
-const saveEdited = async (data: AccountCode) => {
-  if (!data.name) {
+const saveEdited = async (row: AccountCode) => {
+  if (!row.name) {
     onFailure({ msg: 'Name cannot be empty', position: 'bottom' });
     return;
   }
-  const temp = { ...data };
+  const temp = { ...row };
   delete temp.isEditing;
   const rsp = await api.put('accountCode', temp);
+
   if (!rsp.data) {
     return;
   }
@@ -625,31 +626,31 @@ const saveEdited = async (data: AccountCode) => {
     icon: 'sync_alt',
   });
 
-  removeFromEditingTempStorage(data.code);
-  data.isEditing = false;
+  removeFromEditingTempStorage(row.code);
+  row.isEditing = false;
 };
 
-const cancelEdit = (data: AccountCode) => {
-  const orignalData = editingTempStorage.find(({ code }) => code === data.code);
-  removeFromEditingTempStorage(data.code);
+const cancelEdit = (row: AccountCode) => {
+  const orignalData = editingTempStorage.find(({ code }) => code === row.code);
+  removeFromEditingTempStorage(row.code);
 
-  data.code = orignalData!.code;
-  data.name = orignalData!.name;
-  data.visible = orignalData!.visible;
-  data.vtype = orignalData!.vtype;
-  data.isEditing = false;
+  row.code = orignalData!.code;
+  row.name = orignalData!.name;
+  row.visible = orignalData!.visible;
+  row.vtype = orignalData!.vtype;
+  row.isEditing = false;
 };
 
 const removeFromEditingTempStorage = (code: string) => {
   editingTempStorage = editingTempStorage.filter((item) => item.code !== code);
 };
 
-const deleteCode = (data: AccountCode) => {
-  confirmDialog(() => deleteCodeConfirmed(data), {});
+const deleteCode = (row: AccountCode) => {
+  confirmDialog(() => deleteCodeConfirmed(row), {});
 };
 
-const deleteCodeConfirmed = async (data: AccountCode) => {
-  const rsp = await api.delete(`accountCode/${data.code}`);
+const deleteCodeConfirmed = async (row: AccountCode) => {
+  const rsp = await api.delete(`accountCode/${row.code}`);
 
   if (!rsp.data) {
     return;
@@ -661,7 +662,7 @@ const deleteCodeConfirmed = async (data: AccountCode) => {
   });
 
   accountCodes.value = accountCodes.value.filter(
-    ({ code }) => code !== data.code
+    ({ code }) => code !== row.code
   );
 };
 
