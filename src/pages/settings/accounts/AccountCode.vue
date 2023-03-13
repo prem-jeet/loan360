@@ -469,22 +469,22 @@ const breadcrumbs = [
 ];
 
 const visibleOptions = [
-  { value: 'CC', label: 'CC Sheet Receivable' },
-  { value: 'XC', label: 'xIrr Credit' },
-  { value: 'XD', label: 'xIrr Debit' },
-  { value: 'CH', label: 'Charges' },
-  { value: 'CB', label: 'CIBIL Balances' },
-  { value: 'CT', label: 'Charges Taxable' },
-  { value: 'CI', label: 'Charges Initial Overdue' },
-  { value: 'CO', label: 'Collection Overdue' },
-  { value: 'SC', label: 'SCF Charges' },
+  { value: 'CC', label: 'CC Sheet Receivable (CC)' },
+  { value: 'XC', label: 'xIrr Credit (XC)' },
+  { value: 'XD', label: 'xIrr Debit (XD)' },
+  { value: 'CH', label: 'Charges (CH)' },
+  { value: 'CB', label: 'CIBIL Balances (CB)' },
+  { value: 'CT', label: 'Charges Taxable (CT)' },
+  { value: 'CI', label: 'Charges Initial Overdue (CI)' },
+  { value: 'CO', label: 'Collection Overdue (CO)' },
+  { value: 'SC', label: 'SCF Charges (SC)' },
 ];
 const vtypeOptions = [
-  { value: 'P', label: 'Payment' },
-  { value: 'R', label: 'Receipt' },
-  { value: 'J', label: 'Journal' },
-  { value: 'C', label: 'Contra' },
-  { value: 'N', label: 'Notional' },
+  { value: 'P', label: 'Payment (P)' },
+  { value: 'R', label: 'Receipt (R)' },
+  { value: 'J', label: 'Journal (J)' },
+  { value: 'C', label: 'Contra (C)' },
+  { value: 'N', label: 'Notional (N)' },
 ];
 
 const addCodeLabelContainerClasses =
