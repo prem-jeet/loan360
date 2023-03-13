@@ -11,8 +11,9 @@
     </div>
   </div>
   <div v-if="select === 'IRR'">
-    <div class="row justify-start q-pa-sm">
-      <div class="col">Amount+Intt. {{ irr.agreedAmount }}</div>
+    <div class="row justify-between q-pa-sm">
+      <div class="col-4">Amount+Intt. {{ irr.agreedAmount }}</div>
+      <div v-if="irr.name" class="col-3">Name: {{ irr.name }}</div>
     </div>
     <div
       v-if="installmentStructure.length > 0"
@@ -35,14 +36,6 @@
     </div>
     <div class="row justify-start q-pa-sm">
       <div class="col">Total {{ totalInst }} Insts of Rs.{{ totalAmt }}</div>
-    </div>
-    <div class="row justify-start q-pa-sm">
-      <q-btn
-        color="light-blue"
-        label="calculate irr"
-        @click="calcIRR()"
-      ></q-btn>
-      <span class="q-ma-sm text-bold">IRR : {{ irr.irr }}</span>
     </div>
   </div>
   <div v-else>
@@ -76,7 +69,16 @@
     </div>
   </div>
   <div class="row">
-    <div class="col text-right">
+    <div v-if="select === 'IRR'" class="col-xs-12 col-sm-6 col-md-8">
+      <q-btn
+        color="light-blue"
+        label="calculate irr"
+        @click="calcIRR()"
+      ></q-btn>
+      <span class="q-ma-sm text-bold">IRR : {{ irr.irr }}</span>
+    </div>
+    <div v-else class="col-xs-12 col-sm-6 col-md-8"></div>
+    <div class="col-xs-12 col-sm-6 col-md-4 text-right">
       <q-btn color="light-blue" label="reset" @click="reset" />
     </div>
   </div>
