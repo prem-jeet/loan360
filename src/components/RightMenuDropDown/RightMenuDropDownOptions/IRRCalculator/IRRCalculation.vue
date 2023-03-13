@@ -36,6 +36,14 @@
     <div class="row justify-start q-pa-sm">
       <div class="col">Total {{ totalInst }} Insts of Rs.{{ totalAmt }}</div>
     </div>
+    <div class="row justify-start q-pa-sm">
+      <q-btn
+        color="light-blue"
+        label="calculate irr"
+        @click="calcIRR()"
+      ></q-btn>
+      <span class="q-ma-sm text-bold">IRR : {{ irr.irr }}</span>
+    </div>
   </div>
   <div v-else>
     <div
@@ -129,18 +137,96 @@ const calcIntallments = () => {
   installmentStructure = [];
   installmentStructure.push(inst1);
   installmentStructure.push(inst2);
-  console.log('hi', installmentStructure);
   calcTotals();
 };
 
 const makeEntries = () => {
   let dt = new Date(2000, 0, 1);
-  let ent = {};
+  let ent = {
+    dt: dt,
+    ino: 0,
+    amount:
+      (irr.amount as number) -
+      (irr.charges || 0) +
+      (irr.commission || 0) -
+      (irr.security || 0),
+  };
   entries = [];
+  entries.push(ent);
+  let advanceLeft = irr.advInstallments || 0;
+  let ino = 1;
+  for (let i = 0; i < installmentStructure.length; i++) {
+    for (let j = 1; j <= installmentStructure[i].no; j++) {
+      // ent = {};
+      ent.dt = new Date(dt.getTime());
+      if (advanceLeft > 0) {
+        --advanceLeft;
+        entries[0].amount -= installmentStructure[i].amount;
+      } else {
+        ent.dt.setMonth(dt.getMonth() + ino);
+        ent.ino = ino;
+        ent.amount = -installmentStructure[i].amount;
+        entries.push(ent);
+      }
+      ino++;
+    }
+  }
+
+  entries[entries.length - 1].amount += irr.security || 0;
+  if ((irr.rebate as number) > 0) {
+    let rebateBalance = irr.rebate;
+    let j = entries.length - 1;
+    for (let i = j; i >= 0; i--) {
+      if (-entries[i].amount >= (rebateBalance as number)) {
+        entries[i].amount += rebateBalance;
+        break;
+      } else {
+        (rebateBalance as number) -= entries[i].amount;
+        entries.splice(i, 1);
+      }
+    }
+  }
 };
 
 const calcIRR = () => {
   makeEntries();
+  let _p = 0;
+  let Intt = 0;
+  let Irr_ = 0;
+  let FstDt;
+  let lldt;
+  let chkdt;
+  let nCount;
+  let u = 1.990008372;
+  let l = 0.0000000000001;
+  let times = 0;
+  let lldays = 0;
+  while (times < 1000) {
+    times = times + 1;
+    _p = 0;
+    Intt = 0;
+    Irr_ = (u + l) / 2;
+    FstDt = entries[0].dt;
+    lldt = FstDt;
+    nCount = 1;
+    for (let i = 0; i < entries.length; i++) {
+      lldays = 365 / 12;
+      Intt = Intt + (_p * lldays * Irr_) / 100;
+      chkdt = FstDt;
+      chkdt.setMonth(chkdt.getMonth(), nCount);
+      _p = _p + Intt;
+      Intt = 0;
+      nCount = nCount + 1;
+      _p = _p + entries[i].amount;
+      lldt = entries[i].dt;
+    }
+    if (_p < 0) {
+      l = Irr_;
+    } else {
+      u = Irr_;
+    }
+  }
+  irr.irr = Math.round(Irr_ * 365 * 1000) / 1000;
 };
 
 const calcTotals = () => {
@@ -148,11 +234,6 @@ const calcTotals = () => {
     ta = 0;
 
   for (let i = 0; i < installmentStructure.length; i++) {
-    console.log(
-      'hi',
-      installmentStructure[i].amount,
-      installmentStructure[i].no
-    );
     ti = ti + installmentStructure[i].no;
     ta = ta + installmentStructure[i].amount * installmentStructure[i].no;
   }

@@ -28,7 +28,7 @@
           <q-input
             outlined
             dense
-            v-model="irr.amount"
+            v-model.number="irr.amount"
             hide-bottom-space
             type="number"
             :error="error && !irr.amount"
@@ -44,7 +44,7 @@
           <q-input
             outlined
             dense
-            v-model="irr.rate"
+            v-model.number="irr.rate"
             hide-bottom-space
             type="number"
             :error="error && !irr.rate"
@@ -57,7 +57,7 @@
           <q-input
             outlined
             dense
-            v-model="irr.irr"
+            v-model.number="irr.irr"
             hide-bottom-space
             type="number"
             :error="error && !irr.irr"
@@ -76,7 +76,7 @@
           <q-input
             outlined
             dense
-            v-model="irr.inttMonths"
+            v-model.number="irr.inttMonths"
             hide-bottom-space
             type="number"
             :error="error && !irr.inttMonths"
@@ -89,7 +89,7 @@
           <q-input
             outlined
             dense
-            v-model="irr.installments"
+            v-model.number="irr.installments"
             hide-bottom-space
             type="number"
             :error="error && !irr.installments"
@@ -134,7 +134,7 @@
           <q-input
             outlined
             dense
-            v-model="irr.advInstallments"
+            v-model.number="irr.advInstallments"
             type="number"
             input-class="text-right remove-input-number-indicator"
           />
@@ -148,7 +148,7 @@
           <q-input
             outlined
             dense
-            v-model="irr.commission"
+            v-model.number="irr.commission"
             type="number"
             input-class="text-right remove-input-number-indicator"
           />
@@ -158,7 +158,7 @@
           <q-input
             outlined
             dense
-            v-model="irr.charges"
+            v-model.number="irr.charges"
             type="number"
             input-class="text-right remove-input-number-indicator"
           />
@@ -171,7 +171,7 @@
           <q-input
             outlined
             dense
-            v-model="irr.rebate"
+            v-model.number="irr.rebate"
             type="number"
             input-class="text-right remove-input-number-indicator"
           />
@@ -181,7 +181,7 @@
           <q-input
             outlined
             dense
-            v-model="irr.security"
+            v-model.number="irr.security"
             type="number"
             input-class="text-right remove-input-number-indicator"
           />
@@ -205,7 +205,7 @@
 
 <script setup lang="ts">
 import IRRCalculation from './IRRCalculation.vue';
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { IrrObject } from './types';
 const rowCss =
   'row q-col-gutter-md-md q-col-gutter-sm-sm q-col-gutter-xs-sm justify-center q-pt-sm';
@@ -310,6 +310,9 @@ const reset = () => {
   irr.agreedAmount = null;
   irr.interest = null;
 };
+onMounted(async () => {
+  nextEmi(irr.firstEmi);
+});
 </script>
 
 <style scoped></style>
