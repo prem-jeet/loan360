@@ -23,3 +23,9 @@ export interface installmentObject {
 export interface installmentData {
   installmentStructure: installmentObject[];
 }
+
+export interface addInstallment {
+  amount?: number | null;
+  no?: number | null;
+  percent?: number | null;
+}

@@ -15,35 +15,96 @@
       <div class="col-4">Amount+Intt. {{ irr.agreedAmount }}</div>
       <div v-if="irr.name" class="col-3">Name: {{ irr.name }}</div>
     </div>
-    <div
-      v-if="installmentArray.installmentStructure.length > 0"
-      class="row justify-start q-pa-sm"
-    >
-      <div class="col">
-        <b>PDC/ACH : </b> {{ totalInst }} of Rs.{{
-          installmentArray.installmentStructure[0].amount
-        }}
-        each
+    <div v-if="adding">
+      <div
+        v-if="installmentArray.installmentStructure.length > 0"
+        class="row justify-start q-pa-sm"
+      >
+        <div class="col">
+          <b>PDC/ACH : </b> {{ totalInst }} of Rs.{{
+            installmentArray.installmentStructure[0].amount
+          }}
+          each
+        </div>
+      </div>
+
+      <div
+        v-for="(item, index) in installmentArray.installmentStructure"
+        :key="index"
+        class="row justify-start q-pa-sm"
+        style="border: 1px solid rgba(164, 219, 232)"
+      >
+        <div class="col-8">
+          {{ item.no }} Insts. of Rs.{{ item.amount }} each
+        </div>
+        <div class="col-4 text-right">
+          <q-btn
+            color="red"
+            icon="fa-solid fa-xmark"
+            size="sm"
+            @click="remove(index)"
+          ></q-btn>
+        </div>
+      </div>
+      <div class="row justify-start q-pa-sm">
+        <div class="col-8 q-pt-sm">
+          Total {{ totalInst }} Insts of Rs.{{ totalAmt }}
+        </div>
+        <div class="col-4 text-right">
+          <q-btn color="blue" @click="adding = !adding">add</q-btn>
+        </div>
       </div>
     </div>
-    <div
-      v-for="(item, index) in installmentArray.installmentStructure"
-      :key="index"
-      class="row justify-start q-pa-sm"
-      style="border: 1px solid rgba(164, 219, 232)"
-    >
-      <div class="col-8">{{ item.no }} Insts. of Rs.{{ item.amount }} each</div>
-      <div class="col-4 text-right">
-        <q-btn
-          color="red"
-          icon="fa-solid fa-xmark"
-          size="sm"
-          @click="remove(index)"
-        ></q-btn>
+    <div v-else>
+      <div :class="rowCss" class="q-px-sm">
+        <div :class="colCssLL">Number</div>
+        <div :class="colCssR">
+          <q-input
+            outlined
+            dense
+            v-model.number="addInstallment.no"
+            hide-bottom-space
+            type="number"
+            placeholder="No. of Inst "
+            input-class="remove-input-number-indicator"
+          />
+        </div>
+        <div :class="colCssLL">% age</div>
+        <div :class="colCssR">
+          <q-input
+            outlined
+            dense
+            v-model.number="addInstallment.percent"
+            hide-bottom-space
+            type="number"
+            placeholder="%age of Agreed amount"
+            input-class="remove-input-number-indicator"
+          />
+        </div>
       </div>
-    </div>
-    <div class="row justify-start q-pa-sm">
-      <div class="col">Total {{ totalInst }} Insts of Rs.{{ totalAmt }}</div>
+      <div :class="rowCss" class="q-pa-sm">
+        <div :class="colCssLL">Amount</div>
+        <div :class="colCssR">
+          <q-input
+            outlined
+            dense
+            v-model.number="addInstallment.amount"
+            hide-bottom-space
+            type="number"
+            placeholder="Amt. of Inst."
+            input-class="remove-input-number-indicator"
+          />
+        </div>
+        <div :class="colCssLL"></div>
+        <div :class="colCssR" class="text-right">
+          <q-btn icon="fa-solid fa-check" color="blue" class="q-mr-sm"></q-btn>
+          <q-btn
+            icon="fa-solid fa-xmark"
+            color="red"
+            @click="adding = !adding"
+          ></q-btn>
+        </div>
+      </div>
     </div>
   </div>
   <div v-else>
@@ -94,15 +155,19 @@
 
 <script setup lang="ts">
 import { reactive, onMounted, ref } from 'vue';
-import { IrrObject, installmentData } from './types';
+import { IrrObject, installmentData, addInstallment } from './types';
 const rowCss =
   'row q-col-gutter-md-md q-col-gutter-sm-sm q-col-gutter-xs-sm justify-center';
+const colCssLL =
+  'col-12 col-xs-12 col-sm-6 col-md-2 q-mt-xs-sm q-mt-sm-none q-mt-md-sm';
 const colCssL = 'col-12 col-xs-4 col-sm-4 col-md-4';
+const colCssR = 'col-12 col-xs-12 col-sm-6 col-md-4';
 const emits = defineEmits(['back', 'reset']);
 // let installmentArray.installmentStructure: any[] = [];
 let entries: any[] = [];
 const totalInst = ref(0);
 const totalAmt = ref(0);
+const adding = ref(true);
 const installmentArray = reactive<installmentData>({
   installmentStructure: [],
 });
@@ -117,6 +182,7 @@ const props = defineProps({
   },
 });
 const irr = reactive<IrrObject>({ ...props.data });
+const addInstallment = reactive<addInstallment>({});
 
 const back = () => {
   emits('back');
@@ -124,10 +190,11 @@ const back = () => {
 const reset = () => {
   emits('reset');
 };
+const addInstallments = () => {
+  console.log('hi');
+};
 const remove = (index: number) => {
-  console.log('index', installmentArray.installmentStructure);
   installmentArray.installmentStructure.splice(index, 1);
-  console.log('af', installmentArray.installmentStructure);
 };
 const calcInterest = () => {
   if (irr.amount && irr.rate && irr.inttMonths) {
