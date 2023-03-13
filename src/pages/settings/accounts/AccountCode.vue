@@ -396,6 +396,7 @@
                 outlined
                 dense
                 :error="!newCode.code"
+                error-message="Unique Code required"
                 hide-bottom-space
               />
             </div>
@@ -409,6 +410,7 @@
                 outlined
                 dense
                 :error="!newCode.name"
+                error-message="Name required"
                 hide-bottom-space
               />
             </div>
