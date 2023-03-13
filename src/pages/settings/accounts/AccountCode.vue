@@ -42,7 +42,7 @@
                   label="Add code"
                   icon="add"
                   color="blue-7"
-                  @click="addCodeDialog = true"
+                  @click="addCodeDialogActive = true"
                 />
               </div>
               <div class="row items-center q-mt-lg">
@@ -52,7 +52,7 @@
                     v-if="accountCodes.length"
                     color="red"
                     label="clear"
-                    @click="reset"
+                    @click="resetAccountCodeSection"
                     size="sm"
                   />
                 </div>
@@ -187,11 +187,18 @@
                 <MultiSelectInput
                   :options="visibleOptions"
                   :selected-options="
-                    getSelectedOptions(visibleOptions, props.row.visible)
+                    getSelectedOptionsFromSelectedString(
+                      visibleOptions,
+                      props.row.visible
+                    )
                   "
                   @updated="
                     (val) =>
-                      updateTableMultiselectValue(props.row, 'visible', val)
+                      updateMultiselectSelerctedString(
+                        props.row,
+                        'visible',
+                        val
+                      )
                   "
                   v-else
                 />
@@ -203,11 +210,14 @@
                 <MultiSelectInput
                   :options="vtypeOptions"
                   :selected-options="
-                    getSelectedOptions(vtypeOptions, props.row.vtype)
+                    getSelectedOptionsFromSelectedString(
+                      vtypeOptions,
+                      props.row.vtype
+                    )
                   "
                   @updated="
                     (val) =>
-                      updateTableMultiselectValue(props.row, 'vtype', val)
+                      updateMultiselectSelerctedString(props.row, 'vtype', val)
                   "
                   v-else
                 />
@@ -219,7 +229,7 @@
     </div>
   </div>
 
-  <q-dialog v-model="addCodeDialog" persistent>
+  <q-dialog v-model="addCodeDialogActive" persistent>
     <q-card
       :style="{
         width: '100vw !important',
@@ -232,7 +242,7 @@
           <div class="flex items-center">
             <span class="text-h4">Add code</span>
             <q-space />
-            <q-btn icon="close" flat @click="addCodeDialog = false" />
+            <q-btn icon="close" flat @click="addCodeDialogActive = false" />
           </div>
         </q-card-section>
         <q-card-section class="q-gutter-y-md">
@@ -269,7 +279,7 @@
                 :options="visibleOptions"
                 :selected-options="newCode.visible"
                 @updated="(val) => (newCode.visible = val)"
-                ref="visibleSelectRef"
+                ref="newVisible"
               />
             </div>
           </div>
@@ -280,7 +290,7 @@
                 :options="vtypeOptions"
                 :selected-options="newCode.vtype"
                 @updated="(val) => (newCode.vtype = val)"
-                ref="vtypeSelectRef"
+                ref="newCodeVtype"
               />
             </div>
           </div>
@@ -340,23 +350,6 @@ const addCodeLabelContainerClasses =
 const addCodeInputContainerClasses =
   'col-12 col-sm-9 col-md-7 q-mt-sm q-mt-sm-none';
 
-const fetchAccountcodebySection = async (
-  code: 'D' | 'L'
-): Promise<Omit<AccountCode, 'isEditing'>[]> => {
-  const rsp = await api(`accountCodeBySection/${code}`);
-
-  if (!rsp.data) {
-    return [];
-  }
-
-  return rsp.data;
-};
-
-const reset = () => {
-  accountCodes.value = [];
-  sectionCode.value = null;
-};
-
 const columns: {
   name: string;
   required?: boolean;
@@ -405,6 +398,23 @@ const columns: {
   },
 ];
 
+const fetchAccountCodeBySection = async (
+  code: 'D' | 'L'
+): Promise<Omit<AccountCode, 'isEditing'>[]> => {
+  const rsp = await api(`accountCodeBySection/${code}`);
+
+  if (!rsp.data) {
+    return [];
+  }
+
+  return rsp.data;
+};
+
+const resetAccountCodeSection = () => {
+  accountCodes.value = [];
+  sectionCode.value = null;
+};
+
 const saveEdited = async (data: AccountCode) => {
   const temp = { ...data };
   delete temp.isEditing;
@@ -431,6 +441,9 @@ const cancelEdit = (data: AccountCode) => {
   data.visible = orignalData!.visible;
   data.vtype = orignalData!.vtype;
   data.isEditing = false;
+};
+const removeFromEditingTempStorage = (code: string) => {
+  editingTempStorage = editingTempStorage.filter((item) => item.code !== code);
 };
 
 const deleteCode = (data: AccountCode) => {
@@ -470,23 +483,6 @@ const addNewCode = async () => {
   accountCodes.value.push({ ...formData, isEditing: false });
 };
 
-const removeFromEditingTempStorage = (code: string) => {
-  editingTempStorage = editingTempStorage.filter((item) => item.code !== code);
-};
-
-const resetNewcodeForm = () => {
-  newCode.code = '';
-  newCode.name = '';
-  newCode.visible = null;
-  newCode.section = 'D';
-  newCode.vtype = null;
-
-  // @ts-expect-error method provided by q-select
-  vtypeSelectRef.value.reset();
-  // @ts-expect-error method provided by q-select
-  visibleSelectRef.value.reset();
-};
-
 const preocessNewCodedata = (): AccountCode => {
   const visible = !newCode.visible
     ? null
@@ -505,7 +501,27 @@ const preocessNewCodedata = (): AccountCode => {
   return temp;
 };
 
-const getSelectedOptions = (
+const formateCodeString = (string: string) =>
+  string
+    .toUpperCase()
+    .split(' ')
+    .filter((item) => item !== '')
+    .join('');
+
+const resetNewcodeForm = () => {
+  newCode.code = '';
+  newCode.name = '';
+  newCode.visible = null;
+  newCode.section = 'D';
+  newCode.vtype = null;
+
+  // @ts-expect-error method provided by q-select
+  newCodeVtype.value.reset();
+  // @ts-expect-error method provided by q-select
+  newVisible.value.reset();
+};
+
+const getSelectedOptionsFromSelectedString = (
   arr: typeof visibleOptions,
   selectedStr: string
 ) => {
@@ -515,7 +531,7 @@ const getSelectedOptions = (
   return arr.filter((item) => selectedStr.includes(item.value));
 };
 
-const updateTableMultiselectValue = (
+const updateMultiselectSelerctedString = (
   row: AccountCode,
   key: 'visible' | 'vtype',
   selectedOptions: typeof visibleOptions
@@ -528,15 +544,15 @@ const updateTableMultiselectValue = (
   row[key] = selectedOptions.map((item) => item.value).join(',');
 };
 
-let editingTempStorage: AccountCode[] = [];
-const vtypeSelectRef = ref(null);
-const visibleSelectRef = ref(null);
+const fetchingData = ref(false);
 const sectionCode = ref(null);
 const accountCodes = ref<AccountCode[]>([]);
-const fetchingData = ref(false);
+let editingTempStorage: AccountCode[] = [];
+const newCodeVtype = ref(null);
+const newVisible = ref(null);
 const codeSearchQuery = ref('');
 const nameSearchQuery = ref('');
-const addCodeDialog = ref(false);
+const addCodeDialogActive = ref(false);
 const newCode = reactive<{
   code: string;
   name: string;
@@ -553,14 +569,14 @@ const newCode = reactive<{
 
 watch(newCode, () => {
   if (newCode.code) {
-    newCode.code = newCode.code.toUpperCase();
+    newCode.code = formateCodeString(newCode.code);
   }
 });
 
 watch(sectionCode, async () => {
   if (sectionCode.value) {
     fetchingData.value = true;
-    const rsp = await fetchAccountcodebySection(sectionCode.value);
+    const rsp = await fetchAccountCodeBySection(sectionCode.value);
 
     accountCodes.value = rsp.map((data) => ({ ...data, isEditing: false }));
     newCode.section = sectionCode.value;
@@ -570,37 +586,33 @@ watch(sectionCode, async () => {
 
 const filteredAccountCode = computed(() => {
   const _codeSearchQuery = codeSearchQuery.value;
-  const _nameSearchQuery = nameSearchQuery.value;
-  if (_codeSearchQuery && _nameSearchQuery) {
-    return accountCodes.value.filter(
-      (item) =>
-        item.code.includes(_codeSearchQuery) &&
-        item.name.includes(_nameSearchQuery)
-    );
-  }
-  if (_codeSearchQuery) {
-    return accountCodes.value.filter((item) =>
-      item.code.includes(_codeSearchQuery)
-    );
-  }
-  if (_nameSearchQuery) {
-    return accountCodes.value.filter((item) =>
-      item.name.includes(_nameSearchQuery)
-    );
-  }
-  return accountCodes.value;
+  const _nameSearchQuery = nameSearchQuery.value?.toLocaleLowerCase();
+
+  return accountCodes.value.filter((item) => {
+    const codePresent = item.code.includes(_codeSearchQuery);
+    const namePresent = item.name
+      .toLocaleLowerCase()
+      .includes(_nameSearchQuery);
+
+    if (_codeSearchQuery && _nameSearchQuery) {
+      return codePresent && namePresent;
+    }
+
+    if (_codeSearchQuery) {
+      return codePresent;
+    }
+    if (_nameSearchQuery) {
+      return namePresent;
+    }
+
+    return true;
+  });
 });
 
-watch([codeSearchQuery, nameSearchQuery], () => {
+watch(codeSearchQuery, () => {
   if (codeSearchQuery.value) {
-    codeSearchQuery.value = codeSearchQuery.value.toUpperCase();
+    codeSearchQuery.value = formateCodeString(codeSearchQuery.value);
   }
-
-  console.log({
-    codeSearchQuery: codeSearchQuery.value,
-    nameSearchQuery: nameSearchQuery.value,
-    filteredAccountCode: filteredAccountCode.value,
-  });
 });
 </script>
 
