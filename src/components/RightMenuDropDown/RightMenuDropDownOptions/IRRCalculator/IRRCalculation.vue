@@ -27,12 +27,20 @@
       </div>
     </div>
     <div
-      v-for="item in installmentStructure"
-      :key="item"
+      v-for="(item, index) in installmentStructure"
+      :key="index"
       class="row justify-start q-pa-sm"
       style="border: 1px solid rgba(164, 219, 232)"
     >
-      <div class="col">{{ item.no }} Insts. of Rs.{{ item.amount }} each</div>
+      <div class="col-8">{{ item.no }} Insts. of Rs.{{ item.amount }} each</div>
+      <div class="col-4 text-right">
+        <q-btn
+          color="red"
+          icon="fa-solid fa-xmark"
+          size="sm"
+          @click="remove(index)"
+        ></q-btn>
+      </div>
     </div>
     <div class="row justify-start q-pa-sm">
       <div class="col">Total {{ totalInst }} Insts of Rs.{{ totalAmt }}</div>
@@ -113,7 +121,11 @@ const back = () => {
 const reset = () => {
   emits('reset');
 };
-
+const remove = (index: number) => {
+  console.log('index', installmentStructure);
+  installmentStructure.splice(index, 1);
+  console.log('af', installmentStructure);
+};
 const calcInterest = () => {
   if (irr.amount && irr.rate && irr.inttMonths) {
     irr.interest = ((irr.amount * irr.rate) / 100 / 12) * irr.inttMonths;
