@@ -9,7 +9,9 @@
         padding="sm sm"
         icon="arrow_back"
         @click="back"
-      />
+      >
+        <q-tooltip> back </q-tooltip>
+      </q-btn>
     </div>
     <div :class="colCssL">
       <q-btn color="red-5" label="PDF" size="md" icon="download" />
