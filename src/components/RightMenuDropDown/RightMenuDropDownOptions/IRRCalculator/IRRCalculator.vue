@@ -194,7 +194,12 @@
           label="Auto-Fill"
           @click="autoFill()"
         />
-        <q-btn color="light-blue" label="Next" @click="nextcal" />
+        <q-btn
+          v-if="nextValue"
+          color="light-blue"
+          label="Next"
+          @click="nextcal"
+        />
       </div>
     </q-card-section>
     <q-card-section v-else class="scroll">
@@ -205,7 +210,7 @@
 
 <script setup lang="ts">
 import IRRCalculation from './IRRCalculation.vue';
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, computed } from 'vue';
 import { IrrObject } from './types';
 const rowCss =
   'row q-col-gutter-md-md q-col-gutter-sm-sm q-col-gutter-xs-sm justify-center q-pt-sm';
@@ -281,14 +286,7 @@ const nextEmi = (v: any) => {
   }
 };
 const nextcal = () => {
-  if (
-    !(irr.amount && irr.inttMonths && irr.installments && (irr.rate || irr.irr))
-  ) {
-    error.value = true;
-    return;
-  } else {
-    next.value = !next.value;
-  }
+  next.value = !next.value;
 };
 const back = () => {
   next.value = !next.value;
@@ -310,8 +308,18 @@ const reset = () => {
   irr.agreedAmount = null;
   irr.interest = null;
 };
+const nextValue = computed(() => {
+  if (
+    !(irr.amount && irr.inttMonths && irr.installments && (irr.rate || irr.irr))
+  ) {
+    return false;
+  } else {
+    return true;
+  }
+});
 onMounted(async () => {
   nextEmi(irr.firstEmi);
+  error.value = true;
 });
 </script>
 

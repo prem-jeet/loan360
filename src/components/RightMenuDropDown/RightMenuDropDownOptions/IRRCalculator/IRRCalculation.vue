@@ -58,7 +58,7 @@
           Total {{ totalInst }} Insts of Rs.{{ totalAmt }}
         </div>
         <div class="col-4 text-right">
-          <q-btn color="blue" @click="adding = !adding">add</q-btn>
+          <q-btn color="green-8" @click="adding = !adding">add</q-btn>
         </div>
       </div>
     </div>
@@ -166,7 +166,7 @@
     </div>
     <div v-else class="col-xs-12 col-sm-6 col-md-8"></div>
     <div class="col-xs-12 col-sm-6 col-md-4 text-right">
-      <q-btn color="light-blue" label="reset" @click="reset" />
+      <q-btn color="red-8" label="reset" @click="reset" />
     </div>
   </div>
 </template>
