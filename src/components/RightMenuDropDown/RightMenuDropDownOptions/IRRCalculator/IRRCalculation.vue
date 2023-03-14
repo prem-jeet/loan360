@@ -1,23 +1,15 @@
 <template>
   <div :class="rowCss">
-    <div :class="colCssL">
-      <q-btn
-        color="dark"
-        size="xs"
-        outline
-        dense
-        padding="sm sm"
-        icon="arrow_back"
-        @click="back"
-      >
+    <div class="col-xs-3 col-sm-4 col-md-4">
+      <q-btn color="dark" size="sm" outline icon="arrow_back" @click="back">
         <q-tooltip> back </q-tooltip>
       </q-btn>
     </div>
-    <div :class="colCssL">
-      <q-btn color="red-5" label="PDF" size="md" icon="download" />
+    <div class="col-xs-4 col-sm-4 col-md-4">
+      <q-btn color="red-5" label="PDF" size="sm" icon="download" />
     </div>
-    <div :class="colCssL">
-      <q-btn color="green-5" label="Excel" size="md" icon="download" />
+    <div class="col-xs-5 col-sm-4 col-md-4 text-right">
+      <q-btn color="green-5" label="Excel" size="sm" icon="download" />
     </div>
   </div>
   <div v-if="select === 'IRR'">
@@ -161,7 +153,7 @@
       </div>
     </div>
   </div>
-  <div class="row">
+  <div class="row q-mt-sm">
     <div v-if="select === 'IRR'" class="col-xs-12 col-sm-6 col-md-8">
       <q-btn
         color="light-blue"
@@ -184,7 +176,7 @@ const rowCss =
   'row q-col-gutter-md-md q-col-gutter-sm-sm q-col-gutter-xs-sm justify-center';
 const colCssLL =
   'col-12 col-xs-12 col-sm-6 col-md-2 q-mt-xs-sm q-mt-sm-none q-mt-md-sm';
-const colCssL = 'col-12 col-xs-4 col-sm-4 col-md-4';
+const colCssL = 'col-xs-4 col-sm-4 col-md-4';
 const colCssR = 'col-12 col-xs-12 col-sm-6 col-md-4';
 const emits = defineEmits(['back', 'reset']);
 let entries: any[] = [];
