@@ -265,7 +265,7 @@ const makeEntries = () => {
   };
   entries = [];
   entries.push(ent);
-  console.log('be', entries);
+
   let advanceLeft = irr.advInstallments || 0;
   let ino = 1;
   for (let i = 0; i < installmentArray.installmentStructure.length; i++) {
@@ -275,14 +275,14 @@ const makeEntries = () => {
       j++
     ) {
       // ent = {};
-      ent.dt = new Date(dt.getTime());
+      // ent.dt = new Date(dt.getTime());
       if (advanceLeft > 0) {
         --advanceLeft;
         entries[0].amount -= installmentArray.installmentStructure[i]
           .amount as number;
       } else {
+        dt = new Date();
         dt.setMonth(dt.getMonth() + ino);
-        console.log('date', dt);
         let ent2 = {
           dt: dt,
           ino: ino,
