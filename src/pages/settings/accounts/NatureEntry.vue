@@ -1,7 +1,225 @@
 <template>
-  <div>nature of entry</div>
+  <div class="absolute q-pa-md full-width full-height bg-gre-4">
+    <q-chip outline square size="md" class="shadow-4" :ripple="false">
+      <BreadCrumbs :ordered-paths="breadcrumbs" />
+    </q-chip>
+
+    <div class="row q-mt-lg q-pb-xl">
+      <div class="col">
+        <q-table
+          :rows="filteredNatureEntry"
+          :columns="columns"
+          row-key="code"
+          :loading="fetchingData"
+          table-header-class="bg-deep-purple-10 text-white"
+          separator="cell"
+          bordered
+          title="Nature entry"
+          :no-data-label="'No result found'"
+          :rows-per-page-options="[0]"
+          :hide-bottom="!!filteredNatureEntry.length"
+          :grid="$q.screen.width < 830"
+          card-container-class="q-gutter-y-md q-mt-xs"
+        >
+          <template v-slot:top>
+            <div class="row q-gutter-y-lg q-pb-xs-md">
+              <div class="col-12 text-h4">Nature entry</div>
+              <div class="col-12">
+                <q-input
+                  v-model="searchQuery"
+                  outlined
+                  clearable
+                  dense
+                  rounded
+                  placeholder="By code"
+                >
+                  <template v-slot:prepend>
+                    <q-icon name="search" />
+                  </template>
+                </q-input>
+              </div>
+            </div>
+          </template>
+
+          <template v-slot:header-cell="props">
+            <q-th :props="props" style="font-size: 1rem">
+              {{ props.col.label }}
+            </q-th>
+          </template>
+
+          <!-- row design for screens > 800px-->
+          <template v-slot:body="props">
+            <q-tr :props="props">
+              <q-td key="actions" auto-width>
+                <q-btn-group push unelevated>
+                  <q-btn
+                    icon="edit"
+                    size="xs"
+                    outline
+                    color="accent"
+                    v-if="!isEditing || editingRowIndex !== props.rowIndex"
+                    @click="() => editEntry(props.rowIndex)"
+                  >
+                    <q-tooltip>Edit</q-tooltip>
+                  </q-btn>
+                  <q-btn
+                    icon="delete"
+                    size="xs"
+                    outline
+                    color="red"
+                    v-if="!isEditing || editingRowIndex !== props.rowIndex"
+                    @click="() => deleteEntry(props.rowIndex)"
+                  >
+                    <q-tooltip>Delete</q-tooltip>
+                  </q-btn>
+                  <q-btn
+                    icon="check"
+                    size="xs"
+                    outline
+                    color="green-10"
+                    v-if="isEditing && editingRowIndex === props.rowIndex"
+                    @click="saveEdited"
+                  >
+                    <q-tooltip>Save</q-tooltip>
+                  </q-btn>
+                  <q-btn
+                    icon="close"
+                    size="xs"
+                    outline
+                    color="red"
+                    v-if="isEditing && editingRowIndex === props.rowIndex"
+                    @click="isEditing = false"
+                  >
+                    <q-tooltip>Cancel</q-tooltip>
+                  </q-btn>
+                </q-btn-group>
+              </q-td>
+              <q-td key="code" :props="props">
+                <span>{{ props.row.code }}</span>
+              </q-td>
+              <q-td key="name" :props="props">
+                <span>{{ props.row.name }}</span>
+              </q-td>
+              <q-td key="section" :props="props">
+                <span>{{ props.row.section }}</span>
+              </q-td>
+            </q-tr>
+          </template>
+        </q-table>
+      </div>
+    </div>
+  </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { api } from 'src/boot/axios';
+import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
+import { confirmDialog } from 'src/utils/notification';
+import { ref, reactive, computed, onMounted } from 'vue';
+
+interface NatureEntry {
+  code: string;
+  name: string;
+  section: 'D' | 'L' | 'A';
+}
+
+const breadcrumbs = [
+  { path: '/module/settings', label: 'Settings' },
+  { path: '/module/settings/natureEntry', label: 'Loan master' },
+];
+
+const columns: {
+  name: string;
+  required?: boolean;
+  label: string;
+  field: string;
+  align: 'left';
+  sortable?: boolean;
+}[] = [
+  {
+    name: 'actions',
+    label: 'Actions',
+    align: 'left',
+    field: '',
+  },
+  {
+    name: 'code',
+    required: true,
+    align: 'left',
+    field: 'code',
+    label: 'Code',
+  },
+  {
+    name: 'name',
+    required: true,
+    align: 'left',
+    field: 'name',
+    label: 'Name',
+  },
+  {
+    name: 'section',
+    required: true,
+    align: 'left',
+    field: 'section',
+    label: 'Section',
+  },
+];
+
+const fetchingData = ref(false);
+const natureEntry = ref<NatureEntry[]>([]);
+const searchQuery = ref<string | null>('');
+const filteredNatureEntry = computed(() => {
+  if (!searchQuery.value) {
+    return natureEntry.value;
+  }
+  return natureEntry.value.filter((entry) => entry.code === searchQuery.value);
+});
+const isEditing = ref(false);
+const editingRowIndex = ref(0);
+const editingData = reactive<NatureEntry>({ code: '', name: '', section: 'A' });
+
+const editEntry = (rowIndex: number) => {
+  if (isEditing.value) {
+    confirmDialog(
+      () => editEntryConfirmed(natureEntry.value[rowIndex], rowIndex),
+      {
+        msg: 'Are you sure you want to cancel editing the current Code?',
+      }
+    );
+  } else {
+    isEditing.value = true;
+    editEntryConfirmed(natureEntry.value[rowIndex], rowIndex);
+  }
+};
+
+const editEntryConfirmed = (row: NatureEntry, index: number) => {
+  editingRowIndex.value = index;
+  editingData.code = row.code;
+  editingData.name = row.name;
+  editingData.section = row.section;
+};
+
+const saveEdited = () => {
+  /* todo */
+  console.log('called save');
+};
+
+const deleteEntry = (rowIndex: number) => {
+  confirmDialog(() => deleteEntryConfirmed(rowIndex), {});
+};
+
+const deleteEntryConfirmed = (rowIndex: number) => {
+  /* todo */
+  console.log('delete called');
+};
+
+onMounted(async () => {
+  const rsp = await api.get('natureEntry');
+
+  if (rsp.data) {
+    natureEntry.value = rsp.data;
+  }
+});
+</script>
 
 <style scoped></style>
