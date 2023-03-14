@@ -12,11 +12,14 @@
     </q-item>
     <q-card-section v-if="next" class="scroll">
       <div class="row justify-center q-mb-sm">
-        <div class="col-xs-6 col-sm-6 col-md-6">
+        <div class="col-xs-3 col-sm-4 col-md-4">
           <q-radio v-model="mode" dense val="IRR" label="IRR" />
         </div>
-        <div class="col-xs-6 col-sm-6 col-md-6">
+        <div class="col-xs-5 col-sm-4 col-md-4">
           <q-radio v-model="mode" dense val="ReverseIRR" label="Reverse IRR" />
+        </div>
+        <div v-if="irr.name" class="col-xs-4 col-sm-4 col-md-4">
+          Name:{{ irr.name }}
         </div>
       </div>
       <div :class="rowCss">
