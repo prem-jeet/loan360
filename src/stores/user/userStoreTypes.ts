@@ -1,3 +1,16 @@
+export interface State {
+  token: Token;
+  accessToken: string;
+  isAuthenticated: boolean;
+  allowedCompany: Company[] | [];
+  allowedBranch: Branch[] | [];
+  allowedFinancialYear: FinancialYear[] | [];
+  selectedCompany: Company;
+  selectedBranch: Branch;
+  selectedFinancialYear: FinancialYear;
+  appRole: AppRole[] | [];
+}
+
 export interface Token {
   id_token: string;
   expires_in: number;
@@ -48,14 +61,8 @@ export interface FinancialYear {
   inactiveOn: string | null;
 }
 
-export interface State {
-  token: Token;
-  accessToken: string;
-  isAuthenticated: boolean;
-  allowedCompany: Company[] | [];
-  allowedBranch: Branch[] | [];
-  allowedFinancialYear: FinancialYear[] | [];
-  selectedCompany: Company;
-  selectedBranch: Branch;
-  selectedFinancialYear: FinancialYear;
+export interface AppRole {
+  id: number;
+  login: string;
+  roleCode: string;
 }

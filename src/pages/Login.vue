@@ -30,17 +30,33 @@ import logo from 'src/assets/img/JaguarCloud.png';
 import CompanyAndBranchSelectorModal from 'src/components/modals/CompanyAndBranchSelectorModal.vue';
 import { useUserStore } from 'src/stores/user/userStore';
 import { getAuthTokenFromAws, login } from 'src/utils/auth/login';
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
 
 const route = useRoute();
 const router = useRouter();
 
 const userStore = useUserStore();
 
+const { selectedBranch, selectedCompany, selectedFinancialYear } =
+  storeToRefs(userStore);
+
 const isCompanyAndBranchSelectorModalActive = computed(
   () => route.name === 'authenticated'
 );
+
+watch([selectedBranch, selectedCompany, selectedFinancialYear], () => {
+  if (
+    selectedCompany.value.code &&
+    selectedBranch.value.code &&
+    selectedFinancialYear.value.id
+  ) {
+    {
+      router.push({ name: 'moduleSelector' });
+    }
+  }
+});
 
 onMounted(async () => {
   if (route.query.code) {

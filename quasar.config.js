@@ -97,7 +97,11 @@ module.exports = configure(function (/* ctx */) {
     framework: {
       iconSet: 'fontawesome-v6',
       cssAddon: true,
-      config: {},
+      config: {
+        notify: {
+          timeout: 700,
+        },
+      },
 
       // iconSet: 'material-icons', // Quasar icon set
       // lang: 'en-US', // Quasar language pack
@@ -110,7 +114,7 @@ module.exports = configure(function (/* ctx */) {
       // directives: [],
 
       // Quasar plugins
-      plugins: [],
+      plugins: ['Notify', 'Dialog'],
     },
 
     // animations: 'all', // --- includes all animations
