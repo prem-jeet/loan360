@@ -1,11 +1,11 @@
 <template>
-  <div :class="rowCss">
+  <div :class="rowCss" class="q-mb-sm">
     <div class="col-xs-3 col-sm-4 col-md-4">
       <q-btn color="dark" size="sm" outline icon="arrow_back" @click="back">
         <q-tooltip> back </q-tooltip>
       </q-btn>
     </div>
-    <div class="col-xs-4 col-sm-4 col-md-4">
+    <div class="col-xs-4 col-sm-4 col-md-4 text-center">
       <q-btn color="red-5" label="PDF" size="sm" icon="download" />
     </div>
     <div class="col-xs-5 col-sm-4 col-md-4 text-right">
@@ -13,14 +13,16 @@
     </div>
   </div>
   <div v-if="select === 'IRR'">
-    <div class="row justify-between q-pa-sm">
-      <div class="col-4">Amount+Intt. {{ irr.agreedAmount }}</div>
-      <div v-if="irr.name" class="col-3">Name: {{ irr.name }}</div>
+    <div v-if="irr.name" class="row justify-between q-pa-xs q-mt-sm">
+      <div class="col"><b> Name:</b> {{ irr.name }}</div>
+    </div>
+    <div class="row justify-between q-pa-xs">
+      <div class="col">Amount+Intt. {{ irr.agreedAmount }}</div>
     </div>
     <div v-if="adding">
       <div
         v-if="installmentArray.installmentStructure.length > 0"
-        class="row justify-start q-pa-sm"
+        class="row justify-start q-pa-xs"
       >
         <div class="col">
           <b>PDC/ACH : </b> {{ totalInst }} of Rs.{{
