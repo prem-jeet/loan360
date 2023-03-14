@@ -1,13 +1,21 @@
 <template>
   <div :class="rowCss">
     <div :class="colCssL">
-      <q-btn color="light-blue" label="back" @click="back" />
+      <q-btn
+        color="dark"
+        size="xs"
+        outline
+        dense
+        padding="sm sm"
+        icon="arrow_back"
+        @click="back"
+      />
     </div>
     <div :class="colCssL">
-      <q-btn color="light-blue" label="download PDF" />
+      <q-btn color="red-5" label="PDF" size="md" icon="download" />
     </div>
     <div :class="colCssL">
-      <q-btn color="light-blue" label="download excel" />
+      <q-btn color="green-5" label="Excel" size="md" icon="download" />
     </div>
   </div>
   <div v-if="select === 'IRR'">
@@ -39,11 +47,14 @@
         </div>
         <div class="col-4 text-right">
           <q-btn
-            color="red"
+            color="red-7"
             icon="fa-solid fa-xmark"
-            size="sm"
+            size="xs"
+            round
+            unelevated
             @click="remove(index)"
-          ></q-btn>
+          >
+          </q-btn>
         </div>
       </div>
       <div class="row justify-start q-pa-sm">
@@ -174,7 +185,6 @@ const colCssLL =
 const colCssL = 'col-12 col-xs-4 col-sm-4 col-md-4';
 const colCssR = 'col-12 col-xs-12 col-sm-6 col-md-4';
 const emits = defineEmits(['back', 'reset']);
-// let installmentArray.installmentStructure: any[] = [];
 let entries: any[] = [];
 const totalInst = ref(0);
 const totalAmt = ref(0);
@@ -182,7 +192,6 @@ const adding = ref(true);
 const installmentArray = reactive<installmentData>({
   installmentStructure: [],
 });
-
 const props = defineProps({
   data: {
     type: Object,
@@ -203,7 +212,6 @@ const reset = () => {
 };
 const addInst = () => {
   installmentArray.installmentStructure.push(addInstallment);
-  console.log('in', installmentArray.installmentStructure);
   calcTotals();
   adding.value = true;
 };
@@ -245,7 +253,7 @@ const calcIntallments = () => {
 };
 
 const makeEntries = () => {
-  let dt = new Date(2000, 0, 1);
+  let dt = new Date();
   let ent = {
     dt: dt,
     ino: 0,
@@ -257,6 +265,7 @@ const makeEntries = () => {
   };
   entries = [];
   entries.push(ent);
+  console.log('be', entries);
   let advanceLeft = irr.advInstallments || 0;
   let ino = 1;
   for (let i = 0; i < installmentArray.installmentStructure.length; i++) {
@@ -272,11 +281,15 @@ const makeEntries = () => {
         entries[0].amount -= installmentArray.installmentStructure[i]
           .amount as number;
       } else {
-        ent.dt.setMonth(dt.getMonth() + ino);
-        ent.ino = ino;
-        ent.amount = -(installmentArray.installmentStructure[i]
-          .amount as number);
-        entries.push(ent);
+        dt.setMonth(dt.getMonth() + ino);
+        console.log('date', dt);
+        let ent2 = {
+          dt: dt,
+          ino: ino,
+          amount: -(installmentArray.installmentStructure[i].amount as number),
+        };
+
+        entries.push(ent2);
       }
       ino++;
     }
