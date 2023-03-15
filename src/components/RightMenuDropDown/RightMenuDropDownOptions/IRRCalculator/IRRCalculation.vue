@@ -6,10 +6,22 @@
       </q-btn>
     </div>
     <div class="col-xs-4 col-sm-4 col-md-4 text-center">
-      <q-btn color="red-5" label="PDF" size="sm" icon="download" />
+      <q-btn
+        color="red-5"
+        label="PDF"
+        size="sm"
+        icon="download"
+        @click="download('pdf')"
+      />
     </div>
     <div class="col-xs-5 col-sm-4 col-md-4 text-right">
-      <q-btn color="green-5" label="Excel" size="sm" icon="download" />
+      <q-btn
+        color="green-5"
+        label="Excel"
+        size="sm"
+        icon="download"
+        @click="download('excel')"
+      />
     </div>
   </div>
   <div v-if="select === 'IRR'">
@@ -169,6 +181,24 @@
       <q-btn color="red-8" label="reset" @click="reset" />
     </div>
   </div>
+  <div v-show="false" id="pdf-window">
+    <!-- <div v-for="(item, index) in irrInstItems" :key="index">
+      {{ item.sno }}{{ item.nextEmi }} &nbsp; {{ item.instalment }} &nbsp;{{
+        item.interest
+      }}{{ item.principleReceived }}&nbsp;{{ item.principleOs }}&nbsp;{{
+        item.interestOs
+      }}
+    </div> -->
+    <q-table
+      title="EMI Table"
+      :rows="irrInstItemsEmi"
+      :columns="columns"
+      v-model:pagination="pagination"
+      row-key="name"
+      hide-bottom
+      separator="cell"
+    ></q-table>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -178,13 +208,15 @@ const rowCss =
   'row q-col-gutter-md-md q-col-gutter-sm-sm q-col-gutter-xs-sm justify-center';
 const colCssLL =
   'col-12 col-xs-12 col-sm-6 col-md-2 q-mt-xs-sm q-mt-sm-none q-mt-md-sm';
-const colCssL = 'col-xs-4 col-sm-4 col-md-4';
+// const colCssL = 'col-xs-4 col-sm-4 col-md-4';
 const colCssR = 'col-12 col-xs-12 col-sm-6 col-md-4';
 const emits = defineEmits(['back', 'reset']);
 let entries: any[] = [];
+let irrInstItems: any[] = [];
 const totalInst = ref(0);
 const totalAmt = ref(0);
 const adding = ref(true);
+let pdfTemplate = ref();
 const installmentArray = reactive<installmentData>({
   installmentStructure: [],
 });
@@ -199,6 +231,70 @@ const props = defineProps({
 });
 const irr = reactive<IrrObject>({ ...props.data });
 const addInstallment = reactive<addInstallment>({});
+interface DataItem {
+  sno?: number | null;
+  nextEmi?: string | null;
+  instalment?: number | null;
+  interest?: number | null;
+  principleReceived?: number | null;
+  principleOs?: number | null;
+  interestOs?: number | null;
+}
+const irrInstItemsEmi = ref<DataItem[]>([]);
+const pagination = ref({
+  rowsPerPage: 20,
+});
+
+const columns: {
+  name: string;
+  required?: boolean;
+  label: string;
+  field: string;
+  align: 'center';
+  sortable?: boolean;
+}[] = [
+  {
+    name: 'sno',
+    required: true,
+    label: 'No',
+    align: 'center',
+    field: 'sno',
+    sortable: true,
+  },
+  {
+    name: 'nextEmi',
+    label: 'EMI Date',
+    field: 'nextEmi',
+    align: 'center',
+    sortable: true,
+  },
+  {
+    name: 'instalment',
+    label: 'Instalment',
+    field: 'instalment',
+    align: 'center',
+    sortable: true,
+  },
+  { name: 'interest', label: 'Interest', field: 'interest', align: 'center' },
+  {
+    name: 'principleReceived',
+    label: 'PrincipleReceived',
+    field: 'principleReceived',
+    align: 'center',
+  },
+  {
+    name: 'principleOs',
+    label: 'PrincipleOs',
+    field: 'principleOs',
+    align: 'center',
+  },
+  {
+    name: 'interestOs',
+    label: 'InterestOs',
+    field: 'interestOs',
+    align: 'center',
+  },
+];
 
 const back = () => {
   emits('back');
@@ -404,6 +500,124 @@ const calcRate = () => {
         100
     ) / 100;
 };
+
+const download = (type: string) => {
+  irrInstItems = [];
+  let PrinciplieReceived;
+  let Balance = irr.amount;
+  let interest;
+  let sumOfInterest = 0;
+  let sumOfprincipleReceived = 0;
+  let nextEmi;
+  const firstEmi = irr.firstEmi;
+  let incrementCount = 0;
+  for (var i = 0; i < (irr.installments as number); i++) {
+    if (i == 0) {
+      nextEmi = firstEmi;
+    } else {
+      if (i == 1) {
+        nextEmi = irr.nextEmi;
+      } else {
+        const today = new Date(Date.parse(irr.firstEmi as string));
+        const day = today.getDate().toString().padStart(2, '0');
+        const month = (today.getMonth() + 1).toString().padStart(2, '0');
+        const days = ['29', '30', '31'];
+        // const febdays = ['28', '29'];
+
+        if (month === '01' && days.includes(day)) {
+          const year = today.getFullYear().toString();
+          const checkYear = parseInt(year);
+          if (
+            (checkYear % 4 === 0 && checkYear % 100 !== 0) ||
+            checkYear % 400 === 0
+          ) {
+            const day = '29';
+            const month = (today.getMonth() + 2).toString().padStart(2, '0');
+            nextEmi = `${year}-${month}-${day}`;
+          } else {
+            const day = '28';
+            const month = (today.getMonth() + 2).toString().padStart(2, '0');
+            nextEmi = `${year}-${month}-${day}`;
+          }
+        } else if (day === '31') {
+          const day = (today.getDate() - 1).toString().padStart(2, '0');
+          const month = (today.getMonth() + 2).toString().padStart(2, '0');
+          const year = today.getFullYear().toString();
+          nextEmi = `${year}-${month}-${day}`;
+        } else {
+          const day = today.getDate().toString().padStart(2, '0');
+          const month = (today.getMonth() + 2).toString().padStart(2, '0');
+          const year = today.getFullYear().toString();
+          nextEmi = `${year}-${month}-${day}`;
+        }
+      }
+    }
+
+    interest = Math.ceil(((Balance as number) * (irr.irr as number)) / 1200);
+    if (i == (irr.installments as number) - 1) {
+      PrinciplieReceived =
+        (installmentArray.installmentStructure[1].amount as number) - interest;
+      Balance = (Balance as number) - PrinciplieReceived;
+    } else {
+      PrinciplieReceived =
+        (installmentArray.installmentStructure[0].amount as number) - interest;
+      Balance = (Balance as number) - PrinciplieReceived;
+    }
+    var testObj = {
+      sno: i + 1,
+      balance: Balance,
+      nextEmi: nextEmi,
+      interest: 0,
+      principleReceived: 0,
+      instalment: 0,
+      principleOs: 0,
+      interestOs: 0,
+    };
+
+    if (i == (irr.installments as number) - 1) {
+      testObj.interest = (irr.interest as number) - sumOfInterest;
+      testObj.principleReceived =
+        (irr.amount as number) - sumOfprincipleReceived;
+
+      testObj.instalment = installmentArray.installmentStructure[1]
+        .amount as number;
+      testObj.principleOs =
+        (irr.amount as number) -
+        (sumOfprincipleReceived + testObj.principleReceived);
+      testObj.interestOs =
+        (irr.interest as number) - (sumOfInterest + testObj.interest);
+    } else {
+      testObj.interest = interest;
+      testObj.principleReceived = PrinciplieReceived;
+
+      testObj.instalment = installmentArray.installmentStructure[0]
+        .amount as number;
+      sumOfInterest += interest;
+      sumOfprincipleReceived += PrinciplieReceived;
+      testObj.principleOs = (irr.amount as number) - sumOfprincipleReceived;
+      testObj.interestOs = (irr.interest as number) - sumOfInterest;
+    }
+    irrInstItems.push(testObj);
+    console.log('irrInstItem', irrInstItems);
+    irrInstItemsEmi.value = irrInstItems;
+
+    incrementCount = incrementCount + 1;
+  }
+
+  if (type === 'pdf') {
+    setTimeout(() => {
+      pdfTemplate.value = document.getElementById('pdf-window');
+      const myWindow = window.open('', '', 'width=1000,height=700');
+      const templateContent = pdfTemplate.value.innerHTML;
+      myWindow?.document.write(templateContent);
+      myWindow?.document.close();
+      myWindow?.focus();
+      myWindow?.print();
+      myWindow?.close();
+    }, 500);
+  }
+};
+
 onMounted(() => {
   if (props.select === 'IRR') {
     calcInterest();
