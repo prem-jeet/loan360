@@ -31,7 +31,7 @@
                   clearable
                   dense
                   rounded
-                  placeholder="By code"
+                  placeholder="Search code"
                 >
                   <template v-slot:prepend>
                     <q-icon name="search" />
@@ -97,11 +97,31 @@
               <q-td key="code" :props="props">
                 <span>{{ props.row.code }}</span>
               </q-td>
-              <q-td key="name" :props="props">
-                <span>{{ props.row.name }}</span>
+              <q-td key="name" :props="props" style="max-width: 200px">
+                <q-input
+                  v-if="isEditing && editingRowIndex === props.rowIndex"
+                  v-model="props.row.name"
+                  placeholder="Name required"
+                  dense
+                  outlined
+                  :color="props.row.name ? 'green' : 'red'"
+                  autofocus
+                />
+                <span v-else>{{ props.row.name }}</span>
               </q-td>
               <q-td key="section" :props="props">
-                <span>{{ props.row.section }}</span>
+                <q-select
+                  v-if="isEditing && editingRowIndex === props.rowIndex"
+                  dense
+                  outlined
+                  v-model="editingData.section"
+                  :options="sectionSelectOptions"
+                />
+                <span v-else>{{
+                  sectionSelectOptions.find(
+                    (item) => item.value === props.row.section
+                  )!.label
+                }}</span>
               </q-td>
             </q-tr>
           </template>
@@ -115,7 +135,7 @@
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { confirmDialog } from 'src/utils/notification';
-import { ref, reactive, computed, onMounted } from 'vue';
+import { ref, reactive, computed, watch, onMounted } from 'vue';
 
 interface NatureEntry {
   code: string;
@@ -126,6 +146,12 @@ interface NatureEntry {
 const breadcrumbs = [
   { path: '/module/settings', label: 'Settings' },
   { path: '/module/settings/natureEntry', label: 'Loan master' },
+];
+
+const sectionSelectOptions = [
+  { value: 'A', label: 'Account' },
+  { value: 'L', label: 'Loan' },
+  { value: 'D', label: 'Deposit' },
 ];
 
 const columns: {
@@ -148,6 +174,7 @@ const columns: {
     align: 'left',
     field: 'code',
     label: 'Code',
+    sortable: true,
   },
   {
     name: 'name',
@@ -155,6 +182,7 @@ const columns: {
     align: 'left',
     field: 'name',
     label: 'Name',
+    sortable: true,
   },
   {
     name: 'section',
@@ -162,6 +190,7 @@ const columns: {
     align: 'left',
     field: 'section',
     label: 'Section',
+    sortable: true,
   },
 ];
 
@@ -172,7 +201,12 @@ const filteredNatureEntry = computed(() => {
   if (!searchQuery.value) {
     return natureEntry.value;
   }
-  return natureEntry.value.filter((entry) => entry.code === searchQuery.value);
+
+  return natureEntry.value.filter((entry) => {
+    console.log(entry.code === searchQuery.value);
+
+    entry.code === searchQuery.value;
+  });
 });
 const isEditing = ref(false);
 const editingRowIndex = ref(0);
@@ -188,6 +222,7 @@ const editEntry = (rowIndex: number) => {
     );
   } else {
     isEditing.value = true;
+    editingRowIndex.value = rowIndex;
     editEntryConfirmed(natureEntry.value[rowIndex], rowIndex);
   }
 };
@@ -213,6 +248,11 @@ const deleteEntryConfirmed = (rowIndex: number) => {
   console.log('delete called');
 };
 
+watch(searchQuery, () => {
+  if (searchQuery.value) {
+    searchQuery.value = searchQuery.value.trim().toUpperCase();
+  }
+});
 onMounted(async () => {
   const rsp = await api.get('natureEntry');
 
