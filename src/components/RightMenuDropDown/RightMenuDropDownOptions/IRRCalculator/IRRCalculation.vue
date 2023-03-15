@@ -182,13 +182,6 @@
     </div>
   </div>
   <div v-show="false" id="pdf-window">
-    <!-- <div v-for="(item, index) in irrInstItems" :key="index">
-      {{ item.sno }}{{ item.nextEmi }} &nbsp; {{ item.instalment }} &nbsp;{{
-        item.interest
-      }}{{ item.principleReceived }}&nbsp;{{ item.principleOs }}&nbsp;{{
-        item.interestOs
-      }}
-    </div> -->
     <q-table
       title="EMI Table"
       :rows="irrInstItemsEmi"
@@ -197,7 +190,15 @@
       row-key="name"
       hide-bottom
       separator="cell"
-    ></q-table>
+    >
+      <template v-slot:bottom-row>
+        <q-tr>
+          <q-td v-for="col in columns" :key="col.name">
+            {{ totalColumn(col.name) }}
+          </q-td>
+        </q-tr>
+      </template>
+    </q-table>
   </div>
 </template>
 
@@ -231,6 +232,7 @@ const props = defineProps({
 });
 const irr = reactive<IrrObject>({ ...props.data });
 const addInstallment = reactive<addInstallment>({});
+
 interface DataItem {
   sno?: number | null;
   nextEmi?: string | null;
@@ -241,6 +243,18 @@ interface DataItem {
   interestOs?: number | null;
 }
 const irrInstItemsEmi = ref<DataItem[]>([]);
+// const footerRows = ref([
+//   {
+//     sno: 'Total',
+//     nextEmi: '',
+//     instalment: calculateTotal(irrInstItemsEmi.value, 'instalment'),
+//     interest: '',
+//     principleReceived: '',
+//     principleOs: '',
+//     interestOs: '',
+//   },
+// ]);
+
 const pagination = ref({
   rowsPerPage: 20,
 });
@@ -295,7 +309,29 @@ const columns: {
     align: 'center',
   },
 ];
-
+const totalColumn = (val: string) => {
+  let total = 0;
+  if (val === 'nextEmi') {
+    return 'Total';
+  } else if (val === 'instalment') {
+    for (let i = 0; i < irrInstItemsEmi.value.length; i++) {
+      total += irrInstItemsEmi.value[i].instalment as number;
+    }
+    return total;
+  } else if (val === 'interest') {
+    for (let i = 0; i < irrInstItemsEmi.value.length; i++) {
+      total += irrInstItemsEmi.value[i].interest as number;
+    }
+    return total;
+  } else if (val === 'principleReceived') {
+    for (let i = 0; i < irrInstItemsEmi.value.length; i++) {
+      total += irrInstItemsEmi.value[i].principleReceived as number;
+    }
+    return total;
+  } else {
+    return;
+  }
+};
 const back = () => {
   emits('back');
 };
@@ -598,7 +634,7 @@ const download = (type: string) => {
       testObj.interestOs = (irr.interest as number) - sumOfInterest;
     }
     irrInstItems.push(testObj);
-    console.log('irrInstItem', irrInstItems);
+    // console.log('irrInstItem', irrInstItems);
     irrInstItemsEmi.value = irrInstItems;
 
     incrementCount = incrementCount + 1;
