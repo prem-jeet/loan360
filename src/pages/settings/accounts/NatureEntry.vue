@@ -78,7 +78,7 @@
                     outline
                     color="green-10"
                     v-if="isEditing && editingRowIndex === props.rowIndex"
-                    @click="saveEdited"
+                    @click="() => saveEdited(props.rowIndex)"
                   >
                     <q-tooltip>Save</q-tooltip>
                   </q-btn>
@@ -97,10 +97,10 @@
               <q-td key="code" :props="props">
                 <span>{{ props.row.code }}</span>
               </q-td>
-              <q-td key="name" :props="props" style="max-width: 200px">
+              <q-td key="name" :props="props">
                 <q-input
                   v-if="isEditing && editingRowIndex === props.rowIndex"
-                  v-model="props.row.name"
+                  v-model="editingData.name"
                   placeholder="Name required"
                   dense
                   outlined
@@ -109,7 +109,12 @@
                 />
                 <span v-else>{{ props.row.name }}</span>
               </q-td>
-              <q-td key="section" :props="props">
+              <q-td
+                key="section"
+                :props="props"
+                auto-width
+                style="min-width: 300px"
+              >
                 <q-select
                   v-if="isEditing && editingRowIndex === props.rowIndex"
                   dense
@@ -134,7 +139,7 @@
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { confirmDialog } from 'src/utils/notification';
+import { confirmDialog, onSuccess } from 'src/utils/notification';
 import { ref, reactive, computed, watch, onMounted } from 'vue';
 
 interface NatureEntry {
@@ -148,50 +153,10 @@ const breadcrumbs = [
   { path: '/module/settings/natureEntry', label: 'Loan master' },
 ];
 
-const sectionSelectOptions = [
+const sectionSelectOptions: { value: 'A' | 'L' | 'D'; label: string }[] = [
   { value: 'A', label: 'Account' },
   { value: 'L', label: 'Loan' },
   { value: 'D', label: 'Deposit' },
-];
-
-const columns: {
-  name: string;
-  required?: boolean;
-  label: string;
-  field: string;
-  align: 'left';
-  sortable?: boolean;
-}[] = [
-  {
-    name: 'actions',
-    label: 'Actions',
-    align: 'left',
-    field: '',
-  },
-  {
-    name: 'code',
-    required: true,
-    align: 'left',
-    field: 'code',
-    label: 'Code',
-    sortable: true,
-  },
-  {
-    name: 'name',
-    required: true,
-    align: 'left',
-    field: 'name',
-    label: 'Name',
-    sortable: true,
-  },
-  {
-    name: 'section',
-    required: true,
-    align: 'left',
-    field: 'section',
-    label: 'Section',
-    sortable: true,
-  },
 ];
 
 const fetchingData = ref(false);
@@ -210,7 +175,51 @@ const filteredNatureEntry = computed(() => {
 });
 const isEditing = ref(false);
 const editingRowIndex = ref(0);
-const editingData = reactive<NatureEntry>({ code: '', name: '', section: 'A' });
+const editingData = reactive<{
+  name: string;
+  section: { value: 'A' | 'D' | 'L'; label: string };
+}>({
+  name: '',
+  section: { value: 'A', label: 'Accounts' },
+});
+
+const columns = reactive<
+  {
+    name: string;
+    required?: boolean;
+    label: string;
+    field: string;
+    align: 'left';
+  }[]
+>([
+  {
+    name: 'actions',
+    label: 'Actions',
+    align: 'left',
+    field: '',
+  },
+  {
+    name: 'code',
+    required: true,
+    align: 'left',
+    field: 'code',
+    label: 'Code',
+  },
+  {
+    name: 'name',
+    required: true,
+    align: 'left',
+    field: 'name',
+    label: 'Name',
+  },
+  {
+    name: 'section',
+    required: true,
+    align: 'left',
+    field: 'section',
+    label: 'Section',
+  },
+]);
 
 const editEntry = (rowIndex: number) => {
   if (isEditing.value) {
@@ -229,14 +238,29 @@ const editEntry = (rowIndex: number) => {
 
 const editEntryConfirmed = (row: NatureEntry, index: number) => {
   editingRowIndex.value = index;
-  editingData.code = row.code;
+
   editingData.name = row.name;
-  editingData.section = row.section;
+  editingData.section = sectionSelectOptions.find(
+    (item) => item.value === row.section
+  ) as { value: 'A' | 'L' | 'D'; label: string };
 };
 
-const saveEdited = () => {
-  /* todo */
-  console.log('called save');
+const saveEdited = async (rowIndex: number) => {
+  if (!editingData.name) {
+    return;
+  }
+  const rsp = await api.put('natureEntry', {
+    code: natureEntry.value[rowIndex].code,
+    name: editingData.name,
+    section: editingData.section.value,
+  });
+
+  if (rsp.data) {
+    onSuccess({ msg: rsp.data.displayMessage, icon: 'sync_alt' });
+    natureEntry.value[rowIndex].name = editingData.name;
+    natureEntry.value[rowIndex].section = editingData.section.value;
+    isEditing.value = false;
+  }
 };
 
 const deleteEntry = (rowIndex: number) => {
@@ -253,6 +277,7 @@ watch(searchQuery, () => {
     searchQuery.value = searchQuery.value.trim().toUpperCase();
   }
 });
+
 onMounted(async () => {
   const rsp = await api.get('natureEntry');
 
