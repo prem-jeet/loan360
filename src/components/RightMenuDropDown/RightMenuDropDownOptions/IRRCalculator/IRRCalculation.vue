@@ -182,8 +182,11 @@
     </div>
   </div>
   <div v-show="false" id="pdf-window">
+    <div><p style="color: #336b6b">Company Name : IKF Finance Limited</p></div>
+    <div v-if="irr.name">
+      <p style="color: #336b6b">Name : {{ irr.name }}</p>
+    </div>
     <q-table
-      title="EMI Table"
       :rows="irrInstItemsEmi"
       :columns="columns"
       v-model:pagination="pagination"
@@ -191,9 +194,53 @@
       hide-bottom
       separator="cell"
     >
+      <template v-slot:header="props">
+        <q-tr :props="props">
+          <q-th
+            v-for="col in props.cols"
+            :key="col.name"
+            :props="props"
+            style="
+              border-style: solid;
+              padding: 5px 5px;
+              border-color: lightgreen;
+              text-align: center;
+            "
+          >
+            {{ col.label }}
+          </q-th>
+        </q-tr>
+      </template>
+      <template v-slot:body="props">
+        <q-tr :props="props">
+          <q-td
+            v-for="col in props.cols"
+            :key="col.key"
+            :props="col.props"
+            style="
+              border-style: solid;
+              padding: 5px 5px;
+              border-color: lightgreen;
+              text-align: center;
+              width: 80px;
+            "
+          >
+            {{ col.value }}
+          </q-td>
+        </q-tr>
+      </template>
       <template v-slot:bottom-row>
         <q-tr>
-          <q-td v-for="col in columns" :key="col.name">
+          <q-td
+            v-for="col in columns"
+            :key="col.name"
+            style="
+              border-style: solid;
+              padding: 5px 5px;
+              border-color: lightgreen;
+              text-align: center;
+            "
+          >
             {{ totalColumn(col.name) }}
           </q-td>
         </q-tr>
@@ -218,6 +265,10 @@ const totalInst = ref(0);
 const totalAmt = ref(0);
 const adding = ref(true);
 let pdfTemplate = ref();
+const pagination = ref({
+  rowsPerPage: 20,
+});
+
 const installmentArray = reactive<installmentData>({
   installmentStructure: [],
 });
@@ -243,22 +294,6 @@ interface DataItem {
   interestOs?: number | null;
 }
 const irrInstItemsEmi = ref<DataItem[]>([]);
-// const footerRows = ref([
-//   {
-//     sno: 'Total',
-//     nextEmi: '',
-//     instalment: calculateTotal(irrInstItemsEmi.value, 'instalment'),
-//     interest: '',
-//     principleReceived: '',
-//     principleOs: '',
-//     interestOs: '',
-//   },
-// ]);
-
-const pagination = ref({
-  rowsPerPage: 20,
-});
-
 const columns: {
   name: string;
   required?: boolean;
