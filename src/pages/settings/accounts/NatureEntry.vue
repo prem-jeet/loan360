@@ -267,9 +267,21 @@ const deleteEntry = (rowIndex: number) => {
   confirmDialog(() => deleteEntryConfirmed(rowIndex), {});
 };
 
-const deleteEntryConfirmed = (rowIndex: number) => {
+const deleteEntryConfirmed = async (rowIndex: number) => {
   /* todo */
-  console.log('delete called');
+  console.log(natureEntry.value[rowIndex].code);
+
+  const rsp = await api.delete(
+    `natureEntry/${natureEntry.value[rowIndex].code}`
+  );
+  if (rsp.data) {
+    onSuccess({ msg: rsp.data.displayMessage, icon: 'delete' });
+
+    natureEntry.value = [
+      ...natureEntry.value.splice(0, rowIndex),
+      ...natureEntry.value.splice(rowIndex + 1),
+    ];
+  }
 };
 
 watch(searchQuery, () => {
