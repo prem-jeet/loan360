@@ -270,6 +270,16 @@ const nextEmi = (v: any) => {
       const month = (today.getMonth() + 2).toString().padStart(2, '0');
       irr.nextEmi = `${year}-${month}-${day}`;
     }
+  } else if (month === '12' && day === '31') {
+    const day = today.getDate().toString().padStart(2, '0');
+    const month = '01';
+    const year = (today.getFullYear() + 1).toString();
+    irr.nextEmi = `${year}-${month}-${day}`;
+  } else if (month === '12') {
+    const day = today.getDate().toString().padStart(2, '0');
+    const month = '01';
+    const year = (today.getFullYear() + 1).toString();
+    irr.nextEmi = `${year}-${month}-${day}`;
   } else if (day === '31') {
     const day = (today.getDate() - 1).toString().padStart(2, '0');
     const month = (today.getMonth() + 2).toString().padStart(2, '0');

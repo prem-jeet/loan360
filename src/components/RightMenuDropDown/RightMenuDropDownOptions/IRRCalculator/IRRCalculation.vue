@@ -582,6 +582,7 @@ const download = (type: string) => {
   let nextEmi;
   const firstEmi = irr.firstEmi;
   let incrementCount = 0;
+  let today = new Date(Date.parse(irr.firstEmi as string));
   for (var i = 0; i < (irr.installments as number); i++) {
     if (i == 0) {
       nextEmi = firstEmi;
@@ -589,11 +590,9 @@ const download = (type: string) => {
       if (i == 1) {
         nextEmi = irr.nextEmi;
       } else {
-        const today = new Date(Date.parse(irr.firstEmi as string));
         const day = today.getDate().toString().padStart(2, '0');
         const month = (today.getMonth() + 1).toString().padStart(2, '0');
         const days = ['29', '30', '31'];
-        // const febdays = ['28', '29'];
 
         if (month === '01' && days.includes(day)) {
           const year = today.getFullYear().toString();
@@ -605,21 +604,37 @@ const download = (type: string) => {
             const day = '29';
             const month = (today.getMonth() + 2).toString().padStart(2, '0');
             nextEmi = `${year}-${month}-${day}`;
+            today = new Date(Date.parse(nextEmi));
           } else {
             const day = '28';
             const month = (today.getMonth() + 2).toString().padStart(2, '0');
             nextEmi = `${year}-${month}-${day}`;
+            today = new Date(Date.parse(nextEmi));
           }
+        } else if (month === '12' && day === '31') {
+          const day = today.getDate().toString().padStart(2, '0');
+          const month = '01';
+          const year = (today.getFullYear() + 1).toString();
+          nextEmi = `${year}-${month}-${day}`;
+          today = new Date(Date.parse(nextEmi));
+        } else if (month === '12') {
+          const day = today.getDate().toString().padStart(2, '0');
+          const month = '01';
+          const year = (today.getFullYear() + 1).toString();
+          nextEmi = `${year}-${month}-${day}`;
+          today = new Date(Date.parse(nextEmi));
         } else if (day === '31') {
           const day = (today.getDate() - 1).toString().padStart(2, '0');
           const month = (today.getMonth() + 2).toString().padStart(2, '0');
           const year = today.getFullYear().toString();
           nextEmi = `${year}-${month}-${day}`;
+          today = new Date(Date.parse(nextEmi));
         } else {
           const day = today.getDate().toString().padStart(2, '0');
           const month = (today.getMonth() + 2).toString().padStart(2, '0');
           const year = today.getFullYear().toString();
           nextEmi = `${year}-${month}-${day}`;
+          today = new Date(Date.parse(nextEmi));
         }
       }
     }
