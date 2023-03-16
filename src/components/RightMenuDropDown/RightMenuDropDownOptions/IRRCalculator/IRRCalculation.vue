@@ -102,6 +102,8 @@
             type="number"
             placeholder="No. of Inst "
             input-class="remove-input-number-indicator"
+            :error="error && !addInstallment.no"
+            error-message=""
           />
         </div>
         <div :class="colCssLL">% age</div>
@@ -115,6 +117,8 @@
             placeholder="%age of Agreed amount"
             input-class="remove-input-number-indicator"
             @update:model-value="calcAmount()"
+            :error="error && !addInstallment.percent"
+            error-message=""
           />
         </div>
       </div>
@@ -129,6 +133,8 @@
             type="number"
             placeholder="Amt. of Inst."
             input-class="remove-input-number-indicator"
+            :error="error && !addInstallment.amount"
+            error-message=""
           />
         </div>
         <div :class="colCssLL"></div>
@@ -267,30 +273,10 @@
 
 <script setup lang="ts">
 import { reactive, onMounted, ref } from 'vue';
-import { IrrObject, installmentData, addInstallment } from './types';
+import { IrrObject, InstallmentData, AddInstallment, DataItem } from './types';
 import { downloadAsPDF } from 'src/utils/download';
 import { api } from 'src/boot/axios';
 
-const rowCss =
-  'row q-col-gutter-md-md q-col-gutter-sm-sm q-col-gutter-xs-sm justify-center';
-const colCssLL =
-  'col-12 col-xs-12 col-sm-6 col-md-2 q-mt-xs-sm q-mt-sm-none q-mt-md-sm';
-// const colCssL = 'col-xs-4 col-sm-4 col-md-4';
-const colCssR = 'col-12 col-xs-12 col-sm-6 col-md-4';
-const emits = defineEmits(['back', 'reset']);
-let entries: any[] = [];
-let irrInstItems: any[] = [];
-const totalInst = ref(0);
-const totalAmt = ref(0);
-const adding = ref(true);
-let pdfTemplate = ref();
-const pagination = ref({
-  rowsPerPage: 20,
-});
-
-const installmentArray = reactive<installmentData>({
-  installmentStructure: [],
-});
 const props = defineProps({
   data: {
     type: Object,
@@ -300,18 +286,25 @@ const props = defineProps({
     required: true,
   },
 });
-const irr = reactive<IrrObject>({ ...props.data });
-const addInstallment = reactive<addInstallment>({});
 
-interface DataItem {
-  sno?: number | null;
-  nextEmi?: string | null;
-  instalment?: number | null;
-  interest?: number | null;
-  principleReceived?: number | null;
-  principleOs?: number | null;
-  interestOs?: number | null;
-}
+const rowCss =
+  'row q-col-gutter-md-md q-col-gutter-sm-sm q-col-gutter-xs-sm justify-center';
+const colCssLL =
+  'col-12 col-xs-12 col-sm-6 col-md-2 q-mt-xs-sm q-mt-sm-none q-mt-md-sm';
+const colCssR = 'col-12 col-xs-12 col-sm-6 col-md-4';
+const emits = defineEmits(['back', 'reset']);
+let entries: any[] = [];
+let irrInstItems: any[] = [];
+const totalInst = ref(0);
+const totalAmt = ref(0);
+const error = ref(false);
+const adding = ref(true);
+const pagination = ref({ rowsPerPage: 20 });
+const installmentArray = reactive<InstallmentData>({
+  installmentStructure: [],
+});
+const irr = reactive<IrrObject>({ ...props.data });
+const addInstallment = reactive<AddInstallment>({});
 const irrInstItemsEmi = ref<DataItem[]>([]);
 const columns: {
   name: string;
@@ -393,9 +386,13 @@ const reset = () => {
   emits('reset');
 };
 const addInst = () => {
-  installmentArray.installmentStructure.push(addInstallment);
-  calcTotals();
-  adding.value = true;
+  if (!(addInstallment.amount && addInstallment.percent && addInstallment.no)) {
+    error.value = true;
+  } else {
+    installmentArray.installmentStructure.push(addInstallment);
+    calcTotals();
+    adding.value = true;
+  }
 };
 const remove = (index: number) => {
   installmentArray.installmentStructure.splice(index, 1);
@@ -499,7 +496,6 @@ const calcIRR = () => {
   let Intt = 0;
   let Irr_ = 0;
   let FstDt;
-  let lldt;
   let chkdt;
   let nCount;
   let u = 1.990008372;
@@ -512,7 +508,6 @@ const calcIRR = () => {
     Intt = 0;
     Irr_ = (u + l) / 2;
     FstDt = entries[0].dt;
-    lldt = FstDt;
     nCount = 1;
     for (let i = 0; i < entries.length; i++) {
       lldays = 365 / 12;
@@ -523,7 +518,6 @@ const calcIRR = () => {
       Intt = 0;
       nCount = nCount + 1;
       _p = _p + entries[i].amount;
-      lldt = entries[i].dt;
     }
     if (_p < 0) {
       l = Irr_;
@@ -602,7 +596,7 @@ const download = async (type: string) => {
   const firstEmi = irr.firstEmi;
   let incrementCount = 0;
   let today = new Date(Date.parse(irr.firstEmi as string));
-  for (var i = 0; i < (irr.installments as number); i++) {
+  for (let i = 0; i < (irr.installments as number); i++) {
     if (i == 0) {
       nextEmi = firstEmi;
     } else {
@@ -668,7 +662,7 @@ const download = async (type: string) => {
         (installmentArray.installmentStructure[0].amount as number) - interest;
       Balance = (Balance as number) - PrinciplieReceived;
     }
-    var testObj = {
+    let testObj = {
       sno: i + 1,
       balance: Balance,
       nextEmi: nextEmi,
@@ -710,8 +704,9 @@ const download = async (type: string) => {
   }
 
   if (type === 'pdf') {
-    pdfTemplate.value = document.getElementById('pdf-window');
-    downloadAsPDF(pdfTemplate.value.innerHTML);
+    const pdfTemplate = document.getElementById('pdf-window');
+    console.log(pdfTemplate);
+    downloadAsPDF(pdfTemplate?.innerHTML);
 
     // setTimeout(() => {
     //   pdfTemplate.value = document.getElementById('pdf-window');
@@ -724,7 +719,7 @@ const download = async (type: string) => {
     //   myWindow?.close();
     // }, 500);
   } else if (type === 'excel') {
-    var params = {
+    let params = {
       name: irr.name ? irr.name : null,
       company: 'aaa',
       instalments: irrInstItems,
@@ -732,7 +727,7 @@ const download = async (type: string) => {
     const rsp = await api.post('irrCalcDownloadExcel', params);
     if (rsp.data && rsp.data.code) {
       console.log('hi');
-      var link = document.createElement('a');
+      let link = document.createElement('a');
       link.download = rsp.data.code;
       link.href = 'Reports/' + rsp.data.code;
       link.click();

@@ -15,18 +15,28 @@ export interface IrrObject {
   agreedAmount?: number | null;
   interest?: number | null;
 }
-export interface installmentObject {
+export interface InstallmentObject {
   amount?: number | null;
   no?: number | null;
   percent?: number | null;
 }
 
-export interface installmentData {
-  installmentStructure: installmentObject[];
+export interface InstallmentData {
+  installmentStructure: InstallmentObject[];
 }
 
-export interface addInstallment {
+export interface AddInstallment {
   amount?: number | null;
   no?: number | null;
   percent?: number | null;
+}
+
+export interface DataItem {
+  sno?: number | null;
+  nextEmi?: string | null;
+  instalment?: number | null;
+  interest?: number | null;
+  principleReceived?: number | null;
+  principleOs?: number | null;
+  interestOs?: number | null;
 }
