@@ -23,7 +23,21 @@
         >
           <template v-slot:top>
             <div class="row q-gutter-y-lg q-pb-xs-md">
-              <div class="col-12 text-h4">Nature entry</div>
+              <div class="col-12">
+                <div class="row items-center q-gutter-md">
+                  <div class="col-auto text-h4">Nature entry</div>
+                  <div class="col-auto">
+                    <q-btn
+                      color="blue-7"
+                      icon="add"
+                      label="Add new"
+                      size="md"
+                      v-if="natureEntry.length"
+                      @click="isAddNewEntryModalActive = true"
+                    />
+                  </div>
+                </div>
+              </div>
               <div class="col-12">
                 <q-input
                   v-model="searchQuery"
@@ -134,13 +148,67 @@
       </div>
     </div>
   </div>
+  <q-dialog v-model="isAddNewEntryModalActive">
+    <q-card>
+      <q-form @submit.prevent="saveNewEntry" @reset="resetNewEntryForm">
+        <q-card-section class="bg-grey-2">
+          <div class="flex items-center">
+            <span class="text-h5 q-mr-xl">Add nature entry</span>
+            <q-space />
+            <q-btn
+              class="q-ml-xl"
+              icon="close"
+              flat
+              @click="isAddNewEntryModalActive = false"
+            />
+          </div>
+        </q-card-section>
+        <q-card-section class="q-px-lg q-py-md">
+          <div class="row">
+            <div class="col-12">
+              <q-input
+                v-model="newEntryData.code"
+                label="Code"
+                maxlength="10"
+                counter
+                autofocus
+                :error="!newEntryData.code"
+              >
+                <template v-slot:hint>characters</template>
+              </q-input>
+              <div class="col-12 q-mt-lg">
+                <q-input
+                  v-model="newEntryData.name"
+                  label="Name"
+                  :error="!newEntryData.name"
+                />
+              </div>
+              <div class="col-12 q-mt-lg">
+                <q-select
+                  v-model="newEntryData.section"
+                  :options="sectionSelectOptions"
+                  label="Section"
+                  outlined
+                />
+              </div>
+            </div>
+          </div>
+        </q-card-section>
+        <q-separator class="q-mt-md" />
+        <q-card-actions align="right" class="q-py-md bg-grey-2">
+          <q-btn label="Add" color="green-5" type="submit" />
+          <q-btn label="Reset" color="red-5" type="reset" />
+        </q-card-actions>
+      </q-form>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { confirmDialog, onSuccess } from 'src/utils/notification';
-import { ref, reactive, computed, watch, onMounted } from 'vue';
+import { confirmDialog, onFailure, onSuccess } from 'src/utils/notification';
+import { ref, reactive, computed, watch, watchEffect, onMounted } from 'vue';
 
 interface NatureEntry {
   code: string;
@@ -159,6 +227,7 @@ const sectionSelectOptions: { value: 'A' | 'L' | 'D'; label: string }[] = [
   { value: 'D', label: 'Deposit' },
 ];
 
+const isAddNewEntryModalActive = ref(false);
 const fetchingData = ref(false);
 const natureEntry = ref<NatureEntry[]>([]);
 const searchQuery = ref<string | null>('');
@@ -183,15 +252,19 @@ const editingData = reactive<{
   section: { value: 'A', label: 'Accounts' },
 });
 
-const columns = reactive<
-  {
-    name: string;
-    required?: boolean;
-    label: string;
-    field: string;
-    align: 'left';
-  }[]
->([
+const newEntryData = reactive({
+  code: '',
+  name: '',
+  section: sectionSelectOptions[0],
+});
+
+const columns: {
+  name: string;
+  required?: boolean;
+  label: string;
+  field: string;
+  align: 'left';
+}[] = [
   {
     name: 'actions',
     label: 'Actions',
@@ -219,7 +292,7 @@ const columns = reactive<
     field: 'section',
     label: 'Section',
   },
-]);
+];
 
 const editEntry = (rowIndex: number) => {
   if (isEditing.value) {
@@ -268,9 +341,6 @@ const deleteEntry = (rowIndex: number) => {
 };
 
 const deleteEntryConfirmed = async (rowIndex: number) => {
-  /* todo */
-  console.log(natureEntry.value[rowIndex].code);
-
   const rsp = await api.delete(
     `natureEntry/${natureEntry.value[rowIndex].code}`
   );
@@ -284,18 +354,59 @@ const deleteEntryConfirmed = async (rowIndex: number) => {
   }
 };
 
+const isCodeDuplicate = (code: string, section: string) =>
+  natureEntry.value.some(
+    (item) => item.code === code && item.section === section
+  );
+
+const saveNewEntry = async () => {
+  if (newEntryData.code && newEntryData.name) {
+    if (isCodeDuplicate(newEntryData.code, newEntryData.section.value)) {
+      onFailure({
+        msg: 'Code already present ( Code must be unique ).',
+        icon: 'warning',
+      });
+    } else {
+      const rsp = await api.post('natureEntry', {
+        ...newEntryData,
+        section: newEntryData.section.value,
+      });
+
+      if (rsp.data) {
+        onSuccess({ msg: rsp.data.displayMessage, icon: 'check' });
+        natureEntry.value.push({
+          ...newEntryData,
+          section: newEntryData.section.value,
+        });
+      }
+    }
+  }
+};
+
+const resetNewEntryForm = () => {
+  newEntryData.code = '';
+  newEntryData.name = '';
+  newEntryData.section = sectionSelectOptions[0];
+};
+
 watch(searchQuery, () => {
   if (searchQuery.value) {
     searchQuery.value = searchQuery.value.trim().toUpperCase();
   }
 });
 
+watchEffect(() => {
+  newEntryData.code = newEntryData.code.trim().toUpperCase();
+});
+
 onMounted(async () => {
+  fetchingData.value = true;
   const rsp = await api.get('natureEntry');
 
   if (rsp.data) {
     natureEntry.value = rsp.data;
   }
+  fetchingData.value = false;
 });
 </script>
 
