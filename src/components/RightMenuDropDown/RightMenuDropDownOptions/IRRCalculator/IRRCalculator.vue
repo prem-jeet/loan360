@@ -10,18 +10,26 @@
         </q-toolbar>
       </q-item-section>
     </q-item>
-    <q-card-section v-if="next" class="scroll">
-      <div class="row justify-center q-mb-sm">
-        <div class="col-xs-3 col-sm-4 col-md-4">
-          <q-radio v-model="mode" dense val="IRR" label="IRR" />
+    <q-card-section v-if="next" class="scroll q-pt-sm">
+      <div :class="rowCss">
+        <div class="col-xs-6 col-sm-6 col-md-2">
+          <q-radio v-model="mode" dense val="IRR" label="IRR" class="q-pt-sm" />
         </div>
-        <div class="col-xs-5 col-sm-4 col-md-4">
-          <q-radio v-model="mode" dense val="ReverseIRR" label="Reverse IRR" />
+        <div class="col-xs-6 col-sm-6 col-md-4">
+          <q-radio
+            v-model="mode"
+            dense
+            val="ReverseIRR"
+            label="Reverse IRR"
+            class="q-pt-sm"
+          />
         </div>
-        <div v-if="irr.name" class="col-xs-4 col-sm-4 col-md-4">
-          Name:{{ irr.name }}
+        <div :class="colCssL">Name</div>
+        <div :class="colCssR">
+          <q-input outlined dense v-model="irr.name" />
         </div>
       </div>
+
       <div :class="rowCss">
         <div :class="colCssL">
           Amount
@@ -103,10 +111,6 @@
       </div>
 
       <div :class="rowCss">
-        <div :class="colCssL">Name</div>
-        <div :class="colCssR">
-          <q-input outlined dense v-model="irr.name" />
-        </div>
         <div :class="colCssL">1st EMI Date</div>
         <div :class="colCssR">
           <q-input
@@ -117,9 +121,6 @@
             @update:model-value="nextEmi"
           />
         </div>
-      </div>
-
-      <div :class="rowCss">
         <div :class="colCssL">2nd EMI Date</div>
         <div :class="colCssR">
           <q-input
@@ -131,9 +132,11 @@
             type="date"
           />
         </div>
-        <div v-if="mode === 'IRR'" :class="colCssL">Advance EMIs</div>
-        <div v-else :class="colCssL"></div>
-        <div v-if="mode === 'IRR'" :class="colCssR">
+      </div>
+
+      <div v-if="mode === 'IRR'" :class="rowCss">
+        <div :class="colCssL">Advance EMIs</div>
+        <div :class="colCssR">
           <q-input
             outlined
             dense
@@ -142,10 +145,6 @@
             input-class="text-right remove-input-number-indicator"
           />
         </div>
-        <div v-else :class="colCssR"></div>
-      </div>
-
-      <div v-if="mode == 'IRR'" :class="rowCss">
         <div :class="colCssL">Commission</div>
         <div :class="colCssR">
           <q-input
@@ -156,6 +155,9 @@
             input-class="text-right remove-input-number-indicator"
           />
         </div>
+      </div>
+
+      <div v-if="mode == 'IRR'" :class="rowCss">
         <div :class="colCssL">Doc.Charges</div>
         <div :class="colCssR">
           <q-input
@@ -166,9 +168,6 @@
             input-class="text-right remove-input-number-indicator"
           />
         </div>
-      </div>
-
-      <div v-if="mode == 'IRR'" :class="rowCss">
         <div :class="colCssL">Rebate</div>
         <div :class="colCssR">
           <q-input
@@ -179,6 +178,9 @@
             input-class="text-right remove-input-number-indicator"
           />
         </div>
+      </div>
+
+      <div v-if="mode == 'IRR'" :class="rowCss">
         <div :class="colCssL">Security</div>
         <div :class="colCssR">
           <q-input
@@ -189,6 +191,8 @@
             input-class="text-right remove-input-number-indicator"
           />
         </div>
+        <div :class="colCssL"></div>
+        <div :class="colCssR"></div>
       </div>
       <div class="row justify-center q-pt-md">
         <q-btn
