@@ -1,27 +1,43 @@
 <template>
   <div :class="rowCss" class="q-mb-sm">
-    <div class="col-xs-3 col-sm-4 col-md-4">
+    <div class="col-xs-6 col-sm-6 col-md-6">
       <q-btn color="dark" size="sm" outline icon="arrow_back" @click="back">
         <q-tooltip> back </q-tooltip>
       </q-btn>
     </div>
-    <div class="col-xs-4 col-sm-4 col-md-4 text-center">
-      <q-btn
-        color="red-5"
-        label="PDF"
-        size="sm"
-        icon="download"
-        @click="download('pdf')"
-      />
-    </div>
-    <div class="col-xs-5 col-sm-4 col-md-4 text-right">
-      <q-btn
-        color="green-5"
-        label="Excel"
-        size="sm"
-        icon="download"
-        @click="download('excel')"
-      />
+
+    <div class="col-xs-6 col-sm-6 col-md-6 text-right">
+      <q-btn-dropdown color="primary" label="Download">
+        <q-list>
+          <q-item clickable v-close-popup @click="download('pdf')">
+            <q-item-section avatar>
+              <q-avatar
+                icon="download"
+                size="sm"
+                color="red-5"
+                text-color="white"
+              />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label icon="download">PDF</q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-item clickable v-close-popup @click="download('excel')">
+            <q-item-section avatar>
+              <q-avatar
+                icon="download"
+                size="sm"
+                color="green-5"
+                text-color="white"
+              />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label icon="download">Excel</q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-btn-dropdown>
     </div>
   </div>
   <div v-if="select === 'IRR'">
@@ -715,6 +731,7 @@ const download = async (type: string) => {
     };
     const rsp = await api.post('irrCalcDownloadExcel', params);
     if (rsp.data && rsp.data.code) {
+      console.log('hi');
       var link = document.createElement('a');
       link.download = rsp.data.code;
       link.href = 'Reports/' + rsp.data.code;
