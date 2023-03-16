@@ -7,12 +7,12 @@
     </div>
 
     <div class="col-xs-6 col-sm-6 col-md-6 text-right">
-      <q-btn-dropdown color="primary" label="Download">
+      <q-btn-dropdown color="primary" dropdown-icon="download">
         <q-list>
           <q-item clickable v-close-popup @click="download('pdf')">
             <q-item-section avatar>
               <q-avatar
-                icon="download"
+                icon="fa-solid fa-file-pdf"
                 size="sm"
                 color="red-5"
                 text-color="white"
@@ -26,7 +26,7 @@
           <q-item clickable v-close-popup @click="download('excel')">
             <q-item-section avatar>
               <q-avatar
-                icon="download"
+                icon="fa-solid fa-file-excel"
                 size="sm"
                 color="green-5"
                 text-color="white"
