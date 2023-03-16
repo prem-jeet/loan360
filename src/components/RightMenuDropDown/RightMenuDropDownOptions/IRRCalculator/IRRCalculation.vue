@@ -252,6 +252,9 @@
 <script setup lang="ts">
 import { reactive, onMounted, ref } from 'vue';
 import { IrrObject, installmentData, addInstallment } from './types';
+import { downloadAsPDF } from 'src/utils/download';
+import { api } from 'src/boot/axios';
+
 const rowCss =
   'row q-col-gutter-md-md q-col-gutter-sm-sm q-col-gutter-xs-sm justify-center';
 const colCssLL =
@@ -572,7 +575,7 @@ const calcRate = () => {
     ) / 100;
 };
 
-const download = (type: string) => {
+const download = async (type: string) => {
   irrInstItems = [];
   let PrinciplieReceived;
   let Balance = irr.amount;
@@ -691,16 +694,32 @@ const download = (type: string) => {
   }
 
   if (type === 'pdf') {
-    setTimeout(() => {
-      pdfTemplate.value = document.getElementById('pdf-window');
-      const myWindow = window.open('', '', 'width=1000,height=700');
-      const templateContent = pdfTemplate.value.innerHTML;
-      myWindow?.document.write(templateContent);
-      myWindow?.document.close();
-      myWindow?.focus();
-      myWindow?.print();
-      myWindow?.close();
-    }, 500);
+    pdfTemplate.value = document.getElementById('pdf-window');
+    downloadAsPDF(pdfTemplate.value.innerHTML);
+
+    // setTimeout(() => {
+    //   pdfTemplate.value = document.getElementById('pdf-window');
+    //   const myWindow = window.open('', '', 'width=1000,height=700');
+    //   const templateContent = pdfTemplate.value.innerHTML;
+    //   myWindow?.document.write(templateContent);
+    //   myWindow?.document.close();
+    //   myWindow?.focus();
+    //   myWindow?.print();
+    //   myWindow?.close();
+    // }, 500);
+  } else if (type === 'excel') {
+    var params = {
+      name: irr.name ? irr.name : null,
+      company: 'aaa',
+      instalments: irrInstItems,
+    };
+    const rsp = await api.post('irrCalcDownloadExcel', params);
+    if (rsp.data && rsp.data.code) {
+      var link = document.createElement('a');
+      link.download = rsp.data.code;
+      link.href = 'Reports/' + rsp.data.code;
+      link.click();
+    }
   }
 };
 
