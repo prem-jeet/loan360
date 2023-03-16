@@ -189,17 +189,17 @@
       </div>
     </div>
   </div>
-  <div class="row q-mt-sm">
-    <div v-if="select === 'IRR'" class="col-xs-12 col-sm-6 col-md-8">
-      <q-btn
+  <div class="row q-mt-sm items-center">
+    <div v-if="select === 'IRR'" class="col-xs-6 col-sm-6 col-md-8">
+      <!-- <q-btn
         color="light-blue"
         label="calculate irr"
         @click="calcIRR()"
-      ></q-btn>
-      <span class="q-ma-sm text-bold">IRR : {{ irr.irr }}</span>
+      ></q-btn> -->
+      <h6 class="q-ma-sm text-bold">IRR : {{ irr.irr }}</h6>
     </div>
-    <div v-else class="col-xs-12 col-sm-6 col-md-8"></div>
-    <div class="col-xs-12 col-sm-6 col-md-4 text-right">
+    <div v-else class="col-xs-6 col-sm-6 col-md-8"></div>
+    <div class="col-xs-6 col-sm-6 col-md-4 text-right">
       <q-btn color="red-8" label="reset" @click="reset" />
     </div>
   </div>
@@ -392,6 +392,7 @@ const addInst = () => {
     installmentArray.installmentStructure.push(addInstallment);
     calcTotals();
     adding.value = true;
+    calcIRR();
   }
 };
 const remove = (index: number) => {
