@@ -40,6 +40,9 @@
       </q-btn-dropdown>
     </div>
   </div>
+
+  <!-- IRR Calculation -->
+
   <div v-if="select === 'IRR'">
     <div v-if="irr.name" class="row justify-between q-pa-xs q-mt-sm">
       <div class="col"><b> Name:</b> {{ irr.name }}</div>
@@ -90,6 +93,9 @@
         </div>
       </div>
     </div>
+
+    <!-- Adding installments  -->
+
     <div v-else>
       <div :class="rowCss" class="q-px-sm">
         <div :class="colCssLL">Number</div>
@@ -203,6 +209,9 @@
       <q-btn color="red-8" label="reset" @click="reset" />
     </div>
   </div>
+
+  <!-- PDF  -->
+
   <div v-show="false" id="pdf-window">
     <div><p style="color: #336b6b">Company Name : IKF Finance Limited</p></div>
     <div v-if="irr.name">
@@ -293,8 +302,8 @@ const colCssLL =
   'col-12 col-xs-12 col-sm-6 col-md-2 q-mt-xs-sm q-mt-sm-none q-mt-md-sm';
 const colCssR = 'col-12 col-xs-12 col-sm-6 col-md-4';
 const emits = defineEmits(['back', 'reset']);
-let entries: any[] = [];
-let irrInstItems: any[] = [];
+let entries: { dt: Date; ino?: number | null; amount: number }[] = [];
+let irrInstItems: DataItem[] = [];
 const totalInst = ref(0);
 const totalAmt = ref(0);
 const error = ref(false);
@@ -356,6 +365,7 @@ const columns: {
     align: 'center',
   },
 ];
+
 const totalColumn = (val: string) => {
   let total = 0;
   if (val === 'nextEmi') {
@@ -379,12 +389,15 @@ const totalColumn = (val: string) => {
     return;
   }
 };
+
 const back = () => {
   emits('back');
 };
+
 const reset = () => {
   emits('reset');
 };
+
 const addInst = () => {
   if (!(addInstallment.amount && addInstallment.percent && addInstallment.no)) {
     error.value = true;
@@ -395,15 +408,18 @@ const addInst = () => {
     calcIRR();
   }
 };
+
 const remove = (index: number) => {
   installmentArray.installmentStructure.splice(index, 1);
 };
+
 const calcInterest = () => {
   if (irr.amount && irr.rate && irr.inttMonths) {
     irr.interest = ((irr.amount * irr.rate) / 100 / 12) * irr.inttMonths;
     irr.agreedAmount = irr.amount + irr.interest;
   }
 };
+
 const calcAmount = () => {
   addInstallment.amount = Math.round(
     ((irr.agreedAmount as number) * (addInstallment.percent as number)) /
@@ -411,6 +427,7 @@ const calcAmount = () => {
       (addInstallment.no as number)
   );
 };
+
 const calcIntallments = () => {
   if (installmentArray.installmentStructure.length > 0) {
     return;
@@ -481,7 +498,7 @@ const makeEntries = () => {
     let j = entries.length - 1;
     for (let i = j; i >= 0; i--) {
       if (-entries[i].amount >= (rebateBalance as number)) {
-        entries[i].amount += rebateBalance;
+        entries[i].amount += rebateBalance as number;
         break;
       } else {
         (rebateBalance as number) -= entries[i].amount;

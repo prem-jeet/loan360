@@ -233,10 +233,8 @@ const formattedDate = ref(`${year}-${month}-${day}`);
 const nextEmiDisable = ref(true);
 const next = ref(true);
 const error = ref(false);
-
 const irr = reactive<IrrObject>({});
 irr.firstEmi = formattedDate.value;
-
 const autoFill = () => {
   if (mode.value === 'IRR') {
     irr.amount = 10000;
@@ -252,6 +250,7 @@ const autoFill = () => {
     irr.firstEmi = formattedDate.value;
   }
 };
+
 const nextEmi = (v: any) => {
   const today = new Date(Date.parse(v));
   const day = today.getDate().toString().padStart(2, '0');
@@ -302,12 +301,15 @@ const nextEmi = (v: any) => {
     nextEmiDisable.value = true;
   }
 };
+
 const nextcal = () => {
   next.value = !next.value;
 };
+
 const back = () => {
   next.value = !next.value;
 };
+
 const reset = () => {
   next.value = !next.value;
   irr.amount = null;
@@ -325,6 +327,7 @@ const reset = () => {
   irr.agreedAmount = null;
   irr.interest = null;
 };
+
 const nextValue = computed(() => {
   if (
     !(irr.amount && irr.inttMonths && irr.installments && (irr.rate || irr.irr))
@@ -334,6 +337,7 @@ const nextValue = computed(() => {
     return true;
   }
 });
+
 onMounted(async () => {
   nextEmi(irr.firstEmi);
   error.value = true;
