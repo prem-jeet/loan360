@@ -302,8 +302,7 @@ const colCssLL =
   'col-12 col-xs-12 col-sm-6 col-md-2 q-mt-xs-sm q-mt-sm-none q-mt-md-sm';
 const colCssR = 'col-12 col-xs-12 col-sm-6 col-md-4';
 const emits = defineEmits(['back', 'reset']);
-let entries: { date: Date; IncrementNumber?: number | null; amount: number }[] =
-  [];
+let entries: { date: Date; IncrementNumber?: number; amount: number }[] = [];
 let irrInstItems: DataItem[] = [];
 const totalInst = ref(0);
 const totalAmt = ref(0);
