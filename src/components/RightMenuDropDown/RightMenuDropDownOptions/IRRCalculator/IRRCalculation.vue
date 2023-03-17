@@ -731,19 +731,9 @@ const download = async (type: string) => {
   }
 
   if (type === 'pdf') {
-    const pdfTemplate = document.getElementById('pdf-window');
-    downloadAsPDF(pdfTemplate?.innerHTML);
-
-    // setTimeout(() => {
-    //   pdfTemplate.value = document.getElementById('pdf-window');
-    //   const myWindow = window.open('', '', 'width=1000,height=700');
-    //   const templateContent = pdfTemplate.value.innerHTML;
-    //   myWindow?.document.write(templateContent);
-    //   myWindow?.document.close();
-    //   myWindow?.focus();
-    //   myWindow?.print();
-    //   myWindow?.close();
-    // }, 500);
+    setTimeout(() => {
+      downloadAsPDF('pdf-window');
+    }, 500);
   } else if (type === 'excel') {
     let params = {
       name: irr.name ? irr.name : null,

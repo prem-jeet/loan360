@@ -253,7 +253,6 @@ const autoFill = () => {
 
 const nextEmi = (v: unknown) => {
   if (typeof v === 'string') {
-    console.log(typeof v, 'v');
     const today = new Date(Date.parse(v));
     const day = today.getDate().toString().padStart(2, '0');
     const month = (today.getMonth() + 1).toString().padStart(2, '0');
