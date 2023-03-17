@@ -434,19 +434,21 @@ const calcIntallments = () => {
     return;
   }
   installmentArray.installmentStructure = [];
-  let inst1 = {
+  let installment1 = {
     no: (irr.installments as number) - 1,
     amount: Math.ceil(
       (irr.agreedAmount as number) / (irr.installments as number)
     ),
   };
-  let inst2 = {
+  let installment2 = {
     no: 1,
-    amount: Math.ceil((irr.agreedAmount as number) - inst1.amount * inst1.no),
+    amount: Math.ceil(
+      (irr.agreedAmount as number) - installment1.amount * installment1.no
+    ),
   };
   installmentArray.installmentStructure = [];
-  installmentArray.installmentStructure.push(inst1);
-  installmentArray.installmentStructure.push(inst2);
+  installmentArray.installmentStructure.push(installment1);
+  installmentArray.installmentStructure.push(installment2);
   calcTotals();
 };
 
@@ -509,55 +511,59 @@ const makeEntries = () => {
 
 const calcIRR = () => {
   makeEntries();
-  let _p = 0;
+  let principle = 0;
   let Intt = 0;
-  let Irr_ = 0;
+  let Irr = 0;
   let FstDt;
-  let chkdt;
+  let incrementDate;
   let nCount;
-  let u = 1.990008372;
-  let l = 0.0000000000001;
+  let upper = 1.990008372;
+  let lower = 0.0000000000001;
   let times = 0;
   let lldays = 0;
+
+  /// 1000 times for acuracy
   while (times < 1000) {
     times = times + 1;
-    _p = 0;
+    principle = 0;
     Intt = 0;
-    Irr_ = (u + l) / 2;
+    Irr = (upper + lower) / 2;
     FstDt = entries[0].date;
     nCount = 1;
     for (let i = 0; i < entries.length; i++) {
       lldays = 365 / 12;
-      Intt = Intt + (_p * lldays * Irr_) / 100;
-      chkdt = FstDt;
-      chkdt.setMonth(chkdt.getMonth(), nCount);
-      _p = _p + Intt;
+      Intt = Intt + (principle * lldays * Irr) / 100;
+      incrementDate = FstDt;
+      incrementDate.setMonth(incrementDate.getMonth(), nCount);
+      principle = principle + Intt;
       Intt = 0;
       nCount = nCount + 1;
-      _p = _p + entries[i].amount;
+      principle = principle + entries[i].amount;
     }
-    if (_p < 0) {
-      l = Irr_;
+    if (principle < 0) {
+      lower = Irr;
     } else {
-      u = Irr_;
+      upper = Irr;
     }
   }
-  irr.irr = Math.round(Irr_ * 365 * 1000) / 1000;
+  irr.irr = Math.round(Irr * 365 * 1000) / 1000;
 };
 
 const calcTotals = () => {
-  let ti = 0,
-    ta = 0;
+  let totalInstallment = 0,
+    totalAmount = 0;
 
   for (let i = 0; i < installmentArray.installmentStructure.length; i++) {
-    ti = ti + (installmentArray.installmentStructure[i].no as number);
-    ta =
-      ta +
+    totalInstallment =
+      totalInstallment +
+      (installmentArray.installmentStructure[i].no as number);
+    totalAmount =
+      totalAmount +
       (installmentArray.installmentStructure[i].amount as number) *
         (installmentArray.installmentStructure[i].no as number);
   }
-  totalInst.value = ti;
-  totalAmt.value = ta;
+  totalInst.value = totalInstallment;
+  totalAmt.value = totalAmount;
   if (props.select == 'IRR') {
     irr.irr = NaN;
   } else {
@@ -566,9 +572,9 @@ const calcTotals = () => {
 };
 
 const calcRate = () => {
-  const f3 = irr.amount;
-  const e3 = (irr.irr as number) / 1200;
-  const pd = irr.installments;
+  const f3 = irr.amount; //finance amount
+  const e3 = (irr.irr as number) / 1200; //rate
+  const pd = irr.installments; // period
 
   const inst =
     ((((f3 as number) * (e3 * Math.pow(1 + e3, pd as number))) /
