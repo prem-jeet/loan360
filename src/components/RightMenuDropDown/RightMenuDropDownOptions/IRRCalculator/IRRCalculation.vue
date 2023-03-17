@@ -7,7 +7,7 @@
     </div>
 
     <div class="col-xs-6 col-sm-6 col-md-6 text-right">
-      <q-btn-dropdown color="primary" dropdown-icon="download">
+      <q-btn-dropdown color="primary" dropdown-icon="download" size="sm">
         <q-list>
           <q-item clickable v-close-popup @click="download('pdf')">
             <q-item-section avatar>
