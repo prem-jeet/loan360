@@ -1,9 +1,11 @@
-export const downloadAsPDF = (pdfTemplate: any) => {
-  const myWindow = window.open('', '', 'width=1000,height=700');
-  const templateContent = pdfTemplate;
-  myWindow?.document.write(templateContent);
-  myWindow?.document.close();
-  myWindow?.focus();
-  myWindow?.print();
-  myWindow?.close();
+export const downloadAsPDF = (pdfTemplate: unknown) => {
+  if (typeof pdfTemplate === 'string') {
+    const pdfWindow = window.open('', '', 'width=1000,height=700');
+    const templateContent = pdfTemplate;
+    pdfWindow?.document.write(templateContent);
+    pdfWindow?.document.close();
+    pdfWindow?.focus();
+    pdfWindow?.print();
+    pdfWindow?.close();
+  }
 };

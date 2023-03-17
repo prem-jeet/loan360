@@ -726,7 +726,6 @@ const download = async (type: string) => {
       installmentPDFObj.interestOs = (irr.interest as number) - sumOfInterest;
     }
     irrInstItems.push(installmentPDFObj);
-    // console.log('irrInstItem', irrInstItems);
     irrInstItemsEmi.value = irrInstItems;
 
     incrementCount = incrementCount + 1;
@@ -734,7 +733,6 @@ const download = async (type: string) => {
 
   if (type === 'pdf') {
     const pdfTemplate = document.getElementById('pdf-window');
-    console.log(pdfTemplate);
     downloadAsPDF(pdfTemplate?.innerHTML);
 
     // setTimeout(() => {
@@ -755,7 +753,6 @@ const download = async (type: string) => {
     };
     const rsp = await api.post('irrCalcDownloadExcel', params);
     if (rsp.data && rsp.data.code) {
-      console.log('hi');
       let link = document.createElement('a');
       link.download = rsp.data.code;
       link.href = 'Reports/' + rsp.data.code;
