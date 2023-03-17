@@ -251,54 +251,57 @@ const autoFill = () => {
   }
 };
 
-const nextEmi = (v: any) => {
-  const today = new Date(Date.parse(v));
-  const day = today.getDate().toString().padStart(2, '0');
-  const month = (today.getMonth() + 1).toString().padStart(2, '0');
-  const days = ['29', '30', '31'];
-  const febdays = ['28', '29'];
+const nextEmi = (v: unknown) => {
+  if (typeof v === 'string') {
+    console.log(typeof v, 'v');
+    const today = new Date(Date.parse(v));
+    const day = today.getDate().toString().padStart(2, '0');
+    const month = (today.getMonth() + 1).toString().padStart(2, '0');
+    const days = ['29', '30', '31'];
+    const febdays = ['28', '29'];
 
-  if (month === '01' && days.includes(day)) {
-    const year = today.getFullYear().toString();
-    const checkYear = parseInt(year);
-    if (
-      (checkYear % 4 === 0 && checkYear % 100 !== 0) ||
-      checkYear % 400 === 0
-    ) {
-      const day = '29';
+    if (month === '01' && days.includes(day)) {
+      const year = today.getFullYear().toString();
+      const checkYear = parseInt(year);
+      if (
+        (checkYear % 4 === 0 && checkYear % 100 !== 0) ||
+        checkYear % 400 === 0
+      ) {
+        const day = '29';
+        const month = (today.getMonth() + 2).toString().padStart(2, '0');
+        irr.nextEmi = `${year}-${month}-${day}`;
+      } else {
+        const day = '28';
+        const month = (today.getMonth() + 2).toString().padStart(2, '0');
+        irr.nextEmi = `${year}-${month}-${day}`;
+      }
+    } else if (month === '12' && day === '31') {
+      const day = today.getDate().toString().padStart(2, '0');
+      const month = '01';
+      const year = (today.getFullYear() + 1).toString();
+      irr.nextEmi = `${year}-${month}-${day}`;
+    } else if (month === '12') {
+      const day = today.getDate().toString().padStart(2, '0');
+      const month = '01';
+      const year = (today.getFullYear() + 1).toString();
+      irr.nextEmi = `${year}-${month}-${day}`;
+    } else if (day === '31') {
+      const day = (today.getDate() - 1).toString().padStart(2, '0');
       const month = (today.getMonth() + 2).toString().padStart(2, '0');
+      const year = today.getFullYear().toString();
       irr.nextEmi = `${year}-${month}-${day}`;
     } else {
-      const day = '28';
+      const day = today.getDate().toString().padStart(2, '0');
       const month = (today.getMonth() + 2).toString().padStart(2, '0');
+      const year = today.getFullYear().toString();
       irr.nextEmi = `${year}-${month}-${day}`;
     }
-  } else if (month === '12' && day === '31') {
-    const day = today.getDate().toString().padStart(2, '0');
-    const month = '01';
-    const year = (today.getFullYear() + 1).toString();
-    irr.nextEmi = `${year}-${month}-${day}`;
-  } else if (month === '12') {
-    const day = today.getDate().toString().padStart(2, '0');
-    const month = '01';
-    const year = (today.getFullYear() + 1).toString();
-    irr.nextEmi = `${year}-${month}-${day}`;
-  } else if (day === '31') {
-    const day = (today.getDate() - 1).toString().padStart(2, '0');
-    const month = (today.getMonth() + 2).toString().padStart(2, '0');
-    const year = today.getFullYear().toString();
-    irr.nextEmi = `${year}-${month}-${day}`;
-  } else {
-    const day = today.getDate().toString().padStart(2, '0');
-    const month = (today.getMonth() + 2).toString().padStart(2, '0');
-    const year = today.getFullYear().toString();
-    irr.nextEmi = `${year}-${month}-${day}`;
-  }
 
-  if (month === '02' && febdays.includes(day)) {
-    nextEmiDisable.value = false;
-  } else {
-    nextEmiDisable.value = true;
+    if (month === '02' && febdays.includes(day)) {
+      nextEmiDisable.value = false;
+    } else {
+      nextEmiDisable.value = true;
+    }
   }
 };
 
