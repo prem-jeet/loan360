@@ -683,7 +683,7 @@ const download = async (type: string) => {
         (installmentArray.installmentStructure[0].amount as number) - interest;
       Balance = (Balance as number) - PrinciplieReceived;
     }
-    let testObj = {
+    let installmentPDFObj = {
       sno: installment + 1,
       balance: Balance,
       nextEmi: nextEmi,
@@ -695,29 +695,30 @@ const download = async (type: string) => {
     };
 
     if (installment == (irr.installments as number) - 1) {
-      testObj.interest = (irr.interest as number) - sumOfInterest;
-      testObj.principleReceived =
+      installmentPDFObj.interest = (irr.interest as number) - sumOfInterest;
+      installmentPDFObj.principleReceived =
         (irr.amount as number) - sumOfprincipleReceived;
 
-      testObj.instalment = installmentArray.installmentStructure[1]
+      installmentPDFObj.instalment = installmentArray.installmentStructure[1]
         .amount as number;
-      testObj.principleOs =
+      installmentPDFObj.principleOs =
         (irr.amount as number) -
-        (sumOfprincipleReceived + testObj.principleReceived);
-      testObj.interestOs =
-        (irr.interest as number) - (sumOfInterest + testObj.interest);
+        (sumOfprincipleReceived + installmentPDFObj.principleReceived);
+      installmentPDFObj.interestOs =
+        (irr.interest as number) - (sumOfInterest + installmentPDFObj.interest);
     } else {
-      testObj.interest = interest;
-      testObj.principleReceived = PrinciplieReceived;
+      installmentPDFObj.interest = interest;
+      installmentPDFObj.principleReceived = PrinciplieReceived;
 
-      testObj.instalment = installmentArray.installmentStructure[0]
+      installmentPDFObj.instalment = installmentArray.installmentStructure[0]
         .amount as number;
       sumOfInterest += interest;
       sumOfprincipleReceived += PrinciplieReceived;
-      testObj.principleOs = (irr.amount as number) - sumOfprincipleReceived;
-      testObj.interestOs = (irr.interest as number) - sumOfInterest;
+      installmentPDFObj.principleOs =
+        (irr.amount as number) - sumOfprincipleReceived;
+      installmentPDFObj.interestOs = (irr.interest as number) - sumOfInterest;
     }
-    irrInstItems.push(testObj);
+    irrInstItems.push(installmentPDFObj);
     // console.log('irrInstItem', irrInstItems);
     irrInstItemsEmi.value = irrInstItems;
 
