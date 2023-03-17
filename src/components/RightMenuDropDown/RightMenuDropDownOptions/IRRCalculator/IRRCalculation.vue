@@ -572,13 +572,14 @@ const calcTotals = () => {
 };
 
 const calcRate = () => {
-  const f3 = irr.amount; //finance amount
-  const e3 = (irr.irr as number) / 1200; //rate
-  const pd = irr.installments; // period
+  const financeAmount = irr.amount;
+  const finaceRate = (irr.irr as number) / 1200;
+  const financePeriod = irr.installments;
 
   const inst =
-    ((((f3 as number) * (e3 * Math.pow(1 + e3, pd as number))) /
-      (Math.pow(1 + e3, pd as number) - 1)) *
+    ((((financeAmount as number) *
+      (finaceRate * Math.pow(1 + finaceRate, financePeriod as number))) /
+      (Math.pow(1 + finaceRate, financePeriod as number) - 1)) *
       100) /
     100;
   installmentArray.installmentStructure = [];
