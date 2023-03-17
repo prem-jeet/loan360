@@ -302,7 +302,8 @@ const colCssLL =
   'col-12 col-xs-12 col-sm-6 col-md-2 q-mt-xs-sm q-mt-sm-none q-mt-md-sm';
 const colCssR = 'col-12 col-xs-12 col-sm-6 col-md-4';
 const emits = defineEmits(['back', 'reset']);
-let entries: { dt: Date; ino?: number | null; amount: number }[] = [];
+let entries: { date: Date; IncrementNumber?: number | null; amount: number }[] =
+  [];
 let irrInstItems: DataItem[] = [];
 const totalInst = ref(0);
 const totalAmt = ref(0);
@@ -450,10 +451,10 @@ const calcIntallments = () => {
 };
 
 const makeEntries = () => {
-  let dt = new Date();
-  let ent = {
-    dt: dt,
-    ino: 0,
+  let date = new Date();
+  let entriesObject = {
+    date: date,
+    IncrementNumber: 0,
     amount:
       (irr.amount as number) -
       (irr.charges || 0) +
@@ -461,34 +462,32 @@ const makeEntries = () => {
       (irr.security || 0),
   };
   entries = [];
-  entries.push(ent);
+  entries.push(entriesObject);
 
   let advanceLeft = irr.advInstallments || 0;
-  let ino = 1;
+  let IncrementNumber = 1;
   for (let i = 0; i < installmentArray.installmentStructure.length; i++) {
     for (
       let j = 1;
       j <= (installmentArray.installmentStructure[i].no as number);
       j++
     ) {
-      // ent = {};
-      // ent.dt = new Date(dt.getTime());
       if (advanceLeft > 0) {
         --advanceLeft;
         entries[0].amount -= installmentArray.installmentStructure[i]
           .amount as number;
       } else {
-        dt = new Date();
-        dt.setMonth(dt.getMonth() + ino);
-        let ent2 = {
-          dt: dt,
-          ino: ino,
+        date = new Date();
+        date.setMonth(date.getMonth() + IncrementNumber);
+        let entriesObject2 = {
+          date: date,
+          IncrementNumber: IncrementNumber,
           amount: -(installmentArray.installmentStructure[i].amount as number),
         };
 
-        entries.push(ent2);
+        entries.push(entriesObject2);
       }
-      ino++;
+      IncrementNumber++;
     }
   }
 
@@ -525,7 +524,7 @@ const calcIRR = () => {
     _p = 0;
     Intt = 0;
     Irr_ = (u + l) / 2;
-    FstDt = entries[0].dt;
+    FstDt = entries[0].date;
     nCount = 1;
     for (let i = 0; i < entries.length; i++) {
       lldays = 365 / 12;
@@ -614,11 +613,15 @@ const download = async (type: string) => {
   const firstEmi = irr.firstEmi;
   let incrementCount = 0;
   let today = new Date(Date.parse(irr.firstEmi as string));
-  for (let i = 0; i < (irr.installments as number); i++) {
-    if (i == 0) {
+  for (
+    let installment = 0;
+    installment < (irr.installments as number);
+    installment++
+  ) {
+    if (installment == 0) {
       nextEmi = firstEmi;
     } else {
-      if (i == 1) {
+      if (installment == 1) {
         nextEmi = irr.nextEmi;
       } else {
         const day = today.getDate().toString().padStart(2, '0');
@@ -671,7 +674,7 @@ const download = async (type: string) => {
     }
 
     interest = Math.ceil(((Balance as number) * (irr.irr as number)) / 1200);
-    if (i == (irr.installments as number) - 1) {
+    if (installment == (irr.installments as number) - 1) {
       PrinciplieReceived =
         (installmentArray.installmentStructure[1].amount as number) - interest;
       Balance = (Balance as number) - PrinciplieReceived;
@@ -681,7 +684,7 @@ const download = async (type: string) => {
       Balance = (Balance as number) - PrinciplieReceived;
     }
     let testObj = {
-      sno: i + 1,
+      sno: installment + 1,
       balance: Balance,
       nextEmi: nextEmi,
       interest: 0,
@@ -691,7 +694,7 @@ const download = async (type: string) => {
       interestOs: 0,
     };
 
-    if (i == (irr.installments as number) - 1) {
+    if (installment == (irr.installments as number) - 1) {
       testObj.interest = (irr.interest as number) - sumOfInterest;
       testObj.principleReceived =
         (irr.amount as number) - sumOfprincipleReceived;
