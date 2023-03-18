@@ -244,10 +244,10 @@
       <q-form @submit.prevent="saveNewEntry" @reset="resetNewEntryForm">
         <q-card-section class="bg-grey-2">
           <div class="flex items-center">
-            <span class="text-h5 q-mr-xl">Add nature entry</span>
+            <span class="text-h6 q-mr-xl">Add nature entry</span>
             <q-space />
             <q-btn
-              class="q-ml-xl"
+              class="q-ml-xs-md q-ml-sm-xl"
               icon="close"
               flat
               @click="isAddNewEntryModalActive = false"
