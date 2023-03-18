@@ -371,71 +371,55 @@
   </div>
 
   <q-dialog v-model="addCodeDialogActive" persistent>
-    <q-card
-      :style="{
-        width: '100vw !important',
-        maxWidth: '700px !important',
-        minWidth: '350px !important',
-      }"
-    >
+    <q-card>
       <q-form @submit.prevent="addNewCode" @reset="resetNewcodeForm">
         <q-card-section class="bg-grey-2">
           <div class="flex items-center">
-            <span class="text-h4">Add code</span>
+            <span class="text-h4 q-mr-xl">Add code</span>
             <q-space />
-            <q-btn icon="close" flat @click="addCodeDialogActive = false" />
+            <q-btn
+              icon="close"
+              class="q-ml-xs-md q-ml-sm-xl"
+              flat
+              @click="addCodeDialogActive = false"
+            />
           </div>
         </q-card-section>
-        <q-card-section class="q-gutter-y-md">
+        <q-card-section class="q-px-lg q-py-md">
           <div class="row items-center">
-            <div :class="addCodeLabelContainerClasses">Code:</div>
-            <div :class="addCodeInputContainerClasses">
+            <div class="col-12">
               <q-input
                 v-model="newCode.code"
-                placeholder="code"
-                outlined
-                dense
+                label="Code"
                 :error="!newCode.code"
-                error-message="Unique Code required"
-                hide-bottom-space
+                error-message="Code required"
               />
             </div>
           </div>
-          <div class="row items-center">
-            <div :class="addCodeLabelContainerClasses">Name:</div>
-            <div :class="addCodeInputContainerClasses">
-              <q-input
-                v-model="newCode.name"
-                placeholder="name"
-                outlined
-                dense
-                :error="!newCode.name"
-                error-message="Name required"
-                hide-bottom-space
-              />
-            </div>
+          <div class="col-12 q-mt-lg">
+            <q-input
+              v-model="newCode.name"
+              label="Name"
+              :error="!newCode.name"
+              error-message="Name required"
+              hide-bottom-space
+            />
           </div>
-          <div class="row items-center">
-            <div :class="addCodeLabelContainerClasses">Visible:</div>
-            <div :class="addCodeInputContainerClasses">
-              <MultiSelectInput
-                :options="visibleOptions"
-                :selected-options="newCode.visible"
-                @updated="(val) => (newCode.visible = val)"
-                ref="newVisible"
-              />
-            </div>
+          <div class="col-12 q-mt-lg">
+            <MultiSelectInput
+              :options="visibleOptions"
+              :selected-options="newCode.visible"
+              @updated="(val) => (newCode.visible = val)"
+              ref="newVisible"
+            />
           </div>
-          <div class="row items-center">
-            <div :class="addCodeLabelContainerClasses">Voucher type:</div>
-            <div :class="addCodeInputContainerClasses">
-              <MultiSelectInput
-                :options="vtypeOptions"
-                :selected-options="newCode.vtype"
-                @updated="(val) => (newCode.vtype = val)"
-                ref="newCodeVtype"
-              />
-            </div>
+          <div class="col-12 q-mt-lg">
+            <MultiSelectInput
+              :options="vtypeOptions"
+              :selected-options="newCode.vtype"
+              @updated="(val) => (newCode.vtype = val)"
+              ref="newCodeVtype"
+            />
           </div>
         </q-card-section>
         <q-separator />
@@ -488,11 +472,6 @@ const vtypeOptions = [
   { value: 'C', label: 'Contra (C)' },
   { value: 'N', label: 'Notional (N)' },
 ];
-
-const addCodeLabelContainerClasses =
-  'col-5 col-sm-3 text-body-1 text-weight-medium';
-const addCodeInputContainerClasses =
-  'col-12 col-sm-9 col-md-7 q-mt-sm q-mt-sm-none';
 
 const columns: {
   name: string;
@@ -599,7 +578,6 @@ const fetchAccountCodeBySection = async (
   if (!rsp.data) {
     return [];
   }
-
   return rsp.data;
 };
 
