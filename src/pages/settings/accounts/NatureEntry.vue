@@ -232,15 +232,12 @@ const fetchingData = ref(false);
 const natureEntry = ref<NatureEntry[]>([]);
 const searchQuery = ref<string | null>('');
 const filteredNatureEntry = computed(() => {
-  if (!searchQuery.value) {
-    return natureEntry.value;
+  if (searchQuery.value) {
+    return natureEntry.value.filter((entry) =>
+      entry.code.includes(searchQuery.value!)
+    );
   }
-
-  return natureEntry.value.filter((entry) => {
-    console.log(entry.code === searchQuery.value);
-
-    entry.code === searchQuery.value;
-  });
+  return natureEntry.value;
 });
 const isEditing = ref(false);
 const editingRowIndex = ref(0);
