@@ -217,7 +217,7 @@
                 </q-card-section>
                 <q-card-section>
                   <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Visible :</div>
+                    <div class="col-12 text-weight-medium">Section :</div>
                     <div class="col-12">
                       <template v-if="!isEditing">
                         {{ props.row.section }}
@@ -280,6 +280,7 @@
                   :options="sectionSelectOptions"
                   label="Section"
                   outlined
+                  behavior="menu"
                 />
               </div>
             </div>
