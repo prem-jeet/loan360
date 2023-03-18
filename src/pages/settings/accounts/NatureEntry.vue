@@ -118,7 +118,7 @@
                   placeholder="Name required"
                   dense
                   outlined
-                  :color="props.row.name ? 'green' : 'red'"
+                  :color="editingData.name ? 'green' : 'red'"
                   autofocus
                 />
                 <span v-else>{{ props.row.name }}</span>
@@ -143,6 +143,97 @@
                 }}</span>
               </q-td>
             </q-tr>
+          </template>
+
+          <!-- card for grid layout screens < 800px -->
+          <template v-slot:item="props">
+            <div class="col-xs-12 col-sm-6 q-px-sm-sm">
+              <q-card>
+                <q-card-section class="flex items-center">
+                  <span class="text-weight-bold">{{ props.key }}</span>
+                  <q-space />
+                  <q-btn-group push unelevated>
+                    <q-btn
+                      icon="edit"
+                      size="xs"
+                      outline
+                      color="accent"
+                      v-if="!isEditing || editingRowIndex !== props.rowIndex"
+                      @click="() => editEntry(props.rowIndex)"
+                    >
+                      <q-tooltip>Edit</q-tooltip>
+                    </q-btn>
+                    <q-btn
+                      icon="delete"
+                      size="xs"
+                      outline
+                      color="red"
+                      v-if="!isEditing || editingRowIndex !== props.rowIndex"
+                      @click="() => deleteEntry(props.rowIndex)"
+                    >
+                      <q-tooltip>Delete</q-tooltip>
+                    </q-btn>
+                    <q-btn
+                      icon="check"
+                      size="xs"
+                      outline
+                      color="green-10"
+                      v-if="isEditing && editingRowIndex === props.rowIndex"
+                      @click="() => saveEdited(props.rowIndex)"
+                    >
+                      <q-tooltip>Save</q-tooltip>
+                    </q-btn>
+                    <q-btn
+                      icon="close"
+                      size="xs"
+                      outline
+                      color="red"
+                      v-if="isEditing && editingRowIndex === props.rowIndex"
+                      @click="isEditing = false"
+                    >
+                      <q-tooltip>Cancel</q-tooltip>
+                    </q-btn>
+                  </q-btn-group>
+                </q-card-section>
+                <q-separator inset />
+                <q-card-section>
+                  <div class="row q-gutter-y-xs">
+                    <div class="col-12 text-weight-medium">Name :</div>
+                    <div class="col-12">
+                      <template v-if="!isEditing">
+                        {{ props.row.name }}
+                      </template>
+                      <q-input
+                        v-if="isEditing && editingRowIndex === props.rowIndex"
+                        v-model="editingData.name"
+                        placeholder="Name required"
+                        dense
+                        outlined
+                        :color="editingData.name ? 'green' : 'red'"
+                        autofocus
+                      />
+                    </div>
+                  </div>
+                </q-card-section>
+                <q-card-section>
+                  <div class="row q-gutter-y-xs">
+                    <div class="col-12 text-weight-medium">Visible :</div>
+                    <div class="col-12">
+                      <template v-if="!isEditing">
+                        {{ props.row.section }}
+                      </template>
+                      <q-select
+                        v-if="isEditing && editingRowIndex === props.rowIndex"
+                        dense
+                        outlined
+                        v-model="editingData.section"
+                        :options="sectionSelectOptions"
+                      />
+                    </div>
+                  </div>
+                </q-card-section>
+              </q-card>
+            </div>
           </template>
         </q-table>
       </div>
