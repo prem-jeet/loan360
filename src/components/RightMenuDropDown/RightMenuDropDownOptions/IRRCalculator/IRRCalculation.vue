@@ -282,7 +282,12 @@
 
 <script setup lang="ts">
 import { reactive, onMounted, ref } from 'vue';
-import { IrrObject, InstallmentData, AddInstallment, DataItem } from './types';
+import {
+  IrrObject,
+  InstallmentData,
+  DataItem,
+  InstallmentObject,
+} from './types';
 import { downloadAsPDF } from 'src/utils/download';
 import { api } from 'src/boot/axios';
 
@@ -313,7 +318,7 @@ const installmentArray = reactive<InstallmentData>({
   installmentStructure: [],
 });
 const irr = reactive<IrrObject>({ ...props.data });
-const addInstallment = reactive<AddInstallment>({});
+const addInstallment = reactive<InstallmentObject>({});
 const irrInstItemsEmi = ref<DataItem[]>([]);
 const columns: {
   name: string;
