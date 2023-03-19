@@ -16,13 +16,9 @@ export interface IrrObject {
   interest?: number | null;
 }
 export interface InstallmentObject {
-  amount?: number | null;
-  no?: number | null;
+  amount: number | null;
+  no: number | null;
   percent?: number | null;
-}
-
-export interface InstallmentData {
-  installmentStructure: InstallmentObject[];
 }
 
 export interface DataItem {

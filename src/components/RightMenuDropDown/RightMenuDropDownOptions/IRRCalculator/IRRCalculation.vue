@@ -51,20 +51,17 @@
       <div class="col">Amount+Intt. {{ irr.agreedAmount }}</div>
     </div>
     <div v-if="adding">
-      <div
-        v-if="installmentArray.installmentStructure.length > 0"
-        class="row justify-start q-pa-xs"
-      >
+      <div v-if="installmentArray.length > 0" class="row justify-start q-pa-xs">
         <div class="col">
           <b>PDC/ACH : </b> {{ totalInst }} of Rs.{{
-            installmentArray.installmentStructure[0].amount
+            installmentArray[0].amount
           }}
           each
         </div>
       </div>
 
       <div
-        v-for="(item, index) in installmentArray.installmentStructure"
+        v-for="(item, index) in installmentArray"
         :key="index"
         class="row justify-start q-pa-sm"
         style="border: 1px solid rgba(164, 219, 232)"
@@ -166,20 +163,15 @@
     </div>
   </div>
   <div v-else>
-    <div
-      v-if="installmentArray.installmentStructure.length > 0"
-      class="row justify-start q-pa-sm"
-    >
+    <div v-if="installmentArray.length > 0" class="row justify-start q-pa-sm">
       <div class="col">
-        <b>PDC/ACH : </b> {{ totalInst }} of Rs.{{
-          installmentArray.installmentStructure[0].amount
-        }}
+        <b>PDC/ACH : </b> {{ totalInst }} of Rs.{{ installmentArray[0].amount }}
         each
       </div>
     </div>
     <div
-      v-for="item in installmentArray.installmentStructure"
-      :key="item as number"
+      v-for="(item, index) in installmentArray"
+      :key="index"
       class="row justify-start q-pa-sm"
       style="border: 1px solid rgba(164, 219, 232)"
     >
@@ -282,12 +274,7 @@
 
 <script setup lang="ts">
 import { reactive, onMounted, ref } from 'vue';
-import {
-  IrrObject,
-  InstallmentData,
-  DataItem,
-  InstallmentObject,
-} from './types';
+import { IrrObject, DataItem, InstallmentObject } from './types';
 import { downloadAsPDF } from 'src/utils/download';
 import { api } from 'src/boot/axios';
 
@@ -314,11 +301,13 @@ const totalAmt = ref(0);
 const error = ref(false);
 const adding = ref(true);
 const pagination = ref({ rowsPerPage: 20 });
-const installmentArray = reactive<InstallmentData>({
-  installmentStructure: [],
-});
+const installmentArray = ref<InstallmentObject[]>([]);
 const irr = reactive<IrrObject>({ ...props.data });
-const addInstallment = reactive<InstallmentObject>({});
+const addInstallment = reactive<InstallmentObject>({
+  amount: null,
+  no: null,
+  percent: null,
+});
 const irrInstItemsEmi = ref<DataItem[]>([]);
 const columns: {
   name: string;
@@ -407,7 +396,7 @@ const addInst = () => {
   if (!(addInstallment.amount && addInstallment.percent && addInstallment.no)) {
     error.value = true;
   } else {
-    installmentArray.installmentStructure.push(addInstallment);
+    installmentArray.value.push(addInstallment);
     calcTotals();
     adding.value = true;
     calcIRR();
@@ -415,7 +404,7 @@ const addInst = () => {
 };
 
 const remove = (index: number) => {
-  installmentArray.installmentStructure.splice(index, 1);
+  installmentArray.value.splice(index, 1);
 };
 
 const calcInterest = () => {
@@ -434,10 +423,10 @@ const calcAmount = () => {
 };
 
 const calcIntallments = () => {
-  if (installmentArray.installmentStructure.length > 0) {
+  if (installmentArray.value.length > 0) {
     return;
   }
-  installmentArray.installmentStructure = [];
+  installmentArray.value = [];
   let installment1 = {
     no: (irr.installments as number) - 1,
     amount: Math.ceil(
@@ -450,9 +439,9 @@ const calcIntallments = () => {
       (irr.agreedAmount as number) - installment1.amount * installment1.no
     ),
   };
-  installmentArray.installmentStructure = [];
-  installmentArray.installmentStructure.push(installment1);
-  installmentArray.installmentStructure.push(installment2);
+  installmentArray.value = [];
+  installmentArray.value.push(installment1);
+  installmentArray.value.push(installment2);
   calcTotals();
 };
 
@@ -472,23 +461,18 @@ const makeEntries = () => {
 
   let advanceLeft = irr.advInstallments || 0;
   let IncrementNumber = 1;
-  for (let i = 0; i < installmentArray.installmentStructure.length; i++) {
-    for (
-      let j = 1;
-      j <= (installmentArray.installmentStructure[i].no as number);
-      j++
-    ) {
+  for (let i = 0; i < installmentArray.value.length; i++) {
+    for (let j = 1; j <= (installmentArray.value[i].no as number); j++) {
       if (advanceLeft > 0) {
         --advanceLeft;
-        entries[0].amount -= installmentArray.installmentStructure[i]
-          .amount as number;
+        entries[0].amount -= installmentArray.value[i].amount as number;
       } else {
         date = new Date();
         date.setMonth(date.getMonth() + IncrementNumber);
         let entriesObject2 = {
           date: date,
           IncrementNumber: IncrementNumber,
-          amount: -(installmentArray.installmentStructure[i].amount as number),
+          amount: -(installmentArray.value[i].amount as number),
         };
 
         entries.push(entriesObject2);
@@ -557,14 +541,13 @@ const calcTotals = () => {
   let totalInstallment = 0,
     totalAmount = 0;
 
-  for (let i = 0; i < installmentArray.installmentStructure.length; i++) {
+  for (let i = 0; i < installmentArray.value.length; i++) {
     totalInstallment =
-      totalInstallment +
-      (installmentArray.installmentStructure[i].no as number);
+      totalInstallment + (installmentArray.value[i].no as number);
     totalAmount =
       totalAmount +
-      (installmentArray.installmentStructure[i].amount as number) *
-        (installmentArray.installmentStructure[i].no as number);
+      (installmentArray.value[i].amount as number) *
+        (installmentArray.value[i].no as number);
   }
   totalInst.value = totalInstallment;
   totalAmt.value = totalAmount;
@@ -586,12 +569,12 @@ const calcRate = () => {
       (Math.pow(1 + finaceRate, financePeriod as number) - 1)) *
       100) /
     100;
-  installmentArray.installmentStructure = [];
+  installmentArray.value = [];
   const inst1 = {
     no: (irr.installments as number) - 1,
     amount: Math.ceil(inst),
   };
-  installmentArray.installmentStructure.push(inst1);
+  installmentArray.value.push(inst1);
   const inst2 = {
     no: 1,
     amount: Math.ceil(
@@ -599,7 +582,7 @@ const calcRate = () => {
         ((irr.installments as number) - 1) * Math.ceil(inst)
     ),
   };
-  installmentArray.installmentStructure.push(inst2);
+  installmentArray.value.push(inst2);
   calcTotals();
   irr.agreedAmount = Math.round((irr.installments as number) * inst);
   irr.interest = Math.round(
@@ -687,11 +670,11 @@ const download = async (type: string) => {
     interest = Math.ceil(((Balance as number) * (irr.irr as number)) / 1200);
     if (installment == (irr.installments as number) - 1) {
       PrinciplieReceived =
-        (installmentArray.installmentStructure[1].amount as number) - interest;
+        (installmentArray.value[1].amount as number) - interest;
       Balance = (Balance as number) - PrinciplieReceived;
     } else {
       PrinciplieReceived =
-        (installmentArray.installmentStructure[0].amount as number) - interest;
+        (installmentArray.value[0].amount as number) - interest;
       Balance = (Balance as number) - PrinciplieReceived;
     }
     let installmentPDFObj = {
@@ -710,8 +693,7 @@ const download = async (type: string) => {
       installmentPDFObj.principleReceived =
         (irr.amount as number) - sumOfprincipleReceived;
 
-      installmentPDFObj.instalment = installmentArray.installmentStructure[1]
-        .amount as number;
+      installmentPDFObj.instalment = installmentArray.value[1].amount as number;
       installmentPDFObj.principleOs =
         (irr.amount as number) -
         (sumOfprincipleReceived + installmentPDFObj.principleReceived);
@@ -721,8 +703,7 @@ const download = async (type: string) => {
       installmentPDFObj.interest = interest;
       installmentPDFObj.principleReceived = PrinciplieReceived;
 
-      installmentPDFObj.instalment = installmentArray.installmentStructure[0]
-        .amount as number;
+      installmentPDFObj.instalment = installmentArray.value[0].amount as number;
       sumOfInterest += interest;
       sumOfprincipleReceived += PrinciplieReceived;
       installmentPDFObj.principleOs =
