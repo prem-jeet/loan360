@@ -201,11 +201,7 @@
                   "
                   @updated="
                     (val) =>
-                      updateMultiselectSelerctedString(
-                        props.row,
-                        'visible',
-                        val
-                      )
+                      updateMultiselectSelectedString(props.row, 'visible', val)
                   "
                   v-else
                 />
@@ -225,7 +221,7 @@
                   "
                   @updated="
                     (val) =>
-                      updateMultiselectSelerctedString(props.row, 'vtype', val)
+                      updateMultiselectSelectedString(props.row, 'vtype', val)
                   "
                   v-else
                 />
@@ -326,7 +322,7 @@
                         "
                         @updated="
                           (val) =>
-                            updateMultiselectSelerctedString(
+                            updateMultiselectSelectedString(
                               props.row,
                               'visible',
                               val
@@ -355,7 +351,7 @@
                         "
                         @updated="
                           (val) =>
-                            updateMultiselectSelerctedString(
+                            updateMultiselectSelectedString(
                               props.row,
                               'vtype',
                               val
@@ -714,7 +710,7 @@ const getSelectedOptionsFromSelectedString = (
   return arr.filter((item) => selectedStr.includes(item.value));
 };
 
-const updateMultiselectSelerctedString = (
+const updateMultiselectSelectedString = (
   row: AccountCode,
   key: 'visible' | 'vtype',
   selectedOptions: typeof visibleOptions
