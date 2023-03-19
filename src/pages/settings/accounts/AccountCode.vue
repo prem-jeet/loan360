@@ -191,6 +191,7 @@
                   {{ props.row.visible }}
                 </template>
                 <MultiSelectInput
+                  label="Visible"
                   :options="visibleOptions"
                   :selected-options="
                     getSelectedOptionsFromSelectedString(
@@ -214,6 +215,7 @@
                   {{ props.row.vtype }}
                 </template>
                 <MultiSelectInput
+                  label="Voucher type"
                   :options="vtypeOptions"
                   :selected-options="
                     getSelectedOptionsFromSelectedString(
@@ -314,6 +316,7 @@
                         {{ props.row.visible }}
                       </template>
                       <MultiSelectInput
+                        label="Visible"
                         :options="visibleOptions"
                         :selected-options="
                           getSelectedOptionsFromSelectedString(
@@ -342,6 +345,7 @@
                         {{ props.row.vtype }}
                       </template>
                       <MultiSelectInput
+                        label="Voucher type"
                         :options="vtypeOptions"
                         :selected-options="
                           getSelectedOptionsFromSelectedString(
@@ -407,6 +411,7 @@
           </div>
           <div class="col-12 q-mt-lg">
             <MultiSelectInput
+              label="Visible"
               :options="visibleOptions"
               :selected-options="newCode.visible"
               @updated="(val) => (newCode.visible = val)"
@@ -415,6 +420,7 @@
           </div>
           <div class="col-12 q-mt-lg">
             <MultiSelectInput
+              label="Voucher type"
               :options="vtypeOptions"
               :selected-options="newCode.vtype"
               @updated="(val) => (newCode.vtype = val)"
