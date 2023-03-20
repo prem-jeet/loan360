@@ -274,7 +274,7 @@
 
 <script setup lang="ts">
 import { reactive, onMounted, ref } from 'vue';
-import { IrrObject, DataItem, InstallmentObject } from './types';
+import { DataItem, InstallmentObject } from './types';
 import { downloadAsPDF } from 'src/utils/download';
 import { api } from 'src/boot/axios';
 
@@ -302,7 +302,7 @@ const error = ref(false);
 const adding = ref(true);
 const pagination = ref({ rowsPerPage: 20 });
 const installmentArray = ref<InstallmentObject[]>([]);
-const irr = reactive<IrrObject>({ ...props.data });
+const irr = { ...props.data };
 const addInstallment = reactive<InstallmentObject>({
   amount: null,
   no: null,

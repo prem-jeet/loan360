@@ -233,7 +233,23 @@ const formattedDate = ref(`${year}-${month}-${day}`);
 const nextEmiDisable = ref(true);
 const next = ref(true);
 const error = ref(false);
-const irr = reactive<IrrObject>({});
+const irr = reactive<IrrObject>({
+  amount: null,
+  rate: null,
+  irr: null,
+  inttMonths: null,
+  installments: null,
+  name: null,
+  firstEmi: null,
+  nextEmi: null,
+  advInstallments: null,
+  commission: null,
+  charges: null,
+  rebate: null,
+  security: null,
+  agreedAmount: null,
+  interest: null,
+});
 irr.firstEmi = formattedDate.value;
 const autoFill = () => {
   if (mode.value === 'IRR') {
