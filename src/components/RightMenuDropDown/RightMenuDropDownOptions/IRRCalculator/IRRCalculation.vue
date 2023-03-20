@@ -511,14 +511,11 @@ const calcTotals = () => {
   let totalInstallment = 0,
     totalAmount = 0;
 
-  for (let i = 0; i < installmentArray.value.length; i++) {
-    totalInstallment =
-      totalInstallment + (installmentArray.value[i].no as number);
-    totalAmount =
-      totalAmount +
-      (installmentArray.value[i].amount as number) *
-        (installmentArray.value[i].no as number);
-  }
+  installmentArray.value.forEach((installment) => {
+    totalInstallment = totalInstallment + installment.no!;
+    totalAmount = totalAmount + installment.amount! * installment.no!;
+  });
+
   totalInst.value = totalInstallment;
   totalAmt.value = totalAmount;
   if (props.select == 'IRR') {
