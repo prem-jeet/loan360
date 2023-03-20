@@ -68,7 +68,7 @@
         v-for="(item, index) in installmentArray"
         :key="index"
         class="row justify-start q-pa-sm"
-        style="border: 1px solid rgba(164, 219, 232)"
+        :style="{ border: '1px solid rgba(164, 219, 232)' }"
       >
         <div class="col-8">
           {{ item.no }} Insts. of Rs.{{ item.amount }} each
@@ -177,7 +177,7 @@
       v-for="(item, index) in installmentArray"
       :key="index"
       class="row justify-start q-pa-sm"
-      style="border: 1px solid rgba(164, 219, 232)"
+      :style="{ border: '1px solid rgba(164, 219, 232)' }"
     >
       <div class="col">{{ item.no }} Insts. of Rs.{{ item.amount }} each</div>
     </div>
@@ -209,9 +209,11 @@
   <!-- PDF  -->
 
   <div v-show="false" id="pdf-window">
-    <div><p style="color: #336b6b">Company Name : IKF Finance Limited</p></div>
+    <div>
+      <p :style="{ color: '#336b6b' }">Company Name : IKF Finance Limited</p>
+    </div>
     <div v-if="irr.name">
-      <p style="color: #336b6b">Name : {{ irr.name }}</p>
+      <p :style="{ color: '#336b6b' }">Name : {{ irr.name }}</p>
     </div>
     <q-table
       :rows="irrInstItemsEmi"
