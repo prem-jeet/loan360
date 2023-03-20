@@ -366,17 +366,17 @@ const totalColumn = (val: string) => {
     return 'Total';
   } else if (val === 'instalment') {
     for (let i = 0; i < irrInstItemsEmi.value.length; i++) {
-      total += irrInstItemsEmi.value[i].instalment as number;
+      total += irrInstItemsEmi.value[i].instalment;
     }
     return total;
   } else if (val === 'interest') {
     for (let i = 0; i < irrInstItemsEmi.value.length; i++) {
-      total += irrInstItemsEmi.value[i].interest as number;
+      total += irrInstItemsEmi.value[i].interest;
     }
     return total;
   } else if (val === 'principleReceived') {
     for (let i = 0; i < irrInstItemsEmi.value.length; i++) {
-      total += irrInstItemsEmi.value[i].principleReceived as number;
+      total += irrInstItemsEmi.value[i].principleReceived;
     }
     return total;
   } else {
