@@ -45,7 +45,7 @@
 
   <div v-if="select === 'IRR'">
     <div v-if="irr.name" class="row justify-between q-pa-xs q-mt-sm">
-      <div class="col"><b> Name:</b> {{ irr.name }}</div>
+      <div class="col"><b> Name</b> {{ irr.name }}</div>
     </div>
     <div class="row justify-between q-pa-xs">
       <div class="col">Amount+Intt. {{ irr.agreedAmount }}</div>
