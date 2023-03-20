@@ -683,24 +683,6 @@ const preparingPerDownload = async (type: string) => {
     incrementCount = incrementCount + 1;
   }
   download(type);
-  // if (type === 'pdf') {
-  //   setTimeout(() => {
-  //     downloadAsPDF('pdf-window');
-  //   }, 500);
-  // } else if (type === 'excel') {
-  //   let params = {
-  //     name: irr.name ? irr.name : null,
-  //     company: 'aaa',
-  //     instalments: irrInstItems,
-  //   };
-  //   const rsp = await api.post('irrCalcDownloadExcel', params);
-  //   if (rsp.data && rsp.data.code) {
-  //     let link = document.createElement('a');
-  //     link.download = rsp.data.code;
-  //     link.href = 'Reports/' + rsp.data.code;
-  //     link.click();
-  //   }
-  // }
 };
 
 const download = async (type: string) => {
