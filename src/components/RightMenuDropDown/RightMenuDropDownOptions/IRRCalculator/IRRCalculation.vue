@@ -619,7 +619,6 @@ const download = async (type: string) => {
       const day = today.getDate().toString().padStart(2, '0');
       const month = (today.getMonth() + 1).toString().padStart(2, '0');
       const days = ['29', '30', '31'];
-      const febDays = ['28', '29', '30', '31'];
 
       if (month === '01' && days.includes(day)) {
         const year = today.getFullYear().toString();

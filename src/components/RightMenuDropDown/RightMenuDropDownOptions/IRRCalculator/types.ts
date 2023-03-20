@@ -22,12 +22,12 @@ export interface InstallmentObject {
 }
 
 export interface DataItem {
-  sno?: number | null;
-  balance?: number | null;
+  sno: number | null;
+  balance: number | null;
   nextEmi?: string | null;
-  interest?: number | null;
-  principleReceived?: number | null;
-  instalment?: number | null;
-  principleOs?: number | null;
-  interestOs?: number | null;
+  interest: number | null;
+  principleReceived: number | null;
+  instalment: number | null;
+  principleOs: number | null;
+  interestOs: number | null;
 }
