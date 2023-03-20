@@ -416,7 +416,7 @@ const calcInterest = () => {
 
 const calcAmount = () => {
   addInstallment.amount = Math.round(
-    ((irr.agreedAmount as number) * (addInstallment.percent as number)) /
+    (irr.agreedAmount * (addInstallment.percent as number)) /
       100 /
       (addInstallment.no as number)
   );
@@ -428,16 +428,12 @@ const calcIntallments = () => {
   }
   installmentArray.value = [];
   let installment1 = {
-    no: (irr.installments as number) - 1,
-    amount: Math.ceil(
-      (irr.agreedAmount as number) / (irr.installments as number)
-    ),
+    no: irr.installments - 1,
+    amount: Math.ceil(irr.agreedAmount / irr.installments),
   };
   let installment2 = {
     no: 1,
-    amount: Math.ceil(
-      (irr.agreedAmount as number) - installment1.amount * installment1.no
-    ),
+    amount: Math.ceil(irr.agreedAmount - installment1.amount * installment1.no),
   };
   installmentArray.value = [];
   installmentArray.value.push(installment1);
@@ -451,7 +447,7 @@ const makeEntries = () => {
     date: date,
     IncrementNumber: 0,
     amount:
-      (irr.amount as number) -
+      irr.amount -
       (irr.charges || 0) +
       (irr.commission || 0) -
       (irr.security || 0),
@@ -482,15 +478,15 @@ const makeEntries = () => {
   }
 
   entries[entries.length - 1].amount += irr.security || 0;
-  if ((irr.rebate as number) > 0) {
+  if (irr.rebate > 0) {
     let rebateBalance = irr.rebate;
     let j = entries.length - 1;
     for (let i = j; i >= 0; i--) {
-      if (-entries[i].amount >= (rebateBalance as number)) {
-        entries[i].amount += rebateBalance as number;
+      if (-entries[i].amount >= rebateBalance) {
+        entries[i].amount += rebateBalance;
         break;
       } else {
-        (rebateBalance as number) -= entries[i].amount;
+        rebateBalance -= entries[i].amount;
         entries.splice(i, 1);
       }
     }
@@ -548,39 +544,35 @@ const calcTotals = () => {
 
 const calcRate = () => {
   const financeAmount = irr.amount;
-  const finaceRate = (irr.irr as number) / 1200;
+  const finaceRate = irr.irr / 1200;
   const financePeriod = irr.installments;
 
   const inst =
-    ((((financeAmount as number) *
-      (finaceRate * Math.pow(1 + finaceRate, financePeriod as number))) /
-      (Math.pow(1 + finaceRate, financePeriod as number) - 1)) *
+    (((financeAmount * (finaceRate * Math.pow(1 + finaceRate, financePeriod))) /
+      (Math.pow(1 + finaceRate, financePeriod) - 1)) *
       100) /
     100;
   installmentArray.value = [];
   const inst1 = {
-    no: (irr.installments as number) - 1,
+    no: irr.installments - 1,
     amount: Math.ceil(inst),
   };
   installmentArray.value.push(inst1);
   const inst2 = {
     no: 1,
     amount: Math.ceil(
-      (irr.installments as number) * inst -
-        ((irr.installments as number) - 1) * Math.ceil(inst)
+      irr.installments * inst - (irr.installments - 1) * Math.ceil(inst)
     ),
   };
   installmentArray.value.push(inst2);
   calcTotals();
-  irr.agreedAmount = Math.round((irr.installments as number) * inst);
+  irr.agreedAmount = Math.round(irr.installments * inst);
   irr.interest = Math.round(
-    Math.round((irr.agreedAmount - (irr.amount as number)) * 100) / 100
+    Math.round((irr.agreedAmount - irr.amount) * 100) / 100
   );
   irr.rate =
     Math.round(
-      (((irr.interest / (irr.amount as number)) * 100 * 12) /
-        (irr.installments as number)) *
-        100
+      (((irr.interest / irr.amount) * 100 * 12) / irr.installments) * 100
     ) / 100;
 };
 
@@ -594,13 +586,9 @@ const download = async (type: string) => {
   let nextEmi;
   const firstEmi = irr.firstEmi;
   let incrementCount = 0;
-  let today = new Date(Date.parse(irr.firstEmi as string));
+  let today = new Date(Date.parse(irr.firstEmi));
   let febDay;
-  for (
-    let installment = 0;
-    installment < (irr.installments as number);
-    installment++
-  ) {
+  for (let installment = 0; installment < irr.installments; installment++) {
     if (installment == 0) {
       nextEmi = firstEmi;
     } else {
@@ -660,15 +648,15 @@ const download = async (type: string) => {
       }
     }
 
-    interest = Math.ceil(((Balance as number) * (irr.irr as number)) / 1200);
-    if (installment == (irr.installments as number) - 1) {
+    interest = Math.ceil((Balance * irr.irr) / 1200);
+    if (installment == irr.installments - 1) {
       PrinciplieReceived =
         (installmentArray.value[1].amount as number) - interest;
-      Balance = (Balance as number) - PrinciplieReceived;
+      Balance = Balance - PrinciplieReceived;
     } else {
       PrinciplieReceived =
         (installmentArray.value[0].amount as number) - interest;
-      Balance = (Balance as number) - PrinciplieReceived;
+      Balance = Balance - PrinciplieReceived;
     }
     let installmentPDFObj = {
       sno: installment + 1,
@@ -681,17 +669,16 @@ const download = async (type: string) => {
       interestOs: 0,
     };
 
-    if (installment == (irr.installments as number) - 1) {
-      installmentPDFObj.interest = (irr.interest as number) - sumOfInterest;
-      installmentPDFObj.principleReceived =
-        (irr.amount as number) - sumOfprincipleReceived;
+    if (installment == irr.installments - 1) {
+      installmentPDFObj.interest = irr.interest - sumOfInterest;
+      installmentPDFObj.principleReceived = irr.amount - sumOfprincipleReceived;
 
       installmentPDFObj.instalment = installmentArray.value[1].amount as number;
       installmentPDFObj.principleOs =
-        (irr.amount as number) -
+        irr.amount -
         (sumOfprincipleReceived + installmentPDFObj.principleReceived);
       installmentPDFObj.interestOs =
-        (irr.interest as number) - (sumOfInterest + installmentPDFObj.interest);
+        irr.interest - (sumOfInterest + installmentPDFObj.interest);
     } else {
       installmentPDFObj.interest = interest;
       installmentPDFObj.principleReceived = PrinciplieReceived;
@@ -699,9 +686,8 @@ const download = async (type: string) => {
       installmentPDFObj.instalment = installmentArray.value[0].amount as number;
       sumOfInterest += interest;
       sumOfprincipleReceived += PrinciplieReceived;
-      installmentPDFObj.principleOs =
-        (irr.amount as number) - sumOfprincipleReceived;
-      installmentPDFObj.interestOs = (irr.interest as number) - sumOfInterest;
+      installmentPDFObj.principleOs = irr.amount - sumOfprincipleReceived;
+      installmentPDFObj.interestOs = irr.interest - sumOfInterest;
     }
     irrInstItems.push(installmentPDFObj);
     irrInstItemsEmi.value = irrInstItems;
