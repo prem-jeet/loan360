@@ -223,12 +223,12 @@
             v-for="col in props.cols"
             :key="col.name"
             :props="props"
-            style="
-              border-style: solid;
-              padding: 5px 5px;
-              border-color: lightgreen;
-              text-align: center;
-            "
+            :style="{
+              borderStyle: 'solid',
+              padding: '5px 5px',
+              borderColor: 'lightgreen',
+              textAlign: 'center',
+            }"
           >
             {{ col.label }}
           </q-th>
@@ -240,13 +240,13 @@
             v-for="col in props.cols"
             :key="col.key"
             :props="col.props"
-            style="
-              border-style: solid;
-              padding: 5px 5px;
-              border-color: lightgreen;
-              text-align: center;
-              width: 80px;
-            "
+            :style="{
+              borderStyle: 'solid',
+              padding: '5px 5px',
+              borderColor: 'lightgreen',
+              textAlign: 'center',
+              width: '80px',
+            }"
           >
             {{ col.value }}
           </q-td>
@@ -257,14 +257,14 @@
           <q-td
             v-for="col in columns"
             :key="col.name"
-            style="
-              border-style: solid;
-              padding: 5px 5px;
-              border-color: lightgreen;
-              text-align: center;
-            "
+            :style="{
+              borderStyle: 'solid',
+              padding: '5px 5px',
+              borderColor: 'lightgreen',
+              textAlign: 'center',
+            }"
           >
-            {{ totalColumn(col.name) }}
+            {{ col.name === 'nextEmi' ? 'Total' : totalColumn(col.name) || '' }}
           </q-td>
         </q-tr>
       </template>
@@ -362,26 +362,14 @@ const columns: {
 
 const totalColumn = (val: string) => {
   let total = 0;
-  if (val === 'nextEmi') {
-    return 'Total';
-  } else if (val === 'instalment') {
-    for (let i = 0; i < irrInstItemsEmi.value.length; i++) {
-      total += irrInstItemsEmi.value[i].instalment;
-    }
+  const keys = ['instalment', 'interest', 'principleReceived'];
+  if (!keys.includes(val)) {
     return total;
-  } else if (val === 'interest') {
-    for (let i = 0; i < irrInstItemsEmi.value.length; i++) {
-      total += irrInstItemsEmi.value[i].interest;
-    }
-    return total;
-  } else if (val === 'principleReceived') {
-    for (let i = 0; i < irrInstItemsEmi.value.length; i++) {
-      total += irrInstItemsEmi.value[i].principleReceived;
-    }
-    return total;
-  } else {
-    return;
   }
+  irrInstItemsEmi.value.forEach(
+    (item) => (total += item[val as keyof typeof item] as number)
+  );
+  return total;
 };
 
 const back = () => {
@@ -442,9 +430,8 @@ const calcIntallments = () => {
 };
 
 const makeEntries = () => {
-  let date = new Date();
   let entriesObject = {
-    date: date,
+    date: new Date(),
     IncrementNumber: 0,
     amount:
       irr.amount -
@@ -457,26 +444,25 @@ const makeEntries = () => {
 
   let advanceLeft = irr.advInstallments || 0;
   let IncrementNumber = 1;
-  for (let i = 0; i < installmentArray.value.length; i++) {
-    for (let j = 1; j <= (installmentArray.value[i].no as number); j++) {
+  installmentArray.value.forEach((installment) => {
+    for (let j = 1; j <= installment.no!; j++) {
       if (advanceLeft > 0) {
         --advanceLeft;
-        entries[0].amount -= installmentArray.value[i].amount as number;
+        entries[0].amount -= installment.amount!;
       } else {
-        date = new Date();
+        let date = new Date();
         date.setMonth(date.getMonth() + IncrementNumber);
         let entriesObject2 = {
           date: date,
           IncrementNumber: IncrementNumber,
-          amount: -(installmentArray.value[i].amount as number),
+          amount: -installment.amount!,
         };
 
         entries.push(entriesObject2);
       }
       IncrementNumber++;
     }
-  }
-
+  });
   entries[entries.length - 1].amount += irr.security || 0;
   if (irr.rebate > 0) {
     let rebateBalance = irr.rebate;
@@ -496,7 +482,7 @@ const makeEntries = () => {
 const calcIRR = () => {
   makeEntries();
   let principle = 0;
-  let Irr = 0;
+  let _irr = 0;
   let upper = 1.990008372;
   let lower = 0.0000000000001;
   let times = 0;
@@ -506,19 +492,19 @@ const calcIRR = () => {
   while (times < 1000) {
     times = times + 1;
     principle = 0;
-    Irr = (upper + lower) / 2;
+    _irr = (upper + lower) / 2;
     for (let i = 0; i < entries.length; i++) {
-      const intrest = (principle * avgDaysPerMonth * Irr) / 100;
+      const intrest = (principle * avgDaysPerMonth * _irr) / 100;
       principle = principle + intrest;
       principle = principle + entries[i].amount;
     }
     if (principle < 0) {
-      lower = Irr;
+      lower = _irr;
     } else {
-      upper = Irr;
+      upper = _irr;
     }
   }
-  irr.irr = Math.round(Irr * 365 * 1000) / 1000;
+  irr.irr = Math.round(_irr * 365 * 1000) / 1000;
 };
 
 const calcTotals = () => {
