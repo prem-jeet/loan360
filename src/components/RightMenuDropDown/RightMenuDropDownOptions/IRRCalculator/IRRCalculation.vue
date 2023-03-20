@@ -9,7 +9,7 @@
     <div class="col-xs-6 col-sm-6 col-md-6 text-right">
       <q-btn-dropdown color="primary" dropdown-icon="download" size="sm">
         <q-list>
-          <q-item clickable v-close-popup @click="download('pdf')">
+          <q-item clickable v-close-popup @click="preparingPerDownload('pdf')">
             <q-item-section avatar>
               <q-avatar
                 icon="fa-solid fa-file-pdf"
@@ -23,7 +23,11 @@
             </q-item-section>
           </q-item>
 
-          <q-item clickable v-close-popup @click="download('excel')">
+          <q-item
+            clickable
+            v-close-popup
+            @click="preparingPerDownload('excel')"
+          >
             <q-item-section avatar>
               <q-avatar
                 icon="fa-solid fa-file-excel"
@@ -277,6 +281,7 @@ import { reactive, onMounted, ref } from 'vue';
 import { DataItem, InstallmentObject } from './types';
 import { downloadAsPDF } from 'src/utils/download';
 import { api } from 'src/boot/axios';
+import { type } from 'os';
 
 const props = defineProps({
   data: {
@@ -559,7 +564,7 @@ const calcRate = () => {
     ) / 100;
 };
 
-const download = async (type: string) => {
+const preparingPerDownload = async (type: string) => {
   irrInstItems = [];
   let PrinciplieReceived;
   let Balance = irr.amount;
@@ -677,7 +682,28 @@ const download = async (type: string) => {
 
     incrementCount = incrementCount + 1;
   }
+  download(type);
+  // if (type === 'pdf') {
+  //   setTimeout(() => {
+  //     downloadAsPDF('pdf-window');
+  //   }, 500);
+  // } else if (type === 'excel') {
+  //   let params = {
+  //     name: irr.name ? irr.name : null,
+  //     company: 'aaa',
+  //     instalments: irrInstItems,
+  //   };
+  //   const rsp = await api.post('irrCalcDownloadExcel', params);
+  //   if (rsp.data && rsp.data.code) {
+  //     let link = document.createElement('a');
+  //     link.download = rsp.data.code;
+  //     link.href = 'Reports/' + rsp.data.code;
+  //     link.click();
+  //   }
+  // }
+};
 
+const download = async (type: string) => {
   if (type === 'pdf') {
     setTimeout(() => {
       downloadAsPDF('pdf-window');
