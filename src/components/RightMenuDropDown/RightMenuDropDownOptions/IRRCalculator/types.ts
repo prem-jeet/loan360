@@ -23,7 +23,7 @@ export interface InstallmentObject {
 
 export interface DataItem {
   sno: number;
-  balance: number | null;
+  balance: number;
   nextEmi?: string | null;
   interest: number;
   principleReceived: number;

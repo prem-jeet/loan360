@@ -500,32 +500,20 @@ const makeEntries = () => {
 const calcIRR = () => {
   makeEntries();
   let principle = 0;
-  let Intt = 0;
   let Irr = 0;
-  let FstDt;
-  let incrementDate;
-  let nCount;
   let upper = 1.990008372;
   let lower = 0.0000000000001;
   let times = 0;
-  let lldays = 0;
+  let avgDaysPerMonth = 365 / 12;
 
   /// 1000 times for acuracy
   while (times < 1000) {
     times = times + 1;
     principle = 0;
-    Intt = 0;
     Irr = (upper + lower) / 2;
-    FstDt = entries[0].date;
-    nCount = 1;
     for (let i = 0; i < entries.length; i++) {
-      lldays = 365 / 12;
-      Intt = Intt + (principle * lldays * Irr) / 100;
-      incrementDate = FstDt;
-      incrementDate.setMonth(incrementDate.getMonth(), nCount);
-      principle = principle + Intt;
-      Intt = 0;
-      nCount = nCount + 1;
+      const intrest = (principle * avgDaysPerMonth * Irr) / 100;
+      principle = principle + intrest;
       principle = principle + entries[i].amount;
     }
     if (principle < 0) {
