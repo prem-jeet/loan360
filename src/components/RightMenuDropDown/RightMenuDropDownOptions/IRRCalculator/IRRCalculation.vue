@@ -283,7 +283,6 @@ import { reactive, onMounted, ref } from 'vue';
 import { DataItem, InstallmentObject } from './types';
 import { downloadAsPDF } from 'src/utils/download';
 import { api } from 'src/boot/axios';
-import { type } from 'os';
 
 const props = defineProps({
   data: {
