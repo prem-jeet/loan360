@@ -1,7 +1,6 @@
 <template>
   <q-select
     outlined
-    dense
     v-model="selected"
     multiple
     :options="options"
@@ -11,9 +10,8 @@
     behavior="menu"
     options-selected-class="bg-primary text-white"
     placeholder="hello"
-    :label-slot="!selected || selected.length === 0"
+    :label="label"
   >
-    <template v-slot:label>None Selected</template>
     <template v-slot:selected-item="scope">
       <q-chip
         removable
@@ -37,6 +35,7 @@ interface Option {
 }
 
 const props = defineProps<{
+  label: string;
   options: Option[];
   selectedOptions?: Option[] | null;
 }>();
