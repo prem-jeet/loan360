@@ -566,71 +566,6 @@ const calcRate = () => {
     ) / 100;
 };
 
-const preparingForDownload = async (type: string) => {
-  irrInstItems = [];
-  let PrinciplieReceived;
-  let Balance = irr.amount;
-  let interest;
-  let sumOfInterest = 0;
-  let sumOfprincipleReceived = 0;
-  let nextEmi;
-  const firstEmi = irr.firstEmi;
-  let incrementCount = 0;
-  const nextEmiData = {
-    date: new Date(Date.parse(irr.firstEmi)),
-    febDay: '',
-  };
-  for (let installment = 0; installment < irr.installments; installment++) {
-    nextEmi = installment === 0 ? firstEmi : nextEmiDate(nextEmiData);
-    interest = Math.ceil((Balance * irr.irr) / 1200);
-    if (installment == irr.installments - 1) {
-      PrinciplieReceived =
-        (installmentArray.value[1].amount as number) - interest;
-      Balance = Balance - PrinciplieReceived;
-    } else {
-      PrinciplieReceived =
-        (installmentArray.value[0].amount as number) - interest;
-      Balance = Balance - PrinciplieReceived;
-    }
-    let installmentPDFObj = {
-      sno: installment + 1,
-      balance: Balance,
-      nextEmi: nextEmi,
-      interest: 0,
-      principleReceived: 0,
-      instalment: 0,
-      principleOs: 0,
-      interestOs: 0,
-    };
-
-    if (installment == irr.installments - 1) {
-      installmentPDFObj.interest = irr.interest - sumOfInterest;
-      installmentPDFObj.principleReceived = irr.amount - sumOfprincipleReceived;
-
-      installmentPDFObj.instalment = installmentArray.value[1].amount as number;
-      installmentPDFObj.principleOs =
-        irr.amount -
-        (sumOfprincipleReceived + installmentPDFObj.principleReceived);
-      installmentPDFObj.interestOs =
-        irr.interest - (sumOfInterest + installmentPDFObj.interest);
-    } else {
-      installmentPDFObj.interest = interest;
-      installmentPDFObj.principleReceived = PrinciplieReceived;
-
-      installmentPDFObj.instalment = installmentArray.value[0].amount as number;
-      sumOfInterest += interest;
-      sumOfprincipleReceived += PrinciplieReceived;
-      installmentPDFObj.principleOs = irr.amount - sumOfprincipleReceived;
-      installmentPDFObj.interestOs = irr.interest - sumOfInterest;
-    }
-    irrInstItems.push(installmentPDFObj);
-    irrInstItemsEmi.value = irrInstItems;
-
-    incrementCount = incrementCount + 1;
-  }
-  download(type);
-};
-
 const nextEmiDate = (data: { date: Date; febDay: string }) => {
   let nextEmi;
   const day = data.date.getDate().toString().padStart(2, '0');
@@ -702,6 +637,71 @@ const download = async (type: string) => {
       link.click();
     }
   }
+};
+
+const preparingForDownload = async (type: string) => {
+  irrInstItems = [];
+  let PrinciplieReceived;
+  let Balance = irr.amount;
+  let interest;
+  let sumOfInterest = 0;
+  let sumOfprincipleReceived = 0;
+  let nextEmi;
+  const firstEmi = irr.firstEmi;
+  let incrementCount = 0;
+  const nextEmiData = {
+    date: new Date(Date.parse(irr.firstEmi)),
+    febDay: '',
+  };
+  for (let installment = 0; installment < irr.installments; installment++) {
+    nextEmi = installment === 0 ? firstEmi : nextEmiDate(nextEmiData);
+    interest = Math.ceil((Balance * irr.irr) / 1200);
+    if (installment == irr.installments - 1) {
+      PrinciplieReceived =
+        (installmentArray.value[1].amount as number) - interest;
+      Balance = Balance - PrinciplieReceived;
+    } else {
+      PrinciplieReceived =
+        (installmentArray.value[0].amount as number) - interest;
+      Balance = Balance - PrinciplieReceived;
+    }
+    let installmentPDFObj = {
+      sno: installment + 1,
+      balance: Balance,
+      nextEmi: nextEmi,
+      interest: 0,
+      principleReceived: 0,
+      instalment: 0,
+      principleOs: 0,
+      interestOs: 0,
+    };
+
+    if (installment == irr.installments - 1) {
+      installmentPDFObj.interest = irr.interest - sumOfInterest;
+      installmentPDFObj.principleReceived = irr.amount - sumOfprincipleReceived;
+
+      installmentPDFObj.instalment = installmentArray.value[1].amount as number;
+      installmentPDFObj.principleOs =
+        irr.amount -
+        (sumOfprincipleReceived + installmentPDFObj.principleReceived);
+      installmentPDFObj.interestOs =
+        irr.interest - (sumOfInterest + installmentPDFObj.interest);
+    } else {
+      installmentPDFObj.interest = interest;
+      installmentPDFObj.principleReceived = PrinciplieReceived;
+
+      installmentPDFObj.instalment = installmentArray.value[0].amount as number;
+      sumOfInterest += interest;
+      sumOfprincipleReceived += PrinciplieReceived;
+      installmentPDFObj.principleOs = irr.amount - sumOfprincipleReceived;
+      installmentPDFObj.interestOs = irr.interest - sumOfInterest;
+    }
+    irrInstItems.push(installmentPDFObj);
+    irrInstItemsEmi.value = irrInstItems;
+
+    incrementCount = incrementCount + 1;
+  }
+  download(type);
 };
 
 onMounted(() => {
