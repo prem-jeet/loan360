@@ -282,7 +282,7 @@
 import { reactive, onMounted, ref } from 'vue';
 import { DataItem, InstallmentObject } from './types';
 import { downloadAsPDF } from 'src/utils/download';
-import { isLeapYear } from 'src/utils/date';
+import { isLeapYear, changeMonthBy } from 'src/utils/date';
 import { api } from 'src/boot/axios';
 
 const props = defineProps({
@@ -567,28 +567,20 @@ const calcRate = () => {
 const nextEmiDate = (data: { date: Date; febDay: string }) => {
   let nextEmi;
   const day = data.date.getDate().toString().padStart(2, '0');
-  const currentMonth = (data.date.getMonth() + 1).toString().padStart(2, '0');
-  const nextMonth = (data.date.getMonth() + 2).toString().padStart(2, '0');
+  const currentMonth = changeMonthBy(data.date, 0);
+  const nextMonth = changeMonthBy(data.date, 1);
   const days = ['29', '30', '31'];
-
   if (currentMonth === '01' && days.includes(day)) {
     const year = data.date.getFullYear().toString();
     const checkYear = parseInt(year);
     data.febDay = day;
-    if (isLeapYear(checkYear)) {
-      nextEmi = `${year}-${nextMonth}-${'29'}`;
-      data.date = new Date(Date.parse(nextEmi));
-    } else {
-      nextEmi = `${year}-${nextMonth}-${'28'}`;
-      data.date = new Date(Date.parse(nextEmi));
-    }
+    nextEmi = `${year}-${nextMonth}-${isLeapYear(checkYear) ? '29' : '28'}`;
+    data.date = new Date(Date.parse(nextEmi));
   } else if (currentMonth === '12' && day === '31') {
-    const day = data.date.getDate().toString().padStart(2, '0');
     const year = (data.date.getFullYear() + 1).toString();
     nextEmi = `${year}-${'01'}-${day}`;
     data.date = new Date(Date.parse(nextEmi));
   } else if (currentMonth === '12') {
-    const day = data.date.getDate().toString().padStart(2, '0');
     const year = (data.date.getFullYear() + 1).toString();
     nextEmi = `${year}-${'01'}-${day}`;
     data.date = new Date(Date.parse(nextEmi));
@@ -608,7 +600,6 @@ const nextEmiDate = (data: { date: Date; febDay: string }) => {
     data.date = new Date(Date.parse(nextEmi));
     data.febDay = '';
   } else {
-    const day = data.date.getDate().toString().padStart(2, '0');
     const year = data.date.getFullYear().toString();
     nextEmi = `${year}-${nextMonth}-${day}`;
     data.date = new Date(Date.parse(nextEmi));
