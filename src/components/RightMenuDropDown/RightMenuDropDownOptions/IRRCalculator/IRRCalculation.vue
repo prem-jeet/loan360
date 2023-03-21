@@ -7,16 +7,21 @@
     </div>
 
     <div class="col-xs-6 col-sm-6 col-md-6 text-right">
-      <q-btn-dropdown color="primary" dropdown-icon="download" size="sm">
+      <q-btn-dropdown
+        color="dark"
+        outline
+        dropdown-icon="download"
+        size="sm"
+        no-icon-animation
+      >
         <q-list>
           <q-item clickable v-close-popup @click="preparingForDownload('pdf')">
-            <q-item-section avatar>
-              <q-avatar
-                icon="fa-solid fa-file-pdf"
-                size="sm"
+            <q-item-section>
+              <q-icon
+                name="fa-solid fa-file-pdf"
+                size="xs"
                 color="red-5"
-                text-color="white"
-              />
+              ></q-icon>
             </q-item-section>
             <q-item-section>
               <q-item-label icon="download">PDF</q-item-label>
@@ -28,13 +33,12 @@
             v-close-popup
             @click="preparingForDownload('excel')"
           >
-            <q-item-section avatar>
-              <q-avatar
-                icon="fa-solid fa-file-excel"
-                size="sm"
+            <q-item-section>
+              <q-icon
+                name="fa-solid fa-file-excel"
+                size="xs"
                 color="green-5"
-                text-color="white"
-              />
+              ></q-icon>
             </q-item-section>
             <q-item-section>
               <q-item-label icon="download">Excel</q-item-label>
@@ -586,7 +590,6 @@ const nextEmiDate = (data: { date: Date; febDay: string }) => {
     data.date = new Date(Date.parse(nextEmi));
   } else if (day === '31') {
     const day = (data.date.getDate() - 1).toString().padStart(2, '0');
-
     const year = data.date.getFullYear().toString();
     nextEmi = `${year}-${nextMonth}-${day}`;
     data.date = new Date(Date.parse(nextEmi));
