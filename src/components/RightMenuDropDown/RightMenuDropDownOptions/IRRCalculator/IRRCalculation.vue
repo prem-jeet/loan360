@@ -9,7 +9,7 @@
     <div class="col-xs-6 col-sm-6 col-md-6 text-right">
       <q-btn-dropdown color="primary" dropdown-icon="download" size="sm">
         <q-list>
-          <q-item clickable v-close-popup @click="preparingPerDownload('pdf')">
+          <q-item clickable v-close-popup @click="preparingForDownload('pdf')">
             <q-item-section avatar>
               <q-avatar
                 icon="fa-solid fa-file-pdf"
@@ -26,7 +26,7 @@
           <q-item
             clickable
             v-close-popup
-            @click="preparingPerDownload('excel')"
+            @click="preparingForDownload('excel')"
           >
             <q-item-section avatar>
               <q-avatar
@@ -565,7 +565,7 @@ const calcRate = () => {
     ) / 100;
 };
 
-const preparingPerDownload = async (type: string) => {
+const preparingForDownload = async (type: string) => {
   irrInstItems = [];
   let PrinciplieReceived;
   let Balance = irr.amount;
@@ -575,15 +575,12 @@ const preparingPerDownload = async (type: string) => {
   let nextEmi;
   const firstEmi = irr.firstEmi;
   let incrementCount = 0;
-  // let today = new Date(Date.parse(irr.firstEmi));
-  // let febDay;
+  const nextEmiData = {
+    date: new Date(Date.parse(irr.firstEmi)),
+    febDay: '',
+  };
   for (let installment = 0; installment < irr.installments; installment++) {
-    if (installment == 0) {
-      nextEmi = firstEmi;
-    } else {
-      nextEmi = nextEmiDate();
-    }
-
+    nextEmi = installment === 0 ? firstEmi : nextEmiDate(nextEmiData);
     interest = Math.ceil((Balance * irr.irr) / 1200);
     if (installment == irr.installments - 1) {
       PrinciplieReceived =
@@ -633,64 +630,57 @@ const preparingPerDownload = async (type: string) => {
   download(type);
 };
 
-let today = new Date(Date.parse(irr.firstEmi));
-let febDay: string;
-const nextEmiDate = () => {
+const nextEmiDate = (data: { date: Date; febDay: string }) => {
   let nextEmi;
-
-  const day = today.getDate().toString().padStart(2, '0');
-  const month = (today.getMonth() + 1).toString().padStart(2, '0');
+  const day = data.date.getDate().toString().padStart(2, '0');
+  const currentMonth = (data.date.getMonth() + 1).toString().padStart(2, '0');
+  const nextMonth = (data.date.getMonth() + 2).toString().padStart(2, '0');
   const days = ['29', '30', '31'];
 
-  if (month === '01' && days.includes(day)) {
-    const year = today.getFullYear().toString();
+  if (currentMonth === '01' && days.includes(day)) {
+    const year = data.date.getFullYear().toString();
     const checkYear = parseInt(year);
-    febDay = day;
+    data.febDay = day;
     if (
       (checkYear % 4 === 0 && checkYear % 100 !== 0) ||
       checkYear % 400 === 0
     ) {
-      const day = '29';
-      const month = (today.getMonth() + 2).toString().padStart(2, '0');
-      nextEmi = `${year}-${month}-${day}`;
-      today = new Date(Date.parse(nextEmi));
+      nextEmi = `${year}-${nextMonth}-${'29'}`;
+      data.date = new Date(Date.parse(nextEmi));
     } else {
-      const day = '28';
-      const month = (today.getMonth() + 2).toString().padStart(2, '0');
-      nextEmi = `${year}-${month}-${day}`;
-      today = new Date(Date.parse(nextEmi));
+      nextEmi = `${year}-${nextMonth}-${'28'}`;
+      data.date = new Date(Date.parse(nextEmi));
     }
-  } else if (month === '12' && day === '31') {
-    const day = today.getDate().toString().padStart(2, '0');
-    const month = '01';
-    const year = (today.getFullYear() + 1).toString();
-    nextEmi = `${year}-${month}-${day}`;
-    today = new Date(Date.parse(nextEmi));
-  } else if (month === '12') {
-    const day = today.getDate().toString().padStart(2, '0');
-    const month = '01';
-    const year = (today.getFullYear() + 1).toString();
-    nextEmi = `${year}-${month}-${day}`;
-    today = new Date(Date.parse(nextEmi));
+  } else if (currentMonth === '12' && day === '31') {
+    const day = data.date.getDate().toString().padStart(2, '0');
+    const year = (data.date.getFullYear() + 1).toString();
+    nextEmi = `${year}-${'01'}-${day}`;
+    data.date = new Date(Date.parse(nextEmi));
+  } else if (currentMonth === '12') {
+    const day = data.date.getDate().toString().padStart(2, '0');
+    const year = (data.date.getFullYear() + 1).toString();
+    nextEmi = `${year}-${'01'}-${day}`;
+    data.date = new Date(Date.parse(nextEmi));
   } else if (day === '31') {
-    const day = (today.getDate() - 1).toString().padStart(2, '0');
-    const month = (today.getMonth() + 2).toString().padStart(2, '0');
-    const year = today.getFullYear().toString();
-    nextEmi = `${year}-${month}-${day}`;
-    today = new Date(Date.parse(nextEmi));
-  } else if (month === '02' && (febDay == '30' || febDay === '31')) {
-    const day = (today.getDate() + 2).toString().padStart(2, '0');
-    const month = (today.getMonth() + 2).toString().padStart(2, '0');
-    const year = today.getFullYear().toString();
-    nextEmi = `${year}-${month}-${day}`;
-    today = new Date(Date.parse(nextEmi));
-    febDay = '';
+    const day = (data.date.getDate() - 1).toString().padStart(2, '0');
+
+    const year = data.date.getFullYear().toString();
+    nextEmi = `${year}-${nextMonth}-${day}`;
+    data.date = new Date(Date.parse(nextEmi));
+  } else if (
+    currentMonth === '02' &&
+    (data.febDay == '30' || data.febDay === '31')
+  ) {
+    const day = (data.date.getDate() + 2).toString().padStart(2, '0');
+    const year = data.date.getFullYear().toString();
+    nextEmi = `${year}-${nextMonth}-${day}`;
+    data.date = new Date(Date.parse(nextEmi));
+    data.febDay = '';
   } else {
-    const day = today.getDate().toString().padStart(2, '0');
-    const month = (today.getMonth() + 2).toString().padStart(2, '0');
-    const year = today.getFullYear().toString();
-    nextEmi = `${year}-${month}-${day}`;
-    today = new Date(Date.parse(nextEmi));
+    const day = data.date.getDate().toString().padStart(2, '0');
+    const year = data.date.getFullYear().toString();
+    nextEmi = `${year}-${nextMonth}-${day}`;
+    data.date = new Date(Date.parse(nextEmi));
   }
   return nextEmi;
 };
