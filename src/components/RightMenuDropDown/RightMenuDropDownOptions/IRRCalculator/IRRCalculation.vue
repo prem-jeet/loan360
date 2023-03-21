@@ -411,9 +411,7 @@ const calcInterest = () => {
 
 const calcAmount = () => {
   addInstallment.amount = Math.round(
-    (irr.agreedAmount * (addInstallment.percent as number)) /
-      100 /
-      (addInstallment.no as number)
+    (irr.agreedAmount * addInstallment.percent!) / 100 / addInstallment.no!
   );
 };
 
@@ -657,12 +655,10 @@ const preparingForDownload = async (type: string) => {
     nextEmi = installment === 0 ? firstEmi : nextEmiDate(nextEmiData);
     interest = Math.ceil((balance * irr.irr) / 1200);
     if (installment == irr.installments - 1) {
-      principlieReceived =
-        (installmentArray.value[1].amount as number) - interest;
+      principlieReceived = installmentArray.value[1].amount! - interest;
       balance = balance - principlieReceived;
     } else {
-      principlieReceived =
-        (installmentArray.value[0].amount as number) - interest;
+      principlieReceived = installmentArray.value[0].amount! - interest;
       balance = balance - principlieReceived;
     }
     let installmentPDFObj = {
@@ -680,7 +676,7 @@ const preparingForDownload = async (type: string) => {
       installmentPDFObj.interest = irr.interest - sumOfInterest;
       installmentPDFObj.principleReceived = irr.amount - sumOfPrincipleReceived;
 
-      installmentPDFObj.instalment = installmentArray.value[1].amount as number;
+      installmentPDFObj.instalment = installmentArray.value[1].amount!;
       installmentPDFObj.principleOs =
         irr.amount -
         (sumOfPrincipleReceived + installmentPDFObj.principleReceived);
@@ -690,7 +686,7 @@ const preparingForDownload = async (type: string) => {
       installmentPDFObj.interest = interest;
       installmentPDFObj.principleReceived = principlieReceived;
 
-      installmentPDFObj.instalment = installmentArray.value[0].amount as number;
+      installmentPDFObj.instalment = installmentArray.value[0].amount!;
       sumOfInterest += interest;
       sumOfPrincipleReceived += principlieReceived;
       installmentPDFObj.principleOs = irr.amount - sumOfPrincipleReceived;
