@@ -282,7 +282,7 @@
 import { reactive, onMounted, ref } from 'vue';
 import { DataItem, InstallmentObject } from './types';
 import { downloadAsPDF } from 'src/utils/download';
-import { leepYearOrNot } from 'src/utils/leepyearornot';
+import { isLeapYear } from 'src/utils/date';
 import { api } from 'src/boot/axios';
 
 const props = defineProps({
@@ -577,7 +577,7 @@ const nextEmiDate = (data: { date: Date; febDay: string }) => {
     const year = data.date.getFullYear().toString();
     const checkYear = parseInt(year);
     data.febDay = day;
-    if (leepYearOrNot(checkYear)) {
+    if (isLeapYear(checkYear)) {
       nextEmi = `${year}-${nextMonth}-${'29'}`;
       data.date = new Date(Date.parse(nextEmi));
     } else {
