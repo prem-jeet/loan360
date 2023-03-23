@@ -1,5 +1,5 @@
 <template>
-  <q-card class="e-card" flat bordered>
+  <q-card :style="{ minWidth: '40vw' }" flat bordered>
     <q-card-section class="bg-purple-6 text-white row items-center">
       <div class="text-subtitle2">
         {{ loanType == 'bs' ? 'Business Loan' : 'Salaried Loan' }}
@@ -8,26 +8,32 @@
       <q-btn icon="close" flat round dense v-close-popup />
     </q-card-section>
 
-    <q-card-section>
-      <div class="row">
-        <div class="col">
-          <div class="q-px-sm">
-            <q-radio v-model="loanType" dense val="bs" label="Business Loan" />
-          </div>
+    <q-card-section
+      :style="{ height: 'calc(100% - 65.6px)' }"
+      class="q-px-xs-sm q-px-sm-md scroll"
+    >
+      <div class="row items-center q-px-xs-md">
+        <div class="col flex q-gutter-x-lg q-gutter-y-sm">
+          <q-radio v-model="loanType" dense val="bs" label="Business Loan" />
+          <q-radio
+            v-model="loanType"
+            dense
+            val="salary"
+            label="Salaried Loan"
+          />
         </div>
-        <div class="col">
-          <div class="q-px-xs-none q-px-sm">
-            <q-radio
-              v-model="loanType"
-              dense
-              val="salary"
-              label="Salaried Loan"
-            />
-          </div>
-        </div>
+        <q-btn
+          class="col-auto"
+          color="red"
+          @click="reset"
+          icon="fa-solid fa-rotate-left"
+          size="xs"
+        >
+          <q-tooltip>Reset</q-tooltip>
+        </q-btn>
       </div>
 
-      <q-form @submit.prevent="calculateAmount()">
+      <q-form @submit.prevent="calculateAmount()" class="q-mt-md">
         <div :class="rowCss">
           <div :class="colCss">
             {{
@@ -237,15 +243,6 @@
             />
           </div>
         </div>
-        <div class="row justify-center q-pt-md">
-          <q-btn
-            class="q-mr-sm"
-            color="light-blue"
-            label="reset"
-            @click="reset"
-          />
-          <q-btn color="light-blue" label="Close" v-close-popup />
-        </div>
       </q-form>
     </q-card-section>
   </q-card>
@@ -340,8 +337,4 @@ const ToatlUpdate = (val: number) => {
   calculateAmount();
 };
 </script>
-<style scoped>
-.e-card {
-  width: 1000px;
-}
-</style>
+<style scoped></style>
