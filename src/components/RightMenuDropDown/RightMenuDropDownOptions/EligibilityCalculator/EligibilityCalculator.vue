@@ -1,19 +1,13 @@
 <template>
   <q-card class="e-card" flat bordered>
-    <q-item class="bg-light-blue-5 text-white q-pa-none q-ma-none">
-      <q-item-section>
-        <q-toolbar class="q-pa-none q-ma-none bg-purple-6">
-          <p v-if="radio == 'bs'" class="text-subtitle2 q-pt-md q-px-md">
-            Business Loan
-          </p>
-          <p v-if="radio == 'salary'" class="text-subtitle2 q-pt-md q-px-md">
-            Salaried Loan
-          </p>
-          <q-space />
-          <q-btn icon="close" flat round dense v-close-popup />
-        </q-toolbar>
-      </q-item-section>
-    </q-item>
+    <q-card-section class="bg-purple-6 text-white row items-center">
+      <div class="text-subtitle2">
+        {{ radio == 'bs' ? 'Business Loan' : 'Salaried Loan' }}
+      </div>
+      <q-space />
+      <q-btn icon="close" flat round dense v-close-popup />
+    </q-card-section>
+
     <q-card-section style="max-height: 80vh" class="scroll">
       <div class="row q-pb-sm">
         <div class="col-xs-6 col-sm-6 col-md-6 q-px-sm">
