@@ -107,7 +107,7 @@
           </template>
 
           <!-- card for grid layout screens < 800px -->
-          <!-- <template v-slot:item="props">
+          <template v-slot:item="props">
             <div class="col-xs-12 col-sm-6 q-px-sm-sm">
               <q-card>
                 <q-card-section class="flex items-center">
@@ -154,13 +154,24 @@
                       <template v-if="!isEditing">
                         {{ props.row.key }}
                       </template>
+                    </div>
+                  </div>
+                </q-card-section>
+
+                <q-card-section>
+                  <div class="row q-gutter-y-xs">
+                    <div class="col-12 text-weight-medium">Value :</div>
+                    <div class="col-12">
+                      <template v-if="!isEditing">
+                        {{ props.row.value }}
+                      </template>
                       <q-input
                         v-if="isEditing && editingRowIndex === props.rowIndex"
-                        v-model="editingData.name"
+                        v-model="editingData.value"
                         placeholder="Name required"
                         dense
                         outlined
-                        :color="editingData.name ? 'green' : 'red'"
+                        :color="editingData.value ? 'green' : 'red'"
                         autofocus
                       />
                     </div>
@@ -168,7 +179,7 @@
                 </q-card-section>
               </q-card>
             </div>
-          </template> -->
+          </template>
         </q-table>
       </div>
     </div>
