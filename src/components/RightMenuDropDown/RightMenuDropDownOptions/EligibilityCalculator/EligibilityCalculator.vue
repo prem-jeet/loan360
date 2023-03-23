@@ -8,15 +8,20 @@
       <q-btn icon="close" flat round dense v-close-popup />
     </q-card-section>
 
-    <q-card-section style="max-height: 80vh" class="scroll">
-      <div class="row q-pb-sm">
-        <div class="col-xs-6 col-sm-6 col-md-6 q-px-sm">
-          <q-radio v-model="radio" dense val="bs" label="Business Loan" />
+    <q-card-section>
+      <div class="row">
+        <div class="col">
+          <div class="q-px-sm">
+            <q-radio v-model="radio" dense val="bs" label="Business Loan" />
+          </div>
         </div>
-        <div class="col-xs-6 col-sm-6 col-md-6 q-px-sm">
-          <q-radio v-model="radio" dense val="salary" label="Salaried Loan" />
+        <div class="col">
+          <div class="q-px-xs-none q-px-sm">
+            <q-radio v-model="radio" dense val="salary" label="Salaried Loan" />
+          </div>
         </div>
       </div>
+
       <q-form @submit.prevent="calculateAmount()">
         <div :class="rowCss">
           <div :class="colCss">
