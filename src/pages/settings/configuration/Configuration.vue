@@ -16,10 +16,10 @@
           bordered
           title="Configurations"
           :no-data-label="'No result found'"
-          :rows-per-page-options="[0]"
-          :hide-bottom="!!filteredConfigurations.length"
           :grid="$q.screen.width < 830"
           card-container-class="q-gutter-y-md q-mt-xs"
+          v-model:pagination="pagination"
+          @update:pagination="(v) => fetchData(v)"
         >
           <template v-slot:top>
             <div class="row q-gutter-y-lg q-pb-xs-md">
@@ -180,6 +180,44 @@
               </q-card>
             </div>
           </template>
+
+          <template v-slot:pagination="scope">
+            <q-btn
+              icon="first_page"
+              color="grey-8"
+              round
+              dense
+              flat
+              @click="firstPage"
+            />
+
+            <q-btn
+              icon="chevron_left"
+              color="grey-8"
+              round
+              dense
+              flat
+              @click="scope.prevPage"
+            />
+
+            <q-btn
+              icon="chevron_right"
+              color="grey-8"
+              round
+              dense
+              flat
+              @click="nextPage"
+            />
+
+            <q-btn
+              icon="last_page"
+              color="grey-8"
+              round
+              dense
+              flat
+              @click="scope.lastPage"
+            />
+          </template>
         </q-table>
       </div>
     </div>
@@ -302,6 +340,34 @@ onMounted(async () => {
   }
   fetchingData.value = false;
 });
+
+const pagination = ref({
+  page: 1,
+  rowsPerPage: 20,
+  // rowsNumber: xx if getting data from a server
+});
+
+const fetchData = async (val: { rowsPerPage: number; page: number }) => {
+  const rsp = await api.get('configItems/' + val.rowsPerPage + '/' + val.page);
+
+  if (rsp.data) {
+    configurations.value = rsp.data.object;
+  }
+};
+const firstPage = async () => {
+  const rsp = await api.get('configItems/' + 20 + '/' + 1);
+
+  if (rsp.data) {
+    configurations.value = rsp.data.object;
+  }
+};
+const nextPage = async () => {
+  const rsp = await api.get('configItems/' + 20 + '/' + 2);
+
+  if (rsp.data) {
+    configurations.value = rsp.data.object;
+  }
+};
 </script>
 
 <style scoped></style>
