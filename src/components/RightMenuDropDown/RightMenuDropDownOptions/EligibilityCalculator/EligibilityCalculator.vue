@@ -2,7 +2,7 @@
   <q-card class="e-card" flat bordered>
     <q-card-section class="bg-purple-6 text-white row items-center">
       <div class="text-subtitle2">
-        {{ radio == 'bs' ? 'Business Loan' : 'Salaried Loan' }}
+        {{ loanType == 'bs' ? 'Business Loan' : 'Salaried Loan' }}
       </div>
       <q-space />
       <q-btn icon="close" flat round dense v-close-popup />
@@ -12,12 +12,17 @@
       <div class="row">
         <div class="col">
           <div class="q-px-sm">
-            <q-radio v-model="radio" dense val="bs" label="Business Loan" />
+            <q-radio v-model="loanType" dense val="bs" label="Business Loan" />
           </div>
         </div>
         <div class="col">
           <div class="q-px-xs-none q-px-sm">
-            <q-radio v-model="radio" dense val="salary" label="Salaried Loan" />
+            <q-radio
+              v-model="loanType"
+              dense
+              val="salary"
+              label="Salaried Loan"
+            />
           </div>
         </div>
       </div>
@@ -26,7 +31,7 @@
         <div :class="rowCss">
           <div :class="colCss">
             {{
-              radio === 'bs'
+              loanType === 'bs'
                 ? ' Monthly Business Sales / Receipt'
                 : ' Monthly Salary'
             }}
@@ -105,7 +110,9 @@
         </div>
         <div :class="rowCss">
           <div :class="colCss">
-            {{ radio === 'bs' ? 'Margin %' : ' Net Salary Eligle for EMI %' }}
+            {{
+              loanType === 'bs' ? 'Margin %' : ' Net Salary Eligle for EMI %'
+            }}
             <span class="text-red"> &nbsp;*</span>
           </div>
           <div :class="colCss">
@@ -124,7 +131,7 @@
         </div>
         <div :class="rowCss">
           <div :class="colCss">
-            {{ radio === 'bs' ? 'Margin in Amt' : 'Net Salary In Amt' }}
+            {{ loanType === 'bs' ? 'Margin in Amt' : 'Net Salary In Amt' }}
           </div>
           <div :class="colCss">
             <q-input
@@ -144,7 +151,7 @@
         <div :class="rowCss">
           <div :class="colCss">
             {{
-              radio === 'bs'
+              loanType === 'bs'
                 ? 'Net Income Available for EMI'
                 : 'Net Salary Available for EMI'
             }}
@@ -176,7 +183,7 @@
             />
           </div>
         </div>
-        <div v-if="radio === 'bs'" :class="rowCss">
+        <div v-if="loanType === 'bs'" :class="rowCss">
           <div :class="colCss">LTV Cost Value</div>
           <div :class="colCss">
             <q-input
@@ -188,7 +195,7 @@
             />
           </div>
         </div>
-        <div v-if="radio === 'bs'" :class="rowCss">
+        <div v-if="loanType === 'bs'" :class="rowCss">
           <div :class="colCss">"LTV %</div>
           <div :class="colCss">
             <q-input
@@ -202,7 +209,7 @@
             />
           </div>
         </div>
-        <div v-if="radio === 'bs'" :class="rowCss">
+        <div v-if="loanType === 'bs'" :class="rowCss">
           <div :class="colCss">LTV Loan Amount</div>
           <div :class="colCss">
             <q-input
@@ -247,7 +254,7 @@
 import ExpensesCalulation from './ExpensesCalulation.vue';
 import { EligibilityObject } from './type';
 import { ref, reactive } from 'vue';
-const radio = ref('bs');
+const loanType = ref('bs');
 const colCss = 'col-xs-12 col-sm-12 col-md-6';
 const rowCss = 'row q-col-gutter-xs q-pt-sm';
 
@@ -311,7 +318,7 @@ const calculateAmount = () => {
   modalObj.calculatedLoanAmount = +modalObj.calculatedLoanAmount.toFixed(0);
   modalObj.calculatedLoanAmount = modalObj.calculatedLoanAmount * 1000;
 
-  if (modalObj.ltvPercent !== null && radio.value === 'bs') {
+  if (modalObj.ltvPercent !== null && loanType.value === 'bs') {
     modalObj.ltvLoanAmount =
       ((modalObj.ltvCostValue as number) * (modalObj.ltvPercent as number)) /
       100;
