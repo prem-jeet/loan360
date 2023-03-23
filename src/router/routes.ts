@@ -65,6 +65,12 @@ const routes: RouteRecordRaw[] = [
             name: 'natureEntry',
             component: () => import('pages/settings/accounts/NatureEntry.vue'),
           },
+          {
+            path: 'config',
+            name: 'config',
+            component: () =>
+              import('pages/settings/configuration/Configuration.vue'),
+          },
         ],
       },
     ],
