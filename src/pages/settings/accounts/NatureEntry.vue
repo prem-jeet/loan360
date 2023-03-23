@@ -494,6 +494,7 @@ onMounted(async () => {
 
   if (rsp.data) {
     natureEntry.value = rsp.data;
+    console.log('na', natureEntry.value);
   }
   fetchingData.value = false;
 });
