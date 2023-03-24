@@ -22,6 +22,10 @@
           @update:pagination="(v) => upDataPagination(v)"
           :rows-per-page-options="[10, 20, 50, 100]"
         >
+          <template v-slot:loading>
+            <q-inner-loading showing color="primary" />
+          </template>
+
           <template v-slot:top>
             <div class="row q-gutter-y-lg q-pb-xs-md">
               <div class="col-12">
@@ -353,14 +357,19 @@ onMounted(async () => {
   fetchingData.value = false;
 });
 
-const upDataPagination = async (val: { rowsPerPage: number; page: number }) => {
-  const rsp = await api.get('configItems/' + val.rowsPerPage + '/' + val.page);
+const upDataPagination = async (val: { rowsPerPage: number }) => {
+  fetchingData.value = true;
+  const rsp = await api.get(
+    'configItems/' + val.rowsPerPage + '/' + pageCount.value
+  );
 
   if (rsp.data) {
     configurations.value = rsp.data.object;
+    fetchingData.value = false;
   }
 };
 const firstPage = async () => {
+  fetchingData.value = true;
   pageCount.value = 1;
 
   const rsp = await api.get(
@@ -370,9 +379,11 @@ const firstPage = async () => {
   if (rsp.data) {
     configurations.value = rsp.data.object;
   }
+  fetchingData.value = false;
 };
 
 const prevPage = async () => {
+  fetchingData.value = true;
   pageCount.value -= 1;
 
   const rsp = await api.get(
@@ -382,9 +393,11 @@ const prevPage = async () => {
   if (rsp.data) {
     configurations.value = rsp.data.object;
   }
+  fetchingData.value = false;
 };
 
 const nextPage = async () => {
+  fetchingData.value = true;
   pageCount.value += 1;
 
   const rsp = await api.get(
@@ -394,9 +407,11 @@ const nextPage = async () => {
   if (rsp.data) {
     configurations.value = rsp.data.object;
   }
+  fetchingData.value = false;
 };
 
 const lastPage = async () => {
+  fetchingData.value = true;
   pageCount.value = Math.ceil(totalCount.value / pagination.value.rowsPerPage);
   lastPageNumber = pageCount.value;
   console.log(pagination.value.page);
@@ -408,6 +423,7 @@ const lastPage = async () => {
   if (rsp.data) {
     configurations.value = rsp.data.object;
   }
+  fetchingData.value = false;
 };
 </script>
 
