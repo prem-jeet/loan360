@@ -189,6 +189,7 @@
               round
               dense
               flat
+              :disable="scope.isFirstPage"
               @click="firstPage"
             />
 
@@ -198,7 +199,8 @@
               round
               dense
               flat
-              @click="scope.prevPage"
+              :disable="scope.isFirstPage"
+              @click="prevPage"
             />
 
             <q-btn
@@ -207,6 +209,7 @@
               round
               dense
               flat
+              :disable="lastPageNumber === pagination.page"
               @click="nextPage"
             />
 
@@ -216,7 +219,8 @@
               round
               dense
               flat
-              @click="scope.lastPage"
+              :disable="lastPageNumber === pagination.page"
+              @click="lastPage"
             />
           </template>
         </q-table>
@@ -245,6 +249,8 @@ const pagination = ref({
   page: 1,
   rowsPerPage: 20,
 });
+const totalCount = ref(0);
+let lastPageNumber = 0;
 const fetchingData = ref(false);
 const configurations = ref<Configuration[]>([]);
 const searchQuery = ref<string | null>('');
@@ -338,10 +344,13 @@ watch(searchQuery, () => {
 
 onMounted(async () => {
   fetchingData.value = true;
-  const rsp = await api.get('configItems/' + 20 + '/' + 1);
+  const rsp = await api.get(
+    'configItems/' + pagination.value.rowsPerPage + '/' + pagination.value.page
+  );
 
   if (rsp.data) {
     configurations.value = rsp.data.object;
+    totalCount.value = parseInt(rsp.data.code);
   }
   fetchingData.value = false;
 });
@@ -354,14 +363,34 @@ const upDataPagination = async (val: { rowsPerPage: number; page: number }) => {
   }
 };
 const firstPage = async () => {
-  const rsp = await api.get('configItems/' + 20 + '/' + 1);
+  pagination.value.page = 1;
+};
+
+const prevPage = async () => {
+  pagination.value.page -= 1;
+};
+
+const nextPage = async () => {
+  pagination.value.page += 1;
+
+  const rsp = await api.get(
+    'configItems/' + pagination.value.rowsPerPage + '/' + pagination.value.page
+  );
 
   if (rsp.data) {
-    configurations.value = rsp.data.object;
+    configurations.value = configurations.value.concat(rsp.data.object);
+    console.log(configurations.value);
   }
 };
-const nextPage = async () => {
-  const rsp = await api.get('configItems/' + 20 + '/' + 2);
+
+const lastPage = async () => {
+  pagination.value.page = Math.round(
+    totalCount.value / pagination.value.rowsPerPage
+  );
+  lastPageNumber = pagination.value.page;
+  console.log(pagination.value.page);
+
+  const rsp = await api.get('configItems/' + totalCount.value + '/' + 1);
 
   if (rsp.data) {
     configurations.value = rsp.data.object;
