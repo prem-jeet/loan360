@@ -152,16 +152,6 @@
                   </q-btn-group>
                 </q-card-section>
                 <q-separator inset />
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Key :</div>
-                    <div class="col-12">
-                      <template v-if="!isEditing">
-                        {{ props.row.key }}
-                      </template>
-                    </div>
-                  </div>
-                </q-card-section>
 
                 <q-card-section>
                   <div class="row q-gutter-y-xs">
