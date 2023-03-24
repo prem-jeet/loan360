@@ -176,7 +176,10 @@
             </div>
           </template>
 
+          <!-- pagination -->
+
           <template v-slot:pagination="scope">
+            <p class="q-px-md q-mt-md">Page no : {{ pageCount }}</p>
             <q-btn
               icon="first_page"
               color="grey-8"
