@@ -19,7 +19,8 @@
           :grid="$q.screen.width < 830"
           card-container-class="q-gutter-y-md q-mt-xs"
           v-model:pagination="pagination"
-          @update:pagination="(v) => fetchData(v)"
+          @update:pagination="(v) => upDataPagination(v)"
+          :rows-per-page-options="[10, 20, 50, 100]"
         >
           <template v-slot:top>
             <div class="row q-gutter-y-lg q-pb-xs-md">
@@ -240,6 +241,10 @@ const breadcrumbs = [
   { path: '', label: 'Configurations' },
 ];
 
+const pagination = ref({
+  page: 1,
+  rowsPerPage: 20,
+});
 const fetchingData = ref(false);
 const configurations = ref<Configuration[]>([]);
 const searchQuery = ref<string | null>('');
@@ -341,13 +346,7 @@ onMounted(async () => {
   fetchingData.value = false;
 });
 
-const pagination = ref({
-  page: 1,
-  rowsPerPage: 20,
-  // rowsNumber: xx if getting data from a server
-});
-
-const fetchData = async (val: { rowsPerPage: number; page: number }) => {
+const upDataPagination = async (val: { rowsPerPage: number; page: number }) => {
   const rsp = await api.get('configItems/' + val.rowsPerPage + '/' + val.page);
 
   if (rsp.data) {
