@@ -99,7 +99,7 @@
                   placeholder="value required"
                   dense
                   outlined
-                  :color="editingData.value ? 'green' : 'red'"
+                  color="green"
                   autofocus
                 />
                 <span v-else>{{ props.row.value }}</span>
@@ -172,7 +172,7 @@
                         placeholder="Name required"
                         dense
                         outlined
-                        :color="editingData.value ? 'green' : 'red'"
+                        color="green"
                         autofocus
                       />
                     </div>
@@ -321,9 +321,6 @@ const editEntryConfirmed = (row: Configuration, index: number) => {
 };
 
 const saveEdited = async (rowIndex: number) => {
-  if (!editingData.value) {
-    return;
-  }
   const rsp = await api.post('config', {
     key: configurations.value[rowIndex].key,
     value: editingData.value,
