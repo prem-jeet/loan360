@@ -60,7 +60,7 @@
           <template v-slot:body="props">
             <q-tr :props="props">
               <q-td key="actions" auto-width>
-                <q-btn-group push unelevated>
+                <q-btn-group v-if="editSaveFlag" push unelevated>
                   <q-btn
                     icon="edit"
                     size="xs"
@@ -258,6 +258,7 @@ const filteredConfigurations = computed(() => {
   return configurations.value;
 });
 const isEditing = ref(false);
+const editSaveFlag = ref(true);
 const editingRowIndex = ref(0);
 const editingData = reactive<{
   value: string;
@@ -316,6 +317,7 @@ const editEntryConfirmed = (row: Configuration, index: number) => {
 };
 
 const saveEdited = async (rowIndex: number) => {
+  editSaveFlag.value = false;
   const rsp = await api.post('config', {
     key: configurations.value[rowIndex].key,
     value: editingData.value,
@@ -326,6 +328,7 @@ const saveEdited = async (rowIndex: number) => {
     configurations.value[rowIndex].value = editingData.value;
     isEditing.value = false;
   }
+  editSaveFlag.value = true;
 };
 
 watch(searchQuery, () => {
