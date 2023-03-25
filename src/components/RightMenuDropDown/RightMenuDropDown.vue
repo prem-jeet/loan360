@@ -89,7 +89,7 @@
       </q-list>
     </q-menu>
   </q-btn>
-  <q-dialog v-model="showEligibilityCalculator" full-height>
+  <q-dialog v-model="showEligibilityCalculator">
     <EligibilityCalculator />
   </q-dialog>
 </template>
