@@ -2,7 +2,7 @@
   <q-card :style="{ minWidth: '40vw' }" flat bordered>
     <q-card-section class="bg-purple-6 text-white row items-center">
       <div class="text-subtitle2">
-        {{ loanType == 'bs' ? 'Business Loan' : 'Salaried Loan' }}
+        {{ loanType == 'bl' ? 'Business Loan' : 'Salaried Loan' }}
       </div>
       <q-space />
       <q-btn icon="close" flat round dense v-close-popup />
@@ -14,13 +14,8 @@
     >
       <div class="row items-center q-px-xs-md">
         <div class="col flex q-gutter-x-lg q-gutter-y-sm">
-          <q-radio v-model="loanType" dense val="bs" label="Business Loan" />
-          <q-radio
-            v-model="loanType"
-            dense
-            val="salary"
-            label="Salaried Loan"
-          />
+          <q-radio v-model="loanType" dense val="bl" label="Business Loan" />
+          <q-radio v-model="loanType" densev val="sl" label="Salaried Loan" />
         </div>
         <q-btn
           class="col-auto"
@@ -37,7 +32,7 @@
         <div :class="rowCss">
           <div :class="colCss">
             {{
-              loanType === 'bs'
+              loanType === 'bl'
                 ? ' Monthly Business Sales / Receipt'
                 : ' Monthly Salary'
             }}
@@ -117,7 +112,7 @@
         <div :class="rowCss">
           <div :class="colCss">
             {{
-              loanType === 'bs' ? 'Margin %' : ' Net Salary Eligle for EMI %'
+              loanType === 'bl' ? 'Margin %' : ' Net Salary Eligle for EMI %'
             }}
             <span class="text-red"> &nbsp;*</span>
           </div>
@@ -137,7 +132,7 @@
         </div>
         <div :class="rowCss">
           <div :class="colCss">
-            {{ loanType === 'bs' ? 'Margin in Amt' : 'Net Salary In Amt' }}
+            {{ loanType === 'bl' ? 'Margin in Amt' : 'Net Salary In Amt' }}
           </div>
           <div :class="colCss">
             <q-input
@@ -157,7 +152,7 @@
         <div :class="rowCss">
           <div :class="colCss">
             {{
-              loanType === 'bs'
+              loanType === 'l'
                 ? 'Net Income Available for EMI'
                 : 'Net Salary Available for EMI'
             }}
@@ -189,7 +184,7 @@
             />
           </div>
         </div>
-        <div v-if="loanType === 'bs'" :class="rowCss">
+        <div v-if="loanType === 'bl'" :class="rowCss">
           <div :class="colCss">LTV Cost Value</div>
           <div :class="colCss">
             <q-input
@@ -201,7 +196,7 @@
             />
           </div>
         </div>
-        <div v-if="loanType === 'bs'" :class="rowCss">
+        <div v-if="loanType === 'bl'" :class="rowCss">
           <div :class="colCss">"LTV %</div>
           <div :class="colCss">
             <q-input
@@ -215,7 +210,7 @@
             />
           </div>
         </div>
-        <div v-if="loanType === 'bs'" :class="rowCss">
+        <div v-if="loanType === 'bl'" :class="rowCss">
           <div :class="colCss">LTV Loan Amount</div>
           <div :class="colCss">
             <q-input
@@ -251,7 +246,7 @@
 import ExpensesCalulation from './ExpensesCalulation.vue';
 import { EligibilityObject } from './type';
 import { ref, reactive } from 'vue';
-const loanType = ref('bs');
+const loanType = ref('bl');
 const colCss = 'col-xs-12 col-sm-12 col-md-6';
 const rowCss = 'row q-col-gutter-xs q-pt-sm';
 
@@ -273,7 +268,6 @@ const modalObj = reactive<EligibilityObject>({
 
 const expensTotal = ref(0);
 const test = (key: string, value: number) => {
-  console.log('value', value, typeof value);
   if (value > 100) modalObj[key as keyof EligibilityObject] = 100;
 };
 
@@ -315,7 +309,7 @@ const calculateAmount = () => {
   modalObj.calculatedLoanAmount = +modalObj.calculatedLoanAmount.toFixed(0);
   modalObj.calculatedLoanAmount = modalObj.calculatedLoanAmount * 1000;
 
-  if (modalObj.ltvPercent !== null && loanType.value === 'bs') {
+  if (modalObj.ltvPercent !== null && loanType.value === 'bl') {
     modalObj.ltvLoanAmount =
       ((modalObj.ltvCostValue as number) * (modalObj.ltvPercent as number)) /
       100;
