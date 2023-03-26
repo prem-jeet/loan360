@@ -19,7 +19,7 @@
           :grid="$q.screen.width < 830"
           card-container-class="q-gutter-y-md q-mt-xs"
           v-model:pagination="pagination"
-          @update:pagination="(v) => upDataPagination(v)"
+          @update:pagination="(v) => upDataRowsPerPage(v)"
           :rows-per-page-options="[10, 20, 50, 100]"
         >
           <template v-slot:loading>
@@ -60,7 +60,7 @@
           <template v-slot:body="props">
             <q-tr :props="props">
               <q-td key="actions" auto-width>
-                <q-btn-group v-if="editSaveFlag" push unelevated>
+                <q-btn-group v-if="loadingFlag" push unelevated>
                   <q-btn
                     icon="edit"
                     size="xs"
@@ -179,14 +179,14 @@
           <!-- pagination -->
 
           <template v-slot:pagination="scope">
-            <p class="q-px-md q-mt-md">Page no : {{ pageCount }}</p>
+            <p class="q-px-md q-mt-md">Page no : {{ pageNumber }}</p>
             <q-btn
               icon="first_page"
               color="grey-8"
               round
               dense
               flat
-              :disable="scope.pagination.page === pageCount"
+              :disable="scope.pagination.page === pageNumber"
               @click="firstPage"
             />
 
@@ -196,7 +196,7 @@
               round
               dense
               flat
-              :disable="scope.pagination.page === pageCount"
+              :disable="scope.pagination.page === pageNumber"
               @click="prevPage"
             />
 
@@ -206,7 +206,7 @@
               round
               dense
               flat
-              :disable="lastPageNumber === pageCount"
+              :disable="lastPageNumber === pageNumber"
               @click="nextPage"
             />
 
@@ -216,7 +216,7 @@
               round
               dense
               flat
-              :disable="lastPageNumber === pageCount"
+              :disable="lastPageNumber === pageNumber"
               @click="lastPage"
             />
           </template>
@@ -247,7 +247,7 @@ const pagination = ref({
   rowsPerPage: 20,
 });
 const totalCount = ref(0);
-const pageCount = ref(1);
+const pageNumber = ref(1);
 let lastPageNumber = 0;
 const fetchingData = ref(false);
 const configurations = ref<Configuration[]>([]);
@@ -261,7 +261,7 @@ const filteredConfigurations = computed(() => {
   return configurations.value;
 });
 const isEditing = ref(false);
-const editSaveFlag = ref(true);
+const loadingFlag = ref(true);
 const editingRowIndex = ref(0);
 const editingData = reactive<{
   value: string;
@@ -320,7 +320,7 @@ const editEntryConfirmed = (row: Configuration, index: number) => {
 };
 
 const saveEdited = async (rowIndex: number) => {
-  editSaveFlag.value = false;
+  loadingFlag.value = false;
   const rsp = await api.post('config', {
     key: configurations.value[rowIndex].key,
     value: editingData.value,
@@ -331,7 +331,7 @@ const saveEdited = async (rowIndex: number) => {
     configurations.value[rowIndex].value = editingData.value;
     isEditing.value = false;
   }
-  editSaveFlag.value = true;
+  loadingFlag.value = true;
 };
 
 watch(searchQuery, () => {
@@ -353,10 +353,10 @@ onMounted(async () => {
   fetchingData.value = false;
 });
 
-const upDataPagination = async (val: { rowsPerPage: number }) => {
+const upDataRowsPerPage = async (val: { rowsPerPage: number }) => {
   fetchingData.value = true;
   const rsp = await api.get(
-    'configItems/' + val.rowsPerPage + '/' + pageCount.value
+    'configItems/' + val.rowsPerPage + '/' + pageNumber.value
   );
 
   if (rsp.data) {
@@ -366,10 +366,10 @@ const upDataPagination = async (val: { rowsPerPage: number }) => {
 };
 const firstPage = async () => {
   fetchingData.value = true;
-  pageCount.value = 1;
+  pageNumber.value = 1;
 
   const rsp = await api.get(
-    'configItems/' + pagination.value.rowsPerPage + '/' + pageCount.value
+    'configItems/' + pagination.value.rowsPerPage + '/' + pageNumber.value
   );
 
   if (rsp.data) {
@@ -380,10 +380,10 @@ const firstPage = async () => {
 
 const prevPage = async () => {
   fetchingData.value = true;
-  pageCount.value -= 1;
+  pageNumber.value -= 1;
 
   const rsp = await api.get(
-    'configItems/' + pagination.value.rowsPerPage + '/' + pageCount.value
+    'configItems/' + pagination.value.rowsPerPage + '/' + pageNumber.value
   );
 
   if (rsp.data) {
@@ -394,10 +394,10 @@ const prevPage = async () => {
 
 const nextPage = async () => {
   fetchingData.value = true;
-  pageCount.value += 1;
+  pageNumber.value += 1;
 
   const rsp = await api.get(
-    'configItems/' + pagination.value.rowsPerPage + '/' + pageCount.value
+    'configItems/' + pagination.value.rowsPerPage + '/' + pageNumber.value
   );
 
   if (rsp.data) {
@@ -408,12 +408,12 @@ const nextPage = async () => {
 
 const lastPage = async () => {
   fetchingData.value = true;
-  pageCount.value = Math.ceil(totalCount.value / pagination.value.rowsPerPage);
-  lastPageNumber = pageCount.value;
+  pageNumber.value = Math.ceil(totalCount.value / pagination.value.rowsPerPage);
+  lastPageNumber = pageNumber.value;
   console.log(pagination.value.page);
 
   const rsp = await api.get(
-    'configItems/' + pagination.value.rowsPerPage + '/' + pageCount.value
+    'configItems/' + pagination.value.rowsPerPage + '/' + pageNumber.value
   );
 
   if (rsp.data) {
