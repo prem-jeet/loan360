@@ -179,9 +179,24 @@
           <!-- pagination -->
 
           <template v-slot:pagination="scope">
+            <div class="row">
+              <div class="col-8 q-mt-sm q-pt-xs">Goto page no :</div>
+              <div class="col-4 q-px-xs">
+                <q-input
+                  v-model.number="goToPage"
+                  type="number"
+                  dense
+                  style="max-width: 60px"
+                  @update:model-value="(v)=>goToPageNumber(v as number)"
+                  :min="1"
+                  :max="Math.ceil(totalCount / pagination.rowsPerPage)"
+                />
+              </div>
+            </div>
+
             <p class="q-px-md q-mt-md">
               Page no : {{ pageNumber }} /
-              {{ Math.ceil(totalPages / pagination.rowsPerPage) }}
+              {{ Math.ceil(totalCount / pagination.rowsPerPage) }}
             </p>
             <q-btn
               icon="first_page"
@@ -249,7 +264,8 @@ const pagination = ref({
   page: 1,
   rowsPerPage: 20,
 });
-const totalPages = ref(0);
+const goToPage = ref();
+const totalCount = ref(0);
 const pageNumber = ref(1);
 let lastPageNumber = 0;
 const fetchingData = ref(false);
@@ -345,10 +361,29 @@ onMounted(async () => {
 
   if (rsp.data) {
     preferences.value = rsp.data.object;
-    totalPages.value = parseInt(rsp.data.id);
+    totalCount.value = parseInt(rsp.data.id);
   }
   fetchingData.value = false;
 });
+
+const goToPageNumber = async (val: number) => {
+  if (
+    val > 0 &&
+    val < Math.ceil(totalCount.value / pagination.value.rowsPerPage)
+  ) {
+    fetchingData.value = true;
+    pageNumber.value = val;
+
+    const rsp = await api.get(
+      'prefItems/' + pagination.value.rowsPerPage + '/' + pageNumber.value
+    );
+
+    if (rsp.data) {
+      preferences.value = rsp.data.object;
+    }
+    fetchingData.value = false;
+  }
+};
 
 const upDataRowsPerPage = async (val: { rowsPerPage: number }) => {
   fetchingData.value = true;
@@ -405,7 +440,7 @@ const nextPage = async () => {
 
 const lastPage = async () => {
   fetchingData.value = true;
-  pageNumber.value = Math.ceil(totalPages.value / pagination.value.rowsPerPage);
+  pageNumber.value = Math.ceil(totalCount.value / pagination.value.rowsPerPage);
   lastPageNumber = pageNumber.value;
   console.log(pagination.value.page);
 
