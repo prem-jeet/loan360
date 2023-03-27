@@ -179,7 +179,10 @@
           <!-- pagination -->
 
           <template v-slot:pagination="scope">
-            <p class="q-px-md q-mt-md">Page no : {{ pageNumber }}</p>
+            <p class="q-px-md q-mt-md">
+              Page no : {{ pageNumber }} /
+              {{ Math.ceil(totalPages / pagination.rowsPerPage) }}
+            </p>
             <q-btn
               icon="first_page"
               color="grey-8"
@@ -246,7 +249,7 @@ const pagination = ref({
   page: 1,
   rowsPerPage: 20,
 });
-const totalCount = ref(0);
+const totalPages = ref(0);
 const pageNumber = ref(1);
 let lastPageNumber = 0;
 const fetchingData = ref(false);
@@ -342,7 +345,7 @@ onMounted(async () => {
 
   if (rsp.data) {
     preferences.value = rsp.data.object;
-    totalCount.value = parseInt(rsp.data.id);
+    totalPages.value = parseInt(rsp.data.id);
   }
   fetchingData.value = false;
 });
@@ -402,7 +405,7 @@ const nextPage = async () => {
 
 const lastPage = async () => {
   fetchingData.value = true;
-  pageNumber.value = Math.ceil(totalCount.value / pagination.value.rowsPerPage);
+  pageNumber.value = Math.ceil(totalPages.value / pagination.value.rowsPerPage);
   lastPageNumber = pageNumber.value;
   console.log(pagination.value.page);
 
