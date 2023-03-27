@@ -49,6 +49,35 @@
                 </q-input>
               </div>
             </div>
+            <div v-if="$q.screen.width < 830" class="col-12">
+              <div class="row items-center">
+                <div class="col-xs-6">Goto page no:</div>
+                <div class="col-xs-6">
+                  <q-input
+                    v-model.number="goToPage"
+                    type="number"
+                    dense
+                    style="max-width: 60px"
+                    :min="1"
+                    :max="Math.ceil(totalCount / pagination.rowsPerPage)"
+                  />
+                </div>
+                <div class="col-xs-6">Records per page:</div>
+                <div class="col-xs-6">
+                  <q-select
+                    dense
+                    v-model="pagination.rowsPerPage"
+                    :options="[10, 20, 50, 100]"
+                  />
+                </div>
+                <div class="col-xs-6 q-py-sm">Page no:</div>
+                <div class="col-xs-6 q-py-sm">
+                  {{ pageNumber }}/{{
+                    Math.ceil(totalCount / pagination.rowsPerPage)
+                  }}
+                </div>
+              </div>
+            </div>
           </template>
 
           <template v-slot:header-cell="props">
@@ -180,25 +209,32 @@
           <!-- pagination -->
 
           <template v-slot:pagination="scope">
-            <div class="row">
-              <div class="col-8 q-mt-sm q-pt-xs">Goto page no :</div>
-              <div class="col-4 q-px-xs">
+            <div class="row q-mr-sm q-pt-xs">
+              <div class="col-auto q-mt-sm q-pt-sm">
+                <q-btn
+                  color="white"
+                  size="sm"
+                  text-color="black"
+                  label="Goto Page"
+                  @click="goToPageNumber"
+                />
+              </div>
+              <div class="col-auto q-mx-sm q-pt-xs">
                 <q-input
-                  v-model.number="goToPage"
+                  v-model.number="pageNumber"
                   type="number"
                   dense
-                  style="max-width: 60px"
-                  @update:model-value="(v)=>goToPageNumber(v as number)"
+                  style="max-width: 70px"
                   :min="1"
                   :max="Math.ceil(totalCount / pagination.rowsPerPage)"
                 />
               </div>
+              <div class="col-auto q-mt-sm q-ml-sm q-pt-xs">
+                <p class="text-subtitle1 text-weight-regular">
+                  /{{ Math.ceil(totalCount / pagination.rowsPerPage) }}
+                </p>
+              </div>
             </div>
-
-            <p class="q-px-md q-mt-md">
-              Page no : {{ pageNumber }} /
-              {{ Math.ceil(totalCount / pagination.rowsPerPage) }}
-            </p>
             <q-btn
               icon="first_page"
               color="grey-8"
@@ -249,7 +285,7 @@
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { confirmDialog, onSuccess } from 'src/utils/notification';
-import { ref, reactive, computed, onMounted } from 'vue';
+import { ref, reactive, computed, watch, onMounted } from 'vue';
 
 interface Preference {
   key: string;
@@ -265,7 +301,7 @@ const pagination = ref({
   page: 1,
   rowsPerPage: 20,
 });
-const goToPage = ref();
+const goToPage = ref(1);
 const totalCount = ref(0);
 const pageNumber = ref(1);
 let lastPageNumber = 0;
@@ -367,23 +403,30 @@ onMounted(async () => {
   fetchingData.value = false;
 });
 
-const goToPageNumber = async (val: number) => {
-  if (
-    val > 0 &&
-    val < Math.ceil(totalCount.value / pagination.value.rowsPerPage)
+watch(pageNumber, () => {
+  if (pageNumber.value < 1) {
+    pageNumber.value = 1;
+  } else if (
+    pageNumber.value >
+    Math.ceil(totalCount.value / pagination.value.rowsPerPage)
   ) {
-    fetchingData.value = true;
-    pageNumber.value = val;
-
-    const rsp = await api.get(
-      'prefItems/' + pagination.value.rowsPerPage + '/' + pageNumber.value
+    pageNumber.value = Math.ceil(
+      totalCount.value / pagination.value.rowsPerPage
     );
-
-    if (rsp.data) {
-      preferences.value = rsp.data.object;
-    }
-    fetchingData.value = false;
   }
+});
+
+const goToPageNumber = async () => {
+  fetchingData.value = true;
+
+  const rsp = await api.get(
+    'prefItems/' + pagination.value.rowsPerPage + '/' + pageNumber.value
+  );
+
+  if (rsp.data) {
+    preferences.value = rsp.data.object;
+  }
+  fetchingData.value = false;
 };
 
 const upDataRowsPerPage = async (val: { rowsPerPage: number }) => {
