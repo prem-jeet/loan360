@@ -21,6 +21,7 @@
           v-model:pagination="pagination"
           @update:pagination="(v) => upDataRowsPerPage(v)"
           :rows-per-page-options="[10, 20, 50, 100]"
+          :hide-bottom="$q.screen.width < 830"
         >
           <template v-slot:loading>
             <q-inner-loading showing color="primary" />
