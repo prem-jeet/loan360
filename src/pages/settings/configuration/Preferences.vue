@@ -218,7 +218,7 @@
 
           <template v-slot:pagination="scope">
             <div class="row q-mr-sm q-pt-xs">
-              <div class="col-auto q-mt-sm q-pt-sm">
+              <div class="col-auto q-mt-sm q-pt-xs">
                 <q-btn
                   color="white"
                   size="sm"
@@ -227,7 +227,7 @@
                   @click="goToPageNumber"
                 />
               </div>
-              <div class="col-auto q-mx-sm q-pt-xs">
+              <div class="col-auto q-ml-md">
                 <q-input
                   v-model.number="pageNumber"
                   type="number"
@@ -237,7 +237,7 @@
                   :max="Math.ceil(totalCount / pagination.rowsPerPage)"
                 />
               </div>
-              <div class="col-auto q-mt-sm q-ml-sm q-pt-xs">
+              <div class="col-auto q-mt-xs q-ml-sm q-pt-xs">
                 <p class="text-subtitle1 text-weight-regular">
                   /{{ Math.ceil(totalCount / pagination.rowsPerPage) }}
                 </p>
@@ -246,6 +246,7 @@
             <q-btn
               icon="first_page"
               color="grey-8"
+              class="q-mb-xs"
               round
               dense
               flat
@@ -256,6 +257,7 @@
             <q-btn
               icon="chevron_left"
               color="grey-8"
+              class="q-mb-xs"
               round
               dense
               flat
@@ -266,6 +268,7 @@
             <q-btn
               icon="chevron_right"
               color="grey-8"
+              class="q-mb-xs"
               round
               dense
               flat
@@ -276,6 +279,7 @@
             <q-btn
               icon="last_page"
               color="grey-8"
+              class="q-mb-xs"
               round
               dense
               flat
@@ -309,7 +313,6 @@ const pagination = ref({
   page: 1,
   rowsPerPage: 20,
 });
-const goToPage = ref(1);
 const totalCount = ref(0);
 const pageNumber = ref(1);
 let lastPageNumber = 0;
