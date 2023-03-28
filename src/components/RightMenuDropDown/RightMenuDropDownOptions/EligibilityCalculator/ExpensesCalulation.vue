@@ -7,21 +7,19 @@
         <q-select
           outlined
           dense
-          :error="error && !expensesSelected"
-          error-message=""
-          v-model="expensesSelected"
-          :options="expenseOptions"
+          v-model="selectedExpense"
+          :options="filteredExpenseOptions"
           label="Expenses"
+          hide-bottom-space
         />
       </div>
       <div class="col-6">
         <q-input
           outlined
           dense
-          v-model="expensesAmount"
+          v-model="expenseAmount"
+          hide-bottom-space
           type="number"
-          :error="error && !expensesAmount"
-          error-message=""
           input-class="text-right remove-input-number-indicator"
         />
       </div>
@@ -32,7 +30,7 @@
         size="xs"
         class="q-ml-auto"
         color="light-blue"
-        @click="add"
+        @click="addExpense"
         icon="add"
         padding="sm"
       >
@@ -42,7 +40,7 @@
         size="xs"
         class="q-ml-md"
         color="red"
-        @click="refresh"
+        @click="clearExpense"
         icon="refresh"
         padding="sm"
       >
@@ -50,204 +48,49 @@
       </q-btn>
     </div>
 
-    <div
-      class="row q-mx-lg-lg q-col-gutter-sm q-pt-xs-md q-pt-sm-xs q-pt-md-xs"
-      v-for="(item, index) in data.ExpensesArray"
-      :key="index"
-    >
-      <div v-if="editIndex !== index" class="col-4 col-md-4">
-        {{ item.field }}
-      </div>
-      <div v-else class="col-xs-12 col-sm-12 col-md-5">
-        <q-select
-          outlined
-          dense
-          ref="inputRef"
-          :error="errormsg && !editExpensesSelected"
-          error-message=""
-          v-model="editExpensesSelected"
-          :options="expenseOptions"
-        >
-        </q-select>
-      </div>
-      <div v-if="editIndex !== index" class="col-3 col-md-4 text-right">
-        {{ item.value }}
-      </div>
-      <div v-else class="col-xs-12 col-sm-12 col-md-4 text-right">
-        <q-input
-          :error="errormsg && !editExpensesAmount"
-          error-message=""
-          outlined
-          dense
-          type="number"
-          v-model="editExpensesAmount"
-          input-class="text-right remove-input-number-indicator"
-        ></q-input>
-      </div>
-      <div v-if="editIndex !== index" class="col-5 col-md-4 text-right">
-        <q-btn
-          class="q-mr-sm"
-          size="xs"
-          color="blue"
-          @click="edit(index)"
-          icon="fa-solid fa-pen-to-square"
-        >
-          <q-tooltip> Edit </q-tooltip>
-        </q-btn>
-        <q-btn
-          size="xs"
-          color="red"
-          @click="remove(index)"
-          icon="fa-solid fa-xmark"
-          ><q-tooltip> Delete</q-tooltip>
-        </q-btn>
-      </div>
-      <div v-else class="col-xs-12 col-sm-12 col-md-3 text-right">
-        <q-btn
-          size="xs"
-          color="blue"
-          @click="editSave()"
-          icon="fa-solid fa-check"
-        >
-          <q-tooltip> Save</q-tooltip>
-        </q-btn>
-        <q-btn
-          class="q-ml-sm"
-          size="xs"
-          color="red"
-          @click="Editremove(index)"
-          icon="fa-solid fa-xmark"
-          ><q-tooltip> Delete</q-tooltip>
-        </q-btn>
-      </div>
-    </div>
-    <div
-      v-if="data.ExpensesArray.length > 0"
-      class="row q-pt-md q-mx-lg-lg q-col-gutter-sm"
-    >
-      <div class="col-4 col-md-4 col-xs-4 col-sm-4 text-bold">
-        Total Expenses
-      </div>
-      <div
-        class="col-4 col-md-4 col-xs-4 col-sm-3 text-right q-pr-xs-lg q-pr-sm-none q-pr-md-none"
-      >
-        {{ expensTotal }}
-      </div>
-      <div class="col-4 col-md-4 col-xs-4 col-sm-5"></div>
+    <div v-for="expense in expenses" :key="expense.label">
+      {{ expense.label }}
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
-import { ExpensesData } from './type';
-import { onMounted } from 'vue';
+import { ref } from 'vue';
+
+import { onMounted, computed } from 'vue';
 import { api } from 'src/boot/axios';
 
 const emits = defineEmits(['totalExpense']);
 
-const error = ref(false);
+const selectedExpense = ref<string | null>(null);
+const expenseAmount = ref<number | null>(null);
+const expenseOptions = ref<string[]>([]);
+const expenses = ref<{ label: string; amount: number }[]>([]);
 
-const expensesSelected = ref('');
-const expensesAmount = ref('');
-const editExpensesSelected = ref('');
-const editExpensesAmount = ref('');
-const saveIndex = ref(0);
-const editIndex = ref();
-const editCondition = ref(true);
-const errormsg = ref(false);
-const expensTotal = ref(0);
-const expenseOptions = ref<{ value: string; label: string }[]>([]);
-
-const data = reactive<ExpensesData>({
-  ExpensesArray: [],
+const filteredExpenseOptions = computed(() => {
+  if (!expenseOptions.value.length) {
+    return [];
+  }
+  const unavailableOptions = expenses.value.map((expense) => expense.label);
+  return expenseOptions.value.filter(
+    (option) => !unavailableOptions.includes(option)
+  );
 });
 
-const add = () => {
-  if (expensesAmount.value && expensesSelected.value) {
-    data.ExpensesArray.push({
-      field: expensesSelected.value,
-      value: parseInt(expensesAmount.value),
-    });
-    let num = parseInt(expensesAmount.value);
-    expensTotal.value += num;
-    expensesSelected.value = '';
-    expensesAmount.value = '';
-    calculateAmount();
-    error.value = false;
-  } else {
-    error.value = true;
-  }
-};
-const remove = (index: number) => {
-  const obj = data.ExpensesArray[index];
-  const val = obj.value;
-  expensTotal.value -= val as number;
-  data.ExpensesArray.splice(index, 1);
-  editExpensesSelected.value = '';
-  editExpensesAmount.value = '';
-  editIndex.value = -1;
-  calculateAmount();
-  // editIndex.value = null;
-};
-const Editremove = (index: number) => {
-  data.ExpensesArray.splice(index, 1);
-  editExpensesSelected.value = '';
-  editExpensesAmount.value = '';
-  editIndex.value = -1;
-  calculateAmount();
-  // editIndex.value = null;
-};
-const edit = (index: number) => {
-  if (editCondition.value) {
-    const obj = data.ExpensesArray[index];
-    const val = obj.value;
-    expensTotal.value -= val as number;
-    editExpensesSelected.value = obj.field as string;
-    editExpensesAmount.value = (obj.value as number).toString();
-    saveIndex.value = index;
-    editIndex.value = index;
-    editCondition.value = false;
-    // data.ExpensesArray.splice(index, 1);
-    calculateAmount();
-  } else {
-    editCondition.value = true;
-    const obj = data.ExpensesArray[saveIndex.value];
-    const val = obj.value;
-    expensTotal.value += val as number;
-
-    const obj2 = data.ExpensesArray[index];
-    const val2 = obj2.value;
-    expensTotal.value -= val2 as number;
-    editExpensesSelected.value = obj2.field as string;
-    editExpensesAmount.value = (obj2.value as number).toString();
-    saveIndex.value = index;
-    editIndex.value = index;
-    editCondition.value = false;
-    calculateAmount();
-  }
+const addExpense = () => {
+  if (selectedExpense.value && expenseAmount.value !== null)
+    expenses.value = [
+      ...expenses.value,
+      {
+        label: selectedExpense.value,
+        amount: expenseAmount.value,
+      },
+    ];
+  clearExpense();
 };
 
-const editSave = () => {
-  if (parseInt(editExpensesAmount.value) >= 0) {
-    const obj = data.ExpensesArray[saveIndex.value];
-    obj.value = parseInt(editExpensesAmount.value);
-    data.ExpensesArray.splice(saveIndex.value, 1, obj);
-    let num = parseInt(editExpensesAmount.value);
-    expensTotal.value += num;
-    calculateAmount();
-    editIndex.value = -1;
-    editCondition.value = true;
-  } else {
-    errormsg.value = true;
-  }
-};
-
-const refresh = () => {
-  (expensesSelected.value = ''), (expensesAmount.value = '');
-};
-
-const calculateAmount = () => {
-  emits('totalExpense', expensTotal.value);
+const clearExpense = () => {
+  selectedExpense.value = null;
+  expenseAmount.value = null;
 };
 
 onMounted(async () => {
@@ -258,8 +101,4 @@ onMounted(async () => {
   }
 });
 </script>
-<style scoped>
-.q-field--with-bottom {
-  padding-bottom: 0px;
-}
-</style>
+<style scoped></style>
