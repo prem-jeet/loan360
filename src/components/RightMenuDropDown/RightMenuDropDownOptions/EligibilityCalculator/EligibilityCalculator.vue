@@ -28,7 +28,7 @@
         </q-btn>
       </div>
 
-      <q-form @submit.prevent="calculateAmount()" class="q-mt-md">
+      <q-form class="q-mt-md">
         <div :class="rowCss">
           <div :class="colCss">
             {{
@@ -63,7 +63,6 @@
               v-model.number="modalObj.rate"
               :rules="[(val: any) => !!val || '']"
               input-class="text-right remove-input-number-indicator"
-              @blur="blur()"
               @update:model-value="(v) => test('rate', v as number)"
             />
           </div>
@@ -81,7 +80,6 @@
               v-model.number="modalObj.tenure"
               :rules="[(val: any) => !!val || '']"
               input-class="text-right remove-input-number-indicator"
-              @blur="blur()"
             />
           </div>
         </div>
@@ -125,7 +123,6 @@
               v-model.number="modalObj.marginPercent"
               :rules="[(val: any) => !!val || '']"
               input-class="text-right remove-input-number-indicator"
-              @blur="blur()"
               @update:model-value="(v) => test('marginPercent', v as number)"
             />
           </div>
@@ -141,13 +138,13 @@
               outlined
               dense
               disable
-              v-model.number="modalObj.marginAmount"
+              v-model.number="marginAmount"
               input-class="text-right remove-input-number-indicator"
             />
           </div>
         </div>
 
-        <ExpensesCalulation @updateToatal="ToatlUpdate" />
+        <ExpensesCalulation @updateToatal="updateTotalExpense" />
 
         <div :class="rowCss">
           <div :class="colCss">
@@ -165,7 +162,7 @@
               type="number"
               dense
               disable
-              v-model.number="modalObj.netAvailableIncome"
+              v-model.number="netAvailableIncome"
               input-class="text-right remove-input-number-indicator"
             />
           </div>
@@ -179,7 +176,7 @@
               dense
               disable
               type="number"
-              v-model.number="modalObj.calculatedLoanAmount"
+              v-model.number="loanAmount"
               input-class="text-right remove-input-number-indicator"
             />
           </div>
@@ -205,7 +202,6 @@
               type="number"
               v-model.number="modalObj.ltvPercent"
               input-class="text-right remove-input-number-indicator"
-              @blur="blur()"
               @update:model-value="(v) => test('ltvPercent', v as number)"
             />
           </div>
@@ -219,7 +215,7 @@
               disable
               dense
               type="number"
-              v-model.number="modalObj.ltvLoanAmount"
+              v-model.number="ltvLoanAmount"
               input-class="text-right remove-input-number-indicator"
             />
           </div>
@@ -233,7 +229,7 @@
               dense
               disable
               type="number"
-              v-model.number="modalObj.maxLoanAmount"
+              v-model.number="maxLoanAmount"
               input-class="text-right remove-input-number-indicator"
             />
           </div>
@@ -245,7 +241,8 @@
 <script setup lang="ts">
 import ExpensesCalulation from './ExpensesCalulation.vue';
 import { EligibilityObject } from './type';
-import { ref, reactive } from 'vue';
+import { ref, reactive, computed } from 'vue';
+
 const loanType = ref('bl');
 const colCss = 'col-xs-12 col-sm-12 col-md-6';
 const rowCss = 'row q-col-gutter-xs q-pt-sm';
@@ -266,6 +263,64 @@ const modalObj = reactive<EligibilityObject>({
   maxLoanAmount: null,
 });
 
+const marginAmount = computed(() => {
+  const { monthlyRevenue, marginPercent } = modalObj;
+
+  if (monthlyRevenue && marginPercent) {
+    return +(monthlyRevenue * (marginPercent / 100)).toFixed(2);
+  }
+
+  return null;
+});
+
+const netAvailableIncome = computed(() => {
+  if (marginAmount.value) {
+    return marginAmount.value - (expensTotal.value || 0);
+  }
+  return null;
+});
+
+const loanAmount = computed(() => {
+  const { rate, tenure } = modalObj;
+
+  if (netAvailableIncome.value && tenure) {
+    const result = Math.round(
+      (netAvailableIncome.value * tenure) /
+        (1 + ((rate || 0) * tenure) / (12 * 100))
+    );
+    return result * 1000;
+  }
+  return null;
+});
+
+const ltvLoanAmount = computed(() => {
+  const { ltvCostValue, ltvPercent } = modalObj;
+  if (ltvCostValue && ltvPercent) {
+    const ltvLoanAmount = Math.round((ltvCostValue * ltvPercent) / 100);
+    return Math.round(ltvLoanAmount / 1000) * 1000;
+  }
+  return null;
+});
+
+const maxLoanAmount = computed(() => {
+  if (!loanAmount.value) {
+    return null;
+  }
+
+  if (loanType.value === 'sl') {
+    return +loanAmount.value.toFixed(2);
+  }
+
+  if (!ltvLoanAmount.value) {
+    return null;
+  }
+
+  return +(
+    ltvLoanAmount.value >= loanAmount.value
+      ? loanAmount.value
+      : ltvLoanAmount.value
+  ).toFixed(2);
+});
 const expensTotal = ref(0);
 const test = (key: string, value: number) => {
   if (value > 100) modalObj[key as keyof EligibilityObject] = 100;
@@ -286,49 +341,9 @@ const reset = () => {
   modalObj.ltvLoanAmount = null;
   modalObj.maxLoanAmount = null;
 };
-const blur = () => {
-  if (
-    (modalObj.monthlyRevenue as number) > 0 &&
-    (modalObj.marginPercent as number) > 0
-  ) {
-    calculateAmount();
-  }
-};
 
-const calculateAmount = () => {
-  modalObj.marginAmount =
-    ((modalObj.monthlyRevenue as number) * (modalObj.marginPercent as number)) /
-    100;
-  modalObj.netAvailableIncome =
-    modalObj.marginAmount - (expensTotal.value > 0 ? expensTotal.value : 0);
-  modalObj.calculatedLoanAmount =
-    (modalObj.netAvailableIncome * (modalObj.tenure as number)) /
-    (1 +
-      ((modalObj.rate as number) / 100) * ((modalObj.tenure as number) / 12));
-  modalObj.calculatedLoanAmount = modalObj.calculatedLoanAmount / 1000;
-  modalObj.calculatedLoanAmount = +modalObj.calculatedLoanAmount.toFixed(0);
-  modalObj.calculatedLoanAmount = modalObj.calculatedLoanAmount * 1000;
-
-  if (modalObj.ltvPercent !== null && loanType.value === 'bl') {
-    modalObj.ltvLoanAmount =
-      ((modalObj.ltvCostValue as number) * (modalObj.ltvPercent as number)) /
-      100;
-    modalObj.ltvLoanAmount = modalObj.ltvLoanAmount / 1000;
-    modalObj.ltvLoanAmount = +modalObj.ltvLoanAmount.toFixed(0);
-    modalObj.ltvLoanAmount = modalObj.ltvLoanAmount * 1000;
-    modalObj.maxLoanAmount =
-      modalObj.ltvLoanAmount >= modalObj.calculatedLoanAmount
-        ? modalObj.calculatedLoanAmount
-        : modalObj.ltvLoanAmount;
-    modalObj.maxLoanAmount = +modalObj.maxLoanAmount.toFixed(2);
-  } else {
-    modalObj.maxLoanAmount = +modalObj.calculatedLoanAmount.toFixed(2);
-  }
-};
-
-const ToatlUpdate = (val: number) => {
+const updateTotalExpense = (val: number) => {
   expensTotal.value = val;
-  calculateAmount();
 };
 </script>
 <style scoped></style>
