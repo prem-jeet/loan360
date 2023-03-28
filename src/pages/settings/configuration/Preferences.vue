@@ -49,6 +49,7 @@
                 </q-input>
               </div>
             </div>
+            <!-- pagination  < 800px -->
             <div v-if="$q.screen.width < 830" class="col-12">
               <div class="row items-center">
                 <div class="col-xs-4 col-sm-2 q-pt-sm">
@@ -214,7 +215,7 @@
             </div>
           </template>
 
-          <!-- pagination -->
+          <!-- pagination  > 800px -->
 
           <template v-slot:pagination="scope">
             <div class="row q-mr-sm q-pt-xs">
