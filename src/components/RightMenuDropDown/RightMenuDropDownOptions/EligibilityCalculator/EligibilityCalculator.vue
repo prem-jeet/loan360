@@ -44,8 +44,8 @@
               type="number"
               dense
               hide-bottom-space
-              v-model="modalObj.monthlyRevenue"
-              :rules="[(val: any) => !!val || '']"
+              v-model.number="modalObj.monthlyRevenue"
+              :rules="[(val: any) => !!val]"
               input-class="text-right remove-input-number-indicator"
             />
           </div>
@@ -78,7 +78,7 @@
               type="number"
               dense
               hide-bottom-space
-              v-model="modalObj.tenure"
+              v-model.number="modalObj.tenure"
               :rules="[(val: any) => !!val || '']"
               input-class="text-right remove-input-number-indicator"
               @blur="blur()"
@@ -92,7 +92,7 @@
               outlined
               dense
               type="number"
-              v-model="modalObj.instalments"
+              v-model.number="modalObj.instalments"
               input-class="text-right remove-input-number-indicator"
             />
           </div>
@@ -104,7 +104,7 @@
               outlined
               type="number"
               dense
-              v-model="modalObj.advInstalments"
+              v-model.number="modalObj.advInstalments"
               input-class="text-right remove-input-number-indicator"
             />
           </div>
@@ -122,7 +122,7 @@
               dense
               type="number"
               hide-bottom-space
-              v-model="modalObj.marginPercent"
+              v-model.number="modalObj.marginPercent"
               :rules="[(val: any) => !!val || '']"
               input-class="text-right remove-input-number-indicator"
               @blur="blur()"
@@ -141,7 +141,7 @@
               outlined
               dense
               disable
-              v-model="modalObj.marginAmount"
+              v-model.number="modalObj.marginAmount"
               input-class="text-right remove-input-number-indicator"
             />
           </div>
@@ -152,7 +152,7 @@
         <div :class="rowCss">
           <div :class="colCss">
             {{
-              loanType === 'l'
+              loanType === 'bl'
                 ? 'Net Income Available for EMI'
                 : 'Net Salary Available for EMI'
             }}
@@ -165,7 +165,7 @@
               type="number"
               dense
               disable
-              v-model="modalObj.netAvailableIncome"
+              v-model.number="modalObj.netAvailableIncome"
               input-class="text-right remove-input-number-indicator"
             />
           </div>
@@ -179,7 +179,7 @@
               dense
               disable
               type="number"
-              v-model="modalObj.calculatedLoanAmount"
+              v-model.number="modalObj.calculatedLoanAmount"
               input-class="text-right remove-input-number-indicator"
             />
           </div>
@@ -191,7 +191,7 @@
               outlined
               type="number"
               dense
-              v-model="modalObj.ltvCostValue"
+              v-model.number="modalObj.ltvCostValue"
               input-class="text-right remove-input-number-indicator"
             />
           </div>
@@ -203,7 +203,7 @@
               outlined
               dense
               type="number"
-              v-model="modalObj.ltvPercent"
+              v-model.number="modalObj.ltvPercent"
               input-class="text-right remove-input-number-indicator"
               @blur="blur()"
               @update:model-value="(v) => test('ltvPercent', v as number)"
@@ -219,7 +219,7 @@
               disable
               dense
               type="number"
-              v-model="modalObj.ltvLoanAmount"
+              v-model.number="modalObj.ltvLoanAmount"
               input-class="text-right remove-input-number-indicator"
             />
           </div>
@@ -233,7 +233,7 @@
               dense
               disable
               type="number"
-              v-model="modalObj.maxLoanAmount"
+              v-model.number="modalObj.maxLoanAmount"
               input-class="text-right remove-input-number-indicator"
             />
           </div>
