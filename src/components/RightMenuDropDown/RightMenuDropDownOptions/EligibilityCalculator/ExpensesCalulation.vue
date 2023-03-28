@@ -17,7 +17,7 @@
         <q-input
           outlined
           dense
-          v-model="expenseAmount"
+          v-model.number="expenseAmount"
           hide-bottom-space
           type="number"
           input-class="text-right remove-input-number-indicator"
@@ -26,6 +26,10 @@
     </div>
 
     <div class="flex q-mt-md q-px-lg">
+      <div class="text-weight-medium" v-if="expenses.length">
+        Total expense: {{ totalExpense }}
+      </div>
+
       <q-btn
         size="xs"
         class="q-ml-auto"
@@ -95,8 +99,16 @@ const filteredExpenseOptions = computed(() => {
   );
 });
 
+const totalExpense = computed(() => {
+  return expenses.value.reduce((acc, val) => acc + val.amount, 0);
+});
+
 const addExpense = () => {
-  if (selectedExpense.value && expenseAmount.value !== null)
+  if (
+    selectedExpense.value &&
+    expenseAmount.value !== null &&
+    typeof expenseAmount.value != 'string'
+  )
     expenses.value = [
       ...expenses.value,
       {
