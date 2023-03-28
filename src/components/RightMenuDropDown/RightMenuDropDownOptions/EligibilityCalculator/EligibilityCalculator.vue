@@ -36,7 +36,7 @@
                 ? ' Monthly Business Sales / Receipt'
                 : ' Monthly Salary'
             }}
-            <span class="text-red"> &nbsp;*</span>
+            <span class="text-red"> *</span>
           </div>
           <div :class="colCss">
             <q-input
@@ -44,15 +44,15 @@
               type="number"
               dense
               hide-bottom-space
-              v-model.number="modalObj.monthlyRevenue"
-              :rules="[(val: any) => !!val]"
+              v-model.number="monthlyRevenue"
+              :error="!monthlyRevenue"
               input-class="text-right remove-input-number-indicator"
             />
           </div>
         </div>
         <div :class="rowCss">
           <div :class="colCss">
-            Interest Rate<span class="text-red"> &nbsp;*</span>
+            Interest Rate <span class="text-red">*</span>
           </div>
           <div :class="colCss">
             <q-input
@@ -61,7 +61,7 @@
               dense
               hide-bottom-space
               v-model.number="percetageValues.rate"
-              :rules="[(val: any) => !!val || '']"
+              :error="percetageValues.rate === null"
               input-class="text-right remove-input-number-indicator"
               @update:model-value="(v) => limitPercetageInput('rate', v as number)"
             />
@@ -69,7 +69,7 @@
         </div>
         <div :class="rowCss">
           <div :class="colCss">
-            Tenure<span class="text-red"> &nbsp;*</span>
+            Tenure (Months) <span class="text-red">*</span>
           </div>
           <div :class="colCss">
             <q-input
@@ -78,7 +78,7 @@
               dense
               hide-bottom-space
               v-model.number="modalObj.tenure"
-              :rules="[(val: any) => !!val || '']"
+              :error="modalObj.tenure === null"
               input-class="text-right remove-input-number-indicator"
             />
           </div>
@@ -96,7 +96,7 @@
           </div>
         </div>
         <div :class="rowCss">
-          <div :class="colCss">Adv Instalments</div>
+          <div :class="colCss">Adv. Instalments</div>
           <div :class="colCss">
             <q-input
               outlined
@@ -110,9 +110,9 @@
         <div :class="rowCss">
           <div :class="colCss">
             {{
-              loanType === 'bl' ? 'Margin %' : ' Net Salary Eligle for EMI %'
+              loanType === 'bl' ? 'Margin % ' : ' Net Salary Eligle for EMI % '
             }}
-            <span class="text-red"> &nbsp;*</span>
+            <span class="text-red">*</span>
           </div>
           <div :class="colCss">
             <q-input
@@ -120,8 +120,8 @@
               dense
               type="number"
               hide-bottom-space
+              :error="percetageValues.margin === null"
               v-model.number="percetageValues.margin"
-              :rules="[(val: any) => !!val || '']"
               input-class="text-right remove-input-number-indicator"
               @update:model-value="(v) => limitPercetageInput('margin', v as number)"
             />
@@ -241,7 +241,7 @@
 <script setup lang="ts">
 import ExpensesCalulation from './ExpensesCalulation.vue';
 import { EligibilityObject } from './type';
-import { ref, reactive, computed } from 'vue';
+import { ref, reactive, computed, watch } from 'vue';
 
 const loanType = ref('bl');
 const colCss = 'col-xs-12 col-sm-12 col-md-6';
@@ -250,10 +250,11 @@ const rowCss = 'row q-col-gutter-xs q-pt-sm';
 const modalObj = reactive<EligibilityObject>({
   instalments: null,
   advInstalments: null,
-  monthlyRevenue: null,
   tenure: null,
   ltvCostValue: null,
 });
+
+const monthlyRevenue = ref<number | null>(null);
 
 const percetageValues = reactive<{
   margin: number | null;
@@ -265,12 +266,13 @@ const percetageValues = reactive<{
   ltv: null,
 });
 
+const expensTotal = ref(0);
+
 const marginAmount = computed(() => {
-  const { monthlyRevenue } = modalObj;
   const { margin } = percetageValues;
 
-  if (monthlyRevenue && margin) {
-    return +(monthlyRevenue * (margin / 100)).toFixed(2);
+  if (monthlyRevenue.value && margin) {
+    return +(monthlyRevenue.value * (margin / 100)).toFixed(2);
   }
 
   return null;
@@ -287,11 +289,10 @@ const loanAmount = computed(() => {
   const { tenure } = modalObj;
   const { rate } = percetageValues;
 
-  if (netAvailableIncome.value && tenure && rate) {
-    const result = Math.round(
-      (netAvailableIncome.value * tenure) / (1 + (rate * tenure) / (12 * 100))
+  if (netAvailableIncome.value && tenure !== null && rate !== null) {
+    return Math.round(
+      (netAvailableIncome.value * tenure) / (1 + (rate / 100) * (tenure / 12))
     );
-    return result * 1000;
   }
   return null;
 });
@@ -325,15 +326,14 @@ const maxLoanAmount = computed(() => {
       : ltvLoanAmount.value
   ).toFixed(2);
 });
-const expensTotal = ref(0);
 
 const limitPercetageInput = (key: string, percentValue: number) => {
-  const newValue = Math.min(100, Math.max(1, percentValue));
+  const newValue = Math.min(100, Math.max(0, percentValue));
   percetageValues[key as keyof typeof percetageValues] = newValue;
 };
 
 const reset = () => {
-  modalObj.monthlyRevenue = null;
+  monthlyRevenue.value = null;
   modalObj.tenure = null;
   modalObj.instalments = null;
   modalObj.advInstalments = null;
@@ -347,5 +347,12 @@ const reset = () => {
 const updateTotalExpense = (val: number) => {
   expensTotal.value = val;
 };
+
+watch(monthlyRevenue, (newVal, oldVal) => {
+  if (oldVal === null) {
+    modalObj.tenure = 0;
+    percetageValues.rate = 0;
+  }
+});
 </script>
 <style scoped></style>

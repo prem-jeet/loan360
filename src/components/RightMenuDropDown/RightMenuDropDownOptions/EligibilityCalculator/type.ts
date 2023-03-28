@@ -1,7 +1,6 @@
 export interface EligibilityObject {
   instalments: number | null;
   advInstalments: number | null;
-  monthlyRevenue: number | null;
   tenure: number | null;
   ltvCostValue: number | null;
 }
