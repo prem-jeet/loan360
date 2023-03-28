@@ -36,7 +36,6 @@
                 ? ' Monthly Business Sales / Receipt'
                 : ' Monthly Salary'
             }}
-            <span class="text-red"> *</span>
           </div>
           <div :class="colCss">
             <q-input
@@ -51,9 +50,7 @@
           </div>
         </div>
         <div :class="rowCss">
-          <div :class="colCss">
-            Interest Rate <span class="text-red">*</span>
-          </div>
+          <div :class="colCss">Interest Rate</div>
           <div :class="colCss">
             <q-input
               outlined
@@ -68,9 +65,7 @@
           </div>
         </div>
         <div :class="rowCss">
-          <div :class="colCss">
-            Tenure (Months) <span class="text-red">*</span>
-          </div>
+          <div :class="colCss">Tenure (Months)</div>
           <div :class="colCss">
             <q-input
               outlined
@@ -112,7 +107,6 @@
             {{
               loanType === 'bl' ? 'Margin % ' : ' Net Salary Eligle for EMI % '
             }}
-            <span class="text-red">*</span>
           </div>
           <div :class="colCss">
             <q-input
