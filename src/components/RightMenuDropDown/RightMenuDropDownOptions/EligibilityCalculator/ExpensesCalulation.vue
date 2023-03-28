@@ -58,21 +58,60 @@
       :key="expense.label"
     >
       <div class="col-auto q-gutter-x-sm">
-        <q-btn icon="edit" color="purple" size="xs" padding="sm">
-          <q-tooltip>Edit</q-tooltip>
+        <q-btn
+          outline
+          :icon="expense.label !== editingExpenseLabel ? 'edit' : 'check'"
+          :color="expense.label !== editingExpenseLabel ? 'purple' : 'green'"
+          size="xs"
+          padding="sm"
+          @click="
+            () => {
+              if (expense.label !== editingExpenseLabel) {
+                editExpense(expense);
+              } else {
+                saveEditedExpense();
+              }
+            }
+          "
+        >
+          <q-tooltip>
+            {{ expense.label !== editingExpenseLabel ? 'Edit' : 'Save' }}
+          </q-tooltip>
         </q-btn>
         <q-btn
-          icon="delete"
+          outline
+          :icon="expense.label !== editingExpenseLabel ? 'delete' : 'close'"
           color="red"
           size="xs"
           padding="sm"
-          @click="() => deleteExpense(expense.label)"
+          @click="
+            () => {
+              if (expense.label !== editingExpenseLabel) {
+                deleteExpense(expense.label);
+              } else {
+                editingExpenseLabel = null;
+                editingExpenseAmount = null;
+              }
+            }
+          "
         >
-          <q-tooltip>Delete</q-tooltip>
+          <q-tooltip>
+            {{ expense.label !== editingExpenseLabel ? 'Delete' : 'Cancel' }}
+          </q-tooltip>
         </q-btn>
       </div>
-      <div class="col">{{ expense.label }}</div>
-      <div class="col">{{ expense.amount }}</div>
+      <div class="col">
+        <template v-if="editingExpenseLabel !== expense.label">
+          {{ expense.label }}
+        </template>
+        <template v-else> editing </template>
+      </div>
+      <div class="col">
+        <template v-if="editingExpenseLabel !== expense.label">
+          {{ expense.amount }}
+        </template>
+        <template v-else> editing </template>
+      </div>
     </div>
   </div>
 </template>
@@ -88,6 +127,9 @@ const selectedExpense = ref<string | null>(null);
 const expenseAmount = ref<number | null>(null);
 const expenseOptions = ref<string[]>([]);
 const expenses = ref<{ label: string; amount: number }[]>([]);
+
+const editingExpenseLabel = ref<string | null>(null);
+const editingExpenseAmount = ref<number | null>(null);
 
 const filteredExpenseOptions = computed(() => {
   if (!expenseOptions.value.length) {
@@ -126,6 +168,26 @@ const clearExpense = () => {
 
 const deleteExpense = (id: string) => {
   expenses.value = expenses.value.filter((expense) => expense.label !== id);
+};
+
+const editExpense = (expese: { label: string; amount: number }) => {
+  editingExpenseLabel.value = expese.label;
+  editingExpenseAmount.value = expese.amount;
+};
+
+const saveEditedExpense = () => {
+  expenses.value = expenses.value.map((expense) => {
+    if (expense.label !== editingExpenseLabel.value) {
+      return expense;
+    }
+
+    return {
+      label: editingExpenseLabel.value!,
+      amount: editingExpenseAmount.value!,
+    };
+  });
+  editingExpenseLabel.value = null;
+  editingExpenseAmount.value = null;
 };
 
 onMounted(async () => {
