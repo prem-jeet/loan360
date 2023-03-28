@@ -184,13 +184,13 @@
               outlined
               type="number"
               dense
-              v-model.number="modalObj.ltvCostValue"
+              v-model.number="ltvCostValue"
               input-class="text-right remove-input-number-indicator"
             />
           </div>
         </div>
         <div v-if="loanType === 'bl'" :class="rowCss">
-          <div :class="colCss">"LTV %</div>
+          <div :class="colCss">LTV %</div>
           <div :class="colCss">
             <q-input
               outlined
@@ -236,19 +236,17 @@
 </template>
 <script setup lang="ts">
 import ExpensesCalulation from './ExpensesCalulation.vue';
-import { EligibilityObject } from './type';
 import { ref, reactive, computed, watch } from 'vue';
 
+const colCss = 'col-12 col-md-6';
+const rowCss = 'row q-mt-sm items-center';
+
 const loanType = ref('bl');
-const colCss = 'col-xs-12 col-sm-12 col-md-6';
-const rowCss = 'row q-col-gutter-xs q-pt-sm';
 
-const modalObj = reactive<EligibilityObject>({
-  ltvCostValue: null,
-});
-
-const tenure = ref<number | null>(null);
 const monthlyRevenue = ref<number | null>(null);
+const tenure = ref<number | null>(null);
+const ltvCostValue = ref<number | null>(null);
+const expensTotal = ref(0);
 
 const installmentValues = reactive<{
   instalments: number | null;
@@ -267,8 +265,6 @@ const percetageValues = reactive<{
   rate: null,
   ltv: null,
 });
-
-const expensTotal = ref(0);
 
 const marginAmount = computed(() => {
   const { margin } = percetageValues;
@@ -300,10 +296,9 @@ const loanAmount = computed(() => {
 });
 
 const ltvLoanAmount = computed(() => {
-  const { ltvCostValue } = modalObj;
   const { ltv: ltvPercent } = percetageValues;
-  if (ltvCostValue && ltvPercent) {
-    const ltvLoanAmount = Math.round((ltvCostValue * ltvPercent) / 100);
+  if (ltvCostValue.value && ltvPercent) {
+    const ltvLoanAmount = Math.round((ltvCostValue.value * ltvPercent) / 100);
     return Math.round(ltvLoanAmount / 1000) * 1000;
   }
   return null;
@@ -335,11 +330,10 @@ const limitPercetageInput = (key: string, percentValue: number) => {
 };
 
 const reset = () => {
-  modalObj.ltvCostValue = null;
-
   monthlyRevenue.value = null;
-
   tenure.value = null;
+  ltvCostValue.value = null;
+
   installmentValues.instalments = null;
   installmentValues.advInstalments = null;
 
@@ -352,13 +346,6 @@ const updateTotalExpense = (val: number) => {
   expensTotal.value = val;
 };
 
-watch(monthlyRevenue, (newVal, oldVal) => {
-  if (oldVal === null) {
-    tenure.value = 0;
-    percetageValues.rate = 0;
-  }
-});
-
 const setTenure = () => {
   if (tenure.value) {
     return;
@@ -367,7 +354,14 @@ const setTenure = () => {
   tenure.value = (advInstalments || 0) + (instalments || 0);
 };
 
-watch(modalObj, () => {
+watch(monthlyRevenue, (newVal, oldVal) => {
+  if (oldVal === null) {
+    tenure.value = 0;
+    percetageValues.rate = 0;
+  }
+});
+
+watch(tenure, () => {
   if (!tenure.value) {
     setTenure();
   }
