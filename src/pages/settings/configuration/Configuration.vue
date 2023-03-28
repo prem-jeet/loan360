@@ -49,6 +49,44 @@
                 </q-input>
               </div>
             </div>
+            <!-- pagination  < 800px -->
+            <div v-if="$q.screen.width < 830" class="col-12">
+              <div class="row items-center">
+                <div class="col-xs-4 col-sm-2 q-pt-sm">
+                  <q-btn
+                    color="white"
+                    size="sm"
+                    text-color="black"
+                    label="Goto Page"
+                    @click="goToPageNumber"
+                  />
+                </div>
+                <div class="col-xs-2 col-sm-1">
+                  <q-input
+                    v-model.number="pageNumber"
+                    type="number"
+                    dense
+                    style="max-width: 70px"
+                    :min="1"
+                    :max="Math.ceil(totalCount / pagination.rowsPerPage)"
+                  />
+                </div>
+
+                <div class="col-xs-1 col-sm-1 q-pt-sm text-center">
+                  /{{ Math.ceil(totalCount / pagination.rowsPerPage) }}
+                </div>
+                <div class="col-xs-1 col-sm-6"></div>
+                <div class="col-xs-4 col-sm-2 q-pr-sm">
+                  <q-select
+                    dense
+                    v-model="pagination.rowsPerPage"
+                    :options="[10, 20, 50, 100]"
+                    label="Rows per page"
+                    @update:model-value="upDataRowsPerPageInMobile"
+                  />
+                </div>
+              </div>
+            </div>
           </template>
 
           <template v-slot:header-cell="props">
@@ -399,6 +437,17 @@ const upDataRowsPerPage = async (val: { rowsPerPage: number }) => {
   fetchingData.value = true;
   const rsp = await api.get(
     'configItems/' + val.rowsPerPage + '/' + pageNumber.value
+  );
+
+  if (rsp.data) {
+    configurations.value = rsp.data.object;
+    fetchingData.value = false;
+  }
+};
+const upDataRowsPerPageInMobile = async () => {
+  fetchingData.value = true;
+  const rsp = await api.get(
+    'prefItems/' + pagination.value.rowsPerPage + '/' + pageNumber.value
   );
 
   if (rsp.data) {
