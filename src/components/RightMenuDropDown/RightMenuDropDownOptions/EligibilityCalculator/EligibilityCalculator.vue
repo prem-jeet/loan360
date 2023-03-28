@@ -140,7 +140,7 @@
           </div>
         </div>
 
-        <ExpensesCalulation @updateToatal="updateTotalExpense" />
+        <ExpensesCalulation @updateToatal="(total) => (totalExpense = total)" />
 
         <div :class="rowCss">
           <div :class="colCss">
@@ -246,7 +246,7 @@ const loanType = ref('bl');
 const monthlyRevenue = ref<number | null>(null);
 const tenure = ref<number | null>(null);
 const ltvCostValue = ref<number | null>(null);
-const expensTotal = ref(0);
+const totalExpense = ref(0);
 
 const installmentValues = reactive<{
   instalments: number | null;
@@ -278,7 +278,7 @@ const marginAmount = computed(() => {
 
 const netAvailableIncome = computed(() => {
   if (marginAmount.value) {
-    return marginAmount.value - (expensTotal.value || 0);
+    return marginAmount.value - (totalExpense.value || 0);
   }
   return null;
 });
@@ -329,6 +329,14 @@ const limitPercetageInput = (key: string, percentValue: number) => {
   percetageValues[key as keyof typeof percetageValues] = newValue;
 };
 
+const setTenure = () => {
+  if (tenure.value) {
+    return;
+  }
+  const { advInstalments, instalments } = installmentValues;
+  tenure.value = (advInstalments || 0) + (instalments || 0);
+};
+
 const reset = () => {
   monthlyRevenue.value = null;
   tenure.value = null;
@@ -340,18 +348,6 @@ const reset = () => {
   percetageValues.rate = null;
   percetageValues.margin = null;
   percetageValues.ltv = null;
-};
-
-const updateTotalExpense = (val: number) => {
-  expensTotal.value = val;
-};
-
-const setTenure = () => {
-  if (tenure.value) {
-    return;
-  }
-  const { advInstalments, instalments } = installmentValues;
-  tenure.value = (advInstalments || 0) + (instalments || 0);
 };
 
 watch(monthlyRevenue, (newVal, oldVal) => {
