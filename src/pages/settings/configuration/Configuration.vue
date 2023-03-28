@@ -21,7 +21,6 @@
           v-model:pagination="pagination"
           @update:pagination="(v) => upDataRowsPerPage(v)"
           :rows-per-page-options="[10, 20, 50, 100]"
-          :hide-bottom="$q.screen.width < 830"
         >
           <template v-slot:loading>
             <q-inner-loading showing color="primary" />
@@ -51,37 +50,32 @@
             </div>
             <!-- pagination  < 800px -->
             <div v-if="$q.screen.width < 830" class="col-12">
-              <div class="row items-center">
-                <div class="col-xs-8 col-sm-10 q-pt-sm">
-                  <q-card-section class="flex items-center q-pa-none">
-                    <q-btn
-                      color="white"
-                      size="sm"
-                      text-color="black"
-                      label="Goto Page"
-                      @click="goToPageNumber"
-                    />
-                    <q-input
-                      v-model.number="pageNumber"
-                      type="number"
-                      dense
-                      :style="{ width: '50px' }"
-                      :min="1"
-                      :max="Math.ceil(totalCount / pagination.rowsPerPage)"
-                      class="q-pa-sm"
-                    />
-                    /{{ Math.ceil(totalCount / pagination.rowsPerPage) }}
-                  </q-card-section>
-                </div>
-
-                <div class="col-xs-4 col-sm-2 q-pr-sm">
-                  <q-select
+              <div class="row">
+                <div
+                  class="col-auto q-pr-sm bg-grey-1"
+                  :style="{ borderRadius: '1rem', overflow: 'hidden' }"
+                >
+                  <q-input
+                    v-model.number="pageNumber"
+                    type="number"
+                    borderless
                     dense
-                    v-model="pagination.rowsPerPage"
-                    :options="[10, 20, 50, 100]"
-                    label="Rows per page"
-                    @update:model-value="upDataRowsPerPageInMobile"
-                  />
+                    :suffix="
+                      '/' +
+                      String(Math.ceil(totalCount / pagination.rowsPerPage))
+                    "
+                    :input-style="{ color: 'red', width: '30px' }"
+                  >
+                    <template v-slot:before>
+                      <q-btn
+                        flat
+                        class="bg-grey-4 q-mr-sm"
+                        no-caps
+                        label="Goto Page"
+                        @click="goToPageNumber"
+                      />
+                    </template>
+                  </q-input>
                 </div>
               </div>
             </div>
@@ -216,76 +210,73 @@
           <!-- pagination  > 800px -->
 
           <template v-slot:pagination="scope">
-            <div class="row q-mr-sm q-pt-xs">
-              <div class="col-auto q-mt-sm q-pt-xs">
-                <q-btn
-                  color="white"
-                  size="sm"
-                  text-color="black"
-                  label="Goto Page"
-                  @click="goToPageNumber"
-                />
-              </div>
-              <div class="col-auto q-ml-md">
-                <q-input
-                  v-model.number="pageNumber"
-                  type="number"
-                  dense
-                  style="max-width: 70px"
-                  :min="1"
-                  :max="Math.ceil(totalCount / pagination.rowsPerPage)"
-                />
-              </div>
-              <div class="col-auto q-mt-xs q-ml-sm q-pt-xs">
-                <p class="text-subtitle1 text-weight-regular">
-                  /{{ Math.ceil(totalCount / pagination.rowsPerPage) }}
-                </p>
-              </div>
+            <div
+              v-if="$q.screen.width > 830"
+              class="q-pr-sm bg-grey-1"
+              :style="{ borderRadius: '1rem', overflow: 'hidden' }"
+            >
+              <q-input
+                v-model.number="pageNumber"
+                type="number"
+                borderless
+                dense
+                :suffix="
+                  '/' + String(Math.ceil(totalCount / pagination.rowsPerPage))
+                "
+                :input-style="{ color: 'red', width: '30px' }"
+              >
+                <template v-slot:before>
+                  <q-btn
+                    flat
+                    class="bg-grey-4 q-mr-sm"
+                    no-caps
+                    label="Goto Page"
+                    @click="goToPageNumber"
+                  />
+                </template>
+              </q-input>
             </div>
+            <div v-if="$q.screen.width > 830" class="q-ml-sm">
+              <q-btn
+                icon="first_page"
+                color="grey-8"
+                round
+                dense
+                flat
+                :disable="scope.pagination.page === pageNumber"
+                @click="firstPage"
+              />
 
-            <q-btn
-              icon="first_page"
-              color="grey-8"
-              round
-              dense
-              flat
-              :disable="scope.pagination.page === pageNumber"
-              @click="firstPage"
-              class="q-mb-xs"
-            />
+              <q-btn
+                icon="chevron_left"
+                color="grey-8"
+                round
+                dense
+                flat
+                :disable="scope.pagination.page === pageNumber"
+                @click="prevPage"
+              />
 
-            <q-btn
-              icon="chevron_left"
-              color="grey-8"
-              round
-              dense
-              flat
-              :disable="scope.pagination.page === pageNumber"
-              @click="prevPage"
-              class="q-mb-xs"
-            />
+              <q-btn
+                icon="chevron_right"
+                color="grey-8"
+                round
+                dense
+                flat
+                :disable="lastPageNumber === pageNumber"
+                @click="nextPage"
+              />
 
-            <q-btn
-              icon="chevron_right"
-              color="grey-8"
-              round
-              dense
-              flat
-              :disable="lastPageNumber === pageNumber"
-              @click="nextPage"
-              class="q-mb-xs"
-            />
-
-            <q-btn
-              icon="last_page"
-              color="grey-8"
-              round
-              dense
-              flat
-              :disable="lastPageNumber === pageNumber"
-              @click="lastPage"
-              class="q-mb-xs"
-            />
+              <q-btn
+                icon="last_page"
+                color="grey-8"
+                round
+                dense
+                flat
+                :disable="lastPageNumber === pageNumber"
+                @click="lastPage"
+              />
+            </div>
           </template>
         </q-table>
       </div>
@@ -435,17 +426,6 @@ const upDataRowsPerPage = async (val: { rowsPerPage: number }) => {
   fetchingData.value = true;
   const rsp = await api.get(
     'configItems/' + val.rowsPerPage + '/' + pageNumber.value
-  );
-
-  if (rsp.data) {
-    configurations.value = rsp.data.object;
-    fetchingData.value = false;
-  }
-};
-const upDataRowsPerPageInMobile = async () => {
-  fetchingData.value = true;
-  const rsp = await api.get(
-    'prefItems/' + pagination.value.rowsPerPage + '/' + pageNumber.value
   );
 
   if (rsp.data) {
