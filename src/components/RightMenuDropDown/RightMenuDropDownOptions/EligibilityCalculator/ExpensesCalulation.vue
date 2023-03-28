@@ -79,7 +79,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-import { onMounted, computed } from 'vue';
+import { watch, onMounted, computed } from 'vue';
 import { api } from 'src/boot/axios';
 
 const emits = defineEmits(['totalExpense']);
@@ -134,6 +134,15 @@ onMounted(async () => {
   if (rsp.data) {
     expenseOptions.value = rsp.data.map((item: { name: string }) => item.name);
   }
+});
+
+watch(totalExpense, () => {
+  let total = 0;
+  if (expenses.value.length) {
+    total = totalExpense.value;
+  }
+
+  emits('totalExpense', total);
 });
 </script>
 <style scoped></style>
