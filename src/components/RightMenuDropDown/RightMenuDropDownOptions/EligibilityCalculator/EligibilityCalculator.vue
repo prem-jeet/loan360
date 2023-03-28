@@ -140,7 +140,7 @@
           </div>
         </div>
 
-        <ExpensesCalulation @updateToatal="(total) => (totalExpense = total)" />
+        <ExpensesCalulation @totalExpense="(total) => (totalExpense = total)" />
 
         <div :class="rowCss">
           <div :class="colCss">

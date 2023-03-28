@@ -250,9 +250,9 @@ const refresh = () => {
   (expensesSelected.value = ''), (expensesAmount.value = '');
 };
 
-const emits = defineEmits(['updateToatal']);
+const emits = defineEmits(['totalExpense']);
 const calculateAmount = () => {
-  emits('updateToatal', expensTotal.value);
+  emits('totalExpense', expensTotal.value);
 };
 </script>
 <style scoped>
