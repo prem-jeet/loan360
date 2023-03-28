@@ -72,8 +72,8 @@
               type="number"
               dense
               hide-bottom-space
-              v-model.number="modalObj.tenure"
-              :error="modalObj.tenure === null"
+              v-model.number="tenure"
+              :error="tenure === null"
               input-class="text-right remove-input-number-indicator"
             />
           </div>
@@ -85,8 +85,9 @@
               outlined
               dense
               type="number"
-              v-model.number="modalObj.instalments"
+              v-model.number="installmentValues.instalments"
               input-class="text-right remove-input-number-indicator"
+              @blur="setTenure"
             />
           </div>
         </div>
@@ -97,7 +98,8 @@
               outlined
               type="number"
               dense
-              v-model.number="modalObj.advInstalments"
+              v-model.number="installmentValues.advInstalments"
+              @blur="setTenure"
               input-class="text-right remove-input-number-indicator"
             />
           </div>
@@ -242,13 +244,19 @@ const colCss = 'col-xs-12 col-sm-12 col-md-6';
 const rowCss = 'row q-col-gutter-xs q-pt-sm';
 
 const modalObj = reactive<EligibilityObject>({
-  instalments: null,
-  advInstalments: null,
-  tenure: null,
   ltvCostValue: null,
 });
 
+const tenure = ref<number | null>(null);
 const monthlyRevenue = ref<number | null>(null);
+
+const installmentValues = reactive<{
+  instalments: number | null;
+  advInstalments: number | null;
+}>({
+  instalments: null,
+  advInstalments: null,
+});
 
 const percetageValues = reactive<{
   margin: number | null;
@@ -280,12 +288,12 @@ const netAvailableIncome = computed(() => {
 });
 
 const loanAmount = computed(() => {
-  const { tenure } = modalObj;
   const { rate } = percetageValues;
 
-  if (netAvailableIncome.value && tenure !== null && rate !== null) {
+  if (netAvailableIncome.value && tenure.value !== null && rate !== null) {
     return Math.round(
-      (netAvailableIncome.value * tenure) / (1 + (rate / 100) * (tenure / 12))
+      (netAvailableIncome.value * tenure.value) /
+        (1 + (rate / 100) * (tenure.value / 12))
     );
   }
   return null;
@@ -327,11 +335,13 @@ const limitPercetageInput = (key: string, percentValue: number) => {
 };
 
 const reset = () => {
-  monthlyRevenue.value = null;
-  modalObj.tenure = null;
-  modalObj.instalments = null;
-  modalObj.advInstalments = null;
   modalObj.ltvCostValue = null;
+
+  monthlyRevenue.value = null;
+
+  tenure.value = null;
+  installmentValues.instalments = null;
+  installmentValues.advInstalments = null;
 
   percetageValues.rate = null;
   percetageValues.margin = null;
@@ -344,8 +354,22 @@ const updateTotalExpense = (val: number) => {
 
 watch(monthlyRevenue, (newVal, oldVal) => {
   if (oldVal === null) {
-    modalObj.tenure = 0;
+    tenure.value = 0;
     percetageValues.rate = 0;
+  }
+});
+
+const setTenure = () => {
+  if (tenure.value) {
+    return;
+  }
+  const { advInstalments, instalments } = installmentValues;
+  tenure.value = (advInstalments || 0) + (instalments || 0);
+};
+
+watch(modalObj, () => {
+  if (!tenure.value) {
+    setTenure();
   }
 });
 </script>
