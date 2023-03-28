@@ -52,30 +52,28 @@
             <!-- pagination  < 800px -->
             <div v-if="$q.screen.width < 830" class="col-12">
               <div class="row items-center">
-                <div class="col-xs-4 col-sm-2 q-pt-sm">
-                  <q-btn
-                    color="white"
-                    size="sm"
-                    text-color="black"
-                    label="Goto Page"
-                    @click="goToPageNumber"
-                  />
-                </div>
-                <div class="col-xs-2 col-sm-1">
-                  <q-input
-                    v-model.number="pageNumber"
-                    type="number"
-                    dense
-                    style="max-width: 70px"
-                    :min="1"
-                    :max="Math.ceil(totalCount / pagination.rowsPerPage)"
-                  />
+                <div class="col-xs-8 col-sm-10 q-pt-sm">
+                  <q-card-section class="flex items-center q-pa-none">
+                    <q-btn
+                      color="white"
+                      size="sm"
+                      text-color="black"
+                      label="Goto Page"
+                      @click="goToPageNumber"
+                    />
+                    <q-input
+                      v-model.number="pageNumber"
+                      type="number"
+                      dense
+                      :style="{ width: '50px' }"
+                      :min="1"
+                      :max="Math.ceil(totalCount / pagination.rowsPerPage)"
+                      class="q-pa-sm"
+                    />
+                    /{{ Math.ceil(totalCount / pagination.rowsPerPage) }}
+                  </q-card-section>
                 </div>
 
-                <div class="col-xs-1 col-sm-1 q-pt-sm text-center">
-                  /{{ Math.ceil(totalCount / pagination.rowsPerPage) }}
-                </div>
-                <div class="col-xs-1 col-sm-6"></div>
                 <div class="col-xs-4 col-sm-2 q-pr-sm">
                   <q-select
                     dense
