@@ -48,8 +48,27 @@
       </q-btn>
     </div>
 
-    <div v-for="expense in expenses" :key="expense.label">
-      {{ expense.label }}
+    <div
+      class="row q-px-lg items-center q-gutter-x-md q-mt-sm"
+      v-for="expense in expenses"
+      :key="expense.label"
+    >
+      <div class="col-auto q-gutter-x-sm">
+        <q-btn icon="edit" color="purple" size="xs" padding="sm">
+          <q-tooltip>Edit</q-tooltip>
+        </q-btn>
+        <q-btn
+          icon="delete"
+          color="red"
+          size="xs"
+          padding="sm"
+          @click="() => deleteExpense(expense.label)"
+        >
+          <q-tooltip>Delete</q-tooltip>
+        </q-btn>
+      </div>
+      <div class="col">{{ expense.label }}</div>
+      <div class="col">{{ expense.amount }}</div>
     </div>
   </div>
 </template>
@@ -91,6 +110,10 @@ const addExpense = () => {
 const clearExpense = () => {
   selectedExpense.value = null;
   expenseAmount.value = null;
+};
+
+const deleteExpense = (id: string) => {
+  expenses.value = expenses.value.filter((expense) => expense.label !== id);
 };
 
 onMounted(async () => {
