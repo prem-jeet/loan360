@@ -21,8 +21,9 @@
           class="col-auto"
           color="red"
           @click="reset"
-          icon="fa-solid fa-rotate-left"
+          icon="refresh"
           size="xs"
+          padding="sm"
         >
           <q-tooltip>Reset</q-tooltip>
         </q-btn>

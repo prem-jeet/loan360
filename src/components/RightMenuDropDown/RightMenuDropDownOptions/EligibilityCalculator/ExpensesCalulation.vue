@@ -1,145 +1,152 @@
 <template>
-  <div class="row q-col-gutter-xs q-pb-sm q-pt-sm">
-    <div :class="colcss">Expense</div>
-  </div>
+  <div class="q-mt-sm q-mb-md">
+    <p>Expense</p>
 
-  <div class="row q-col-gutter-xs q-pb-xs">
-    <div :class="colcss">
-      <q-select
-        outlined
-        dense
-        ref="inputRef"
-        :error="error && !expensesSelected"
-        error-message=""
-        v-model="expensesSelected"
-        :options="expenses"
-        label="Expenses"
-      />
+    <div class="row q-mt-sm justify-between q-px-lg">
+      <div class="col-5">
+        <q-select
+          outlined
+          dense
+          :error="error && !expensesSelected"
+          error-message=""
+          v-model="expensesSelected"
+          :options="expenseOptions"
+          label="Expenses"
+        />
+      </div>
+      <div class="col-6">
+        <q-input
+          outlined
+          dense
+          v-model="expensesAmount"
+          type="number"
+          :error="error && !expensesAmount"
+          error-message=""
+          input-class="text-right remove-input-number-indicator"
+        />
+      </div>
     </div>
-    <div class="col-xs-12 col-sm-12 col-md-6">
-      <q-input
-        outlined
-        dense
-        v-model="expensesAmount"
-        type="number"
-        ref="inputRef"
-        :error="error && !expensesAmount"
-        error-message=""
-        input-class="text-right remove-input-number-indicator"
-      />
-    </div>
-  </div>
 
-  <div class="row q-col-gutter-xs q-pt-sm justify-end q-pr-md-lg q-pr-xs-none">
-    <q-btn
-      size="sm"
-      class="q-pl-md q-mr-sm"
-      color="light-blue"
-      @click="add()"
-      icon="fa-solid fa-plus"
-    >
-      <q-tooltip> Add Expenses</q-tooltip>
-    </q-btn>
-    <q-btn
-      size="sm"
-      class="q-pl-md"
-      color="light-blue"
-      @click="refresh()"
-      icon="fa-solid fa-arrow-rotate-left"
-      ><q-tooltip>Clear</q-tooltip>
-    </q-btn>
-  </div>
-
-  <div
-    class="row q-mx-lg-lg q-col-gutter-sm q-pt-xs-md q-pt-sm-xs q-pt-md-xs"
-    v-for="(item, index) in data.ExpensesArray"
-    :key="index"
-  >
-    <div v-if="editIndex !== index" class="col-4 col-md-4">
-      {{ item.field }}
-    </div>
-    <div v-else class="col-xs-12 col-sm-12 col-md-5">
-      <q-select
-        outlined
-        dense
-        ref="inputRef"
-        :error="errormsg && !editExpensesSelected"
-        error-message=""
-        v-model="editExpensesSelected"
-        :options="expenses"
-      >
-      </q-select>
-    </div>
-    <div v-if="editIndex !== index" class="col-3 col-md-4 text-right">
-      {{ item.value }}
-    </div>
-    <div v-else class="col-xs-12 col-sm-12 col-md-4 text-right">
-      <q-input
-        :error="errormsg && !editExpensesAmount"
-        error-message=""
-        outlined
-        dense
-        type="number"
-        v-model="editExpensesAmount"
-        input-class="text-right remove-input-number-indicator"
-      ></q-input>
-    </div>
-    <div v-if="editIndex !== index" class="col-5 col-md-4 text-right">
+    <div class="flex q-mt-md q-px-lg">
       <q-btn
-        class="q-mr-sm"
         size="xs"
-        color="blue"
-        @click="edit(index)"
-        icon="fa-solid fa-pen-to-square"
+        class="q-ml-auto"
+        color="light-blue"
+        @click="add"
+        icon="add"
+        padding="sm"
       >
-        <q-tooltip> Edit </q-tooltip>
+        <q-tooltip> Add Expenses</q-tooltip>
       </q-btn>
       <q-btn
         size="xs"
+        class="q-ml-md"
         color="red"
-        @click="remove(index)"
-        icon="fa-solid fa-xmark"
-        ><q-tooltip> Delete</q-tooltip>
-      </q-btn>
-    </div>
-    <div v-else class="col-xs-12 col-sm-12 col-md-3 text-right">
-      <q-btn
-        size="xs"
-        color="blue"
-        @click="editSave()"
-        icon="fa-solid fa-check"
+        @click="refresh"
+        icon="refresh"
+        padding="sm"
       >
-        <q-tooltip> Save</q-tooltip>
-      </q-btn>
-      <q-btn
-        class="q-ml-sm"
-        size="xs"
-        color="red"
-        @click="Editremove(index)"
-        icon="fa-solid fa-xmark"
-        ><q-tooltip> Delete</q-tooltip>
+        <q-tooltip>Clear</q-tooltip>
       </q-btn>
     </div>
-  </div>
-  <div
-    v-if="data.ExpensesArray.length > 0"
-    class="row q-pt-md q-mx-lg-lg q-col-gutter-sm"
-  >
-    <div class="col-4 col-md-4 col-xs-4 col-sm-4 text-bold">Total Expenses</div>
+
     <div
-      class="col-4 col-md-4 col-xs-4 col-sm-3 text-right q-pr-xs-lg q-pr-sm-none q-pr-md-none"
+      class="row q-mx-lg-lg q-col-gutter-sm q-pt-xs-md q-pt-sm-xs q-pt-md-xs"
+      v-for="(item, index) in data.ExpensesArray"
+      :key="index"
     >
-      {{ expensTotal }}
+      <div v-if="editIndex !== index" class="col-4 col-md-4">
+        {{ item.field }}
+      </div>
+      <div v-else class="col-xs-12 col-sm-12 col-md-5">
+        <q-select
+          outlined
+          dense
+          ref="inputRef"
+          :error="errormsg && !editExpensesSelected"
+          error-message=""
+          v-model="editExpensesSelected"
+          :options="expenseOptions"
+        >
+        </q-select>
+      </div>
+      <div v-if="editIndex !== index" class="col-3 col-md-4 text-right">
+        {{ item.value }}
+      </div>
+      <div v-else class="col-xs-12 col-sm-12 col-md-4 text-right">
+        <q-input
+          :error="errormsg && !editExpensesAmount"
+          error-message=""
+          outlined
+          dense
+          type="number"
+          v-model="editExpensesAmount"
+          input-class="text-right remove-input-number-indicator"
+        ></q-input>
+      </div>
+      <div v-if="editIndex !== index" class="col-5 col-md-4 text-right">
+        <q-btn
+          class="q-mr-sm"
+          size="xs"
+          color="blue"
+          @click="edit(index)"
+          icon="fa-solid fa-pen-to-square"
+        >
+          <q-tooltip> Edit </q-tooltip>
+        </q-btn>
+        <q-btn
+          size="xs"
+          color="red"
+          @click="remove(index)"
+          icon="fa-solid fa-xmark"
+          ><q-tooltip> Delete</q-tooltip>
+        </q-btn>
+      </div>
+      <div v-else class="col-xs-12 col-sm-12 col-md-3 text-right">
+        <q-btn
+          size="xs"
+          color="blue"
+          @click="editSave()"
+          icon="fa-solid fa-check"
+        >
+          <q-tooltip> Save</q-tooltip>
+        </q-btn>
+        <q-btn
+          class="q-ml-sm"
+          size="xs"
+          color="red"
+          @click="Editremove(index)"
+          icon="fa-solid fa-xmark"
+          ><q-tooltip> Delete</q-tooltip>
+        </q-btn>
+      </div>
     </div>
-    <div class="col-4 col-md-4 col-xs-4 col-sm-5"></div>
+    <div
+      v-if="data.ExpensesArray.length > 0"
+      class="row q-pt-md q-mx-lg-lg q-col-gutter-sm"
+    >
+      <div class="col-4 col-md-4 col-xs-4 col-sm-4 text-bold">
+        Total Expenses
+      </div>
+      <div
+        class="col-4 col-md-4 col-xs-4 col-sm-3 text-right q-pr-xs-lg q-pr-sm-none q-pr-md-none"
+      >
+        {{ expensTotal }}
+      </div>
+      <div class="col-4 col-md-4 col-xs-4 col-sm-5"></div>
+    </div>
   </div>
 </template>
 <script setup lang="ts">
 import { ref, reactive } from 'vue';
 import { ExpensesData } from './type';
+import { onMounted } from 'vue';
+import { api } from 'src/boot/axios';
+
+const emits = defineEmits(['totalExpense']);
 
 const error = ref(false);
-const colcss = 'col-xs-12 col-sm-12 col-md-6';
+
 const expensesSelected = ref('');
 const expensesAmount = ref('');
 const editExpensesSelected = ref('');
@@ -149,18 +156,7 @@ const editIndex = ref();
 const editCondition = ref(true);
 const errormsg = ref(false);
 const expensTotal = ref(0);
-const expenses = ref([
-  'Existing EMI',
-  'House Hold Expenses',
-  'Labour Expenses',
-  'Other',
-  'Purchase Expenses',
-  'Rent',
-  'Salary Expenses',
-  'Third Party',
-  'Transpotation',
-  'Utility Bills',
-]);
+const expenseOptions = ref<{ value: string; label: string }[]>([]);
 
 const data = reactive<ExpensesData>({
   ExpensesArray: [],
@@ -250,10 +246,17 @@ const refresh = () => {
   (expensesSelected.value = ''), (expensesAmount.value = '');
 };
 
-const emits = defineEmits(['totalExpense']);
 const calculateAmount = () => {
   emits('totalExpense', expensTotal.value);
 };
+
+onMounted(async () => {
+  const rsp = await api.get('expenses');
+
+  if (rsp.data) {
+    expenseOptions.value = rsp.data.map((item: { name: string }) => item.name);
+  }
+});
 </script>
 <style scoped>
 .q-field--with-bottom {
