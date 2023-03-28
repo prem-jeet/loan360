@@ -60,10 +60,10 @@
               type="number"
               dense
               hide-bottom-space
-              v-model.number="modalObj.rate"
+              v-model.number="percetageValues.rate"
               :rules="[(val: any) => !!val || '']"
               input-class="text-right remove-input-number-indicator"
-              @update:model-value="(v) => test('rate', v as number)"
+              @update:model-value="(v) => limitPercetageInput('rate', v as number)"
             />
           </div>
         </div>
@@ -120,10 +120,10 @@
               dense
               type="number"
               hide-bottom-space
-              v-model.number="modalObj.marginPercent"
+              v-model.number="percetageValues.margin"
               :rules="[(val: any) => !!val || '']"
               input-class="text-right remove-input-number-indicator"
-              @update:model-value="(v) => test('marginPercent', v as number)"
+              @update:model-value="(v) => limitPercetageInput('margin', v as number)"
             />
           </div>
         </div>
@@ -200,9 +200,9 @@
               outlined
               dense
               type="number"
-              v-model.number="modalObj.ltvPercent"
+              v-model.number="percetageValues.ltv"
               input-class="text-right remove-input-number-indicator"
-              @update:model-value="(v) => test('ltvPercent', v as number)"
+              @update:model-value="(v) => limitPercetageInput('ltv', v as number)"
             />
           </div>
         </div>
@@ -251,23 +251,26 @@ const modalObj = reactive<EligibilityObject>({
   instalments: null,
   advInstalments: null,
   monthlyRevenue: null,
-  marginPercent: null,
-  netAvailableIncome: null,
   tenure: null,
-  rate: null,
-  calculatedLoanAmount: null,
   ltvCostValue: null,
-  ltvPercent: null,
-  ltvLoanAmount: null,
-  marginAmount: null,
-  maxLoanAmount: null,
+});
+
+const percetageValues = reactive<{
+  margin: number | null;
+  rate: number | null;
+  ltv: number | null;
+}>({
+  margin: null,
+  rate: null,
+  ltv: null,
 });
 
 const marginAmount = computed(() => {
-  const { monthlyRevenue, marginPercent } = modalObj;
+  const { monthlyRevenue } = modalObj;
+  const { margin } = percetageValues;
 
-  if (monthlyRevenue && marginPercent) {
-    return +(monthlyRevenue * (marginPercent / 100)).toFixed(2);
+  if (monthlyRevenue && margin) {
+    return +(monthlyRevenue * (margin / 100)).toFixed(2);
   }
 
   return null;
@@ -281,12 +284,12 @@ const netAvailableIncome = computed(() => {
 });
 
 const loanAmount = computed(() => {
-  const { rate, tenure } = modalObj;
+  const { tenure } = modalObj;
+  const { rate } = percetageValues;
 
-  if (netAvailableIncome.value && tenure) {
+  if (netAvailableIncome.value && tenure && rate) {
     const result = Math.round(
-      (netAvailableIncome.value * tenure) /
-        (1 + ((rate || 0) * tenure) / (12 * 100))
+      (netAvailableIncome.value * tenure) / (1 + (rate * tenure) / (12 * 100))
     );
     return result * 1000;
   }
@@ -294,7 +297,8 @@ const loanAmount = computed(() => {
 });
 
 const ltvLoanAmount = computed(() => {
-  const { ltvCostValue, ltvPercent } = modalObj;
+  const { ltvCostValue } = modalObj;
+  const { ltv: ltvPercent } = percetageValues;
   if (ltvCostValue && ltvPercent) {
     const ltvLoanAmount = Math.round((ltvCostValue * ltvPercent) / 100);
     return Math.round(ltvLoanAmount / 1000) * 1000;
@@ -322,24 +326,22 @@ const maxLoanAmount = computed(() => {
   ).toFixed(2);
 });
 const expensTotal = ref(0);
-const test = (key: string, value: number) => {
-  if (value > 100) modalObj[key as keyof EligibilityObject] = 100;
+
+const limitPercetageInput = (key: string, percentValue: number) => {
+  const newValue = Math.min(100, Math.max(1, percentValue));
+  percetageValues[key as keyof typeof percetageValues] = newValue;
 };
 
 const reset = () => {
   modalObj.monthlyRevenue = null;
-  modalObj.rate = null;
   modalObj.tenure = null;
   modalObj.instalments = null;
   modalObj.advInstalments = null;
-  modalObj.marginPercent = null;
-  modalObj.netAvailableIncome = null;
-  modalObj.marginAmount = null;
-  modalObj.calculatedLoanAmount = null;
   modalObj.ltvCostValue = null;
-  modalObj.ltvPercent = null;
-  modalObj.ltvLoanAmount = null;
-  modalObj.maxLoanAmount = null;
+
+  percetageValues.rate = null;
+  percetageValues.margin = null;
+  percetageValues.ltv = null;
 };
 
 const updateTotalExpense = (val: number) => {
