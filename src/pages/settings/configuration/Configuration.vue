@@ -176,10 +176,36 @@
             </div>
           </template>
 
-          <!-- pagination -->
+          <!-- pagination  > 800px -->
 
           <template v-slot:pagination="scope">
-            <p class="q-px-md q-mt-md">Page no : {{ pageNumber }}</p>
+            <div class="row q-mr-sm q-pt-xs">
+              <div class="col-auto q-mt-sm q-pt-xs">
+                <q-btn
+                  color="white"
+                  size="sm"
+                  text-color="black"
+                  label="Goto Page"
+                  @click="goToPageNumber"
+                />
+              </div>
+              <div class="col-auto q-ml-md">
+                <q-input
+                  v-model.number="pageNumber"
+                  type="number"
+                  dense
+                  style="max-width: 70px"
+                  :min="1"
+                  :max="Math.ceil(totalCount / pagination.rowsPerPage)"
+                />
+              </div>
+              <div class="col-auto q-mt-xs q-ml-sm q-pt-xs">
+                <p class="text-subtitle1 text-weight-regular">
+                  /{{ Math.ceil(totalCount / pagination.rowsPerPage) }}
+                </p>
+              </div>
+            </div>
+
             <q-btn
               icon="first_page"
               color="grey-8"
@@ -188,6 +214,7 @@
               flat
               :disable="scope.pagination.page === pageNumber"
               @click="firstPage"
+              class="q-mb-xs"
             />
 
             <q-btn
@@ -198,6 +225,7 @@
               flat
               :disable="scope.pagination.page === pageNumber"
               @click="prevPage"
+              class="q-mb-xs"
             />
 
             <q-btn
@@ -208,6 +236,7 @@
               flat
               :disable="lastPageNumber === pageNumber"
               @click="nextPage"
+              class="q-mb-xs"
             />
 
             <q-btn
@@ -218,6 +247,7 @@
               flat
               :disable="lastPageNumber === pageNumber"
               @click="lastPage"
+              class="q-mb-xs"
             />
           </template>
         </q-table>
@@ -352,7 +382,18 @@ onMounted(async () => {
   }
   fetchingData.value = false;
 });
-
+watch(pageNumber, () => {
+  if (pageNumber.value < 1) {
+    pageNumber.value = 1;
+  } else if (
+    pageNumber.value >
+    Math.ceil(totalCount.value / pagination.value.rowsPerPage)
+  ) {
+    pageNumber.value = Math.ceil(
+      totalCount.value / pagination.value.rowsPerPage
+    );
+  }
+});
 const upDataRowsPerPage = async (val: { rowsPerPage: number }) => {
   fetchingData.value = true;
   const rsp = await api.get(
@@ -363,6 +404,20 @@ const upDataRowsPerPage = async (val: { rowsPerPage: number }) => {
     configurations.value = rsp.data.object;
     fetchingData.value = false;
   }
+};
+
+const goToPageNumber = async () => {
+  fetchingData.value = true;
+  console.log(pageNumber.value, pagination.value.rowsPerPage);
+
+  const rsp = await api.get(
+    'configItems/' + pagination.value.rowsPerPage + '/' + pageNumber.value
+  );
+
+  if (rsp.data) {
+    configurations.value = rsp.data.object;
+  }
+  fetchingData.value = false;
 };
 const firstPage = async () => {
   fetchingData.value = true;
