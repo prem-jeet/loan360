@@ -3,10 +3,10 @@
     <p>Expense</p>
 
     <div
-      class="row q-mt-sm justify-between q-px-lg"
+      class="row justify-between q-px-lg"
       v-if="filteredExpenseOptions.length"
     >
-      <div class="col-5">
+      <div class="col-12 col-md-5">
         <q-select
           outlined
           dense
@@ -16,7 +16,7 @@
           hide-bottom-space
         />
       </div>
-      <div class="col-6">
+      <div class="col-12 col-md-6 q-mt-md q-mt-md-none">
         <q-input
           outlined
           dense
@@ -28,8 +28,11 @@
       </div>
     </div>
 
-    <div class="flex q-mt-md q-px-lg">
-      <div class="text-weight-medium" v-if="expenses.length">
+    <div class="column row-md items-center q-mt-md q-px-lg">
+      <div
+        class="text-weight-medium order-last order-md-first q-mt-sm q-mt-md-none"
+        v-if="expenses.length"
+      >
         Total expense: {{ totalExpense }}
       </div>
       <div v-if="filteredExpenseOptions.length" class="q-ml-auto">
@@ -60,47 +63,51 @@
       v-for="(expense, index) in expenses"
       :key="expense.label"
     >
-      <div class="col-auto q-gutter-x-sm">
-        <q-btn
-          outline
-          :icon="expense.isEditing ? 'check' : 'edit'"
-          :color="expense.isEditing ? 'green' : 'purple'"
-          size="xs"
-          padding="sm"
-          @click="
-            () => {
-              if (!expense.isEditing) {
-                editExpense(expense, index);
-              } else {
-                saveEditedExpense(index);
+      <div class="col-12 col-md-auto q-mb-xs q-mb-md-none">
+        <div class="flex">
+          <q-btn
+            class="q-ml-auto"
+            outline
+            :icon="expense.isEditing ? 'check' : 'edit'"
+            :color="expense.isEditing ? 'green' : 'purple'"
+            size="xs"
+            padding="sm"
+            @click="
+              () => {
+                if (!expense.isEditing) {
+                  editExpense(expense, index);
+                } else {
+                  saveEditedExpense(index);
+                }
               }
-            }
-          "
-        >
-          <q-tooltip>
-            {{ expense.isEditing ? 'Save' : 'Edit' }}
-          </q-tooltip>
-        </q-btn>
-        <q-btn
-          outline
-          :icon="expense.isEditing ? 'close' : 'delete'"
-          color="red"
-          size="xs"
-          padding="sm"
-          @click="
-            () => {
-              if (!expense.isEditing) {
-                deleteExpense(expense.label);
-              } else {
-                expense.isEditing = false;
+            "
+          >
+            <q-tooltip>
+              {{ expense.isEditing ? 'Save' : 'Edit' }}
+            </q-tooltip>
+          </q-btn>
+          <q-btn
+            class="q-ml-sm"
+            outline
+            :icon="expense.isEditing ? 'close' : 'delete'"
+            color="red"
+            size="xs"
+            padding="sm"
+            @click="
+              () => {
+                if (!expense.isEditing) {
+                  deleteExpense(expense.label);
+                } else {
+                  expense.isEditing = false;
+                }
               }
-            }
-          "
-        >
-          <q-tooltip>
-            {{ expense.isEditing ? 'Cancel' : 'Delete' }}
-          </q-tooltip>
-        </q-btn>
+            "
+          >
+            <q-tooltip>
+              {{ expense.isEditing ? 'Cancel' : 'Delete' }}
+            </q-tooltip>
+          </q-btn>
+        </div>
       </div>
       <div class="col">
         <template
