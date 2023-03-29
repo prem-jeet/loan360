@@ -16,9 +16,9 @@
           bordered
           title="Account codes"
           :no-data-label="
-            accountCodes.length
+            accountCodeLoan.length
               ? 'No result found'
-              : 'Select a section Loan/Deposit'
+              : 'Select a section Loan/Laon Against Property/Personal Loan'
           "
           :rows-per-page-options="[0]"
           :hide-bottom="!!filteredAccountCode.length"
