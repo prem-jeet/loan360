@@ -2,7 +2,10 @@
   <div class="q-mt-sm q-mb-md">
     <p>Expense</p>
 
-    <div class="row q-mt-sm justify-between q-px-lg">
+    <div
+      class="row q-mt-sm justify-between q-px-lg"
+      v-if="filteredExpenseOptions.length"
+    >
       <div class="col-5">
         <q-select
           outlined
@@ -29,27 +32,27 @@
       <div class="text-weight-medium" v-if="expenses.length">
         Total expense: {{ totalExpense }}
       </div>
-
-      <q-btn
-        size="xs"
-        class="q-ml-auto"
-        color="light-blue"
-        @click="addExpense"
-        icon="add"
-        padding="sm"
-      >
-        <q-tooltip> Add Expenses</q-tooltip>
-      </q-btn>
-      <q-btn
-        size="xs"
-        class="q-ml-md"
-        color="red"
-        @click="clearExpense"
-        icon="refresh"
-        padding="sm"
-      >
-        <q-tooltip>Clear</q-tooltip>
-      </q-btn>
+      <div v-if="filteredExpenseOptions.length" class="q-ml-auto">
+        <q-btn
+          size="xs"
+          color="light-blue"
+          @click="addExpense"
+          icon="add"
+          padding="sm"
+        >
+          <q-tooltip> Add Expenses</q-tooltip>
+        </q-btn>
+        <q-btn
+          size="xs"
+          class="q-ml-md"
+          color="red"
+          @click="clearExpense"
+          icon="refresh"
+          padding="sm"
+        >
+          <q-tooltip>Clear</q-tooltip>
+        </q-btn>
+      </div>
     </div>
 
     <div
@@ -101,10 +104,23 @@
         </q-btn>
       </div>
       <div class="col">
-        <template v-if="editingExpenseLabel !== expense.label">
+        <template
+          v-if="
+            editingExpenseLabel !== expense.label ||
+            filteredEditingExpenseOptions.length < 2
+          "
+        >
           {{ expense.label }}
         </template>
-        <template v-else> editing </template>
+        <template v-else>
+          <q-select
+            outlined
+            dense
+            v-model="editingExpenseLabel"
+            :options="filteredEditingExpenseOptions"
+            hide-bottom-space
+          />
+        </template>
       </div>
       <div class="col">
         <template v-if="editingExpenseLabel !== expense.label">
@@ -140,6 +156,10 @@ const filteredExpenseOptions = computed(() => {
     (option) => !unavailableOptions.includes(option)
   );
 });
+const filteredEditingExpenseOptions = computed(() => [
+  ...filteredExpenseOptions.value,
+  editingExpenseLabel.value,
+]);
 
 const totalExpense = computed(() => {
   return expenses.value.reduce((acc, val) => acc + val.amount, 0);
