@@ -38,7 +38,10 @@
           <q-item-section>IRR Calculator</q-item-section>
         </q-item>
         <q-separator />
-        <q-item clickable>
+        <q-item
+          clickable
+          @click="showEligibilityCalculator = !showEligibilityCalculator"
+        >
           <q-item-section avatar>
             <q-icon size="xs" name="fa-solid fa-calculator" />
           </q-item-section>
@@ -86,8 +89,15 @@
       </q-list>
     </q-menu>
   </q-btn>
+  <q-dialog v-model="showEligibilityCalculator">
+    <EligibilityCalculator />
+  </q-dialog>
 </template>
 <script setup lang="ts">
+import { ref } from 'vue';
+import EligibilityCalculator from 'src/components/RightMenuDropDown/RightMenuDropDownOptions/EligibilityCalculator/EligibilityCalculator.vue';
+const showEligibilityCalculator = ref(false);
+
 const toggleFullscreen = () => {
   const doc = window.document;
   const docEl = doc.documentElement;
