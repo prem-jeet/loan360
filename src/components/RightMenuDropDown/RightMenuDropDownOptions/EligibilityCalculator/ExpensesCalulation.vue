@@ -63,49 +63,48 @@
       <div class="col-auto q-gutter-x-sm">
         <q-btn
           outline
-          :icon="index !== editedExpense.index ? 'edit' : 'check'"
-          :color="index !== editedExpense.index ? 'purple' : 'green'"
+          :icon="expense.isEditing ? 'check' : 'edit'"
+          :color="expense.isEditing ? 'green' : 'purple'"
           size="xs"
           padding="sm"
           @click="
             () => {
-              if (index !== editedExpense.index) {
+              if (!expense.isEditing) {
                 editExpense(expense, index);
               } else {
-                saveEditedExpense();
+                saveEditedExpense(index);
               }
             }
           "
         >
           <q-tooltip>
-            {{ index !== editedExpense.index ? 'Edit' : 'Save' }}
+            {{ expense.isEditing ? 'Save' : 'Edit' }}
           </q-tooltip>
         </q-btn>
         <q-btn
           outline
-          :icon="index !== editedExpense.index ? 'delete' : 'close'"
+          :icon="expense.isEditing ? 'close' : 'delete'"
           color="red"
           size="xs"
           padding="sm"
           @click="
             () => {
-              if (index !== editedExpense.index) {
+              if (!expense.isEditing) {
                 deleteExpense(expense.label);
+              } else {
+                expense.isEditing = false;
               }
             }
           "
         >
           <q-tooltip>
-            {{ index !== editedExpense.index ? 'Delete' : 'Cancel' }}
+            {{ expense.isEditing ? 'Cancel' : 'Delete' }}
           </q-tooltip>
         </q-btn>
       </div>
       <div class="col">
         <template
-          v-if="
-            index !== editedExpense.index ||
-            filteredEditingExpenseOptions.length < 2
-          "
+          v-if="!expense.isEditing || filteredEditingExpenseOptions.length < 2"
         >
           {{ expense.label }}
         </template>
@@ -120,7 +119,7 @@
         </template>
       </div>
       <div class="col">
-        <template v-if="index !== editedExpense.index">
+        <template v-if="!expense.isEditing">
           {{ expense.amount }}
         </template>
         <template v-else>
@@ -147,12 +146,13 @@ const emits = defineEmits(['totalExpense']);
 const selectedExpense = ref<string | null>(null);
 const expenseAmount = ref<number | null>(null);
 const expenseOptions = ref<string[]>([]);
-const expenses = ref<{ label: string; amount: number }[]>([]);
+const expenses = ref<{ label: string; amount: number; isEditing: boolean }[]>(
+  []
+);
 
 const editedExpense = reactive({
   label: '',
   amount: 0,
-  index: -1,
 });
 
 const filteredExpenseOptions = computed(() => {
@@ -184,6 +184,7 @@ const addExpense = () => {
       {
         label: selectedExpense.value,
         amount: expenseAmount.value,
+        isEditing: false,
       },
     ];
   clearExpense();
@@ -202,15 +203,16 @@ const editExpense = (
   expese: { label: string; amount: number },
   index: number
 ) => {
+  expenses.value.forEach((item) => (item.isEditing = false));
   editedExpense.label = expese.label;
   editedExpense.amount = expese.amount;
-  editedExpense.index = index;
+  expenses.value[index].isEditing = true;
 };
 
-const saveEditedExpense = () => {
-  expenses.value[editedExpense.index].label = editedExpense.label;
-  expenses.value[editedExpense.index].amount = editedExpense.amount;
-  editedExpense.index = -1;
+const saveEditedExpense = (index: number) => {
+  expenses.value[index].label = editedExpense.label;
+  expenses.value[index].amount = editedExpense.amount;
+  expenses.value[index].isEditing = false;
 };
 
 onMounted(async () => {
