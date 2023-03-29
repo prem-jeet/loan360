@@ -57,20 +57,20 @@
 
     <div
       class="row q-px-lg items-center q-gutter-x-md q-mt-sm"
-      v-for="expense in expenses"
+      v-for="(expense, index) in expenses"
       :key="expense.label"
     >
       <div class="col-auto q-gutter-x-sm">
         <q-btn
           outline
-          :icon="expense.label !== editingExpenseLabel ? 'edit' : 'check'"
-          :color="expense.label !== editingExpenseLabel ? 'purple' : 'green'"
+          :icon="index !== editedExpense.index ? 'edit' : 'check'"
+          :color="index !== editedExpense.index ? 'purple' : 'green'"
           size="xs"
           padding="sm"
           @click="
             () => {
-              if (expense.label !== editingExpenseLabel) {
-                editExpense(expense);
+              if (index !== editedExpense.index) {
+                editExpense(expense, index);
               } else {
                 saveEditedExpense();
               }
@@ -78,35 +78,32 @@
           "
         >
           <q-tooltip>
-            {{ expense.label !== editingExpenseLabel ? 'Edit' : 'Save' }}
+            {{ index !== editedExpense.index ? 'Edit' : 'Save' }}
           </q-tooltip>
         </q-btn>
         <q-btn
           outline
-          :icon="expense.label !== editingExpenseLabel ? 'delete' : 'close'"
+          :icon="index !== editedExpense.index ? 'delete' : 'close'"
           color="red"
           size="xs"
           padding="sm"
           @click="
             () => {
-              if (expense.label !== editingExpenseLabel) {
+              if (index !== editedExpense.index) {
                 deleteExpense(expense.label);
-              } else {
-                editingExpenseLabel = null;
-                editingExpenseAmount = null;
               }
             }
           "
         >
           <q-tooltip>
-            {{ expense.label !== editingExpenseLabel ? 'Delete' : 'Cancel' }}
+            {{ index !== editedExpense.index ? 'Delete' : 'Cancel' }}
           </q-tooltip>
         </q-btn>
       </div>
       <div class="col">
         <template
           v-if="
-            editingExpenseLabel !== expense.label ||
+            index !== editedExpense.index ||
             filteredEditingExpenseOptions.length < 2
           "
         >
@@ -116,25 +113,33 @@
           <q-select
             outlined
             dense
-            v-model="editingExpenseLabel"
+            v-model="editedExpense.label"
             :options="filteredEditingExpenseOptions"
             hide-bottom-space
           />
         </template>
       </div>
       <div class="col">
-        <template v-if="editingExpenseLabel !== expense.label">
+        <template v-if="index !== editedExpense.index">
           {{ expense.amount }}
         </template>
-        <template v-else> editing </template>
+        <template v-else>
+          <q-input
+            outlined
+            dense
+            v-model.number="editedExpense.amount"
+            hide-bottom-space
+            type="number"
+            input-class="text-right remove-input-number-indicator"
+          />
+        </template>
       </div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, reactive, watch, onMounted, computed } from 'vue';
 
-import { watch, onMounted, computed } from 'vue';
 import { api } from 'src/boot/axios';
 
 const emits = defineEmits(['totalExpense']);
@@ -144,8 +149,11 @@ const expenseAmount = ref<number | null>(null);
 const expenseOptions = ref<string[]>([]);
 const expenses = ref<{ label: string; amount: number }[]>([]);
 
-const editingExpenseLabel = ref<string | null>(null);
-const editingExpenseAmount = ref<number | null>(null);
+const editedExpense = reactive({
+  label: '',
+  amount: 0,
+  index: -1,
+});
 
 const filteredExpenseOptions = computed(() => {
   if (!expenseOptions.value.length) {
@@ -158,7 +166,7 @@ const filteredExpenseOptions = computed(() => {
 });
 const filteredEditingExpenseOptions = computed(() => [
   ...filteredExpenseOptions.value,
-  editingExpenseLabel.value,
+  editedExpense.label,
 ]);
 
 const totalExpense = computed(() => {
@@ -190,24 +198,19 @@ const deleteExpense = (id: string) => {
   expenses.value = expenses.value.filter((expense) => expense.label !== id);
 };
 
-const editExpense = (expese: { label: string; amount: number }) => {
-  editingExpenseLabel.value = expese.label;
-  editingExpenseAmount.value = expese.amount;
+const editExpense = (
+  expese: { label: string; amount: number },
+  index: number
+) => {
+  editedExpense.label = expese.label;
+  editedExpense.amount = expese.amount;
+  editedExpense.index = index;
 };
 
 const saveEditedExpense = () => {
-  expenses.value = expenses.value.map((expense) => {
-    if (expense.label !== editingExpenseLabel.value) {
-      return expense;
-    }
-
-    return {
-      label: editingExpenseLabel.value!,
-      amount: editingExpenseAmount.value!,
-    };
-  });
-  editingExpenseLabel.value = null;
-  editingExpenseAmount.value = null;
+  expenses.value[editedExpense.index].label = editedExpense.label;
+  expenses.value[editedExpense.index].amount = editedExpense.amount;
+  editedExpense.index = -1;
 };
 
 onMounted(async () => {
