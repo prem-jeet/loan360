@@ -141,6 +141,9 @@ import { ref, reactive, watch, onMounted, computed } from 'vue';
 
 import { api } from 'src/boot/axios';
 
+const props = defineProps({
+  resetFlag: { type: Boolean },
+});
 const emits = defineEmits(['totalExpense']);
 
 const selectedExpense = ref<string | null>(null);
@@ -154,6 +157,8 @@ const editedExpense = reactive({
   label: '',
   amount: 0,
 });
+
+const reset = computed(() => props.resetFlag);
 
 const filteredExpenseOptions = computed(() => {
   if (!expenseOptions.value.length) {
@@ -230,6 +235,10 @@ watch(totalExpense, () => {
   }
 
   emits('totalExpense', total);
+});
+
+watch(reset, () => {
+  expenses.value = [];
 });
 </script>
 <style scoped></style>

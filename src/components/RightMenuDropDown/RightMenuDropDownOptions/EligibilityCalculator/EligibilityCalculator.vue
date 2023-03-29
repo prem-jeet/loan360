@@ -141,7 +141,10 @@
           </div>
         </div>
 
-        <ExpensesCalulation @totalExpense="(total) => (totalExpense = total)" />
+        <ExpensesCalulation
+          @totalExpense="(total) => (totalExpense = total)"
+          :resetFlag="expenseCalculationResetFlag"
+        />
 
         <div :class="rowCss">
           <div :class="colCss">
@@ -243,7 +246,7 @@ const colCss = 'col-12 col-md-6';
 const rowCss = 'row q-mt-sm items-center';
 
 const loanType = ref('bl');
-
+const expenseCalculationResetFlag = ref(true);
 const monthlyRevenue = ref<number | null>(null);
 const tenure = ref<number | null>(null);
 const ltvCostValue = ref<number | null>(null);
@@ -349,6 +352,10 @@ const reset = () => {
   percetageValues.rate = null;
   percetageValues.margin = null;
   percetageValues.ltv = null;
+
+  totalExpense.value = 0;
+
+  expenseCalculationResetFlag.value = !expenseCalculationResetFlag.value;
 };
 
 watch(monthlyRevenue, (newVal, oldVal) => {
