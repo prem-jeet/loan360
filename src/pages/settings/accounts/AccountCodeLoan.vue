@@ -46,12 +46,13 @@
               <div class="row items-center q-mt-lg">
                 <div class="col-12 q-gutter-x-md flex items-center">
                   <span class="text-h6">Section</span>
-                  <!-- <q-btn
-                    v-if="accountCodes.length"
+                  <q-btn
+                    v-if="accountCodeLoan.length"
                     color="red"
                     label="clear"
                     size="sm"
-                  /> -->
+                    @click="resetAccountCodeLoanSection"
+                  />
                 </div>
                 <div class="col-12">
                   <div class="q-gutter-lg">
@@ -313,6 +314,11 @@ const columns: {
     label: 'Account Name',
   },
 ];
+
+const resetAccountCodeLoanSection = () => {
+  accountCodeLoan.value = [];
+  sectionCode.value = null;
+};
 
 const fetchAccountCodeLoanByAccountingCategory = async (
   code: 'D' | 'L'
