@@ -302,30 +302,26 @@ const loanAmount = computed(() => {
 const ltvLoanAmount = computed(() => {
   const { ltv: ltvPercent } = percetageValues;
   if (ltvCostValue.value && ltvPercent) {
-    const ltvLoanAmount = Math.round((ltvCostValue.value * ltvPercent) / 100);
-    return Math.round(ltvLoanAmount / 1000) * 1000;
+    return Math.round((ltvCostValue.value * ltvPercent) / 100);
   }
   return null;
 });
 
 const maxLoanAmount = computed(() => {
-  if (!loanAmount.value) {
-    return null;
+  if (loanType.value === 'sl' && loanAmount.value) {
+    return loanAmount.value;
   }
-
-  if (loanType.value === 'sl') {
-    return +loanAmount.value.toFixed(2);
-  }
-
-  if (!ltvLoanAmount.value) {
-    return null;
-  }
-
-  return +(
-    ltvLoanAmount.value >= loanAmount.value
+  if (loanAmount.value && ltvLoanAmount.value) {
+    return ltvLoanAmount.value >= loanAmount.value
       ? loanAmount.value
+      : ltvLoanAmount.value;
+  }
+
+  return loanAmount.value === null
+    ? ltvLoanAmount.value === null
+      ? null
       : ltvLoanAmount.value
-  ).toFixed(2);
+    : loanAmount.value;
 });
 
 const limitPercetageInput = (key: string, percentValue: number) => {
