@@ -61,6 +61,13 @@ const routes: RouteRecordRaw[] = [
             component: () => import('pages/settings/accounts/AccountCode.vue'),
           },
           {
+            path: 'accountCodeLoan',
+            name: 'accountCodeLoan',
+            component: () =>
+              import('pages/settings/accounts/AccountCodeLoan.vue'),
+          },
+
+          {
             path: 'natureEntry',
             name: 'natureEntry',
             component: () => import('pages/settings/accounts/NatureEntry.vue'),
