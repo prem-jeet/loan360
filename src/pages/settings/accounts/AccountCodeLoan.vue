@@ -132,7 +132,9 @@
               <q-td key="id" :props="props">
                 <template v-if="!props.row.isEditing">
                   {{
-                    accountHeads.find((item) => item.id === props.row.id)!.name
+                    accountHeads.find(
+                      (item) => item.id === props.row.accountId
+                    )!.name
                   }}
                 </template>
                 <q-input
@@ -225,8 +227,9 @@
                     <div class="col-12">
                       <template v-if="!props.row.isEditing">
                         {{
-                          accountHeads.find((item) => item.id === props.row.id)!
-                            .name
+                          accountHeads.find(
+                            (item) => item.id === props.row.accountId
+                          )!.name
                         }}
                       </template>
                       <q-input
