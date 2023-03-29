@@ -148,6 +148,101 @@
           </template>
 
           <!-- card for grid layout screens < 800px -->
+
+          <template v-slot:item="props">
+            <div class="col-xs-12 col-sm-6 q-px-sm-sm">
+              <q-card>
+                <q-card-section class="flex items-center">
+                  <span class="text-weight-bold">{{ props.key }}</span>
+                  <q-space />
+                  <q-btn-group push unelevated>
+                    <q-btn
+                      icon="edit"
+                      size="xs"
+                      outline
+                      color="accent"
+                      v-if="!props.row.isEditing"
+                    >
+                      <q-tooltip>Edit</q-tooltip>
+                    </q-btn>
+                    <q-btn
+                      icon="delete"
+                      size="xs"
+                      outline
+                      color="red"
+                      v-if="!props.row.isEditing"
+                    >
+                      <q-tooltip>Delete</q-tooltip>
+                    </q-btn>
+                    <q-btn
+                      icon="check"
+                      size="xs"
+                      outline
+                      color="green-10"
+                      v-if="props.row.isEditing"
+                    >
+                      <q-tooltip>Save</q-tooltip>
+                    </q-btn>
+                    <q-btn
+                      icon="close"
+                      size="xs"
+                      outline
+                      color="red"
+                      v-if="props.row.isEditing"
+                    >
+                      <q-tooltip>Cancel</q-tooltip>
+                    </q-btn>
+                  </q-btn-group>
+                </q-card-section>
+                <q-separator inset />
+                <q-card-section>
+                  <div class="row q-gutter-y-xs">
+                    <div class="col-12 text-weight-medium">Account Code :</div>
+                    <div class="col-12">
+                      <template v-if="!props.row.isEditing">
+                        {{
+                          accountCodes.find(
+                            (item) => item.code === props.row.accountCode
+                          )!.name
+                        }}
+                      </template>
+                      <q-input
+                        v-else
+                        v-model="props.row.name"
+                        placeholder="Name required"
+                        dense
+                        outlined
+                        :color="props.row.name ? 'green' : 'red'"
+                        autofocus
+                      />
+                    </div>
+                  </div>
+                </q-card-section>
+                <q-card-section>
+                  <div class="row q-gutter-y-xs">
+                    <div class="col-12 text-weight-medium">account Name :</div>
+                    <div class="col-12">
+                      <template v-if="!props.row.isEditing">
+                        {{
+                          accountHeads.find((item) => item.id === props.row.id)!
+                            .name
+                        }}
+                      </template>
+                      <q-input
+                        v-else
+                        v-model="props.row.name"
+                        placeholder="Name required"
+                        dense
+                        outlined
+                        :color="props.row.name ? 'green' : 'red'"
+                        autofocus
+                      />
+                    </div>
+                  </div>
+                </q-card-section>
+              </q-card>
+            </div>
+          </template>
         </q-table>
       </div>
     </div>
@@ -157,8 +252,7 @@
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { confirmDialog, onFailure, onSuccess } from 'src/utils/notification';
-import { ref, reactive, computed, watch, watchEffect, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 
 interface AccountCodes {
   code: string;
