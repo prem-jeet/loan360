@@ -9,7 +9,7 @@
     </q-card-section>
 
     <q-card-section
-      :style="{ height: 'calc(100% - 65.6px)' }"
+      :style="{ maxHeight: '88vh' }"
       class="q-px-xs-sm q-px-sm-md scroll"
     >
       <div class="row items-center q-px-xs-md">
