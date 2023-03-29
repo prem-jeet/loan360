@@ -272,6 +272,7 @@ interface AccountHeads {
 }
 
 interface AccountCodeLoan {
+  id: number;
   accountCode: string;
   accountId: number;
   accountingCategoryCode: string;
