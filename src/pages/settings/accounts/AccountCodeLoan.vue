@@ -273,35 +273,17 @@
         <q-card-section class="q-px-lg q-py-md">
           <div class="row">
             <div class="col-12">
-              <!-- <q-input
-                v-model="newEntryData.code"
-                label="Code"
-                maxlength="10"
-                counter
-                autofocus
-                :error="!newEntryData.code"
-              >
-                <template v-slot:hint>characters</template>
-              </q-input>
-              <div class="col-12 q-mt-lg">
-                <q-input
-                  v-model="newEntryData.name"
-                  label="Name"
-                  :error="!newEntryData.name"
-                />
-              </div> -->
               <div class="col-12 q-mt-lg">
                 <q-select
-                  v-model="newEntryData"
+                  v-model="newAccountCode.section"
                   :options="accountCodeOptions"
                   label="Account Code"
                   outlined
-                  behavior="menu"
                 />
               </div>
               <div class="col-12 q-mt-lg">
                 <q-select
-                  v-model="newEntryData"
+                  v-model="newAccountName.section"
                   use-input
                   hide-dropdown-icon
                   :options="accountHeadOptions"
@@ -329,9 +311,7 @@ import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { confirmDialog, onSuccess } from 'src/utils/notification';
 
-import { ref, computed, watch, onMounted } from 'vue';
-
-const newEntryData = ref('');
+import { ref, computed, watch, onMounted, reactive } from 'vue';
 
 interface AccountCodes {
   code: string;
@@ -373,6 +353,12 @@ const accountCodeLoan = ref<AccountCodeLoan[]>([]);
 const accountCodeOptions = ref<AccountCodeOptions[]>([]);
 const accountHeadOptions = ref<AccountHeadOptions[]>([]);
 const dropdown = ref(null);
+const newAccountCode = reactive({
+  section: accountCodeOptions.value[0],
+});
+const newAccountName = reactive({
+  section: accountHeadOptions.value[0],
+});
 
 const isAddNewEntryModalActive = ref(false);
 const filteredAccountCode = computed(() => {
@@ -441,7 +427,11 @@ const loadAccountCodes = () => {
 };
 
 const saveNewEntry = async () => {
-  console.log('hello', newEntryData.value);
+  console.log(
+    'hello',
+    newAccountCode.section.value,
+    newAccountName.section.value
+  );
 };
 
 const resetNewEntryForm = () => {
