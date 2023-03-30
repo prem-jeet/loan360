@@ -275,7 +275,7 @@
             <div class="col-12">
               <div class="col-12 q-mt-lg">
                 <q-select
-                  v-model="newAccountCode.section"
+                  v-model="newAccountCode"
                   :options="accountCodeOptions"
                   label="Account Code"
                   outlined
@@ -283,7 +283,7 @@
               </div>
               <div class="col-12 q-mt-lg">
                 <q-select
-                  v-model="newAccountName.section"
+                  v-model="newAccountName"
                   use-input
                   hide-dropdown-icon
                   :options="accountHeadOptions"
@@ -353,12 +353,9 @@ const accountCodeLoan = ref<AccountCodeLoan[]>([]);
 const accountCodeOptions = ref<AccountCodeOptions[]>([]);
 const accountHeadOptions = ref<AccountHeadOptions[]>([]);
 const dropdown = ref(null);
-const newAccountCode = reactive({
-  section: accountCodeOptions.value[0],
-});
-const newAccountName = reactive({
-  section: accountHeadOptions.value[0],
-});
+const newAccountCode = ref(accountCodeOptions.value[0]);
+
+const newAccountName = ref(accountHeadOptions.value[0]);
 
 const isAddNewEntryModalActive = ref(false);
 const filteredAccountCode = computed(() => {
@@ -427,11 +424,7 @@ const loadAccountCodes = () => {
 };
 
 const saveNewEntry = async () => {
-  console.log(
-    'hello',
-    newAccountCode.section.value,
-    newAccountName.section.value
-  );
+  console.log('hello', newAccountCode.value.value, newAccountName.value.value);
 };
 
 const resetNewEntryForm = () => {
