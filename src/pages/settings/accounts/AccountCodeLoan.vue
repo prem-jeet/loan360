@@ -309,9 +309,9 @@
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { confirmDialog, onSuccess } from 'src/utils/notification';
+import { confirmDialog, onSuccess, onFailure } from 'src/utils/notification';
 
-import { ref, computed, watch, onMounted, reactive } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 
 interface AccountCodes {
   code: string;
@@ -424,7 +424,29 @@ const loadAccountCodes = () => {
 };
 
 const saveNewEntry = async () => {
-  console.log('hello', newAccountCode.value.value, newAccountName.value.value);
+  if (newAccountCode.value && newAccountName.value) {
+    const val = accountCodeLoan.value.filter((item) => {
+      return item.accountCode === newAccountCode.value.value;
+    });
+    if (val.length) {
+      onFailure({
+        msg: 'Duplicate Account Found',
+        icon: 'warning',
+      });
+    } else {
+      console.log(
+        'hello',
+        newAccountCode.value.value,
+        newAccountName.value.value,
+        val
+      );
+    }
+  } else {
+    onFailure({
+      msg: 'Account is not valid',
+      icon: 'warning',
+    });
+  }
 };
 
 const resetNewEntryForm = () => {
