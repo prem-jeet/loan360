@@ -99,6 +99,7 @@
                     outline
                     color="red"
                     v-if="!props.row.isEditing"
+                    @click="() => deleteEntry(props.rowIndex)"
                   >
                     <q-tooltip>Delete</q-tooltip>
                   </q-btn>
@@ -174,6 +175,7 @@
                       outline
                       color="red"
                       v-if="!props.row.isEditing"
+                      @click="() => deleteEntry(props.rowIndex)"
                     >
                       <q-tooltip>Delete</q-tooltip>
                     </q-btn>
@@ -256,6 +258,8 @@
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
+import { confirmDialog, onSuccess } from 'src/utils/notification';
+
 import { ref, computed, watch, onMounted } from 'vue';
 
 interface AccountCodes {
@@ -318,6 +322,24 @@ const columns: {
     label: 'Account Name',
   },
 ];
+
+const deleteEntry = async (rowIndex: number) => {
+  confirmDialog(() => deleteEntryConfirmed(rowIndex), {});
+};
+
+const deleteEntryConfirmed = async (rowIndex: number) => {
+  const rsp = await api.delete(
+    `accountCodeLoan/${accountCodeLoan.value[rowIndex].id}`
+  );
+  if (rsp.data) {
+    onSuccess({ msg: rsp.data.displayMessage, icon: 'delete' });
+
+    accountCodeLoan.value = [
+      ...accountCodeLoan.value.splice(0, rowIndex),
+      ...accountCodeLoan.value.splice(rowIndex + 1),
+    ];
+  }
+};
 
 const resetAccountCodeLoanSection = () => {
   accountCodeLoan.value = [];
