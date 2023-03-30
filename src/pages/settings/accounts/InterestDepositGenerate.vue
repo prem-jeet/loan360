@@ -3,7 +3,11 @@
     <q-chip outline square size="md" class="shadow-4" :ripple="false">
       <BreadCrumbs :ordered-paths="breadcrumbs" />
     </q-chip>
-    <div class="q-mt-lg q-pb-xl"></div>
+    <div class="q-mt-lg q-pb-xl">
+      <div class="row">
+        <p class="text-h4">Deposit Interest Updation</p>
+      </div>
+    </div>
   </div>
 </template>
 
