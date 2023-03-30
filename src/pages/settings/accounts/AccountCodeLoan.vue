@@ -34,13 +34,14 @@
               <div class="row items-center q-gutter-md">
                 <div class="col-auto text-h4">Account code loan</div>
                 <div class="col-auto">
-                  <!-- <q-btn
+                  <q-btn
                     size="md"
-                    v-if="accountCodes.length"
-                    label="Add code"
+                    v-if="accountCodeLoan.length"
+                    label="Add Account code loan"
                     icon="add"
                     color="blue-7"
-                  /> -->
+                    @click="isAddNewEntryModalActive = true"
+                  />
                 </div>
               </div>
               <div class="row items-center q-mt-lg">
@@ -253,6 +254,74 @@
       </div>
     </div>
   </div>
+
+  <q-dialog v-model="isAddNewEntryModalActive" @show="loadAccountCodes">
+    <q-card>
+      <q-form @submit.prevent="saveNewEntry" @reset="resetNewEntryForm">
+        <q-card-section class="bg-grey-2">
+          <div class="flex items-center">
+            <span class="text-h6 q-mr-xl">Add nature entry</span>
+            <q-space />
+            <q-btn
+              class="q-ml-xs-md q-ml-sm-xl"
+              icon="close"
+              flat
+              @click="isAddNewEntryModalActive = false"
+            />
+          </div>
+        </q-card-section>
+        <q-card-section class="q-px-lg q-py-md">
+          <div class="row">
+            <div class="col-12">
+              <!-- <q-input
+                v-model="newEntryData.code"
+                label="Code"
+                maxlength="10"
+                counter
+                autofocus
+                :error="!newEntryData.code"
+              >
+                <template v-slot:hint>characters</template>
+              </q-input>
+              <div class="col-12 q-mt-lg">
+                <q-input
+                  v-model="newEntryData.name"
+                  label="Name"
+                  :error="!newEntryData.name"
+                />
+              </div> -->
+              <div class="col-12 q-mt-lg">
+                <q-select
+                  v-model="newEntryData"
+                  :options="accountCodeOptions"
+                  label="Account Code"
+                  outlined
+                  behavior="menu"
+                />
+              </div>
+              <div class="col-12 q-mt-lg">
+                <q-select
+                  v-model="newEntryData"
+                  use-input
+                  hide-dropdown-icon
+                  :options="accountHeadOptions"
+                  label="Account name"
+                  outlined
+                  @input-value="loadAccountHeads"
+                  ref="dropdown"
+                />
+              </div>
+            </div>
+          </div>
+        </q-card-section>
+        <q-separator class="q-mt-md" />
+        <q-card-actions align="right" class="q-py-md bg-grey-2">
+          <q-btn label="Add" color="green-5" type="submit" />
+          <q-btn label="Reset" color="red-5" type="reset" />
+        </q-card-actions>
+      </q-form>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script setup lang="ts">
@@ -261,6 +330,8 @@ import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { confirmDialog, onSuccess } from 'src/utils/notification';
 
 import { ref, computed, watch, onMounted } from 'vue';
+
+const newEntryData = ref('');
 
 interface AccountCodes {
   code: string;
@@ -273,6 +344,15 @@ interface AccountCodes {
 interface AccountHeads {
   id: number;
   name: string;
+}
+
+interface AccountCodeOptions {
+  value: string;
+  label: string;
+}
+interface AccountHeadOptions {
+  value: number;
+  label: string;
 }
 
 interface AccountCodeLoan {
@@ -290,7 +370,11 @@ const fetchingData = ref(false);
 const accountCodes = ref<AccountCodes[]>([]);
 const accountHeads = ref<AccountHeads[]>([]);
 const accountCodeLoan = ref<AccountCodeLoan[]>([]);
+const accountCodeOptions = ref<AccountCodeOptions[]>([]);
+const accountHeadOptions = ref<AccountHeadOptions[]>([]);
+const dropdown = ref(null);
 
+const isAddNewEntryModalActive = ref(false);
 const filteredAccountCode = computed(() => {
   return accountCodeLoan.value;
 });
@@ -322,6 +406,47 @@ const columns: {
     label: 'Account Name',
   },
 ];
+
+const loadAccountHeads = async (value: string) => {
+  let payLoad = {
+    pageNo: 1,
+    pageSize: 100,
+    where:
+      " c.name ilike '%" +
+      value +
+      "%' and inactive <> true and ( 1 = 1  and  1 = 1 )",
+  };
+  if (value.length > 1) {
+    const rsp = await api.post('accountHead/typeahead/name', payLoad);
+    if (rsp.data) {
+      const options = rsp.data.map((item: { id: number; name: string }) => ({
+        value: item.id,
+        label: item.name,
+      }));
+
+      accountHeadOptions.value = options;
+      // @ts-expect-error function provided by component
+      dropdown.value!.showPopup();
+    }
+  } else {
+    accountHeadOptions.value = [];
+  }
+};
+const loadAccountCodes = () => {
+  const options = accountCodes.value.map((item) => ({
+    value: item.code,
+    label: item.name,
+  }));
+  accountCodeOptions.value = options;
+};
+
+const saveNewEntry = async () => {
+  console.log('hello', newEntryData.value);
+};
+
+const resetNewEntryForm = () => {
+  console.log('hi');
+};
 
 const deleteEntry = async (rowIndex: number) => {
   confirmDialog(() => deleteEntryConfirmed(rowIndex), {});
@@ -385,13 +510,10 @@ onMounted(async () => {
 
   const rsp = await api.get('accountHead');
   if (rsp.data) {
-    rsp.data.filter((item: { id: number; name: string }) => {
-      let obj = {
-        id: item.id,
-        name: item.name,
-      };
-      accountHeads.value.push(obj);
-    });
+    accountHeads.value = rsp.data.map((item: { id: number; name: string }) => ({
+      id: item.id,
+      name: item.name,
+    }));
   }
   fetchingData.value = false;
 });
