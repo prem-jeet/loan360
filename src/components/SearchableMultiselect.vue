@@ -105,7 +105,7 @@
         text-color="purple-10"
         class="text-weight-medium"
       >
-        {{ opt[displaySelectedLables ? 'label' : 'value'] }}
+        {{ opt[chipKey] }}
       </q-chip>
       <q-chip v-if="index === maxChips" color="indigo-3" text-color="indigo-8">
         <q-avatar icon="add" color="indigo-8" text-color="indigo-3" />
@@ -123,14 +123,11 @@ interface Props {
   options: Option[];
   modelValue: Option[];
   label: string;
-  maxChips?: number;
-  displaySelectedLables?: boolean;
+  maxChips: number;
+  chipKey: string;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  maxChips: 4,
-  displaySelectedLables: true,
-});
+const props = defineProps<Props>();
 
 const emit = defineEmits(['update:modelValue']);
 
