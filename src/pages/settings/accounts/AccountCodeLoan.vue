@@ -91,6 +91,7 @@
                     outline
                     color="accent"
                     v-if="!props.row.isEditing"
+                    @click="() => editEntry(props.rowIndex)"
                   >
                     <q-tooltip>Edit</q-tooltip>
                   </q-btn>
@@ -110,6 +111,7 @@
                     outline
                     color="green-10"
                     v-if="props.row.isEditing"
+                    @click="() => saveEdited(props.rowIndex)"
                   >
                     <q-tooltip>Save</q-tooltip>
                   </q-btn>
@@ -119,17 +121,27 @@
                     outline
                     color="red"
                     v-if="props.row.isEditing"
+                    @click="props.row.isEditing = false"
                   >
                     <q-tooltip>Cancel</q-tooltip>
                   </q-btn>
                 </q-btn-group>
               </q-td>
               <q-td key="accountCode" :props="props">
-                <span>{{
-                  accountCodes.find(
-                    (item) => item.code === props.row.accountCode
-                  )!.name
-                }}</span>
+                <template v-if="!props.row.isEditing">
+                  {{
+                    accountCodes.find(
+                      (item) => item.code === props.row.accountCode
+                    )!.name
+                  }}
+                </template>
+
+                <q-select
+                  v-else
+                  v-model="editAccountCode"
+                  :options="accountCodeOptions"
+                  outlined
+                />
               </q-td>
               <q-td key="id" :props="props">
                 <template v-if="!props.row.isEditing">
@@ -139,15 +151,26 @@
                     )!.name
                   }}
                 </template>
-                <q-input
+
+                <q-select
                   v-else
-                  v-model="props.row.name"
+                  v-model="editAccountName"
+                  use-input
+                  hide-dropdown-icon
+                  :options="accountHeadOptions"
+                  outlined
+                  @input-value="loadAccountHeads"
+                  ref="dropdown"
+                />
+                <!-- <q-input
+
+                  v-model="props.row.id"
                   placeholder="Name required"
                   dense
                   outlined
-                  :color="props.row.name ? 'green' : 'red'"
+                  :color="props.row.id ? 'green' : 'red'"
                   autofocus
-                />
+                /> -->
               </q-td>
             </q-tr>
           </template>
@@ -214,11 +237,11 @@
                       </template>
                       <q-input
                         v-else
-                        v-model="props.row.name"
+                        v-model="props.row.id"
                         placeholder="Name required"
                         dense
                         outlined
-                        :color="props.row.name ? 'green' : 'red'"
+                        :color="props.row.id ? 'green' : 'red'"
                         autofocus
                       />
                     </div>
@@ -237,11 +260,11 @@
                       </template>
                       <q-input
                         v-else
-                        v-model="props.row.name"
+                        v-model="props.row.id"
                         placeholder="Name required"
                         dense
                         outlined
-                        :color="props.row.name ? 'green' : 'red'"
+                        :color="props.row.id ? 'green' : 'red'"
                         autofocus
                       />
                     </div>
@@ -357,6 +380,9 @@ const dropdown = ref(null);
 const newAccountCode = ref(accountCodeOptions.value[0]);
 const newAccountName = ref(accountHeadOptions.value[0]);
 
+const editAccountCode = ref(accountCodeOptions.value[0]);
+const editAccountName = ref(accountHeadOptions.value[0]);
+
 const isAddNewEntryModalActive = ref(false);
 const filteredAccountCode = computed(() => {
   return accountCodeLoan.value;
@@ -421,6 +447,59 @@ const loadAccountCodes = () => {
     label: item.name,
   }));
   accountCodeOptions.value = options;
+};
+
+const editEntry = (index: number) => {
+  const row: AccountCodeLoan = accountCodeLoan.value[index];
+  row.isEditing = true;
+  loadAccountCodes();
+  let tempCode: AccountCodeOptions[] = accountCodeOptions.value.filter(
+    (item) => {
+      return item.value === row.accountCode;
+    }
+  );
+
+  let tempName: AccountHeads[] = accountHeads.value.filter((item) => {
+    return item.id === row.accountId;
+  });
+  let tempObj: AccountHeadOptions = {
+    value: tempName[0].id,
+
+    label: tempName[0].name,
+  };
+  editAccountCode.value = tempCode[0];
+  editAccountName.value = tempObj;
+};
+
+const saveEdited = async (index: number) => {
+  let id: number = accountCodeLoan.value[index].id;
+  if (editAccountCode.value && editAccountName.value) {
+    let tempObj: AccountCodes[] = accountCodes.value.filter((item) => {
+      return item.code === editAccountCode.value.value;
+    });
+
+    const payLoad = {
+      accountCode: tempObj[0].code,
+      accountId: editAccountName.value.value,
+      accountingCategoryCode: sectionCode.value,
+      id: id,
+    };
+
+    const rsp = await api.post('accountCodeLoan', payLoad);
+    if (rsp.data) {
+      onSuccess({ msg: rsp.data.displayMessage, icon: 'check' });
+      accountCodeLoan.value[index].accountCode = tempObj[0].code;
+      accountCodeLoan.value[index].accountId = editAccountName.value.value;
+      accountCodeLoan.value[index].isEditing = false;
+      editAccountCode.value.label = '';
+      editAccountName.value.label = '';
+    }
+  } else {
+    onFailure({
+      msg: 'Account is not valid',
+      icon: 'warning',
+    });
+  }
 };
 
 const saveNewEntry = async () => {
@@ -519,7 +598,6 @@ onMounted(async () => {
 
   if (rsp.data) {
     accountCodes.value = rsp.data;
-    console.log(accountCodes.value);
   }
 
   fetchingData.value = false;
