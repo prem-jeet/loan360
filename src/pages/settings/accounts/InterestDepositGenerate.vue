@@ -5,14 +5,14 @@
     </q-chip>
     <div class="q-mt-lg q-pb-xl">
       <div class="row justify-center q-py-lg q-mt-lg">
-        <div class="col-5">
+        <div class="col-12 col-sm-8 col-md-5">
           <q-card>
             <q-card-section class="bg-grey-4 text-center">
               <span class="text-h4">Deposit Interest Updation</span>
             </q-card-section>
             <q-card-section>
               <div class="row q-gutter-lg justify-center q-py-lg">
-                <div class="col-6">
+                <div class="col-11 col-sm-9 col-md-7">
                   <SearchableMultiselect
                     :max-chips="5"
                     chip-key="value"
@@ -21,7 +21,7 @@
                     :options="companyOptions"
                   />
                 </div>
-                <div class="col-6">
+                <div class="col-11 col-sm-9 col-md-7">
                   <SearchableMultiselect
                     :max-chips="5"
                     chip-key="value"
