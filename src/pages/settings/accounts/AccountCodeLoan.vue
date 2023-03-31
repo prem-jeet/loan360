@@ -339,7 +339,7 @@ interface AccountCodeLoan {
   id: number;
   accountCode: string;
   accountId: number;
-  accountingCategoryCode: string;
+  accountingCategoryCode: 'L' | 'LAP' | 'PL' | null;
   isEditing: boolean;
 }
 const breadcrumbs = [
@@ -441,7 +441,7 @@ const saveNewEntry = async () => {
       const payLoad = {
         accountCode: tempObj[0].code,
         accountId: newAccountName.value.value,
-        accountingCategoryCode: tempObj[0].section,
+        accountingCategoryCode: sectionCode.value,
       };
 
       const rsp = await api.post('accountCodeLoan', payLoad);
@@ -453,6 +453,8 @@ const saveNewEntry = async () => {
           isEditing: false,
         });
         isAddNewEntryModalActive.value = false;
+        newAccountCode.value.label = '';
+        newAccountName.value.label = '';
       }
     }
   } else {
@@ -479,10 +481,7 @@ const deleteEntryConfirmed = async (rowIndex: number) => {
   if (rsp.data) {
     onSuccess({ msg: rsp.data.displayMessage, icon: 'delete' });
 
-    accountCodeLoan.value = [
-      ...accountCodeLoan.value.splice(0, rowIndex),
-      ...accountCodeLoan.value.splice(rowIndex + 1),
-    ];
+    accountCodeLoan.value.splice(rowIndex, 1);
   }
 };
 
@@ -492,7 +491,7 @@ const resetAccountCodeLoanSection = () => {
 };
 
 const fetchAccountCodeLoanByAccountingCategory = async (
-  code: 'D' | 'L'
+  code: 'L' | 'LAP' | 'PL'
 ): Promise<Omit<AccountCodeLoan, 'isEditing'>[]> => {
   const rsp = await api(`accountCodeLoanByAccountingCategory/${code}`);
 
