@@ -434,12 +434,20 @@ const saveNewEntry = async () => {
         icon: 'warning',
       });
     } else {
-      console.log(
-        'hello',
-        newAccountCode.value.value,
-        newAccountName.value.value,
-        val
-      );
+      let tempObj: AccountCodes[] = accountCodes.value.filter((item) => {
+        return item.code === newAccountCode.value.value;
+      });
+
+      const payLoad = {
+        accountCode: tempObj[0].code,
+        accountId: newAccountName.value.value,
+        accountingCategoryCode: tempObj[0].section,
+      };
+
+      const rsp = await api.post('accountCodeLoan', payLoad);
+      if (rsp.data) {
+        onSuccess({ msg: rsp.data.displayMessage, icon: 'check' });
+      }
     }
   } else {
     onFailure({
@@ -505,6 +513,7 @@ onMounted(async () => {
 
   if (rsp.data) {
     accountCodes.value = rsp.data;
+    console.log(accountCodes.value);
   }
 
   fetchingData.value = false;
