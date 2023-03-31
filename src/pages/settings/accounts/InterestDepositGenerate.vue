@@ -40,6 +40,8 @@
                 :disable="
                   !(selectedBranches.length && selectedCompanies.length)
                 "
+                :loading="submitting"
+                @click="submit"
               />
               <q-btn color="red-10" label="reset" @click="resetSelection" />
             </q-card-actions>
@@ -52,9 +54,11 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
+import { api } from 'src/boot/axios';
 import SearchableMultiselect from 'src/components/SearchableMultiselect.vue';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { useUserStore } from 'src/stores/user/userStore';
+import { onSuccess } from 'src/utils/notification';
 import { ref, computed } from 'vue';
 
 const breadcrumbs = [
@@ -85,10 +89,32 @@ const BranchOptions = computed(() =>
 
 const selectedCompanies = ref<Option[]>([]);
 const selectedBranches = ref<Option[]>([]);
+const submitting = ref(false);
 
 const resetSelection = () => {
   selectedCompanies.value = [];
   selectedBranches.value = [];
+};
+
+const submit = async () => {
+  submitting.value = true;
+  const companines = `companies=${selectedCompanies.value
+    .map((company) => company.value)
+    .join(',')}`;
+  const branches = `branches=${selectedBranches.value
+    .map((branch) => branch.value)
+    .join(',')}`;
+  const rsp = await api(
+    `interestDeposit/generateAll?${companines}&${branches}`
+  );
+
+  if (rsp.data) {
+    onSuccess({
+      msg: rsp.data.displayMessage,
+      position: 'center',
+    });
+  }
+  submitting.value = false;
 };
 </script>
 
