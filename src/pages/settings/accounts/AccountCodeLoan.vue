@@ -90,7 +90,7 @@
                     size="xs"
                     outline
                     color="accent"
-                    v-if="!props.row.isEditing"
+                    v-if="!isEditing || editingRowIndex !== props.rowIndex"
                     @click="() => editEntry(props.rowIndex)"
                   >
                     <q-tooltip>Edit</q-tooltip>
@@ -100,7 +100,7 @@
                     size="xs"
                     outline
                     color="red"
-                    v-if="!props.row.isEditing"
+                    v-if="!isEditing || editingRowIndex !== props.rowIndex"
                     @click="() => deleteEntry(props.rowIndex)"
                   >
                     <q-tooltip>Delete</q-tooltip>
@@ -110,7 +110,7 @@
                     size="xs"
                     outline
                     color="green-10"
-                    v-if="props.row.isEditing"
+                    v-if="isEditing && editingRowIndex === props.rowIndex"
                     @click="() => saveEdited(props.rowIndex)"
                   >
                     <q-tooltip>Save</q-tooltip>
@@ -120,40 +120,31 @@
                     size="xs"
                     outline
                     color="red"
-                    v-if="props.row.isEditing"
-                    @click="props.row.isEditing = false"
+                    v-if="isEditing && editingRowIndex === props.rowIndex"
+                    @click="isEditing = false"
                   >
                     <q-tooltip>Cancel</q-tooltip>
                   </q-btn>
                 </q-btn-group>
               </q-td>
               <q-td key="accountCode" :props="props">
-                <template v-if="!props.row.isEditing">
+                <q-select
+                  v-if="isEditing && editingRowIndex === props.rowIndex"
+                  v-model="editAccountCode"
+                  :options="accountCodeOptions"
+                  outlined
+                />
+                <template v-else>
                   {{
                     accountCodes.find(
                       (item) => item.code === props.row.accountCode
                     )!.name
                   }}
                 </template>
-
-                <q-select
-                  v-else
-                  v-model="editAccountCode"
-                  :options="accountCodeOptions"
-                  outlined
-                />
               </q-td>
               <q-td key="id" :props="props">
-                <template v-if="!props.row.isEditing">
-                  {{
-                    accountHeads.find(
-                      (item) => item.id === props.row.accountId
-                    )!.name
-                  }}
-                </template>
-
                 <q-select
-                  v-else
+                  v-if="isEditing && editingRowIndex === props.rowIndex"
                   v-model="editAccountName"
                   use-input
                   hide-dropdown-icon
@@ -162,6 +153,14 @@
                   @input-value="loadAccountHeads"
                   ref="dropdown"
                 />
+                <template v-else>
+                  {{
+                    accountHeads.find(
+                      (item) => item.id === props.row.accountId
+                    )!.name
+                  }}
+                </template>
+
                 <!-- <q-input
 
                   v-model="props.row.id"
@@ -189,7 +188,7 @@
                       size="xs"
                       outline
                       color="accent"
-                      v-if="!props.row.isEditing"
+                      v-if="isEditing"
                     >
                       <q-tooltip>Edit</q-tooltip>
                     </q-btn>
@@ -198,7 +197,7 @@
                       size="xs"
                       outline
                       color="red"
-                      v-if="!props.row.isEditing"
+                      v-if="isEditing"
                       @click="() => deleteEntry(props.rowIndex)"
                     >
                       <q-tooltip>Delete</q-tooltip>
@@ -208,7 +207,7 @@
                       size="xs"
                       outline
                       color="green-10"
-                      v-if="props.row.isEditing"
+                      v-if="isEditing"
                     >
                       <q-tooltip>Save</q-tooltip>
                     </q-btn>
@@ -217,7 +216,7 @@
                       size="xs"
                       outline
                       color="red"
-                      v-if="props.row.isEditing"
+                      v-if="isEditing"
                     >
                       <q-tooltip>Cancel</q-tooltip>
                     </q-btn>
@@ -228,7 +227,7 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">Account Code :</div>
                     <div class="col-12">
-                      <template v-if="!props.row.isEditing">
+                      <template v-if="!isEditing">
                         {{
                           accountCodes.find(
                             (item) => item.code === props.row.accountCode
@@ -251,7 +250,7 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">account Name :</div>
                     <div class="col-12">
-                      <template v-if="!props.row.isEditing">
+                      <template v-if="!isEditing">
                         {{
                           accountHeads.find(
                             (item) => item.id === props.row.accountId
@@ -363,7 +362,6 @@ interface AccountCodeLoan {
   accountCode: string;
   accountId: number;
   accountingCategoryCode: 'L' | 'LAP' | 'PL' | null;
-  isEditing: boolean;
 }
 const breadcrumbs = [
   { path: '/module/settings', label: 'Settings' },
@@ -382,6 +380,8 @@ const newAccountName = ref(accountHeadOptions.value[0]);
 
 const editAccountCode = ref(accountCodeOptions.value[0]);
 const editAccountName = ref(accountHeadOptions.value[0]);
+const editingRowIndex = ref(0);
+const isEditing = ref(false);
 
 const isAddNewEntryModalActive = ref(false);
 const filteredAccountCode = computed(() => {
@@ -449,9 +449,21 @@ const loadAccountCodes = () => {
   accountCodeOptions.value = options;
 };
 
-const editEntry = (index: number) => {
+const editEntry = (rowIndex: number) => {
+  if (isEditing.value) {
+    confirmDialog(() => editEntryConfirmed(rowIndex), {
+      msg: 'Are you sure you want to cancel editing the current Code?',
+    });
+  } else {
+    isEditing.value = true;
+    editingRowIndex.value = rowIndex;
+    editEntryConfirmed(rowIndex);
+  }
+};
+
+const editEntryConfirmed = (index: number) => {
+  editingRowIndex.value = index;
   const row: AccountCodeLoan = accountCodeLoan.value[index];
-  row.isEditing = true;
   loadAccountCodes();
   let tempCode: AccountCodeOptions[] = accountCodeOptions.value.filter(
     (item) => {
@@ -490,7 +502,7 @@ const saveEdited = async (index: number) => {
       onSuccess({ msg: rsp.data.displayMessage, icon: 'check' });
       accountCodeLoan.value[index].accountCode = tempObj[0].code;
       accountCodeLoan.value[index].accountId = editAccountName.value.value;
-      accountCodeLoan.value[index].isEditing = false;
+      isEditing.value = false;
       editAccountCode.value.label = '';
       editAccountName.value.label = '';
     }
@@ -529,7 +541,6 @@ const saveNewEntry = async () => {
         accountCodeLoan.value.push({
           ...payLoad,
           id: rsp.data.id,
-          isEditing: false,
         });
         isAddNewEntryModalActive.value = false;
         newAccountCode.value.label = '';
@@ -569,25 +580,13 @@ const resetAccountCodeLoanSection = () => {
   sectionCode.value = null;
 };
 
-const fetchAccountCodeLoanByAccountingCategory = async (
-  code: 'L' | 'LAP' | 'PL'
-): Promise<Omit<AccountCodeLoan, 'isEditing'>[]> => {
-  const rsp = await api(`accountCodeLoanByAccountingCategory/${code}`);
-
-  if (!rsp.data) {
-    return [];
-  }
-  return rsp.data;
-};
-
 watch(sectionCode, async () => {
   if (sectionCode.value) {
     fetchingData.value = true;
-    const rsp = await fetchAccountCodeLoanByAccountingCategory(
-      sectionCode.value
+    const rsp = await api(
+      `accountCodeLoanByAccountingCategory/${sectionCode.value}`
     );
-
-    accountCodeLoan.value = rsp.map((data) => ({ ...data, isEditing: false }));
+    accountCodeLoan.value = rsp.data;
     fetchingData.value = false;
   }
 });
