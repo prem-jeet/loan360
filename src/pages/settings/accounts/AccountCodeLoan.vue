@@ -340,6 +340,7 @@ interface AccountCodeLoan {
   accountCode: string;
   accountId: number;
   accountingCategoryCode: string;
+  isEditing: boolean;
 }
 const breadcrumbs = [
   { path: '/module/settings', label: 'Settings' },
@@ -354,7 +355,6 @@ const accountCodeOptions = ref<AccountCodeOptions[]>([]);
 const accountHeadOptions = ref<AccountHeadOptions[]>([]);
 const dropdown = ref(null);
 const newAccountCode = ref(accountCodeOptions.value[0]);
-
 const newAccountName = ref(accountHeadOptions.value[0]);
 
 const isAddNewEntryModalActive = ref(false);
@@ -447,6 +447,12 @@ const saveNewEntry = async () => {
       const rsp = await api.post('accountCodeLoan', payLoad);
       if (rsp.data) {
         onSuccess({ msg: rsp.data.displayMessage, icon: 'check' });
+        accountCodeLoan.value.push({
+          ...payLoad,
+          id: rsp.data.id,
+          isEditing: false,
+        });
+        isAddNewEntryModalActive.value = false;
       }
     }
   } else {
@@ -458,7 +464,8 @@ const saveNewEntry = async () => {
 };
 
 const resetNewEntryForm = () => {
-  console.log('hi');
+  newAccountCode.value.label = '';
+  newAccountName.value.label = '';
 };
 
 const deleteEntry = async (rowIndex: number) => {
