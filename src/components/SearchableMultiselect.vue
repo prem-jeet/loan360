@@ -4,76 +4,63 @@
     v-model="computedSelected"
     :options="filteredOptions"
     multiple
-    options-selected-class="bg-deep-orange-6 text-white"
+    options-selected-class="bg-teal-9 text-teal-1"
     :hide-selected="false"
     :label="props.label"
     menu-shrink
     popup-content-style="height: 300px"
+    options-dense
   >
     <template v-slot:before-options>
       <q-item>
-        <q-item-section>
-          <div class="row items-center">
-            <template v-if="filteredOptions.length">
-              <q-btn
-                :icon="isAllSelected ? 'playlist_remove' : 'playlist_add_check'"
-                size="sm"
-                color="grey-10"
-                @click="toggleSelection"
-                round
-                class="q-ml-xs"
-              >
-                <q-tooltip>
-                  {{ isAllSelected ? 'Select none' : 'Select all' }}
-                </q-tooltip>
-              </q-btn>
+        <q-item-section avatar>
+          <q-input
+            v-model="query"
+            placeholder="search"
+            autofocus
+            dense
+            @click.stop=""
+          >
+            <template v-slot:prepend>
+              <q-icon name="search" />
             </template>
-            <q-input
-              v-model="query"
-              placeholder="search"
-              autofocus
-              dense
-              class="q-ml-sm"
-            >
-              <template v-slot:prepend>
-                <q-icon name="search" />
-              </template>
-            </q-input>
-          </div>
+          </q-input>
+        </q-item-section>
+        <q-item-section v-if="filteredOptions.length">
+          <q-btn
+            @click="allSelected = !allSelected"
+            :icon="allSelected ? 'playlist_remove' : 'playlist_add_check'"
+            :color="allSelected ? 'red' : 'teal'"
+            padding="sm"
+          >
+            <q-tooltip>
+              {{ allSelected ? 'Deselect all' : 'Select all' }}
+            </q-tooltip>
+          </q-btn>
         </q-item-section>
       </q-item>
     </template>
     <template v-slot:option="{ itemProps, opt, selected, toggleOption }">
       <q-item v-bind="itemProps">
         <q-item-section>
-          <div class="row items-center">
-            <q-checkbox
-              :model-value="selected"
-              @update:model-value="toggleOption(opt)"
-            />
-            {{ opt.label }}
-          </div>
+          <q-checkbox
+            :model-value="selected"
+            @update:model-value="toggleOption(opt)"
+            color="grey-10"
+            :label="opt.label"
+          />
         </q-item-section>
       </q-item>
     </template>
     <template v-slot:no-option>
       <q-item>
         <q-item-section>
-          <div class="row items-center">
-            <template v-if="filteredOptions.length">
-              <q-btn
-                :icon="isAllSelected ? 'playlist_remove' : 'playlist_add_check'"
-                size="sm"
-                color="grey-10"
-                @click="toggleSelection"
-                round
-                class="q-ml-xs"
-              >
-                <q-tooltip>
-                  {{ isAllSelected ? 'Select none' : 'Select all' }}
-                </q-tooltip>
-              </q-btn>
-            </template>
+          <q-checkbox
+            v-model="allSelected"
+            unchecked-icon="playlist_add_check"
+            checked-icon="playlist_remove"
+            color="grey-10"
+          >
             <q-input
               v-model="query"
               placeholder="search"
@@ -85,7 +72,7 @@
                 <q-icon name="search" />
               </template>
             </q-input>
-          </div>
+          </q-checkbox>
         </q-item-section>
       </q-item>
       <q-item>
@@ -135,6 +122,8 @@ const query = ref('');
 
 const selected = ref([...props.modelValue]);
 
+const allSelected = ref(props.modelValue.length === props.options.length);
+
 const computedSelected = computed({
   get() {
     return [...props.modelValue];
@@ -152,17 +141,9 @@ const filteredOptions = computed(() => [
   ),
 ]);
 
-const isAllSelected = computed(
-  () => computedSelected.value.length === props.options.length
+watch(
+  allSelected,
+  () => (selected.value = allSelected.value ? [...props.options] : [])
 );
-
-const toggleSelection = () => {
-  if (isAllSelected.value) {
-    emit('update:modelValue', []);
-  } else {
-    emit('update:modelValue', [...props.options]);
-  }
-};
-
 watch(selected, () => emit('update:modelValue', selected.value));
 </script>
