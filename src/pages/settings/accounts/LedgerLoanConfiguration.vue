@@ -33,6 +33,55 @@
               {{ props.col.label }}
             </q-th>
           </template>
+
+          <!-- row design for screens > 800px-->
+          <template v-slot:body="props">
+            <q-tr :props="props">
+              <q-td key="itemOrder" :props="props">
+                <span>{{ props.row.itemOrder }}</span>
+              </q-td>
+              <q-td key="ledgerType" :props="props">
+                <span>{{
+                  ledgerTypes[props.row.ledgerType as keyof typeof ledgerTypes]
+                }}</span>
+              </q-td>
+              <q-td key="accountCode1" :props="props">
+                <span>{{ props.row.accountCode1 }}</span>
+              </q-td>
+              <q-td key="accountCode2" :props="props">
+                <span>{{ props.row.accountCode2 }}</span>
+              </q-td>
+              <q-td key="accountCode3" :props="props">
+                <span>{{ props.row.accountCode3 }}</span>
+              </q-td>
+              <q-td key="interestMethod" :props="props">
+                <span>
+                  {{
+                    interestMethods[
+                      props.row.interestMethod as keyof typeof interestMethods
+                    ]
+                  }}
+                </span>
+              </q-td>
+              <q-td key="rateType" :props="props">
+                <span>
+                  {{ rateTypes[props.row.rateType as keyof typeof rateTypes] }}
+                </span>
+              </q-td>
+              <q-td key="rate" :props="props">
+                <span>{{ props.row.rate }}</span>
+              </q-td>
+              <q-td key="negativeRate" :props="props">
+                <span>{{ props.row.negativeRate }}</span>
+              </q-td>
+              <q-td key="graceDays" :props="props">
+                <span>{{ props.row.graceDays }}</span>
+              </q-td>
+              <q-td key="viewType" :props="props">
+                <span>{{ props.row.viewType }}</span>
+              </q-td>
+            </q-tr>
+          </template>
         </q-table>
       </div>
     </div>
@@ -71,6 +120,29 @@ const breadcrumbs = [
   },
 ];
 
+const ledgerTypes = {
+  I: 'Interest Sheet',
+  L: 'Ledger',
+};
+
+const interestMethods = {
+  S: 'Simple Interest',
+  SE: 'Simple Interest Enterprise',
+  SC: 'Simple Int.Compound on Expiry',
+  CE: 'Compound Interest Enterprise',
+  CW: 'Compound Interest Win',
+  DI: 'Daily Interest',
+  DA: 'Daily Amount',
+  IS: 'Instalment wise Simple',
+  IM: 'Instalment wise Month End Compounding',
+  MC: 'Month End Compounding',
+  I: 'RR',
+};
+
+const rateTypes = {
+  S: 'single',
+  B: 'Buckets based',
+};
 const columns: {
   name: string;
   required?: boolean;
@@ -83,6 +155,14 @@ const columns: {
     name: 'itemOrder',
     label: 'Item Order',
     field: 'itemOrder',
+    align: 'left',
+    sortable: true,
+  },
+
+  {
+    name: 'ledgerType',
+    label: 'Ledger Type',
+    field: 'ledgerType',
     align: 'left',
     sortable: true,
   },
@@ -109,23 +189,9 @@ const columns: {
   },
 
   {
-    name: 'ledgerType',
-    label: 'Ledger Type',
-    field: 'ledgerType',
-    align: 'left',
-    sortable: true,
-  },
-  {
     name: 'interestMethod',
     label: 'Interest Method',
     field: 'interestMethod',
-    align: 'left',
-    sortable: true,
-  },
-  {
-    name: 'rate',
-    label: 'Rate',
-    field: 'rate',
     align: 'left',
     sortable: true,
   },
@@ -137,9 +203,9 @@ const columns: {
     sortable: true,
   },
   {
-    name: 'graceDays',
-    label: 'Grace Days',
-    field: 'graceDays',
+    name: 'rate',
+    label: 'Rate',
+    field: 'rate',
     align: 'left',
     sortable: true,
   },
@@ -147,6 +213,13 @@ const columns: {
     name: 'negativeRate',
     label: 'Negative Rate',
     field: 'negativeRate',
+    align: 'left',
+    sortable: true,
+  },
+  {
+    name: 'graceDays',
+    label: 'Grace Days',
+    field: 'graceDays',
     align: 'left',
     sortable: true,
   },
