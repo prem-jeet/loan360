@@ -71,6 +71,12 @@ const routes: RouteRecordRaw[] = [
             component: () =>
               import('pages/settings/accounts/InterestDepositGenerate.vue'),
           },
+          {
+            path: 'loanMaster/configLedgerLoan',
+            name: 'configLedgerLoan',
+            component: () =>
+              import('src/pages/settings/accounts/LedgerLoanConfiguration.vue'),
+          },
         ],
       },
     ],
