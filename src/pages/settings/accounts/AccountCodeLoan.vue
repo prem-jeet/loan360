@@ -179,13 +179,56 @@
           <template v-slot:item="props">
             <div class="col-xs-12 col-sm-6 q-px-sm-sm">
               <q-card>
-                <q-card-section class="flex items-center">
-                  <span class="text-weight-bold">{{ props.key }}</span>
-                  <q-space />
+                <q-card-section>
+                  <div class="row q-gutter-y-xs">
+                    <div class="col-12 text-weight-medium">Account code :</div>
+                    <div class="col-12">
+                      <q-select
+                        v-if="isEditing && editingRowIndex === props.rowIndex"
+                        v-model="editAccountCode"
+                        :options="accountCodeOptions"
+                        outlined
+                      />
+                      <template v-else>
+                        {{
+                          accountCodes.find(
+                            (item) => item.code === props.row.accountCode
+                          )!.name
+                        }}
+                      </template>
+                    </div>
+                  </div>
+                </q-card-section>
+                <q-card-section class="q-pt-none">
+                  <div class="row q-gutter-y-xs">
+                    <div class="col-12 text-weight-medium">Account Name :</div>
+                    <div class="col-12">
+                      <q-select
+                        v-if="isEditing && editingRowIndex === props.rowIndex"
+                        v-model="editAccountName"
+                        use-input
+                        hide-dropdown-icon
+                        :options="accountHeadOptions"
+                        outlined
+                        @input-value="loadAccountHeads"
+                        ref="dropdown"
+                      />
+                      <template v-else>
+                        {{
+                          accountHeads.find(
+                            (item) => item.id === props.row.accountId
+                          )!.name
+                        }}
+                      </template>
+                    </div>
+                  </div>
+                </q-card-section>
+
+                <q-card-actions align="right" class="q-py-md bg-grey-2">
                   <q-btn-group push unelevated>
                     <q-btn
                       icon="edit"
-                      size="xs"
+                      size="sm"
                       outline
                       color="accent"
                       v-if="!isEditing || editingRowIndex !== props.rowIndex"
@@ -195,7 +238,7 @@
                     </q-btn>
                     <q-btn
                       icon="delete"
-                      size="xs"
+                      size="sm"
                       outline
                       color="red"
                       v-if="!isEditing || editingRowIndex !== props.rowIndex"
@@ -205,7 +248,7 @@
                     </q-btn>
                     <q-btn
                       icon="check"
-                      size="xs"
+                      size="sm"
                       outline
                       color="green-10"
                       v-if="isEditing && editingRowIndex === props.rowIndex"
@@ -215,7 +258,7 @@
                     </q-btn>
                     <q-btn
                       icon="close"
-                      size="xs"
+                      size="sm"
                       outline
                       color="red"
                       v-if="isEditing && editingRowIndex === props.rowIndex"
@@ -224,42 +267,7 @@
                       <q-tooltip>Cancel</q-tooltip>
                     </q-btn>
                   </q-btn-group>
-                </q-card-section>
-                <q-separator inset />
-                <q-card-section>
-                  <q-select
-                    v-if="isEditing && editingRowIndex === props.rowIndex"
-                    v-model="editAccountCode"
-                    :options="accountCodeOptions"
-                    outlined
-                  />
-                  <template v-else>
-                    {{
-                      accountCodes.find(
-                        (item) => item.code === props.row.accountCode
-                      )!.name
-                    }}
-                  </template>
-                </q-card-section>
-                <q-card-section>
-                  <q-select
-                    v-if="isEditing && editingRowIndex === props.rowIndex"
-                    v-model="editAccountName"
-                    use-input
-                    hide-dropdown-icon
-                    :options="accountHeadOptions"
-                    outlined
-                    @input-value="loadAccountHeads"
-                    ref="dropdown"
-                  />
-                  <template v-else>
-                    {{
-                      accountHeads.find(
-                        (item) => item.id === props.row.accountId
-                      )!.name
-                    }}
-                  </template>
-                </q-card-section>
+                </q-card-actions>
               </q-card>
             </div>
           </template>
