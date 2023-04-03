@@ -16,4 +16,5 @@
 /* Firefox */
 .remove-input-number-indicator[type='number'] {
   -moz-appearance: textfield;
+  appearance: textfield;
 }

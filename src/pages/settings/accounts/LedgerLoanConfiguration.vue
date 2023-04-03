@@ -14,7 +14,7 @@
         >
           <template v-slot:top>
             <div class="row items-center q-gutter-md">
-              <div class="col-12 text-h4">Account codes</div>
+              <div class="col-12 text-h4">Ledger Loan Configuration</div>
               <div class="col-auto">
                 <q-btn
                   size="md"
@@ -22,7 +22,11 @@
                   label="Add Ledger Loan Configuration"
                   icon="add"
                   color="blue-7"
-                  @click="null"
+                  @click="
+                    mode = 'new';
+                    resetHandler();
+                    isDialogActive = true;
+                  "
                 />
               </div>
             </div>
@@ -38,7 +42,28 @@
           <template v-slot:body="props">
             <q-tr :props="props">
               <q-td key="itemOrder" :props="props">
-                <span>{{ props.row.itemOrder }}</span>
+                {{ props.row.itemOrder }}
+                <q-btn-group push unelevated flat class="q-ml-md">
+                  <q-btn
+                    padding="sm"
+                    icon="edit"
+                    size="xs"
+                    flat
+                    color="accent"
+                    @click="
+                      mode = 'edit';
+                      resetHandler(props.rowIndex);
+                      isDialogActive = true;
+                    "
+                  />
+                  <q-btn
+                    padding="sm"
+                    icon="delete"
+                    size="xs"
+                    flat
+                    color="red"
+                  />
+                </q-btn-group>
               </q-td>
               <q-td key="ledgerType" :props="props">
                 <span>{{
@@ -86,26 +111,244 @@
       </div>
     </div>
   </div>
+
+  <q-dialog v-model="isDialogActive" persistent>
+    <q-card>
+      <q-form @submit.prevent="submitHandler" @reset="resetHandler">
+        <q-card-section class="row items-center bg-grey-2">
+          <div class="text-h6">Ledger loan configuration</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+        <q-card-section>
+          <div class="row">
+            <!-- item order -->
+            <div class="col-12">
+              <q-input
+                type="number"
+                v-model.number="tempConfig.itemOrder"
+                label="Item order"
+                :min="1"
+                :rules="[(val:string) => val!==null && val!=='']"
+              />
+            </div>
+            <!-- ledger type -->
+            <div class="col-12">
+              <q-select
+                v-model="tempConfig.ledgerType"
+                label="Ledger Type"
+                :options="getMultiselectOptions(ledgerTypes)"
+                emit-value
+                map-options
+                menu-shrink
+                :rules="[(val) => val !== null]"
+              />
+            </div>
+            <!-- account code 1 -->
+            <div class="col-12">
+              <q-select
+                v-model="tempConfig.accountCode1"
+                label="Accout Code 1"
+                :options="accountCodeTypes"
+                options-dense
+                map-options
+                menu-shrink
+                emit-value
+                clearable
+                :rules="[isAccountcodeValid]"
+              />
+            </div>
+            <!-- account code 2 -->
+            <div class="col-12">
+              <q-select
+                v-model="tempConfig.accountCode2"
+                label="Accout Code 2"
+                :options="accountCodeTypes"
+                options-dense
+                map-options
+                menu-shrink
+                emit-value
+                clearable
+                :rules="[isAccountcodeValid]"
+              />
+            </div>
+            <!-- account code 3 -->
+            <div class="col-12" v-if="tempConfig.ledgerType === 'L'">
+              <q-select
+                v-model="tempConfig.accountCode3"
+                label="Accout Code 3"
+                :options="accountCodeTypes"
+                options-dense
+                map-options
+                menu-shrink
+                emit-value
+                clearable
+                :rules="[isAccountcodeValid]"
+              />
+            </div>
+            <template v-if="tempConfig.ledgerType === 'I'">
+              <!-- interest methods -->
+              <div class="col-12">
+                <q-select
+                  v-model="tempConfig.interestMethod"
+                  label="Interest Methods"
+                  :options="getMultiselectOptions(interestMethods)"
+                  map-options
+                  menu-shrink
+                  emit-value
+                  options-dense
+                  :rules="[(val:string) => val !== null]"
+                />
+              </div>
+              <!-- rate type -->
+              <div :class="[!tempConfig.rateType ? 'col-12' : 'col-3']">
+                <q-select
+                  v-model="tempConfig.rateType"
+                  label="Rate type"
+                  :options="getMultiselectOptions(rateTypes)"
+                  map-options
+                  menu-shrink
+                  emit-value
+                  :rules="[(val:string) => val!==null]"
+                />
+              </div>
+              <div class="flex flex-center col-9">
+                <!-- rate -> single-->
+                <q-input
+                  v-if="tempConfig.rateType === 'S'"
+                  v-model.number="tempConfig.rate"
+                  label="Rate"
+                  outlined
+                  dense
+                  :rules="[(val:string) => val!==null && val!=='']"
+                  hide-bottom-space
+                  :min="0"
+                />
+                <!-- rate -> bucket -->
+                <div v-if="tempConfig.rateType === 'B'" class="row flex-center">
+                  <q-input
+                    class="col-3"
+                    dense
+                    outlined
+                    label="Days"
+                    v-model.number="bucketBasedRateInput.days1"
+                    type="number"
+                    :rules="[() => !!bucketBasedRateArr.length]"
+                    hide-bottom-space
+                  />
+                  <q-input
+                    class="col-3"
+                    dense
+                    outlined
+                    label="Days"
+                    v-model.number="bucketBasedRateInput.days2"
+                    type="number"
+                    :rules="[() => !!bucketBasedRateArr.length]"
+                    hide-bottom-space
+                  />
+                  <q-input
+                    class="col-3"
+                    dense
+                    outlined
+                    label="Rate"
+                    v-model.number="bucketBasedRateInput.rate"
+                    type="number"
+                    :rules="[() => !!bucketBasedRateArr.length]"
+                    hide-bottom-space
+                  />
+                  <q-btn
+                    icon="add"
+                    round
+                    class="q-ml-sm"
+                    color="teal"
+                    dense
+                    outline
+                    @click.stop="addRate"
+                    type="button"
+                  />
+                </div>
+              </div>
+              <!-- rate -> bucket display-->
+              <div class="col-12" v-if="tempConfig.rateType === 'B'">
+                <div class="row">
+                  <div
+                    class="col-auto"
+                    v-for="(rate, index) in bucketBasedRateArr"
+                    :key="`${rate.days1}-${rate.days2}-${rate.rate}`"
+                  >
+                    <q-chip removable @remove="() => removeRate(index)">
+                      {{ `${rate.days1}-${rate.days2}-${rate.rate}` }}
+                    </q-chip>
+                  </div>
+                </div>
+              </div>
+              <!-- negative rate -->
+              <div class="col-5">
+                <q-input
+                  v-model.number="tempConfig.negativeRate"
+                  :min="0"
+                  label="Negative rate"
+                  type="number"
+                />
+              </div>
+              <div class="col-5 offset-1">
+                <q-input
+                  v-model.number="tempConfig.graceDays"
+                  :min="0"
+                  label="Grace days"
+                  type="number"
+                />
+              </div>
+            </template>
+            <div class="col-12">
+              <q-input
+                v-model="tempConfig.viewType"
+                label="View type"
+                :rules="[(val) => val !== null && val !== '']"
+                clearable
+              />
+            </div>
+          </div>
+        </q-card-section>
+        <q-separator class="q-mt-sm" />
+        <q-card-actions align="center" class="q-py-md bg-grey-2">
+          <q-btn
+            :label="mode === 'new' ? 'Add' : 'Save '"
+            :icon="mode === 'new' ? 'add' : 'save '"
+            color="teal"
+            type="submit"
+          />
+          <q-btn label="Reset" type="reset" color="red" icon="refresh" />
+        </q-card-actions>
+      </q-form>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { onMounted, ref } from 'vue';
+import { watch, onMounted, reactive, ref } from 'vue';
 
 interface LedgerAccount {
   id: number;
   accountCode1: string | null;
   accountCode2: string | null;
   accountCode3: string | null;
-  itemOrder: number;
-  ledgerType: string | null;
-  interestMethod: string | null;
+  itemOrder: number | null;
+  ledgerType: keyof typeof ledgerTypes | null;
+  interestMethod: keyof typeof interestMethods | null;
   rate: string | null;
-  rateType: string | null;
+  rateType: keyof typeof rateTypes | null;
   graceDays: number | null;
   negativeRate: string | null;
   viewType: string | null;
+}
+
+interface BucketBasedRate {
+  days1: number | null;
+  days2: number | null;
+  rate: number | null;
 }
 
 const breadcrumbs = [
@@ -143,6 +386,9 @@ const rateTypes = {
   S: 'single',
   B: 'Buckets based',
 };
+
+const accountCodeTypes = ref<{ label: string; value: string }[]>([]);
+
 const columns: {
   name: string;
   required?: boolean;
@@ -171,21 +417,18 @@ const columns: {
     label: 'Account Code 1',
     field: 'accountCode1',
     align: 'left',
-    sortable: true,
   },
   {
     name: 'accountCode2',
     label: 'Account Code 2',
     field: 'accountCode2',
     align: 'left',
-    sortable: true,
   },
   {
     name: 'accountCode3',
     label: 'Account Code 3',
     field: 'accountCode3',
     align: 'left',
-    sortable: true,
   },
 
   {
@@ -207,38 +450,148 @@ const columns: {
     label: 'Rate',
     field: 'rate',
     align: 'left',
-    sortable: true,
   },
   {
     name: 'negativeRate',
     label: 'Negative Rate',
     field: 'negativeRate',
     align: 'left',
-    sortable: true,
   },
   {
     name: 'graceDays',
     label: 'Grace Days',
     field: 'graceDays',
     align: 'left',
-    sortable: true,
   },
   {
     name: 'viewType',
     label: 'View Type',
     field: 'viewType',
     align: 'left',
-    sortable: true,
   },
 ];
 
+const mode = ref<'edit' | 'new'>('new');
+const isDialogActive = ref(true);
+const tempConfig = reactive<LedgerAccount>({
+  id: -1,
+  accountCode1: null,
+  accountCode2: null,
+  accountCode3: null,
+  itemOrder: null,
+  ledgerType: null,
+  interestMethod: null,
+  rate: null,
+  rateType: null,
+  graceDays: null,
+  negativeRate: null,
+  viewType: 'Customer,Court',
+});
+const bucketBasedRateInput = reactive<BucketBasedRate>({
+  days1: null,
+  days2: null,
+  rate: null,
+});
+
+const bucketBasedRateArr = ref<BucketBasedRate[]>([]);
+
 const configLedgerLoan = ref<LedgerAccount[]>([]);
 
+const isAccountcodeValid = () => {
+  const check =
+    tempConfig.accountCode1 !== null || tempConfig.accountCode2 !== null;
+  if (tempConfig.ledgerType === 'I') {
+    return check;
+  }
+  if (tempConfig.ledgerType === 'L') {
+    return check || tempConfig.accountCode3 !== null;
+  }
+  return true;
+};
+
+const submitHandler = () => {
+  console.log('submitted');
+};
+
+const resetHandler = (index?: number) => {
+  if (mode.value === 'new') {
+    tempConfig.accountCode1 = null;
+    tempConfig.accountCode2 = null;
+    tempConfig.accountCode3 = null;
+    tempConfig.itemOrder = null;
+    tempConfig.ledgerType = null;
+    tempConfig.interestMethod = null;
+    tempConfig.rate = null;
+    tempConfig.rateType = null;
+    tempConfig.graceDays = null;
+    tempConfig.negativeRate = null;
+    tempConfig.viewType = 'Customer,Court';
+  } else {
+    if (index !== undefined) {
+      const row = configLedgerLoan.value[index];
+      tempConfig.accountCode1 = row.accountCode1;
+      tempConfig.accountCode2 = row.accountCode2;
+      tempConfig.accountCode3 = row.accountCode3;
+      tempConfig.itemOrder = row.itemOrder;
+      tempConfig.ledgerType = row.ledgerType;
+      tempConfig.interestMethod = row.interestMethod;
+      tempConfig.rate = row.rate;
+      tempConfig.rateType = row.rateType;
+      tempConfig.graceDays = row.graceDays;
+      tempConfig.negativeRate = row.negativeRate;
+      tempConfig.viewType = row.viewType;
+    }
+  }
+};
+const getMultiselectOptions = (obj: { [key: string]: string }) => {
+  const optionsArr = [];
+
+  for (let key in obj) {
+    optionsArr.push({ value: key, label: obj[key] });
+  }
+
+  return optionsArr;
+};
+
+const addRate = () => {
+  const { days1, days2, rate } = bucketBasedRateInput;
+  if (
+    !(Number.isFinite(days1) && Number.isFinite(days2) && Number.isFinite(rate))
+  ) {
+    return;
+  }
+
+  bucketBasedRateArr.value = [
+    ...bucketBasedRateArr.value,
+    { ...bucketBasedRateInput },
+  ];
+
+  bucketBasedRateInput.days1 = null;
+  bucketBasedRateInput.days2 = null;
+  bucketBasedRateInput.rate = null;
+};
+
+const removeRate = (index: number) => {
+  bucketBasedRateArr.value = [
+    ...bucketBasedRateArr.value.slice(0, index),
+    ...bucketBasedRateArr.value.slice(index + 1),
+  ];
+};
 onMounted(async () => {
   const rsp = await api('configLedgerLoan');
 
   if (rsp.data) {
     configLedgerLoan.value = rsp.data;
+  }
+
+  const accountCodes = await api.get('accountCodeBySection/L');
+  if (accountCodes.data) {
+    accountCodeTypes.value = accountCodes.data.map(
+      (code: { name: string; code: string }) => ({
+        value: code.code,
+        label: code.name,
+      })
+    );
   }
 });
 </script>
