@@ -24,7 +24,7 @@
   </q-toolbar>
 </template>
 <script setup lang="ts">
-import RightMenuDropDown from 'src/components/modals/RightMenuDropDown.vue';
+import RightMenuDropDown from 'src/components/RightMenuDropDown/RightMenuDropDown.vue';
 import logo from 'src/assets/img/JaguarWhite.png';
 import { useRoute } from 'vue-router';
 

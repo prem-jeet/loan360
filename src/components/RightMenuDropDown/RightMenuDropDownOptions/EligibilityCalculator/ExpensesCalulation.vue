@@ -1,0 +1,251 @@
+<template>
+  <div class="q-mt-sm q-mb-md">
+    <p>Expense</p>
+
+    <div
+      class="row justify-between q-px-lg"
+      v-if="filteredExpenseOptions.length"
+    >
+      <div class="col-12 col-md-5">
+        <q-select
+          outlined
+          dense
+          v-model="selectedExpense"
+          :options="filteredExpenseOptions"
+          label="Expenses"
+          hide-bottom-space
+        />
+      </div>
+      <div class="col-12 col-md-6 q-mt-md q-mt-md-none">
+        <q-input
+          outlined
+          dense
+          v-model.number="expenseAmount"
+          hide-bottom-space
+          type="number"
+          input-class="text-right remove-input-number-indicator"
+        />
+      </div>
+    </div>
+
+    <div class="column row-md items-center q-mt-md q-px-lg">
+      <div
+        class="text-weight-medium order-last order-md-first q-mt-sm q-mt-md-none"
+        v-if="expenses.length"
+      >
+        Total expense: {{ totalExpense }}
+      </div>
+      <div v-if="filteredExpenseOptions.length" class="q-ml-auto">
+        <q-btn
+          size="xs"
+          color="light-blue"
+          @click="addExpense"
+          icon="add"
+          padding="sm"
+        >
+          <q-tooltip> Add Expenses</q-tooltip>
+        </q-btn>
+        <q-btn
+          size="xs"
+          class="q-ml-md"
+          color="red"
+          @click="clearExpense"
+          icon="refresh"
+          padding="sm"
+        >
+          <q-tooltip>Clear</q-tooltip>
+        </q-btn>
+      </div>
+    </div>
+
+    <div
+      class="row q-px-lg items-center q-gutter-x-md q-mt-sm"
+      v-for="(expense, index) in expenses"
+      :key="expense.label"
+    >
+      <div class="col-12 col-md-auto q-mb-xs q-mb-md-none">
+        <div class="flex">
+          <q-btn
+            class="q-ml-auto"
+            outline
+            :icon="expense.isEditing ? 'check' : 'edit'"
+            :color="expense.isEditing ? 'green' : 'purple'"
+            size="xs"
+            padding="sm"
+            @click="
+              () => {
+                if (!expense.isEditing) {
+                  editExpense(expense, index);
+                } else {
+                  saveEditedExpense(index);
+                }
+              }
+            "
+          >
+            <q-tooltip>
+              {{ expense.isEditing ? 'Save' : 'Edit' }}
+            </q-tooltip>
+          </q-btn>
+          <q-btn
+            class="q-ml-sm"
+            outline
+            :icon="expense.isEditing ? 'close' : 'delete'"
+            color="red"
+            size="xs"
+            padding="sm"
+            @click="
+              () => {
+                if (!expense.isEditing) {
+                  deleteExpense(expense.label);
+                } else {
+                  expense.isEditing = false;
+                }
+              }
+            "
+          >
+            <q-tooltip>
+              {{ expense.isEditing ? 'Cancel' : 'Delete' }}
+            </q-tooltip>
+          </q-btn>
+        </div>
+      </div>
+      <div class="col">
+        <template
+          v-if="!expense.isEditing || filteredEditingExpenseOptions.length < 2"
+        >
+          {{ expense.label }}
+        </template>
+        <template v-else>
+          <q-select
+            outlined
+            dense
+            v-model="editedExpense.label"
+            :options="filteredEditingExpenseOptions"
+            hide-bottom-space
+          />
+        </template>
+      </div>
+      <div class="col">
+        <template v-if="!expense.isEditing">
+          {{ expense.amount }}
+        </template>
+        <template v-else>
+          <q-input
+            outlined
+            dense
+            v-model.number="editedExpense.amount"
+            hide-bottom-space
+            type="number"
+            input-class="text-right remove-input-number-indicator"
+          />
+        </template>
+      </div>
+    </div>
+  </div>
+</template>
+<script setup lang="ts">
+import { ref, reactive, watch, onMounted, computed } from 'vue';
+
+import { api } from 'src/boot/axios';
+
+const props = defineProps({
+  resetFlag: { type: Boolean },
+});
+const emits = defineEmits(['totalExpense']);
+
+const selectedExpense = ref<string | null>(null);
+const expenseAmount = ref<number | null>(null);
+const expenseOptions = ref<string[]>([]);
+const expenses = ref<{ label: string; amount: number; isEditing: boolean }[]>(
+  []
+);
+
+const editedExpense = reactive({
+  label: '',
+  amount: 0,
+});
+
+const reset = computed(() => props.resetFlag);
+
+const filteredExpenseOptions = computed(() => {
+  if (!expenseOptions.value.length) {
+    return [];
+  }
+  const unavailableOptions = expenses.value.map((expense) => expense.label);
+  return expenseOptions.value.filter(
+    (option) => !unavailableOptions.includes(option)
+  );
+});
+const filteredEditingExpenseOptions = computed(() => [
+  ...filteredExpenseOptions.value,
+  editedExpense.label,
+]);
+
+const totalExpense = computed(() => {
+  return expenses.value.reduce((acc, val) => acc + val.amount, 0);
+});
+
+const addExpense = () => {
+  if (
+    selectedExpense.value &&
+    expenseAmount.value !== null &&
+    typeof expenseAmount.value != 'string'
+  )
+    expenses.value = [
+      ...expenses.value,
+      {
+        label: selectedExpense.value,
+        amount: expenseAmount.value,
+        isEditing: false,
+      },
+    ];
+  clearExpense();
+};
+
+const clearExpense = () => {
+  selectedExpense.value = null;
+  expenseAmount.value = null;
+};
+
+const deleteExpense = (id: string) => {
+  expenses.value = expenses.value.filter((expense) => expense.label !== id);
+};
+
+const editExpense = (
+  expese: { label: string; amount: number },
+  index: number
+) => {
+  expenses.value.forEach((item) => (item.isEditing = false));
+  editedExpense.label = expese.label;
+  editedExpense.amount = expese.amount;
+  expenses.value[index].isEditing = true;
+};
+
+const saveEditedExpense = (index: number) => {
+  expenses.value[index].label = editedExpense.label;
+  expenses.value[index].amount = editedExpense.amount;
+  expenses.value[index].isEditing = false;
+};
+
+onMounted(async () => {
+  const rsp = await api.get('expenses');
+
+  if (rsp.data) {
+    expenseOptions.value = rsp.data.map((item: { name: string }) => item.name);
+  }
+});
+
+watch(totalExpense, () => {
+  let total = 0;
+  if (expenses.value.length) {
+    total = totalExpense.value;
+  }
+
+  emits('totalExpense', total);
+});
+
+watch(reset, () => {
+  expenses.value = [];
+});
+</script>
+<style scoped></style>
