@@ -516,10 +516,10 @@ const saveEdited = async (index: number) => {
 
 const saveNewEntry = async () => {
   if (newAccountCode.value && newAccountName.value) {
-    const val = accountCodeLoan.value.filter((item) => {
+    const tempVal = accountCodeLoan.value.filter((item) => {
       return item.accountCode === newAccountCode.value.value;
     });
-    if (val.length) {
+    if (tempVal.length) {
       onFailure({
         msg: 'Duplicate Account Found',
         icon: 'warning',
