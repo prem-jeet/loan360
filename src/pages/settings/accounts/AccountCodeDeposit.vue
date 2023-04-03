@@ -1,9 +1,18 @@
 <template>
-  <div>
-    <h1>Account Code Deposit Page</h1>
+  <div class="absolute q-pa-md full-width full-height bg-gre-4">
+    <q-chip outline square size="md" class="shadow-4" :ripple="false">
+      <BreadCrumbs :ordered-paths="breadcrumbs" />
+    </q-chip>
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
+
+const breadcrumbs = [
+  { path: '/module/settings', label: 'Settings' },
+  { path: '/module/settings/accountcode', label: 'Account Code Deposit' },
+];
+</script>
 
 <style scoped></style>
