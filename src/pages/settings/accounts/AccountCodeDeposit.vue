@@ -203,7 +203,7 @@
           </template>
 
           <!-- card for grid layout screens < 800px -->
-          <!-- <template v-slot:item="props">
+          <template v-slot:item="props">
             <div class="col-xs-12 col-sm-6 q-px-sm-sm">
               <q-card>
                 <q-card-section class="flex items-center">
@@ -255,43 +255,35 @@
                 <q-separator inset />
                 <q-card-section>
                   <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Name :</div>
+                    <div class="col-12 text-weight-medium">Account Code :</div>
                     <div class="col-12">
                       <template v-if="!isEditing">
-                        {{ props.row.name }}
+                        {{
+                          accountCodes.find(
+                            (item) => item.value === props.row.accountCode
+                          )!.label
+                        }}
                       </template>
-                      <q-input
-                        v-if="isEditing && editingRowIndex === props.rowIndex"
-                        v-model="editingData.name"
-                        placeholder="Name required"
-                        dense
-                        outlined
-                        :color="editingData.name ? 'green' : 'red'"
-                        autofocus
-                      />
                     </div>
                   </div>
                 </q-card-section>
                 <q-card-section>
                   <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Section :</div>
+                    <div class="col-12 text-weight-medium">Account Name :</div>
                     <div class="col-12">
                       <template v-if="!isEditing">
-                        {{ props.row.section }}
+                        {{
+                          accountHeads.find(
+                            (item) => item.value === props.row.accountId
+                          )!.label
+                        }}
                       </template>
-                      <q-select
-                        v-if="isEditing && editingRowIndex === props.rowIndex"
-                        dense
-                        outlined
-                        v-model="editingData.section"
-                        :options="sectionSelectOptions"
-                      />
                     </div>
                   </div>
                 </q-card-section>
               </q-card>
             </div>
-          </template> -->
+          </template>
         </q-table>
       </div>
     </div>
