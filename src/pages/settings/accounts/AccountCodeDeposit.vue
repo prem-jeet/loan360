@@ -72,6 +72,9 @@
                     @click="loadAccountCodeDeposits"
                   />
                 </div>
+                <div class="col-12 q-ml-none q-pl-sm q-pt-sm">
+                  <q-checkbox v-model="isApplication" label="isApplication" />
+                </div>
               </div>
             </div>
           </template>
@@ -154,7 +157,7 @@
                 }}</span>
               </q-td>
               <q-td
-                key="section"
+                key="isApplication"
                 :props="props"
                 auto-width
                 style="min-width: 300px"
@@ -165,12 +168,10 @@
                   outlined
                   v-model="editingData.section"
                   :options="sectionSelectOptions"
-                />
-                <span v-else>{{
-                  sectionSelectOptions.find(
-                    (item) => item.value === props.row.section
-                  )!.label
-                }}</span> -->
+                />-->
+                <span>
+                  <q-checkbox v-model="props.row.isApplication" disable
+                /></span>
               </q-td>
             </q-tr>
           </template>
@@ -274,13 +275,12 @@
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 
 const breadcrumbs = [
   { path: '/module/settings', label: 'Settings' },
   { path: '/module/settings/accountcode', label: 'Account Code Deposit' },
 ];
-const fetchingData = ref(false);
 
 interface AccountHeads {
   name: string;
@@ -295,6 +295,14 @@ interface Options {
   value: string;
   label: string;
 }
+interface AccountCodeDeposit {
+  accountCode: string;
+  categoryCode: string;
+  id: number;
+  isApplication: boolean;
+  productCode: string;
+}
+const fetchingData = ref(false);
 const accountHeads = ref<AccountHeads[]>([]);
 const accountCodes = ref<AccountCodes[]>([]);
 const error = ref(false);
@@ -313,20 +321,13 @@ const categorys = ref<Options[]>([
   { value: 'O', label: 'Others' },
   { value: 'DR', label: "Director's Relatives" },
 ]);
-// const newAccountName = ref(accountHeadOptions.value[0]);
 const product = ref(products.value[0]);
 const category = ref(categorys.value[0]);
-
-interface AccountCodeDeposit {
-  accountCode: string;
-  categoryCode: string;
-  id: number;
-  isApplication: boolean;
-  productCode: string;
-}
 const accountCodeDeposits = ref<AccountCodeDeposit[]>([]);
+const accountCodeDepositsTemp = ref<AccountCodeDeposit[]>([]);
 const editingRowIndex = ref(0);
 const isEditing = ref(false);
+const isApplication = ref(false);
 
 const columns: {
   name: string;
@@ -365,14 +366,14 @@ const columns: {
 ];
 
 const editEntry = (index: number) => {
-  console.log('hi');
+  console.log('hi', index);
 };
 
 const deleteEntry = (index: number) => {
-  console.log('hi');
+  console.log('hi', index);
 };
 const saveEdited = (index: number) => {
-  console.log('hi');
+  console.log('hi', index);
 };
 const filteredNatureEntry = computed(() => {
   return accountCodeDeposits.value;
@@ -386,11 +387,29 @@ const loadAccountCodeDeposits = async () => {
       `accountCodeDeposit/${product.value.value}/${category.value.value}`
     );
     if (rsp.data) {
-      accountCodeDeposits.value = rsp.data;
+      accountCodeDeposits.value = rsp.data.filter(
+        (item: { isApplication: boolean }) => {
+          return item.isApplication === false;
+        }
+      );
+      accountCodeDepositsTemp.value = rsp.data;
       console.log(accountCodeDeposits.value);
     }
   }
 };
+
+watch(isApplication, () => {
+  if (isApplication.value === true) {
+    accountCodeDeposits.value = accountCodeDepositsTemp.value.filter((item) => {
+      return item.isApplication === true;
+    });
+  }
+  if (isApplication.value === false) {
+    accountCodeDeposits.value = accountCodeDepositsTemp.value.filter((item) => {
+      return item.isApplication === false;
+    });
+  }
+});
 
 onMounted(async () => {
   fetchingData.value = true;
