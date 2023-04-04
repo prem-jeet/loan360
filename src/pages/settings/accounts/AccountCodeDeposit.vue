@@ -15,7 +15,11 @@
           separator="cell"
           bordered
           title="Nature entry"
-          :no-data-label="'Select a filter product and category'"
+          :no-data-label="
+            accountCodeDepositsTemp.length
+              ? 'No result found'
+              : 'Select a filter product and category'
+          "
           :rows-per-page-options="[0]"
           :hide-bottom="!!filteredNatureEntry.length"
           :grid="$q.screen.width < 830"
@@ -39,8 +43,13 @@
               <div class="row items-center q-gutter-x-md">
                 <div class="col-12 q-mb-sm">
                   <span class="text-h6">Filter</span>
-                  <span class="q-ml-md">
-                    <q-btn label="Clear" color="red" size="sm"></q-btn
+                  <span v-if="accountCodeDepositsTemp.length" class="q-ml-md">
+                    <q-btn
+                      label="Clear"
+                      color="red"
+                      size="sm"
+                      @click="resetAccountCodeDeposits"
+                    ></q-btn
                   ></span>
                 </div>
                 <div class="col-xs-12 col-sm-12 col-md-4 q-pt-sm">
@@ -72,7 +81,14 @@
                     @click="loadAccountCodeDeposits"
                   />
                 </div>
-                <div class="col-12 q-ml-none q-pl-sm q-pt-sm">
+                <div
+                  v-if="
+                    product.value !== 'FD' &&
+                    product.value !== 'RD' &&
+                    product.value !== 'DD'
+                  "
+                  class="col-12 q-ml-none q-pl-sm q-pt-sm"
+                >
                   <q-checkbox v-model="isApplication" label="isApplication" />
                 </div>
               </div>
@@ -378,11 +394,16 @@ const saveEdited = (index: number) => {
 const filteredNatureEntry = computed(() => {
   return accountCodeDeposits.value;
 });
+
+const resetAccountCodeDeposits = () => {
+  accountCodeDeposits.value = [];
+  accountCodeDepositsTemp.value = [];
+};
 const loadAccountCodeDeposits = async () => {
+  isApplication.value = false;
   if (product.value.value === '' || category.value.value === '') {
     error.value = true;
   } else {
-    console.log(category.value.value);
     const rsp = await api(
       `accountCodeDeposit/${product.value.value}/${category.value.value}`
     );
