@@ -311,7 +311,7 @@
             />
           </div>
         </q-card-section>
-        <q-card-section class="q-px-lg q-py-md">
+        <q-card-section class="q-px-lg q-py-sm">
           <div class="row">
             <div class="col-12">
               <div class="col-12 q-mt-lg">
@@ -362,15 +362,13 @@
                 />
               </div>
 
-              <div class="col-12 q-mt-lg"></div>
-
               <div
                 v-if="
                   addNewProduct.value === 'FD' ||
                   addNewProduct.value === 'RD' ||
                   addNewProduct.value === 'DD'
                 "
-                class="col-12 q-mt-lg"
+                class="col-12 q-mt-sm"
               >
                 <q-checkbox
                   disable
@@ -378,7 +376,7 @@
                   label="isApplication"
                 />
               </div>
-              <div v-else class="col-12 q-mt-lg">
+              <div v-else class="col-12 q-mt-sm">
                 <q-checkbox v-model="addIsApplication" label="isApplication" />
               </div>
             </div>
