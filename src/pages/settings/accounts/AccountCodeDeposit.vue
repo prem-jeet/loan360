@@ -36,6 +36,7 @@
                       icon="add"
                       label="Add new"
                       size="md"
+                      @click="isAddNewEntryModalActive = true"
                     />
                   </div>
                 </div>
@@ -59,7 +60,7 @@
                     :options="products"
                     label="Select product"
                     outlined
-                    :error="error && !product"
+                    :error="product.value === ''"
                     hide-bottom-space
                   />
                 </div>
@@ -70,7 +71,7 @@
                     :options="categorys"
                     label="Select category"
                     outlined
-                    :error="error && !category"
+                    :error="category.value === ''"
                     hide-bottom-space
                   />
                 </div>
@@ -83,12 +84,20 @@
                 </div>
                 <div
                   v-if="
-                    product.value !== 'FD' &&
-                    product.value !== 'RD' &&
-                    product.value !== 'DD'
+                    product.value === 'FD' ||
+                    product.value === 'RD' ||
+                    product.value === 'DD'
                   "
                   class="col-12 q-ml-none q-pl-sm q-pt-sm"
                 >
+                  <q-checkbox
+                    v-model="isApplication"
+                    disable
+                    label="isApplication"
+                  />
+                </div>
+
+                <div v-else class="col-12 q-ml-none q-pl-sm q-pt-sm">
                   <q-checkbox v-model="isApplication" label="isApplication" />
                 </div>
               </div>
@@ -152,8 +161,8 @@
                 <span>
                   {{
                     accountCodes.find(
-                      (item) => item.code === props.row.accountCode
-                    )!.name
+                      (item) => item.value === props.row.accountCode
+                    )!.label
                   }}</span
                 >
               </q-td>
@@ -168,8 +177,9 @@
                   autofocus
                 /> -->
                 <span>{{
-                  accountHeads.find((item) => item.id === props.row.accountId)!
-                    .name
+                  accountHeads.find(
+                    (item) => item.value === props.row.accountId
+                  )!.label
                 }}</span>
               </q-td>
               <q-td
@@ -286,11 +296,108 @@
       </div>
     </div>
   </div>
+  <q-dialog v-model="isAddNewEntryModalActive">
+    <q-card>
+      <q-form @submit.prevent="saveNewEntry" @reset="resetNewEntryForm">
+        <q-card-section class="bg-grey-2">
+          <div class="flex items-center">
+            <span class="text-h6 q-mr-xl">Add nature entry</span>
+            <q-space />
+            <q-btn
+              class="q-ml-xs-md q-ml-sm-xl"
+              icon="close"
+              flat
+              @click="isAddNewEntryModalActive = false"
+            />
+          </div>
+        </q-card-section>
+        <q-card-section class="q-px-lg q-py-md">
+          <div class="row">
+            <div class="col-12">
+              <div class="col-12 q-mt-lg">
+                <q-select
+                  v-model="addNewProduct"
+                  dense
+                  :options="products"
+                  label="Select product"
+                  outlined
+                  :error="addNewProduct.label === ''"
+                  hide-bottom-space
+                />
+              </div>
+              <div class="col-12 q-mt-lg">
+                <q-select
+                  v-model="addNewCategory"
+                  dense
+                  :options="categorys"
+                  label="Select category"
+                  outlined
+                  :error="addNewCategory.value === ''"
+                  hide-bottom-space
+                />
+              </div>
+              <div class="col-12 q-mt-lg">
+                <q-select
+                  v-model="accountCode"
+                  dense
+                  :options="accountCodes"
+                  label="Select Code"
+                  outlined
+                  :error="accountCode.value === ''"
+                  hide-bottom-space
+                />
+              </div>
+              <div class="col-12 q-mt-lg">
+                <q-select
+                  v-model="accountName"
+                  dense
+                  use-input
+                  hide-dropdown-icon
+                  :options="accountNameOptions"
+                  label="Account name"
+                  outlined
+                  :error="accountName.label === ''"
+                  @input-value="loadAccountNames"
+                  ref="dropdown"
+                />
+              </div>
+
+              <div class="col-12 q-mt-lg"></div>
+
+              <div
+                v-if="
+                  addNewProduct.value === 'FD' ||
+                  addNewProduct.value === 'RD' ||
+                  addNewProduct.value === 'DD'
+                "
+                class="col-12 q-mt-lg"
+              >
+                <q-checkbox
+                  disable
+                  v-model="addIsApplication"
+                  label="isApplication"
+                />
+              </div>
+              <div v-else class="col-12 q-mt-lg">
+                <q-checkbox v-model="addIsApplication" label="isApplication" />
+              </div>
+            </div>
+          </div>
+        </q-card-section>
+        <q-separator class="q-mt-md" />
+        <q-card-actions align="right" class="q-py-md bg-grey-2">
+          <q-btn label="Add" color="green-5" type="submit" />
+          <q-btn label="Reset" color="red-5" type="reset" />
+        </q-card-actions>
+      </q-form>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
+import { onSuccess } from 'src/utils/notification';
 import { ref, onMounted, computed, watch } from 'vue';
 
 const breadcrumbs = [
@@ -299,12 +406,12 @@ const breadcrumbs = [
 ];
 
 interface AccountHeads {
-  name: string;
-  id: number;
+  label: string;
+  value: number;
 }
 interface AccountCodes {
-  name: string;
-  code: string;
+  label: string;
+  value: string;
 }
 
 interface Options {
@@ -318,10 +425,11 @@ interface AccountCodeDeposit {
   isApplication: boolean;
   productCode: string;
 }
+const isAddNewEntryModalActive = ref(false);
 const fetchingData = ref(false);
 const accountHeads = ref<AccountHeads[]>([]);
+const accountNameOptions = ref<AccountHeads[]>([]);
 const accountCodes = ref<AccountCodes[]>([]);
-const error = ref(false);
 const products = ref<Options[]>([
   { value: 'FD', label: 'Fixed Deposit' },
   { value: 'RD', label: 'Recurring Deposit' },
@@ -337,13 +445,19 @@ const categorys = ref<Options[]>([
   { value: 'O', label: 'Others' },
   { value: 'DR', label: "Director's Relatives" },
 ]);
-const product = ref(products.value[0]);
-const category = ref(categorys.value[0]);
+const product = ref({ value: '', label: '' });
+const category = ref({ value: '', label: '' });
+const addNewProduct = ref({ value: '', label: '' });
+const addNewCategory = ref({ value: '', label: '' });
+const accountCode = ref({ value: '', label: '' });
+const accountName = ref({ value: null, label: '' });
 const accountCodeDeposits = ref<AccountCodeDeposit[]>([]);
 const accountCodeDepositsTemp = ref<AccountCodeDeposit[]>([]);
 const editingRowIndex = ref(0);
 const isEditing = ref(false);
 const isApplication = ref(false);
+const addIsApplication = ref(false);
+const dropdown = ref(null);
 
 const columns: {
   name: string;
@@ -381,6 +495,27 @@ const columns: {
   },
 ];
 
+const saveNewEntry = async () => {
+  const tempObj = {
+    accountCode: accountCode.value.value,
+    accountId: accountName.value.value,
+    categoryCode: addNewCategory.value.value,
+    isApplication: addIsApplication.value,
+    productCode: addNewProduct.value.value,
+  };
+  const rsp = await api.post('accountCodeDeposit', tempObj);
+  if (rsp.data) {
+    onSuccess({
+      msg: rsp.data.displayMessage,
+      icon: 'sync_alt',
+    });
+    loadAccountCodeDeposits();
+    isAddNewEntryModalActive.value = false;
+  }
+};
+const resetNewEntryForm = () => {
+  console.log('hi');
+};
 const editEntry = (index: number) => {
   console.log('hi', index);
 };
@@ -394,28 +529,36 @@ const saveEdited = (index: number) => {
 const filteredNatureEntry = computed(() => {
   return accountCodeDeposits.value;
 });
+const loadAccountNames = (searchName: string) => {
+  if (searchName.length > 1) {
+    accountNameOptions.value = accountHeads.value.filter((item) => {
+      return item.label.toLowerCase().includes(searchName.toLowerCase());
+    });
 
+    // @ts-expect-error function provided by component
+    dropdown.value!.showPopup();
+  } else {
+    accountNameOptions.value = [];
+  }
+};
 const resetAccountCodeDeposits = () => {
   accountCodeDeposits.value = [];
   accountCodeDepositsTemp.value = [];
 };
 const loadAccountCodeDeposits = async () => {
   isApplication.value = false;
-  if (product.value.value === '' || category.value.value === '') {
-    error.value = true;
-  } else {
-    const rsp = await api(
-      `accountCodeDeposit/${product.value.value}/${category.value.value}`
+
+  const rsp = await api(
+    `accountCodeDeposit/${product.value.value}/${category.value.value}`
+  );
+  if (rsp.data) {
+    accountCodeDeposits.value = rsp.data.filter(
+      (item: { isApplication: boolean }) => {
+        return item.isApplication === false;
+      }
     );
-    if (rsp.data) {
-      accountCodeDeposits.value = rsp.data.filter(
-        (item: { isApplication: boolean }) => {
-          return item.isApplication === false;
-        }
-      );
-      accountCodeDepositsTemp.value = rsp.data;
-      console.log(accountCodeDeposits.value);
-    }
+    accountCodeDepositsTemp.value = rsp.data;
+    console.log(accountCodeDeposits.value);
   }
 };
 
@@ -432,14 +575,33 @@ watch(isApplication, () => {
   }
 });
 
+watch(product, () => {
+  if (
+    product.value.value === 'FD' ||
+    product.value.value === 'RD' ||
+    product.value.value === 'DD'
+  ) {
+    isApplication.value = false;
+  }
+});
+watch(addNewProduct, () => {
+  if (
+    addNewProduct.value.value === 'FD' ||
+    addNewProduct.value.value === 'RD' ||
+    addNewProduct.value.value === 'DD'
+  ) {
+    addIsApplication.value = false;
+  }
+});
+
 onMounted(async () => {
   fetchingData.value = true;
   const rsp = await api.get('accountHead');
 
   if (rsp.data) {
     accountHeads.value = rsp.data.map((item: { id: number; name: string }) => ({
-      id: item.id,
-      name: item.name,
+      value: item.id,
+      label: item.name,
     }));
     console.log(accountHeads.value);
   }
@@ -453,8 +615,8 @@ onMounted(async () => {
   if (rsp.data) {
     accountCodes.value = rsp.data.map(
       (item: { code: string; name: string }) => ({
-        code: item.code,
-        name: item.name,
+        value: item.code,
+        label: item.name,
       })
     );
     console.log(accountCodes.value);
