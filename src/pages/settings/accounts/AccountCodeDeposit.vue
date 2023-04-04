@@ -514,7 +514,15 @@ const saveNewEntry = async () => {
   }
 };
 const resetNewEntryForm = () => {
-  console.log('hi');
+  addNewCategory.value.label = '';
+  addNewCategory.value.value = '';
+  addNewProduct.value.label = '';
+  addNewProduct.value.value = '';
+  accountCode.value.label = '';
+  accountCode.value.value = '';
+  accountName.value.label = '';
+  accountName.value.value = null;
+  addIsApplication.value = false;
 };
 const editEntry = (index: number) => {
   console.log('hi', index);
