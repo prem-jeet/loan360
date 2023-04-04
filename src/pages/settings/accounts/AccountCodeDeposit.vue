@@ -53,7 +53,7 @@
                     ></q-btn
                   ></span>
                 </div>
-                <div class="col-xs-12 col-sm-12 col-md-4 q-pt-sm">
+                <div class="col-xs-12 col-sm-4 col-md-4 q-pt-md">
                   <q-select
                     v-model="product"
                     dense
@@ -64,7 +64,7 @@
                     hide-bottom-space
                   />
                 </div>
-                <div class="col-xs-12 col-sm-12 col-md-4 q-pt-sm">
+                <div class="col-xs-12 col-sm-4 col-md-4 q-pt-md">
                   <q-select
                     v-model="category"
                     dense
@@ -75,7 +75,7 @@
                     hide-bottom-space
                   />
                 </div>
-                <div class="col-xs-12 col-sm-12 col-md-2 q-pt-sm">
+                <div class="col-xs-12 col-sm-2 col-md-2 q-pt-md">
                   <q-btn
                     color="primary"
                     label="search"
