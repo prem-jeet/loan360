@@ -158,7 +158,18 @@
                 </q-btn-group>
               </q-td>
               <q-td key="accountCode" :props="props">
-                <span>
+                <q-select
+                  v-if="isEditing && editingRowIndex === props.rowIndex"
+                  v-model="editAccountCode"
+                  dense
+                  :options="accountCodes"
+                  label="Select Code"
+                  outlined
+                  :error="editAccountCode.value === ''"
+                  hide-bottom-space
+                />
+
+                <span v-else>
                   {{
                     accountCodes.find(
                       (item) => item.value === props.row.accountCode
@@ -167,16 +178,21 @@
                 >
               </q-td>
               <q-td key="accountId" :props="props">
-                <!-- <q-input
+                <q-select
+                  class="q-pb-none"
                   v-if="isEditing && editingRowIndex === props.rowIndex"
-                  v-model="editingData.name"
-                  placeholder="Name required"
+                  v-model="editAccountName"
                   dense
+                  use-input
+                  hide-dropdown-icon
+                  :options="accountNameOptions"
+                  label="Account name"
                   outlined
-                  :color="editingData.name ? 'green' : 'red'"
-                  autofocus
-                /> -->
-                <span>{{
+                  @input-value="loadAccountNames"
+                  ref="dropdown"
+                />
+
+                <span v-else>{{
                   accountHeads.find(
                     (item) => item.value === props.row.accountId
                   )!.label
@@ -188,14 +204,30 @@
                 auto-width
                 style="min-width: 300px"
               >
-                <!-- <q-select
-                  v-if="isEditing && editingRowIndex === props.rowIndex"
-                  dense
-                  outlined
-                  v-model="editingData.section"
-                  :options="sectionSelectOptions"
-                />-->
-                <span>
+                <span v-if="isEditing && editingRowIndex === props.rowIndex">
+                  <div
+                    v-if="
+                      product.value === 'FD' ||
+                      product.value === 'RD' ||
+                      product.value === 'DD'
+                    "
+                    class="col-12 q-mt-sm"
+                  >
+                    <q-checkbox
+                      disable
+                      v-model="editIsApplication"
+                      label="isApplication"
+                    />
+                  </div>
+                  <div v-else class="col-12 q-mt-sm">
+                    <q-checkbox
+                      v-model="editIsApplication"
+                      label="isApplication"
+                    />
+                  </div>
+                </span>
+
+                <span v-else>
                   <q-checkbox v-model="props.row.isApplication" disable
                 /></span>
               </q-td>
@@ -348,7 +380,7 @@
                   :options="accountNameOptions"
                   label="Account name"
                   outlined
-                  :error="accountName.label === ''"
+                  :error="accountNameBool"
                   @input-value="loadAccountNames"
                   ref="dropdown"
                 />
@@ -414,6 +446,7 @@ interface AccountCodeDeposit {
   id: number;
   isApplication: boolean;
   productCode: string;
+  accountId: number;
 }
 const isAddNewEntryModalActive = ref(false);
 const fetchingData = ref(false);
@@ -440,13 +473,17 @@ const category = ref({ value: '', label: '' });
 const addNewProduct = ref({ value: '', label: '' });
 const addNewCategory = ref({ value: '', label: '' });
 const accountCode = ref({ value: '', label: '' });
-const accountName = ref({ value: null, label: '' });
+const accountName = ref(accountHeads.value[0]);
+const editAccountCode = ref({ value: '', label: '' });
+const editAccountName = ref(accountHeads.value[0]);
+const accountNameBool = ref(true);
 const accountCodeDeposits = ref<AccountCodeDeposit[]>([]);
 const accountCodeDepositsTemp = ref<AccountCodeDeposit[]>([]); // for isapplicable
 const editingRowIndex = ref(0);
 const isEditing = ref(false);
 const isApplication = ref(false);
 const addIsApplication = ref(false);
+const editIsApplication = ref(false);
 const dropdown = ref(null);
 
 const columns: {
@@ -511,11 +548,69 @@ const resetNewEntryForm = () => {
   accountCode.value.label = '';
   accountCode.value.value = '';
   accountName.value.label = '';
-  accountName.value.value = null;
+  accountName.value.value = 0;
   addIsApplication.value = false;
 };
-const editEntry = (index: number) => {
-  console.log('hi', index);
+
+const editEntry = (rowIndex: number) => {
+  if (isEditing.value) {
+    confirmDialog(() => editEntryConfirmed(rowIndex), {
+      msg: 'Are you sure you want to cancel editing the current Code?',
+    });
+  } else {
+    isEditing.value = true;
+    editingRowIndex.value = rowIndex;
+    editEntryConfirmed(rowIndex);
+  }
+};
+const editEntryConfirmed = (index: number) => {
+  editingRowIndex.value = index;
+  const row: AccountCodeDeposit = accountCodeDeposits.value[index];
+
+  let tempCode: AccountCodes[] = accountCodes.value.filter((item) => {
+    return item.value === row.accountCode;
+  });
+  editAccountCode.value = tempCode[0];
+  let tempName: AccountHeads[] = accountHeads.value.filter((item) => {
+    return item.value === row.accountId;
+  });
+  editAccountName.value = tempName[0];
+  editIsApplication.value = accountCodeDeposits.value[index].isApplication;
+};
+const saveEdited = async (index: number) => {
+  const row: AccountCodeDeposit = accountCodeDeposits.value[index];
+
+  const rsp = await api.get('accountHead');
+
+  let headObj = rsp.data.filter((item: { id: number }) => {
+    return item.id === row.accountId;
+  });
+
+  const payLoad = {
+    account: headObj[0],
+    accountCode: editAccountCode.value.value,
+    accountId: editAccountName.value.value,
+    categoryCode: row.categoryCode,
+    id: row.id,
+    isApplication: false,
+    productCode: row.productCode,
+  };
+
+  const rsp_ = await api.post('accountCodeDeposit', payLoad);
+  if (rsp_.data) {
+    onSuccess({
+      msg: rsp_.data.displayMessage,
+      icon: 'sync_alt',
+    });
+    accountCodeDeposits.value[index].accountCode = editAccountCode.value.value;
+    accountCodeDeposits.value[index].accountId = editAccountName.value.value;
+    accountCodeDeposits.value[index].isApplication = editIsApplication.value;
+    console.log(accountCodeDeposits.value);
+
+    isEditing.value = false;
+    editAccountCode.value.label = '';
+    editAccountName.value.label = '';
+  }
 };
 
 const deleteEntry = async (rowIndex: number) => {
@@ -533,9 +628,6 @@ const deleteEntryConfirmed = async (rowIndex: number) => {
   }
 };
 
-const saveEdited = (index: number) => {
-  console.log('hi', index);
-};
 const filteredNatureEntry = computed(() => {
   return accountCodeDeposits.value;
 });
@@ -601,6 +693,13 @@ watch(addNewProduct, () => {
     addNewProduct.value.value === 'DD'
   ) {
     addIsApplication.value = false;
+  }
+});
+watch(accountName, () => {
+  if (accountName.value) {
+    accountNameBool.value = false;
+  } else {
+    accountNameBool.value = true;
   }
 });
 
