@@ -113,17 +113,17 @@
   </div>
 
   <q-dialog v-model="isDialogActive" persistent>
-    <q-card>
+    <q-card :style="{ minWidth: '40vw' }">
+      <q-card-section class="row items-center bg-grey-2">
+        <div class="text-h6">Ledger loan configuration</div>
+        <q-space />
+        <q-btn icon="close" flat round dense v-close-popup />
+      </q-card-section>
       <q-form @submit.prevent="submitHandler" @reset="resetHandler">
-        <q-card-section class="row items-center bg-grey-2">
-          <div class="text-h6">Ledger loan configuration</div>
-          <q-space />
-          <q-btn icon="close" flat round dense v-close-popup />
-        </q-card-section>
-        <q-card-section>
-          <div class="row">
+        <q-card-section :style="{ maxHeight: '70vh' }" class="scroll">
+          <div class="row justify-evenly q-gutter-md">
             <!-- item order -->
-            <div class="col-12">
+            <div class="col">
               <q-input
                 type="number"
                 v-model.number="tempConfig.itemOrder"
@@ -133,7 +133,7 @@
               />
             </div>
             <!-- ledger type -->
-            <div class="col-12">
+            <div class="col">
               <q-select
                 v-model="tempConfig.ledgerType"
                 label="Ledger Type"
@@ -144,8 +144,11 @@
                 :rules="[(val) => val !== null]"
               />
             </div>
+          </div>
+
+          <div class="row justify-evenly q-gutter-md">
             <!-- account code 1 -->
-            <div class="col-12">
+            <div class="col">
               <q-select
                 v-model="tempConfig.accountCode1"
                 label="Accout Code 1"
@@ -155,11 +158,17 @@
                 menu-shrink
                 emit-value
                 clearable
-                :rules="[isAccountcodeValid]"
+                :rules="[(val:string) => {
+                  if (tempConfig.ledgerType === 'I' ? tempConfig.accountCode2 : tempConfig.ledgerType === 'L' ? tempConfig.accountCode2 || tempConfig.accountCode3 : false) {
+            return !!val;
+              } 
+
+                return true;
+                }]"
               />
             </div>
             <!-- account code 2 -->
-            <div class="col-12">
+            <div class="col">
               <q-select
                 v-model="tempConfig.accountCode2"
                 label="Accout Code 2"
@@ -169,11 +178,16 @@
                 menu-shrink
                 emit-value
                 clearable
-                :rules="[isAccountcodeValid]"
+                :rules="[(val:string) => {
+                  if (tempConfig.ledgerType === 'L' && tempConfig.accountCode3) {
+                  return !!val;
+                  } 
+                return true;
+                }]"
               />
             </div>
             <!-- account code 3 -->
-            <div class="col-12" v-if="tempConfig.ledgerType === 'L'">
+            <div class="col" v-if="tempConfig.ledgerType === 'L'">
               <q-select
                 v-model="tempConfig.accountCode3"
                 label="Accout Code 3"
@@ -183,12 +197,14 @@
                 menu-shrink
                 emit-value
                 clearable
-                :rules="[isAccountcodeValid]"
               />
             </div>
-            <template v-if="tempConfig.ledgerType === 'I'">
-              <!-- interest methods -->
-              <div class="col-12">
+          </div>
+
+          <template v-if="tempConfig.ledgerType === 'I'">
+            <!-- interest methods -->
+            <div class="row justify-evenly q-gutter-md">
+              <div class="col">
                 <q-select
                   v-model="tempConfig.interestMethod"
                   label="Interest Methods"
@@ -201,7 +217,7 @@
                 />
               </div>
               <!-- rate type -->
-              <div :class="[!tempConfig.rateType ? 'col-12' : 'col-3']">
+              <div class="col">
                 <q-select
                   v-model="tempConfig.rateType"
                   label="Rate type"
@@ -209,23 +225,31 @@
                   map-options
                   menu-shrink
                   emit-value
-                  :rules="[(val:string) => val!==null]"
                 />
               </div>
-              <div class="flex flex-center col-9">
-                <!-- rate -> single-->
+              <!-- rate -> single-->
+              <div
+                class="col flex flex-center"
+                v-if="tempConfig.rateType === 'S'"
+              >
                 <q-input
-                  v-if="tempConfig.rateType === 'S'"
                   v-model.number="tempConfig.rate"
                   label="Rate"
                   outlined
                   dense
-                  :rules="[(val:string) => val!==null && val!=='']"
                   hide-bottom-space
                   :min="0"
                 />
+              </div>
+            </div>
+
+            <div
+              class="row justify-evenly q-gutter-md"
+              v-if="tempConfig.rateType === 'B'"
+            >
+              <div class="col flex items-center">
                 <!-- rate -> bucket -->
-                <div v-if="tempConfig.rateType === 'B'" class="row flex-center">
+                <div class="row justify-evenly items-center">
                   <q-input
                     class="col-3"
                     dense
@@ -233,7 +257,6 @@
                     label="Days"
                     v-model.number="bucketBasedRateInput.days1"
                     type="number"
-                    :rules="[() => !!bucketBasedRateArr.length]"
                     hide-bottom-space
                   />
                   <q-input
@@ -243,7 +266,6 @@
                     label="Days"
                     v-model.number="bucketBasedRateInput.days2"
                     type="number"
-                    :rules="[() => !!bucketBasedRateArr.length]"
                     hide-bottom-space
                   />
                   <q-input
@@ -253,23 +275,23 @@
                     label="Rate"
                     v-model.number="bucketBasedRateInput.rate"
                     type="number"
-                    :rules="[() => !!bucketBasedRateArr.length]"
                     hide-bottom-space
                   />
-                  <q-btn
-                    icon="add"
-                    round
-                    class="q-ml-sm"
-                    color="teal"
-                    dense
-                    outline
-                    @click.stop="addRate"
-                    type="button"
-                  />
+                  <div class="col-2">
+                    <q-btn
+                      icon="add"
+                      round
+                      color="teal"
+                      dense
+                      outline
+                      @click.stop="addRate"
+                      type="button"
+                    />
+                  </div>
                 </div>
               </div>
               <!-- rate -> bucket display-->
-              <div class="col-12" v-if="tempConfig.rateType === 'B'">
+              <div class="col">
                 <div class="row">
                   <div
                     class="col-auto"
@@ -282,8 +304,10 @@
                   </div>
                 </div>
               </div>
+            </div>
+            <div class="row justify-evenly q-gutter-md">
               <!-- negative rate -->
-              <div class="col-5">
+              <div class="col">
                 <q-input
                   v-model.number="tempConfig.negativeRate"
                   :min="0"
@@ -291,7 +315,8 @@
                   type="number"
                 />
               </div>
-              <div class="col-5 offset-1">
+              <!-- grace days -->
+              <div class="col">
                 <q-input
                   v-model.number="tempConfig.graceDays"
                   :min="0"
@@ -299,18 +324,18 @@
                   type="number"
                 />
               </div>
-            </template>
-            <div class="col-12">
-              <q-input
-                v-model="tempConfig.viewType"
-                label="View type"
-                :rules="[(val) => val !== null && val !== '']"
-                clearable
-              />
             </div>
+          </template>
+          <div class="col-12">
+            <q-input
+              v-model="tempConfig.viewType"
+              label="View type"
+              :rules="[(val) => val !== null && val !== '']"
+              clearable
+            />
           </div>
         </q-card-section>
-        <q-separator class="q-mt-sm" />
+
         <q-card-actions align="center" class="q-py-md bg-grey-2">
           <q-btn
             :label="mode === 'new' ? 'Add' : 'Save '"
@@ -328,7 +353,7 @@
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { watch, onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 
 interface LedgerAccount {
   id: number;
@@ -565,10 +590,6 @@ const addRate = () => {
     ...bucketBasedRateArr.value,
     { ...bucketBasedRateInput },
   ];
-
-  bucketBasedRateInput.days1 = null;
-  bucketBasedRateInput.days2 = null;
-  bucketBasedRateInput.rate = null;
 };
 
 const removeRate = (index: number) => {
