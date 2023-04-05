@@ -300,6 +300,7 @@
                   :options="accountCodeOptions"
                   label="Account Code"
                   outlined
+                  :rules="[(val) => !!val || '']"
                 />
               </div>
               <div class="col-12 q-mt-lg">
@@ -312,6 +313,7 @@
                   outlined
                   @input-value="loadAccountHeads"
                   ref="dropdown"
+                  :rules="[(val) => !!val || '']"
                 />
               </div>
             </div>
@@ -555,7 +557,7 @@ const saveNewEntry = async () => {
 };
 
 const resetNewEntryForm = () => {
-  newAccountCode.value.label = '';
+  newAccountCode.value = { value: '', label: '' };
   newAccountName.value.label = '';
 };
 
