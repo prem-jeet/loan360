@@ -387,7 +387,7 @@
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { onSuccess } from 'src/utils/notification';
+import { onSuccess, confirmDialog } from 'src/utils/notification';
 import { ref, onMounted, computed, watch } from 'vue';
 
 const breadcrumbs = [
@@ -518,9 +518,21 @@ const editEntry = (index: number) => {
   console.log('hi', index);
 };
 
-const deleteEntry = (index: number) => {
-  console.log('hi', index);
+const deleteEntry = async (rowIndex: number) => {
+  confirmDialog(() => deleteEntryConfirmed(rowIndex), {});
 };
+
+const deleteEntryConfirmed = async (rowIndex: number) => {
+  const rsp = await api.delete(
+    `accountCodeDeposit/${accountCodeDeposits.value[rowIndex].id}`
+  );
+  if (rsp.data) {
+    onSuccess({ msg: rsp.data.displayMessage, icon: 'delete' });
+
+    accountCodeDeposits.value.splice(rowIndex, 1);
+  }
+};
+
 const saveEdited = (index: number) => {
   console.log('hi', index);
 };
