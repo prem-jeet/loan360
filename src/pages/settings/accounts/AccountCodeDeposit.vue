@@ -188,15 +188,18 @@
                   :options="accountNameOptions"
                   label="Account name"
                   outlined
+                  :error="error"
                   @input-value="loadAccountNames"
                   ref="dropdown"
                 />
 
-                <span v-else>{{
-                  accountHeads.find(
-                    (item) => item.value === props.row.accountId
-                  )!.label
-                }}</span>
+                <span v-else>
+                  {{
+                    accountHeads.find(
+                      (item) => item.value === props.row.accountId
+                    )!.label
+                  }}</span
+                >
               </q-td>
               <q-td
                 key="isApplication"
@@ -448,6 +451,7 @@ interface AccountCodeDeposit {
   productCode: string;
   accountId: number;
 }
+const error = ref(false);
 const isAddNewEntryModalActive = ref(false);
 const fetchingData = ref(false);
 const accountHeads = ref<AccountHeads[]>([]);
@@ -578,38 +582,41 @@ const editEntryConfirmed = (index: number) => {
   editIsApplication.value = accountCodeDeposits.value[index].isApplication;
 };
 const saveEdited = async (index: number) => {
-  const row: AccountCodeDeposit = accountCodeDeposits.value[index];
+  if (editAccountName.value) {
+    const row: AccountCodeDeposit = accountCodeDeposits.value[index];
 
-  const rsp = await api.get('accountHead');
+    const rsp = await api.get('accountHead');
 
-  let headObj = rsp.data.filter((item: { id: number }) => {
-    return item.id === row.accountId;
-  });
-
-  const payLoad = {
-    account: headObj[0],
-    accountCode: editAccountCode.value.value,
-    accountId: editAccountName.value.value,
-    categoryCode: row.categoryCode,
-    id: row.id,
-    isApplication: false,
-    productCode: row.productCode,
-  };
-
-  const rsp_ = await api.post('accountCodeDeposit', payLoad);
-  if (rsp_.data) {
-    onSuccess({
-      msg: rsp_.data.displayMessage,
-      icon: 'sync_alt',
+    let headObj = rsp.data.filter((item: { id: number }) => {
+      return item.id === row.accountId;
     });
-    accountCodeDeposits.value[index].accountCode = editAccountCode.value.value;
-    accountCodeDeposits.value[index].accountId = editAccountName.value.value;
-    accountCodeDeposits.value[index].isApplication = editIsApplication.value;
-    console.log(accountCodeDeposits.value);
 
-    isEditing.value = false;
-    editAccountCode.value.label = '';
-    editAccountName.value.label = '';
+    const payLoad = {
+      account: headObj[0],
+      accountCode: editAccountCode.value.value,
+      accountId: editAccountName.value.value,
+      categoryCode: row.categoryCode,
+      id: row.id,
+      isApplication: false,
+      productCode: row.productCode,
+    };
+
+    const rsp_ = await api.post('accountCodeDeposit', payLoad);
+    if (rsp_.data) {
+      onSuccess({
+        msg: rsp_.data.displayMessage,
+        icon: 'sync_alt',
+      });
+      accountCodeDeposits.value[index].accountCode =
+        editAccountCode.value.value;
+      accountCodeDeposits.value[index].accountId = editAccountName.value.value;
+      accountCodeDeposits.value[index].isApplication = editIsApplication.value;
+      console.log(accountCodeDeposits.value);
+
+      isEditing.value = false;
+    }
+  } else {
+    error.value = true;
   }
 };
 
@@ -660,7 +667,7 @@ const loadAccountCodeDeposits = async () => {
       }
     );
     accountCodeDepositsTemp.value = rsp.data;
-    console.log(accountCodeDeposits.value);
+    console.log(accountCodeDeposits.value, 'hhh');
   }
 };
 
@@ -700,6 +707,13 @@ watch(accountName, () => {
     accountNameBool.value = false;
   } else {
     accountNameBool.value = true;
+  }
+});
+watch(editAccountName, () => {
+  if (editAccountName.value) {
+    error.value = false;
+  } else {
+    error.value = true;
   }
 });
 
