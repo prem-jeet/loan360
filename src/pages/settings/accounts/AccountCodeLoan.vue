@@ -56,14 +56,21 @@
                   />
                 </div>
                 <div class="col-12">
-                  <div class="q-gutter-lg">
-                    <q-radio v-model="sectionCode" val="L" label="Loan" />
+                  <div class="q-gutter-lg q-mt-sm">
                     <q-radio
+                      class="q-mt-none"
+                      v-model="sectionCode"
+                      val="L"
+                      label="Loan"
+                    />
+                    <q-radio
+                      class="q-mt-none"
                       v-model="sectionCode"
                       val="LAP"
                       label="Loan Against Property"
                     />
                     <q-radio
+                      class="q-mt-none"
                       v-model="sectionCode"
                       val="PL"
                       label="Personal Loan"
