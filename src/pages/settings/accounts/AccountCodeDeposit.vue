@@ -36,7 +36,7 @@
                       icon="add"
                       label="Add new"
                       size="md"
-                      @click="isAddNewEntryModalActive = true"
+                      @click="addNewAccount"
                     />
                   </div>
                 </div>
@@ -385,7 +385,7 @@
       </div>
     </div>
   </div>
-  <q-dialog v-model="isAddNewEntryModalActive">
+  <q-dialog v-model="isEntryModalActive">
     <q-card>
       <q-form @submit.prevent="saveNewEntry" @reset="resetNewEntryForm">
         <q-card-section class="bg-grey-2">
@@ -396,7 +396,7 @@
               class="q-ml-xs-md q-ml-sm-xl"
               icon="close"
               flat
-              @click="isAddNewEntryModalActive = false"
+              @click="isEntryModalActive = false"
             />
           </div>
         </q-card-section>
@@ -405,23 +405,23 @@
             <div class="col-12">
               <div class="col-12 q-mt-lg">
                 <q-select
-                  v-model="addNewProduct"
+                  v-model="tempProduct"
                   dense
                   :options="products"
                   label="Select product"
                   outlined
-                  :error="addNewProduct.label === ''"
+                  :rules="[(val:Options) => val.value!=='']"
                   hide-bottom-space
                 />
               </div>
               <div class="col-12 q-mt-lg">
                 <q-select
-                  v-model="addNewCategory"
+                  v-model="tempCategory"
                   dense
                   :options="categorys"
                   label="Select category"
                   outlined
-                  :error="addNewCategory.value === ''"
+                  :rules="[(val:Options) => val.value!=='']"
                   hide-bottom-space
                 />
               </div>
@@ -432,7 +432,7 @@
                   :options="accountCodes"
                   label="Select Code"
                   outlined
-                  :error="accountCode.value === ''"
+                  :rules="[(val:Options) => val.value!=='']"
                   hide-bottom-space
                 />
               </div>
@@ -445,7 +445,7 @@
                   :options="accountNameOptions"
                   label="Account name"
                   outlined
-                  :error="accountNameBool"
+                  :rules="[(val:AccountHeads) => val.value!==null]"
                   @input-value="loadAccountNames"
                   ref="dropdown"
                 />
@@ -453,20 +453,20 @@
 
               <div
                 v-if="
-                  addNewProduct.value === 'FD' ||
-                  addNewProduct.value === 'RD' ||
-                  addNewProduct.value === 'DD'
+                  tempProduct.value === 'FD' ||
+                  tempProduct.value === 'RD' ||
+                  tempProduct.value === 'DD'
                 "
                 class="col-12 q-mt-sm"
               >
                 <q-checkbox
                   disable
-                  v-model="addIsApplication"
+                  v-model="tempIsApplication"
                   label="isApplication"
                 />
               </div>
               <div v-else class="col-12 q-mt-sm">
-                <q-checkbox v-model="addIsApplication" label="isApplication" />
+                <q-checkbox v-model="tempIsApplication" label="isApplication" />
               </div>
             </div>
           </div>
@@ -513,11 +513,11 @@ interface AccountCodeDeposit {
   productCode: string;
   accountId: number;
 }
+
 const error = ref(false);
 const errorProduct = ref(false);
 const errorCategory = ref(false);
-
-const isAddNewEntryModalActive = ref(false);
+const isEntryModalActive = ref(false);
 const fetchingData = ref(false);
 const accountHeads = ref<AccountHeads[]>([]);
 const accountNameOptions = ref<AccountHeads[]>([]);
@@ -539,10 +539,10 @@ const categorys = ref<Options[]>([
 ]);
 const product = ref({ value: '', label: '' });
 const category = ref({ value: '', label: '' });
-const addNewProduct = ref({ value: '', label: '' });
-const addNewCategory = ref({ value: '', label: '' });
+const tempProduct = ref({ value: '', label: '' });
+const tempCategory = ref({ value: '', label: '' });
 const accountCode = ref({ value: '', label: '' });
-const accountName = ref(accountHeads.value[0]);
+const accountName = ref({ value: null, label: '' });
 const editAccountCode = ref({ value: '', label: '' });
 const editAccountName = ref(accountHeads.value[0]);
 const accountNameBool = ref(true);
@@ -550,8 +550,9 @@ const accountCodeDeposits = ref<AccountCodeDeposit[]>([]);
 const accountCodeDepositsTemp = ref<AccountCodeDeposit[]>([]); // for isapplicable
 const editingRowIndex = ref(0);
 const isEditing = ref(false);
+const isEdit = ref(false);
 const isApplication = ref(false);
-const addIsApplication = ref(false);
+const tempIsApplication = ref(false);
 const editIsApplication = ref(false);
 const dropdown = ref(null);
 
@@ -591,13 +592,24 @@ const columns: {
   },
 ];
 
+const addNewAccount = () => {
+  isEntryModalActive.value = true;
+  isEdit.value = false;
+  tempCategory.value = { value: '', label: '' };
+  tempProduct.value = { value: '', label: '' };
+  accountCode.value = { value: '', label: '' };
+  accountName.value = { value: null, label: '' };
+  tempIsApplication.value = false;
+};
+
 const saveNewEntry = async () => {
+  console.log(accountName);
   const tempObj = {
     accountCode: accountCode.value.value,
     accountId: accountName.value.value,
-    categoryCode: addNewCategory.value.value,
-    isApplication: addIsApplication.value,
-    productCode: addNewProduct.value.value,
+    categoryCode: tempCategory.value.value,
+    isApplication: tempIsApplication.value,
+    productCode: tempProduct.value.value,
   };
   const rsp = await api.post('accountCodeDeposit', tempObj);
   if (rsp.data) {
@@ -606,19 +618,15 @@ const saveNewEntry = async () => {
       icon: 'sync_alt',
     });
     loadAccountCodeDeposits();
-    isAddNewEntryModalActive.value = false;
+    isEntryModalActive.value = false;
   }
 };
 const resetNewEntryForm = () => {
-  addNewCategory.value.label = '';
-  addNewCategory.value.value = '';
-  addNewProduct.value.label = '';
-  addNewProduct.value.value = '';
-  accountCode.value.label = '';
-  accountCode.value.value = '';
-  accountName.value.label = '';
-  accountName.value.value = 0;
-  addIsApplication.value = false;
+  tempCategory.value = { value: '', label: '' };
+  tempProduct.value = { value: '', label: '' };
+  accountCode.value = { value: '', label: '' };
+  accountName.value = { value: null, label: '' };
+  tempIsApplication.value = false;
 };
 
 const editEntry = (rowIndex: number) => {
@@ -777,13 +785,13 @@ watch(category, () => {
     errorCategory.value = false;
   }
 });
-watch(addNewProduct, () => {
+watch(tempProduct, () => {
   if (
-    addNewProduct.value.value === 'FD' ||
-    addNewProduct.value.value === 'RD' ||
-    addNewProduct.value.value === 'DD'
+    tempProduct.value.value === 'FD' ||
+    tempProduct.value.value === 'RD' ||
+    tempProduct.value.value === 'DD'
   ) {
-    addIsApplication.value = false;
+    tempIsApplication.value = false;
   }
 });
 watch(accountName, () => {
