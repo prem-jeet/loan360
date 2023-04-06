@@ -40,7 +40,7 @@
                     label="Add Account code loan"
                     icon="add"
                     color="blue-7"
-                    @click="isAddNewEntryModalActive = true"
+                    @click="addNewAccount"
                   />
                 </div>
               </div>
@@ -188,20 +188,22 @@
     </div>
   </div>
 
-  <!--Add-->
+  <!--Add and Edit-->
 
-  <q-dialog v-model="isAddNewEntryModalActive" @show="loadAccountCodes">
+  <q-dialog v-model="isEntryModalActive" @show="loadAccountCodes">
     <q-card>
-      <q-form @submit.prevent="saveNewEntry" @reset="resetNewEntryForm">
+      <q-form @submit.prevent="saveEntry" @reset="resetEntryForm">
         <q-card-section class="bg-grey-2">
           <div class="flex items-center">
-            <span class="text-h6 q-mr-xl"> Add account code loan </span>
+            <span class="text-h6 q-mr-xl"
+              >{{ isEdit ? 'Edit account code loan' : 'Add account code loan' }}
+            </span>
             <q-space />
             <q-btn
               class="q-ml-xs-md q-ml-sm-xl"
               icon="close"
               flat
-              @click="isAddNewEntryModalActive = false"
+              @click="isEntryModalActive = false"
             />
           </div>
         </q-card-section>
@@ -210,7 +212,7 @@
             <div class="col-12">
               <div class="col-12 q-mt-lg">
                 <q-select
-                  v-model="newAccountCode"
+                  v-model="accountCode"
                   :options="accountCodeOptions"
                   label="Account Code"
                   outlined
@@ -219,7 +221,7 @@
               </div>
               <div class="col-12 q-mt-lg">
                 <q-select
-                  v-model="newAccountName"
+                  v-model="accountName"
                   use-input
                   hide-dropdown-icon
                   :options="accountHeadOptions"
@@ -243,7 +245,7 @@
   </q-dialog>
 
   <!-- Edit-->
-
+  <!--
   <q-dialog v-model="isEditEntryModalActive">
     <q-card>
       <q-form @submit.prevent="saveEdited" @reset="resetEditEntryForm">
@@ -292,7 +294,7 @@
         </q-card-actions>
       </q-form>
     </q-card>
-  </q-dialog>
+  </q-dialog> -->
 </template>
 
 <script setup lang="ts">
@@ -342,15 +344,15 @@ const accountCodeLoan = ref<AccountCodeLoan[]>([]);
 const accountCodeOptions = ref<AccountCodeOptions[]>([]);
 const accountHeadOptions = ref<AccountHeadOptions[]>([]);
 const dropdown = ref(null);
-const newAccountCode = ref(accountCodeOptions.value[0]);
-const newAccountName = ref(accountHeadOptions.value[0]);
+const accountCode = ref(accountCodeOptions.value[0]);
+const accountName = ref(accountHeadOptions.value[0]);
+const resetAccountCode = ref(accountCodeOptions.value[0]);
+const restAccountName = ref(accountHeadOptions.value[0]);
 
-const editAccountCode = ref(accountCodeOptions.value[0]);
-const editAccountName = ref(accountHeadOptions.value[0]);
 const editingRowIndex = ref(0);
 
-const isAddNewEntryModalActive = ref(false);
-const isEditEntryModalActive = ref(false);
+const isEntryModalActive = ref(false);
+const isEdit = ref(false);
 const filteredAccountCode = computed(() => {
   return accountCodeLoan.value;
 });
@@ -416,9 +418,17 @@ const loadAccountCodes = () => {
   accountCodeOptions.value = options;
 };
 
+const saveEntry = () => {
+  isEdit.value ? saveEdited() : saveNewEntry();
+};
+const resetEntryForm = () => {
+  isEdit.value ? resetEditEntryForm() : resetNewEntryForm();
+};
+
 const editEntry = (rowIndex: number) => {
   editEntryConfirmed(rowIndex);
-  isEditEntryModalActive.value = true;
+  isEdit.value = true;
+  isEntryModalActive.value = true;
 };
 
 const editEntryConfirmed = (index: number) => {
@@ -439,20 +449,20 @@ const editEntryConfirmed = (index: number) => {
 
     label: tempName[0].name,
   };
-  editAccountCode.value = tempCode[0];
-  editAccountName.value = tempObj;
+  accountCode.value = tempCode[0];
+  accountName.value = tempObj;
 };
 
 const saveEdited = async () => {
   let id: number = accountCodeLoan.value[editingRowIndex.value].id;
-  if (editAccountCode.value && editAccountName.value) {
+  if (accountCode.value && accountName.value) {
     let tempObj: AccountCodes[] = accountCodes.value.filter((item) => {
-      return item.code === editAccountCode.value.value;
+      return item.code === accountCode.value.value;
     });
 
     const payLoad = {
       accountCode: tempObj[0].code,
-      accountId: editAccountName.value.value,
+      accountId: accountName.value.value,
       accountingCategoryCode: sectionCode.value,
       id: id,
     };
@@ -463,8 +473,8 @@ const saveEdited = async () => {
       accountCodeLoan.value[editingRowIndex.value].accountCode =
         tempObj[0].code;
       accountCodeLoan.value[editingRowIndex.value].accountId =
-        editAccountName.value.value;
-      isEditEntryModalActive.value = false;
+        accountName.value.value;
+      isEntryModalActive.value = false;
     }
   } else {
     onFailure({
@@ -478,10 +488,17 @@ const resetEditEntryForm = () => {
   editEntryConfirmed(editingRowIndex.value);
 };
 
+const addNewAccount = () => {
+  isEntryModalActive.value = true;
+  isEdit.value = false;
+  accountCode.value = resetAccountCode.value;
+  accountName.value = restAccountName.value;
+};
+
 const saveNewEntry = async () => {
-  if (newAccountCode.value && newAccountName.value) {
+  if (accountCode.value && accountName.value) {
     const tempVal = accountCodeLoan.value.filter((item) => {
-      return item.accountCode === newAccountCode.value.value;
+      return item.accountCode === accountCode.value.value;
     });
     if (tempVal.length) {
       onFailure({
@@ -490,12 +507,12 @@ const saveNewEntry = async () => {
       });
     } else {
       let tempObj: AccountCodes[] = accountCodes.value.filter((item) => {
-        return item.code === newAccountCode.value.value;
+        return item.code === accountCode.value.value;
       });
 
       const payLoad = {
         accountCode: tempObj[0].code,
-        accountId: newAccountName.value.value,
+        accountId: accountName.value.value,
         accountingCategoryCode: sectionCode.value,
       };
 
@@ -506,9 +523,9 @@ const saveNewEntry = async () => {
           ...payLoad,
           id: rsp.data.id,
         });
-        isAddNewEntryModalActive.value = false;
-        newAccountCode.value.label = '';
-        newAccountName.value.label = '';
+        isEntryModalActive.value = false;
+        accountCode.value = resetAccountCode.value;
+        accountName.value = restAccountName.value;
       }
     }
   } else {
@@ -520,8 +537,8 @@ const saveNewEntry = async () => {
 };
 
 const resetNewEntryForm = () => {
-  newAccountCode.value = { value: '', label: '' };
-  newAccountName.value.label = '';
+  accountCode.value = resetAccountCode.value;
+  accountName.value = restAccountName.value;
 };
 
 const deleteEntry = async (rowIndex: number) => {
