@@ -120,7 +120,6 @@
                     size="xs"
                     outline
                     color="accent"
-                    v-if="!isEditing || editingRowIndex !== props.rowIndex"
                     @click="() => editEntry(props.rowIndex)"
                   >
                     <q-tooltip>Edit</q-tooltip>
@@ -130,76 +129,25 @@
                     size="xs"
                     outline
                     color="red"
-                    v-if="!isEditing || editingRowIndex !== props.rowIndex"
                     @click="() => deleteEntry(props.rowIndex)"
                   >
                     <q-tooltip>Delete</q-tooltip>
                   </q-btn>
-                  <q-btn
-                    icon="check"
-                    size="xs"
-                    outline
-                    color="green-10"
-                    v-if="isEditing && editingRowIndex === props.rowIndex"
-                    @click="() => saveEdited(props.rowIndex)"
-                  >
-                    <q-tooltip>Save</q-tooltip>
-                  </q-btn>
-                  <q-btn
-                    icon="close"
-                    size="xs"
-                    outline
-                    color="red"
-                    v-if="isEditing && editingRowIndex === props.rowIndex"
-                    @click="isEditing = false"
-                  >
-                    <q-tooltip>Cancel</q-tooltip>
-                  </q-btn>
                 </q-btn-group>
               </q-td>
               <q-td key="accountCode" :props="props">
-                <q-select
-                  v-if="isEditing && editingRowIndex === props.rowIndex"
-                  v-model="editAccountCode"
-                  dense
-                  :options="accountCodes"
-                  label="Select Code"
-                  outlined
-                  :error="editAccountCode.value === ''"
-                  hide-bottom-space
-                />
-
-                <span v-else>
-                  {{
-                    accountCodes.find(
-                      (item) => item.value === props.row.accountCode
-                    )!.label
-                  }}</span
-                >
+                {{
+                  accountCodes.find(
+                    (item) => item.value === props.row.accountCode
+                  )!.label
+                }}
               </q-td>
               <q-td key="accountId" :props="props">
-                <q-select
-                  class="q-pb-none"
-                  v-if="isEditing && editingRowIndex === props.rowIndex"
-                  v-model="editAccountName"
-                  dense
-                  use-input
-                  hide-dropdown-icon
-                  :options="accountNameOptions"
-                  label="Account name"
-                  outlined
-                  :error="error"
-                  @input-value="loadAccountNames"
-                  ref="dropdown"
-                />
-
-                <span v-else>
-                  {{
-                    accountHeads.find(
-                      (item) => item.value === props.row.accountId
-                    )!.label
-                  }}</span
-                >
+                {{
+                  accountHeads.find(
+                    (item) => item.value === props.row.accountId
+                  )!.label
+                }}
               </q-td>
               <q-td
                 key="isApplication"
@@ -207,32 +155,7 @@
                 auto-width
                 style="min-width: 300px"
               >
-                <span v-if="isEditing && editingRowIndex === props.rowIndex">
-                  <div
-                    v-if="
-                      product.value === 'FD' ||
-                      product.value === 'RD' ||
-                      product.value === 'DD'
-                    "
-                    class="col-12 q-mt-sm"
-                  >
-                    <q-checkbox
-                      disable
-                      v-model="editIsApplication"
-                      label="isApplication"
-                    />
-                  </div>
-                  <div v-else class="col-12 q-mt-sm">
-                    <q-checkbox
-                      v-model="editIsApplication"
-                      label="isApplication"
-                    />
-                  </div>
-                </span>
-
-                <span v-else>
-                  <q-checkbox v-model="props.row.isApplication" disable
-                /></span>
+                <q-checkbox v-model="props.row.isApplication" disable />
               </q-td>
             </q-tr>
           </template>
@@ -245,23 +168,11 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">Account Code :</div>
                     <div class="col-12">
-                      <q-select
-                        v-if="isEditing && editingRowIndex === props.rowIndex"
-                        v-model="editAccountCode"
-                        dense
-                        :options="accountCodes"
-                        label="Select Code"
-                        outlined
-                        :error="editAccountCode.value === ''"
-                        hide-bottom-space
-                      />
-
-                      <span v-else>
-                        {{
-                          accountCodes.find(
-                            (item) => item.value === props.row.accountCode
-                          )!.label
-                        }}</span
+                      {{
+                        accountCodes.find(
+                          (item) => item.value === props.row.accountCode
+                        )!.label
+                      }}
                       >
                     </div>
                   </div>
@@ -270,28 +181,11 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">Account Name :</div>
                     <div class="col-12">
-                      <q-select
-                        class="q-pb-none"
-                        v-if="isEditing && editingRowIndex === props.rowIndex"
-                        v-model="editAccountName"
-                        dense
-                        use-input
-                        hide-dropdown-icon
-                        :options="accountNameOptions"
-                        label="Account name"
-                        outlined
-                        :error="error"
-                        @input-value="loadAccountNames"
-                        ref="dropdown"
-                      />
-
-                      <span v-else>
-                        {{
-                          accountHeads.find(
-                            (item) => item.value === props.row.accountId
-                          )!.label
-                        }}</span
-                      >
+                      {{
+                        accountHeads.find(
+                          (item) => item.value === props.row.accountId
+                        )!.label
+                      }}
                     </div>
                   </div>
                 </q-card-section>
@@ -299,37 +193,11 @@
                 <q-card-section>
                   <div class="row q-gutter-y-xs">
                     <div class="col-12">
-                      <span
-                        v-if="isEditing && editingRowIndex === props.rowIndex"
-                      >
-                        <div
-                          v-if="
-                            product.value === 'FD' ||
-                            product.value === 'RD' ||
-                            product.value === 'DD'
-                          "
-                          class="col-12 q-mt-sm"
-                        >
-                          <q-checkbox
-                            disable
-                            v-model="editIsApplication"
-                            label="isApplication"
-                          />
-                        </div>
-                        <div v-else class="col-12 q-mt-sm">
-                          <q-checkbox
-                            v-model="editIsApplication"
-                            label="isApplication"
-                          />
-                        </div>
-                      </span>
-
-                      <span v-else>
-                        <q-checkbox
-                          v-model="props.row.isApplication"
-                          disable
-                          label="isApplication"
-                      /></span>
+                      <q-checkbox
+                        v-model="props.row.isApplication"
+                        disable
+                        label="isApplication"
+                      />
                     </div>
                   </div>
                 </q-card-section>
@@ -341,7 +209,6 @@
                       size="sm"
                       outline
                       color="accent"
-                      v-if="!isEditing || editingRowIndex !== props.rowIndex"
                       @click="() => editEntry(props.rowIndex)"
                     >
                       <q-tooltip>Edit</q-tooltip>
@@ -351,30 +218,9 @@
                       size="sm"
                       outline
                       color="red"
-                      v-if="!isEditing || editingRowIndex !== props.rowIndex"
                       @click="() => deleteEntry(props.rowIndex)"
                     >
                       <q-tooltip>Delete</q-tooltip>
-                    </q-btn>
-                    <q-btn
-                      icon="check"
-                      size="sm"
-                      outline
-                      color="green-10"
-                      v-if="isEditing && editingRowIndex === props.rowIndex"
-                      @click="() => saveEdited(props.rowIndex)"
-                    >
-                      <q-tooltip>Save</q-tooltip>
-                    </q-btn>
-                    <q-btn
-                      icon="close"
-                      size="sm"
-                      outline
-                      color="red"
-                      v-if="isEditing && editingRowIndex === props.rowIndex"
-                      @click="isEditing = false"
-                    >
-                      <q-tooltip>Cancel</q-tooltip>
                     </q-btn>
                   </q-btn-group>
                 </q-card-actions>
@@ -387,10 +233,12 @@
   </div>
   <q-dialog v-model="isEntryModalActive">
     <q-card>
-      <q-form @submit.prevent="saveNewEntry" @reset="resetNewEntryForm">
+      <q-form @submit.prevent="saveEntry" @reset="resetEntryForm">
         <q-card-section class="bg-grey-2">
           <div class="flex items-center">
-            <span class="text-h6 q-mr-xl">Add nature entry</span>
+            <span class="text-h6 q-mr-xl">{{
+              isEdit ? 'Edit account code deposit' : 'Add account code deposit'
+            }}</span>
             <q-space />
             <q-btn
               class="q-ml-xs-md q-ml-sm-xl"
@@ -445,7 +293,7 @@
                   :options="accountNameOptions"
                   label="Account name"
                   outlined
-                  :rules="[(val:AccountHeads) => val.value!==null]"
+                  :rules="[(val) => val !== undefined]"
                   @input-value="loadAccountNames"
                   ref="dropdown"
                 />
@@ -514,12 +362,12 @@ interface AccountCodeDeposit {
   accountId: number;
 }
 
-const error = ref(false);
 const errorProduct = ref(false);
 const errorCategory = ref(false);
 const isEntryModalActive = ref(false);
 const fetchingData = ref(false);
 const accountHeads = ref<AccountHeads[]>([]);
+const temp = ref<AccountHeads[]>([]);
 const accountNameOptions = ref<AccountHeads[]>([]);
 const accountCodes = ref<AccountCodes[]>([]);
 const products = ref<Options[]>([
@@ -542,14 +390,11 @@ const category = ref({ value: '', label: '' });
 const tempProduct = ref({ value: '', label: '' });
 const tempCategory = ref({ value: '', label: '' });
 const accountCode = ref({ value: '', label: '' });
-const accountName = ref({ value: null, label: '' });
-const editAccountCode = ref({ value: '', label: '' });
-const editAccountName = ref(accountHeads.value[0]);
+const accountName = ref(temp.value[0]);
 const accountNameBool = ref(true);
 const accountCodeDeposits = ref<AccountCodeDeposit[]>([]);
 const accountCodeDepositsTemp = ref<AccountCodeDeposit[]>([]); // for isapplicable
 const editingRowIndex = ref(0);
-const isEditing = ref(false);
 const isEdit = ref(false);
 const isApplication = ref(false);
 const tempIsApplication = ref(false);
@@ -598,12 +443,11 @@ const addNewAccount = () => {
   tempCategory.value = { value: '', label: '' };
   tempProduct.value = { value: '', label: '' };
   accountCode.value = { value: '', label: '' };
-  accountName.value = { value: null, label: '' };
+  accountName.value = temp.value[0];
   tempIsApplication.value = false;
 };
 
 const saveNewEntry = async () => {
-  console.log(accountName);
   const tempObj = {
     accountCode: accountCode.value.value,
     accountId: accountName.value.value,
@@ -625,72 +469,83 @@ const resetNewEntryForm = () => {
   tempCategory.value = { value: '', label: '' };
   tempProduct.value = { value: '', label: '' };
   accountCode.value = { value: '', label: '' };
-  accountName.value = { value: null, label: '' };
+  accountName.value = temp.value[0];
   tempIsApplication.value = false;
 };
 
 const editEntry = (rowIndex: number) => {
-  if (isEditing.value) {
-    confirmDialog(() => editEntryConfirmed(rowIndex), {
-      msg: 'Are you sure you want to cancel editing the current Code?',
-    });
-  } else {
-    isEditing.value = true;
-    editingRowIndex.value = rowIndex;
-    editEntryConfirmed(rowIndex);
-  }
+  editEntryConfirmed(rowIndex);
+  isEdit.value = true;
+  isEntryModalActive.value = true;
 };
 const editEntryConfirmed = (index: number) => {
   editingRowIndex.value = index;
   const row: AccountCodeDeposit = accountCodeDeposits.value[index];
 
+  let productTemp = products.value.filter((item) => {
+    return item.value === row.productCode;
+  });
+  tempProduct.value = productTemp[0];
+
+  let categoryTemp = categorys.value.filter((item) => {
+    return item.value === row.categoryCode;
+  });
+  tempCategory.value = categoryTemp[0];
+
   let tempCode: AccountCodes[] = accountCodes.value.filter((item) => {
     return item.value === row.accountCode;
   });
-  editAccountCode.value = tempCode[0];
-  let tempName: AccountHeads[] = accountHeads.value.filter((item) => {
+  accountCode.value = tempCode[0];
+  let tempName = accountHeads.value.filter((item) => {
     return item.value === row.accountId;
   });
-  editAccountName.value = tempName[0];
+  accountName.value = tempName[0];
   editIsApplication.value = accountCodeDeposits.value[index].isApplication;
+  tempIsApplication.value = row.isApplication;
 };
+
 const saveEdited = async (index: number) => {
-  if (editAccountName.value) {
-    const row: AccountCodeDeposit = accountCodeDeposits.value[index];
+  const row: AccountCodeDeposit = accountCodeDeposits.value[index];
 
-    const rsp = await api.get('accountHead');
+  const rsp = await api.get('accountHead');
 
-    let headObj = rsp.data.filter((item: { id: number }) => {
-      return item.id === row.accountId;
+  let headObj = rsp.data.filter((item: { id: number }) => {
+    return item.id === row.accountId;
+  });
+
+  const payLoad = {
+    account: headObj[0],
+    accountCode: accountCode.value.value,
+    accountId: accountName.value.value,
+    categoryCode: row.categoryCode,
+    id: row.id,
+    isApplication: tempIsApplication.value,
+    productCode: row.productCode,
+  };
+
+  const rsp_ = await api.post('accountCodeDeposit', payLoad);
+  if (rsp_.data) {
+    onSuccess({
+      msg: rsp_.data.displayMessage,
+      icon: 'sync_alt',
     });
-
-    const payLoad = {
-      account: headObj[0],
-      accountCode: editAccountCode.value.value,
-      accountId: editAccountName.value.value,
-      categoryCode: row.categoryCode,
-      id: row.id,
-      isApplication: false,
-      productCode: row.productCode,
-    };
-
-    const rsp_ = await api.post('accountCodeDeposit', payLoad);
-    if (rsp_.data) {
-      onSuccess({
-        msg: rsp_.data.displayMessage,
-        icon: 'sync_alt',
-      });
-      accountCodeDeposits.value[index].accountCode =
-        editAccountCode.value.value;
-      accountCodeDeposits.value[index].accountId = editAccountName.value.value;
-      accountCodeDeposits.value[index].isApplication = editIsApplication.value;
-      console.log(accountCodeDeposits.value);
-
-      isEditing.value = false;
-    }
-  } else {
-    error.value = true;
+    accountCodeDeposits.value[index].accountCode = accountCode.value.value;
+    accountCodeDeposits.value[index].accountId = accountName.value.value;
+    accountCodeDeposits.value[index].isApplication = tempIsApplication.value;
+    isEntryModalActive.value = false;
   }
+};
+
+const resetEditEntryForm = () => {
+  editEntryConfirmed(editingRowIndex.value);
+};
+
+const saveEntry = () => {
+  isEdit.value ? saveEdited(editingRowIndex.value) : saveNewEntry();
+};
+
+const resetEntryForm = () => {
+  isEdit.value ? resetEditEntryForm() : resetNewEntryForm();
 };
 
 const deleteEntry = async (rowIndex: number) => {
@@ -750,7 +605,6 @@ const loadAccountCodeDeposits = async () => {
       }
     );
     accountCodeDepositsTemp.value = rsp.data;
-    console.log(accountCodeDeposits.value, 'hhh');
   }
 };
 
@@ -801,13 +655,6 @@ watch(accountName, () => {
     accountNameBool.value = true;
   }
 });
-watch(editAccountName, () => {
-  if (editAccountName.value) {
-    error.value = false;
-  } else {
-    error.value = true;
-  }
-});
 
 onMounted(async () => {
   fetchingData.value = true;
@@ -834,7 +681,6 @@ onMounted(async () => {
         label: item.name,
       })
     );
-    console.log(accountCodes.value);
   }
   fetchingData.value = false;
 });
