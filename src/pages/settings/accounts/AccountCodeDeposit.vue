@@ -30,7 +30,7 @@
               <div class="col-12">
                 <div class="row items-center q-gutter-md">
                   <div class="col-auto text-h6">Account Code Deposit</div>
-                  <div class="col-auto">
+                  <div v-if="accountCodeDepositsTemp.length" class="col-auto">
                     <q-btn
                       color="blue-7"
                       icon="add"
@@ -60,7 +60,7 @@
                     :options="products"
                     label="Select product"
                     outlined
-                    :error="product.value === ''"
+                    :error="errorProduct"
                     hide-bottom-space
                   />
                 </div>
@@ -71,7 +71,7 @@
                     :options="categorys"
                     label="Select category"
                     outlined
-                    :error="category.value === ''"
+                    :error="errorCategory"
                     hide-bottom-space
                   />
                 </div>
@@ -79,7 +79,7 @@
                   <q-btn
                     color="primary"
                     label="search"
-                    @click="loadAccountCodeDeposits"
+                    @click="searchDeposits"
                   />
                 </div>
                 <div
@@ -514,6 +514,9 @@ interface AccountCodeDeposit {
   accountId: number;
 }
 const error = ref(false);
+const errorProduct = ref(false);
+const errorCategory = ref(false);
+
 const isAddNewEntryModalActive = ref(false);
 const fetchingData = ref(false);
 const accountHeads = ref<AccountHeads[]>([]);
@@ -716,6 +719,16 @@ const resetAccountCodeDeposits = () => {
   accountCodeDeposits.value = [];
   accountCodeDepositsTemp.value = [];
 };
+
+const searchDeposits = () => {
+  if (product.value.value === '' || category.value.value === '') {
+    errorProduct.value = true;
+    errorCategory.value = true;
+  } else {
+    loadAccountCodeDeposits();
+  }
+};
+
 const loadAccountCodeDeposits = async () => {
   isApplication.value = false;
 
@@ -753,6 +766,15 @@ watch(product, () => {
     product.value.value === 'DD'
   ) {
     isApplication.value = false;
+  }
+  if (product.value.value !== '') {
+    errorProduct.value = false;
+  }
+});
+
+watch(category, () => {
+  if (category.value.value !== '') {
+    errorCategory.value = false;
   }
 });
 watch(addNewProduct, () => {
