@@ -243,65 +243,12 @@
       </q-form>
     </q-card>
   </q-dialog>
-
-  <!-- Edit-->
-  <!--
-  <q-dialog v-model="isEditEntryModalActive">
-    <q-card>
-      <q-form @submit.prevent="saveEdited" @reset="resetEditEntryForm">
-        <q-card-section class="bg-grey-2">
-          <div class="flex items-center">
-            <span class="text-h6 q-mr-xl"> Edit account code loan </span>
-            <q-space />
-            <q-btn
-              class="q-ml-xs-md q-ml-sm-xl"
-              icon="close"
-              flat
-              @click="isEditEntryModalActive = false"
-            />
-          </div>
-        </q-card-section>
-        <q-card-section class="q-px-lg q-py-md">
-          <div class="row">
-            <div class="col-12">
-              <div class="col-12 q-mt-lg">
-                <q-select
-                  v-model="editAccountCode"
-                  :options="accountCodeOptions"
-                  :rules="[(val) => !!val || '']"
-                  outlined
-                />
-              </div>
-              <div class="col-12 q-mt-lg">
-                <q-select
-                  v-model="editAccountName"
-                  use-input
-                  hide-dropdown-icon
-                  :options="accountHeadOptions"
-                  outlined
-                  @input-value="loadAccountHeads"
-                  ref="dropdown"
-                  :rules="[(val) => !!val || '']"
-                />
-              </div>
-            </div>
-          </div>
-        </q-card-section>
-        <q-separator class="q-mt-md" />
-        <q-card-actions align="right" class="q-py-md bg-grey-2">
-          <q-btn label="save" color="green-5" type="submit" />
-          <q-btn label="Reset" color="red-5" type="reset" />
-        </q-card-actions>
-      </q-form>
-    </q-card>
-  </q-dialog> -->
 </template>
 
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { confirmDialog, onSuccess, onFailure } from 'src/utils/notification';
-
 import { ref, computed, watch, onMounted } from 'vue';
 
 interface AccountCodes {
@@ -348,9 +295,7 @@ const accountCode = ref(accountCodeOptions.value[0]);
 const accountName = ref(accountHeadOptions.value[0]);
 const resetAccountCode = ref(accountCodeOptions.value[0]);
 const restAccountName = ref(accountHeadOptions.value[0]);
-
 const editingRowIndex = ref(0);
-
 const isEntryModalActive = ref(false);
 const isEdit = ref(false);
 const filteredAccountCode = computed(() => {
@@ -418,11 +363,57 @@ const loadAccountCodes = () => {
   accountCodeOptions.value = options;
 };
 
-const saveEntry = () => {
-  isEdit.value ? saveEdited() : saveNewEntry();
+const addNewAccount = () => {
+  isEntryModalActive.value = true;
+  isEdit.value = false;
+  accountCode.value = resetAccountCode.value;
+  accountName.value = restAccountName.value;
 };
-const resetEntryForm = () => {
-  isEdit.value ? resetEditEntryForm() : resetNewEntryForm();
+
+const saveNewEntry = async () => {
+  if (accountCode.value && accountName.value) {
+    const tempVal = accountCodeLoan.value.filter((item) => {
+      return item.accountCode === accountCode.value.value;
+    });
+    if (tempVal.length) {
+      onFailure({
+        msg: 'Duplicate Account Found',
+        icon: 'warning',
+      });
+    } else {
+      let tempObj: AccountCodes[] = accountCodes.value.filter((item) => {
+        return item.code === accountCode.value.value;
+      });
+
+      const payLoad = {
+        accountCode: tempObj[0].code,
+        accountId: accountName.value.value,
+        accountingCategoryCode: sectionCode.value,
+      };
+
+      const rsp = await api.post('accountCodeLoan', payLoad);
+      if (rsp.data) {
+        onSuccess({ msg: rsp.data.displayMessage, icon: 'check' });
+        accountCodeLoan.value.push({
+          ...payLoad,
+          id: rsp.data.id,
+        });
+        isEntryModalActive.value = false;
+        accountCode.value = resetAccountCode.value;
+        accountName.value = restAccountName.value;
+      }
+    }
+  } else {
+    onFailure({
+      msg: 'Account is not valid',
+      icon: 'warning',
+    });
+  }
+};
+
+const resetNewEntryForm = () => {
+  accountCode.value = resetAccountCode.value;
+  accountName.value = restAccountName.value;
 };
 
 const editEntry = (rowIndex: number) => {
@@ -488,57 +479,11 @@ const resetEditEntryForm = () => {
   editEntryConfirmed(editingRowIndex.value);
 };
 
-const addNewAccount = () => {
-  isEntryModalActive.value = true;
-  isEdit.value = false;
-  accountCode.value = resetAccountCode.value;
-  accountName.value = restAccountName.value;
+const saveEntry = () => {
+  isEdit.value ? saveEdited() : saveNewEntry();
 };
-
-const saveNewEntry = async () => {
-  if (accountCode.value && accountName.value) {
-    const tempVal = accountCodeLoan.value.filter((item) => {
-      return item.accountCode === accountCode.value.value;
-    });
-    if (tempVal.length) {
-      onFailure({
-        msg: 'Duplicate Account Found',
-        icon: 'warning',
-      });
-    } else {
-      let tempObj: AccountCodes[] = accountCodes.value.filter((item) => {
-        return item.code === accountCode.value.value;
-      });
-
-      const payLoad = {
-        accountCode: tempObj[0].code,
-        accountId: accountName.value.value,
-        accountingCategoryCode: sectionCode.value,
-      };
-
-      const rsp = await api.post('accountCodeLoan', payLoad);
-      if (rsp.data) {
-        onSuccess({ msg: rsp.data.displayMessage, icon: 'check' });
-        accountCodeLoan.value.push({
-          ...payLoad,
-          id: rsp.data.id,
-        });
-        isEntryModalActive.value = false;
-        accountCode.value = resetAccountCode.value;
-        accountName.value = restAccountName.value;
-      }
-    }
-  } else {
-    onFailure({
-      msg: 'Account is not valid',
-      icon: 'warning',
-    });
-  }
-};
-
-const resetNewEntryForm = () => {
-  accountCode.value = resetAccountCode.value;
-  accountName.value = restAccountName.value;
+const resetEntryForm = () => {
+  isEdit.value ? resetEditEntryForm() : resetNewEntryForm();
 };
 
 const deleteEntry = async (rowIndex: number) => {
