@@ -58,6 +58,8 @@
                     v-model="product"
                     dense
                     :options="products"
+                    map-options
+                    emit-value
                     label="Select product"
                     outlined
                     :error="errorProduct"
@@ -71,6 +73,8 @@
                     :options="categorys"
                     label="Select category"
                     outlined
+                    map-options
+                    emit-value
                     :error="errorCategory"
                     hide-bottom-space
                   />
@@ -84,9 +88,7 @@
                 </div>
                 <div
                   v-if="
-                    product.value === 'FD' ||
-                    product.value === 'RD' ||
-                    product.value === 'DD'
+                    product === 'FD' || product === 'RD' || product === 'DD'
                   "
                   class="col-12 q-ml-none q-pl-sm q-pt-sm"
                 >
@@ -253,10 +255,14 @@
             <div class="col-12">
               <div class="col-12 q-mt-lg">
                 <q-select
-                  v-model="tempProduct"
+                  v-model="test"
                   dense
                   :options="products"
                   label="Select product"
+                  options-dense
+                  map-options
+                  menu-shrink
+                  emit-value
                   outlined
                   :rules="[(val:Options) => val.value!=='']"
                   hide-bottom-space
@@ -361,7 +367,7 @@ interface AccountCodeDeposit {
   productCode: string;
   accountId: number;
 }
-
+const test = ref('');
 const errorProduct = ref(false);
 const errorCategory = ref(false);
 const isEntryModalActive = ref(false);
@@ -385,8 +391,8 @@ const categorys = ref<Options[]>([
   { value: 'O', label: 'Others' },
   { value: 'DR', label: "Director's Relatives" },
 ]);
-const product = ref({ value: '', label: '' });
-const category = ref({ value: '', label: '' });
+const product = ref('');
+const category = ref('');
 const tempProduct = ref({ value: '', label: '' });
 const tempCategory = ref({ value: '', label: '' });
 const accountCode = ref({ value: '', label: '' });
@@ -584,7 +590,7 @@ const resetAccountCodeDeposits = () => {
 };
 
 const searchDeposits = () => {
-  if (product.value.value === '' || category.value.value === '') {
+  if (product.value === '' || category.value === '') {
     errorProduct.value = true;
     errorCategory.value = true;
   } else {
@@ -596,7 +602,7 @@ const loadAccountCodeDeposits = async () => {
   isApplication.value = false;
 
   const rsp = await api(
-    `accountCodeDeposit/${product.value.value}/${category.value.value}`
+    `accountCodeDeposit/${product.value}/${category.value}`
   );
   if (rsp.data) {
     accountCodeDeposits.value = rsp.data.filter(
@@ -623,19 +629,19 @@ watch(isApplication, () => {
 
 watch(product, () => {
   if (
-    product.value.value === 'FD' ||
-    product.value.value === 'RD' ||
-    product.value.value === 'DD'
+    product.value === 'FD' ||
+    product.value === 'RD' ||
+    product.value === 'DD'
   ) {
     isApplication.value = false;
   }
-  if (product.value.value !== '') {
+  if (product.value !== '') {
     errorProduct.value = false;
   }
 });
 
 watch(category, () => {
-  if (category.value.value !== '') {
+  if (category.value !== '') {
     errorCategory.value = false;
   }
 });
@@ -665,7 +671,6 @@ onMounted(async () => {
       value: item.id,
       label: item.name,
     }));
-    console.log(accountHeads.value);
   }
   fetchingData.value = false;
 });
