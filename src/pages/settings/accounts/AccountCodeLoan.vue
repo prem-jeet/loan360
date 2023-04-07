@@ -40,7 +40,9 @@
                     label="Add Account code loan"
                     icon="add"
                     color="blue-7"
-                    @click="addNewAccount"
+                    @click="
+                      (mode = 'new'), setFormData(), (isEntryModalActive = true)
+                    "
                   />
                 </div>
               </div>
@@ -59,19 +61,19 @@
                   <div class="q-gutter-lg q-mt-sm">
                     <q-radio
                       class="q-mt-none"
-                      v-model="sectionCode"
+                      v-model="newCodeLoan.accountingCategoryCode"
                       val="L"
                       label="Loan"
                     />
                     <q-radio
                       class="q-mt-none"
-                      v-model="sectionCode"
+                      v-model="newCodeLoan.accountingCategoryCode"
                       val="LAP"
                       label="Loan Against Property"
                     />
                     <q-radio
                       class="q-mt-none"
-                      v-model="sectionCode"
+                      v-model="newCodeLoan.accountingCategoryCode"
                       val="PL"
                       label="Personal Loan"
                     />
@@ -97,7 +99,12 @@
                     size="xs"
                     outline
                     color="accent"
-                    @click="() => editEntry(props.rowIndex)"
+                    @click="
+                      (mode = 'edit'),
+                        setFormData(),
+                        (isEntryModalActive = true),
+                        (editingRowIndex = props.rowIndex)
+                    "
                   >
                     <q-tooltip>Edit</q-tooltip>
                   </q-btn>
@@ -165,7 +172,12 @@
                       size="sm"
                       outline
                       color="accent"
-                      @click="() => editEntry(props.rowIndex)"
+                      @click="
+                        (mode = 'edit'),
+                          setFormData(),
+                          (isEntryModalActive = true),
+                          (editingRowIndex = props.rowIndex)
+                      "
                     >
                       <q-tooltip>Edit</q-tooltip>
                     </q-btn>
@@ -192,11 +204,15 @@
 
   <q-dialog v-model="isEntryModalActive" @show="loadAccountCodes">
     <q-card>
-      <q-form @submit.prevent="saveEntry" @reset="resetEntryForm">
+      <q-form @submit.prevent="saveEntry" @reset="setFormData()">
         <q-card-section class="bg-grey-2">
           <div class="flex items-center">
             <span class="text-h6 q-mr-xl"
-              >{{ isEdit ? 'Edit account code loan' : 'Add account code loan' }}
+              >{{
+                mode === 'new'
+                  ? 'Add account code loan'
+                  : 'Edit account code loan'
+              }}
             </span>
             <q-space />
             <q-btn
@@ -212,21 +228,25 @@
             <div class="col-12">
               <div class="col-12 q-mt-lg">
                 <q-select
-                  v-model="accountCode"
+                  v-model="newCodeLoan.accountCode"
                   :options="accountCodeOptions"
                   label="Account Code"
                   outlined
+                  emit-value
+                  map-options
                   :rules="[(val) => !!val || '']"
                 />
               </div>
               <div class="col-12 q-mt-lg">
                 <q-select
-                  v-model="accountName"
+                  v-model="newCodeLoan.accountId"
                   use-input
                   hide-dropdown-icon
                   :options="accountHeadOptions"
                   label="Account name"
                   outlined
+                  emit-value
+                  map-options
                   @input-value="loadAccountHeads"
                   ref="dropdown"
                   :rules="[(val) => !!val || '']"
@@ -237,7 +257,7 @@
         </q-card-section>
         <q-separator class="q-mt-md" />
         <q-card-actions align="right" class="q-py-md bg-grey-2">
-          <q-btn label="Add" color="green-5" type="submit" />
+          <q-btn label="save" color="green-5" type="submit" />
           <q-btn label="Reset" color="red-5" type="reset" />
         </q-card-actions>
       </q-form>
@@ -249,7 +269,7 @@
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { confirmDialog, onSuccess, onFailure } from 'src/utils/notification';
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, watch, onMounted, reactive } from 'vue';
 
 interface AccountCodes {
   code: string;
@@ -274,16 +294,15 @@ interface AccountHeadOptions {
 }
 
 interface AccountCodeLoan {
-  id: number;
+  id: number | null;
   accountCode: string;
-  accountId: number;
+  accountId: number | null;
   accountingCategoryCode: 'L' | 'LAP' | 'PL' | null;
 }
 const breadcrumbs = [
   { path: '/module/settings', label: 'Settings' },
   { path: '/module/settings/natureEntry', label: 'Account Code Loan' },
 ];
-const sectionCode = ref(null);
 const fetchingData = ref(false);
 const accountCodes = ref<AccountCodes[]>([]);
 const accountHeads = ref<AccountHeads[]>([]);
@@ -291,16 +310,20 @@ const accountCodeLoan = ref<AccountCodeLoan[]>([]);
 const accountCodeOptions = ref<AccountCodeOptions[]>([]);
 const accountHeadOptions = ref<AccountHeadOptions[]>([]);
 const dropdown = ref(null);
-const accountCode = ref(accountCodeOptions.value[0]);
-const accountName = ref(accountHeadOptions.value[0]);
-const resetAccountCode = ref(accountCodeOptions.value[0]);
-const restAccountName = ref(accountHeadOptions.value[0]);
 const editingRowIndex = ref(0);
 const isEntryModalActive = ref(false);
-const isEdit = ref(false);
 const filteredAccountCode = computed(() => {
   return accountCodeLoan.value;
 });
+
+let mode: 'new' | 'edit' = 'new';
+const newCodeLoan = reactive<AccountCodeLoan>({
+  id: null,
+  accountCode: '',
+  accountId: null,
+  accountingCategoryCode: null,
+});
+
 const columns: {
   name: string;
   required?: boolean;
@@ -329,6 +352,17 @@ const columns: {
     label: 'Account Name',
   },
 ];
+
+const setFormData = () => {
+  if (mode === 'new') {
+    (newCodeLoan.accountCode = ''), (newCodeLoan.accountId = null);
+  } else {
+    newCodeLoan.accountCode =
+      accountCodeLoan.value[editingRowIndex.value].accountCode;
+    newCodeLoan.accountId =
+      accountCodeLoan.value[editingRowIndex.value].accountId;
+  }
+};
 
 const loadAccountHeads = async (value: string) => {
   let payLoad = {
@@ -363,127 +397,56 @@ const loadAccountCodes = () => {
   accountCodeOptions.value = options;
 };
 
-const addNewAccount = () => {
-  isEntryModalActive.value = true;
-  isEdit.value = false;
-  accountCode.value = resetAccountCode.value;
-  accountName.value = restAccountName.value;
-};
-
 const saveNewEntry = async () => {
-  if (accountCode.value && accountName.value) {
-    const tempVal = accountCodeLoan.value.filter((item) => {
-      return item.accountCode === accountCode.value.value;
-    });
-    if (tempVal.length) {
-      onFailure({
-        msg: 'Duplicate Account Found',
-        icon: 'warning',
-      });
-    } else {
-      let tempObj: AccountCodes[] = accountCodes.value.filter((item) => {
-        return item.code === accountCode.value.value;
-      });
-
-      const payLoad = {
-        accountCode: tempObj[0].code,
-        accountId: accountName.value.value,
-        accountingCategoryCode: sectionCode.value,
-      };
-
-      const rsp = await api.post('accountCodeLoan', payLoad);
-      if (rsp.data) {
-        onSuccess({ msg: rsp.data.displayMessage, icon: 'check' });
-        accountCodeLoan.value.push({
-          ...payLoad,
-          id: rsp.data.id,
-        });
-        isEntryModalActive.value = false;
-        accountCode.value = resetAccountCode.value;
-        accountName.value = restAccountName.value;
-      }
-    }
-  } else {
+  const tempVal = accountCodeLoan.value.filter((item) => {
+    return item.accountCode === newCodeLoan.accountCode;
+  });
+  if (tempVal.length) {
     onFailure({
-      msg: 'Account is not valid',
+      msg: 'Duplicate Account Found',
       icon: 'warning',
     });
-  }
-};
-
-const resetNewEntryForm = () => {
-  accountCode.value = resetAccountCode.value;
-  accountName.value = restAccountName.value;
-};
-
-const editEntry = (rowIndex: number) => {
-  editEntryConfirmed(rowIndex);
-  isEdit.value = true;
-  isEntryModalActive.value = true;
-};
-
-const editEntryConfirmed = (index: number) => {
-  editingRowIndex.value = index;
-  const row: AccountCodeLoan = accountCodeLoan.value[index];
-  loadAccountCodes();
-  let tempCode: AccountCodeOptions[] = accountCodeOptions.value.filter(
-    (item) => {
-      return item.value === row.accountCode;
-    }
-  );
-
-  let tempName: AccountHeads[] = accountHeads.value.filter((item) => {
-    return item.id === row.accountId;
-  });
-  let tempObj: AccountHeadOptions = {
-    value: tempName[0].id,
-
-    label: tempName[0].name,
-  };
-  accountCode.value = tempCode[0];
-  accountName.value = tempObj;
-};
-
-const saveEdited = async () => {
-  let id: number = accountCodeLoan.value[editingRowIndex.value].id;
-  if (accountCode.value && accountName.value) {
-    let tempObj: AccountCodes[] = accountCodes.value.filter((item) => {
-      return item.code === accountCode.value.value;
-    });
-
+  } else {
     const payLoad = {
-      accountCode: tempObj[0].code,
-      accountId: accountName.value.value,
-      accountingCategoryCode: sectionCode.value,
-      id: id,
+      accountCode: newCodeLoan.accountCode,
+      accountId: newCodeLoan.accountId,
+      accountingCategoryCode: newCodeLoan.accountingCategoryCode,
     };
 
     const rsp = await api.post('accountCodeLoan', payLoad);
     if (rsp.data) {
       onSuccess({ msg: rsp.data.displayMessage, icon: 'check' });
-      accountCodeLoan.value[editingRowIndex.value].accountCode =
-        tempObj[0].code;
-      accountCodeLoan.value[editingRowIndex.value].accountId =
-        accountName.value.value;
+      accountCodeLoan.value.push({
+        ...payLoad,
+        id: rsp.data.id,
+      });
       isEntryModalActive.value = false;
     }
-  } else {
-    onFailure({
-      msg: 'Account is not valid',
-      icon: 'warning',
-    });
   }
 };
 
-const resetEditEntryForm = () => {
-  editEntryConfirmed(editingRowIndex.value);
+const saveEdited = async () => {
+  const payLoad = {
+    accountCode: newCodeLoan.accountCode,
+    accountId: newCodeLoan.accountId,
+    accountingCategoryCode: newCodeLoan.accountingCategoryCode,
+    id: accountCodeLoan.value[editingRowIndex.value].id,
+  };
+
+  const rsp = await api.post('accountCodeLoan', payLoad);
+  if (rsp.data) {
+    onSuccess({ msg: rsp.data.displayMessage, icon: 'check' });
+    accountCodeLoan.value[editingRowIndex.value].accountCode =
+      newCodeLoan.accountCode;
+
+    accountCodeLoan.value[editingRowIndex.value].accountId =
+      newCodeLoan.accountId;
+    isEntryModalActive.value = false;
+  }
 };
 
 const saveEntry = () => {
-  isEdit.value ? saveEdited() : saveNewEntry();
-};
-const resetEntryForm = () => {
-  isEdit.value ? resetEditEntryForm() : resetNewEntryForm();
+  mode === 'new' ? saveNewEntry() : saveEdited();
 };
 
 const deleteEntry = async (rowIndex: number) => {
@@ -503,17 +466,31 @@ const deleteEntryConfirmed = async (rowIndex: number) => {
 
 const resetAccountCodeLoanSection = () => {
   accountCodeLoan.value = [];
-  sectionCode.value = null;
+  newCodeLoan.accountingCategoryCode = null;
 };
 
-watch(sectionCode, async () => {
-  if (sectionCode.value) {
+watch(newCodeLoan, async () => {
+  if (newCodeLoan.accountingCategoryCode) {
     fetchingData.value = true;
     const rsp = await api(
-      `accountCodeLoanByAccountingCategory/${sectionCode.value}`
+      `accountCodeLoanByAccountingCategory/${newCodeLoan.accountingCategoryCode}`
     );
     accountCodeLoan.value = rsp.data;
     fetchingData.value = false;
+  }
+});
+
+watch(newCodeLoan, async () => {
+  if (newCodeLoan.accountId) {
+    const options = accountHeads.value.map(
+      (item: { id: number; name: string }) => ({
+        value: item.id,
+        label: item.name,
+      })
+    );
+    accountHeadOptions.value = options.filter((item) => {
+      return item.value === newCodeLoan.accountId;
+    });
   }
 });
 
