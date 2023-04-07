@@ -36,7 +36,11 @@
                       icon="add"
                       label="Add new"
                       size="md"
-                      @click="addNewAccount"
+                      @click="
+                        (mode = 'new'),
+                          setFormData(),
+                          (isEntryModalActive = true)
+                      "
                     />
                   </div>
                 </div>
@@ -93,14 +97,18 @@
                   class="col-12 q-ml-none q-pl-sm q-pt-sm"
                 >
                   <q-checkbox
-                    v-model="isApplication"
+                    v-model="tempConfig.isApplication"
                     disable
                     label="isApplication"
                   />
                 </div>
 
                 <div v-else class="col-12 q-ml-none q-pl-sm q-pt-sm">
-                  <q-checkbox v-model="isApplication" label="isApplication" />
+                  <q-checkbox
+                    @click="loadWithisApplication()"
+                    v-model="tempConfig.isApplication"
+                    label="isApplication"
+                  />
                 </div>
               </div>
             </div>
@@ -122,7 +130,12 @@
                     size="xs"
                     outline
                     color="accent"
-                    @click="() => editEntry(props.rowIndex)"
+                    @click="
+                      (mode = 'edit'),
+                        setFormData(),
+                        (isEntryModalActive = true),
+                        (editingRowIndex = props.rowIndex)
+                    "
                   >
                     <q-tooltip>Edit</q-tooltip>
                   </q-btn>
@@ -211,7 +224,12 @@
                       size="sm"
                       outline
                       color="accent"
-                      @click="() => editEntry(props.rowIndex)"
+                      @click="
+                        (mode = 'edit'),
+                          setFormData(),
+                          (isEntryModalActive = true),
+                          (editingRowIndex = props.rowIndex)
+                      "
                     >
                       <q-tooltip>Edit</q-tooltip>
                     </q-btn>
@@ -235,11 +253,13 @@
   </div>
   <q-dialog v-model="isEntryModalActive">
     <q-card>
-      <q-form @submit.prevent="saveEntry" @reset="resetEntryForm">
+      <q-form @submit.prevent="saveEntry" @reset="setFormData()">
         <q-card-section class="bg-grey-2">
           <div class="flex items-center">
             <span class="text-h6 q-mr-xl">{{
-              isEdit ? 'Edit account code deposit' : 'Add account code deposit'
+              mode === 'new'
+                ? 'Add account code deposit'
+                : 'Edit account code deposit'
             }}</span>
             <q-space />
             <q-btn
@@ -255,51 +275,57 @@
             <div class="col-12">
               <div class="col-12 q-mt-lg">
                 <q-select
-                  v-model="test"
+                  v-if="mode === 'new'"
+                  v-model="tempConfig.productCode"
                   dense
                   :options="products"
                   label="Select product"
-                  options-dense
                   map-options
-                  menu-shrink
                   emit-value
                   outlined
-                  :rules="[(val:Options) => val.value!=='']"
+                  :rules="[(val:string) => val!=='']"
                   hide-bottom-space
                 />
               </div>
               <div class="col-12 q-mt-lg">
                 <q-select
-                  v-model="tempCategory"
+                  v-if="mode === 'new'"
+                  v-model="tempConfig.categoryCode"
                   dense
                   :options="categorys"
                   label="Select category"
                   outlined
-                  :rules="[(val:Options) => val.value!=='']"
+                  map-options
+                  emit-value
+                  :rules="[(val:string) => val!=='']"
                   hide-bottom-space
                 />
               </div>
               <div class="col-12 q-mt-lg">
                 <q-select
-                  v-model="accountCode"
+                  v-model="tempConfig.accountCode"
                   dense
                   :options="accountCodes"
                   label="Select Code"
                   outlined
-                  :rules="[(val:Options) => val.value!=='']"
+                  map-options
+                  emit-value
+                  :rules="[(val:string) => val!=='']"
                   hide-bottom-space
                 />
               </div>
               <div class="col-12 q-mt-lg">
                 <q-select
-                  v-model="accountName"
+                  v-model="tempConfig.accountId"
                   dense
                   use-input
+                  map-options
+                  emit-value
                   hide-dropdown-icon
                   :options="accountNameOptions"
                   label="Account name"
                   outlined
-                  :rules="[(val) => val !== undefined]"
+                  :rules="[(val) => val !== null]"
                   @input-value="loadAccountNames"
                   ref="dropdown"
                 />
@@ -307,27 +333,30 @@
 
               <div
                 v-if="
-                  tempProduct.value === 'FD' ||
-                  tempProduct.value === 'RD' ||
-                  tempProduct.value === 'DD'
+                  tempConfig.productCode === 'FD' ||
+                  tempConfig.productCode === 'RD' ||
+                  tempConfig.productCode === 'DD'
                 "
                 class="col-12 q-mt-sm"
               >
                 <q-checkbox
                   disable
-                  v-model="tempIsApplication"
+                  v-model="tempConfig.isApplication"
                   label="isApplication"
                 />
               </div>
               <div v-else class="col-12 q-mt-sm">
-                <q-checkbox v-model="tempIsApplication" label="isApplication" />
+                <q-checkbox
+                  v-model="tempConfig.isApplication"
+                  label="isApplication"
+                />
               </div>
             </div>
           </div>
         </q-card-section>
         <q-separator class="q-mt-md" />
         <q-card-actions align="right" class="q-py-md bg-grey-2">
-          <q-btn label="Add" color="green-5" type="submit" />
+          <q-btn label="save" color="green-5" type="submit" />
           <q-btn label="Reset" color="red-5" type="reset" />
         </q-card-actions>
       </q-form>
@@ -339,7 +368,7 @@
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { onSuccess, confirmDialog } from 'src/utils/notification';
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed, watch, reactive } from 'vue';
 
 const breadcrumbs = [
   { path: '/module/settings', label: 'Settings' },
@@ -362,18 +391,28 @@ interface Options {
 interface AccountCodeDeposit {
   accountCode: string;
   categoryCode: string;
-  id: number;
+  id: number | null;
   isApplication: boolean;
   productCode: string;
-  accountId: number;
+  accountId: number | null;
 }
-const test = ref('');
+
+const tempConfig = reactive<AccountCodeDeposit>({
+  accountCode: '',
+  categoryCode: '',
+  id: null,
+  isApplication: false,
+  productCode: '',
+  accountId: null,
+});
+
+let mode: 'new' | 'edit' = 'new';
+
 const errorProduct = ref(false);
 const errorCategory = ref(false);
 const isEntryModalActive = ref(false);
 const fetchingData = ref(false);
 const accountHeads = ref<AccountHeads[]>([]);
-const temp = ref<AccountHeads[]>([]);
 const accountNameOptions = ref<AccountHeads[]>([]);
 const accountCodes = ref<AccountCodes[]>([]);
 const products = ref<Options[]>([
@@ -393,18 +432,10 @@ const categorys = ref<Options[]>([
 ]);
 const product = ref('');
 const category = ref('');
-const tempProduct = ref({ value: '', label: '' });
-const tempCategory = ref({ value: '', label: '' });
-const accountCode = ref({ value: '', label: '' });
-const accountName = ref(temp.value[0]);
-const accountNameBool = ref(true);
 const accountCodeDeposits = ref<AccountCodeDeposit[]>([]);
 const accountCodeDepositsTemp = ref<AccountCodeDeposit[]>([]); // for isapplicable
+
 const editingRowIndex = ref(0);
-const isEdit = ref(false);
-const isApplication = ref(false);
-const tempIsApplication = ref(false);
-const editIsApplication = ref(false);
 const dropdown = ref(null);
 
 const columns: {
@@ -443,23 +474,32 @@ const columns: {
   },
 ];
 
-const addNewAccount = () => {
-  isEntryModalActive.value = true;
-  isEdit.value = false;
-  tempCategory.value = { value: '', label: '' };
-  tempProduct.value = { value: '', label: '' };
-  accountCode.value = { value: '', label: '' };
-  accountName.value = temp.value[0];
-  tempIsApplication.value = false;
+const setFormData = () => {
+  if (mode === 'new') {
+    tempConfig.accountCode = '';
+    tempConfig.accountId = null;
+    tempConfig.categoryCode = '';
+    tempConfig.isApplication = false;
+    tempConfig.productCode = '';
+  } else {
+    tempConfig.accountCode =
+      accountCodeDeposits.value[editingRowIndex.value].accountCode;
+    tempConfig.accountId =
+      accountCodeDeposits.value[editingRowIndex.value].accountId;
+    tempConfig.isApplication =
+      accountCodeDeposits.value[editingRowIndex.value].isApplication;
+    tempConfig.productCode =
+      accountCodeDeposits.value[editingRowIndex.value].productCode;
+  }
 };
 
 const saveNewEntry = async () => {
   const tempObj = {
-    accountCode: accountCode.value.value,
-    accountId: accountName.value.value,
-    categoryCode: tempCategory.value.value,
-    isApplication: tempIsApplication.value,
-    productCode: tempProduct.value.value,
+    accountCode: tempConfig.accountCode,
+    accountId: tempConfig.accountId,
+    categoryCode: tempConfig.categoryCode,
+    isApplication: tempConfig.isApplication,
+    productCode: tempConfig.productCode,
   };
   const rsp = await api.post('accountCodeDeposit', tempObj);
   if (rsp.data) {
@@ -471,62 +511,22 @@ const saveNewEntry = async () => {
     isEntryModalActive.value = false;
   }
 };
-const resetNewEntryForm = () => {
-  tempCategory.value = { value: '', label: '' };
-  tempProduct.value = { value: '', label: '' };
-  accountCode.value = { value: '', label: '' };
-  accountName.value = temp.value[0];
-  tempIsApplication.value = false;
-};
-
-const editEntry = (rowIndex: number) => {
-  editEntryConfirmed(rowIndex);
-  isEdit.value = true;
-  isEntryModalActive.value = true;
-};
-const editEntryConfirmed = (index: number) => {
-  editingRowIndex.value = index;
-  const row: AccountCodeDeposit = accountCodeDeposits.value[index];
-
-  let productTemp = products.value.filter((item) => {
-    return item.value === row.productCode;
-  });
-  tempProduct.value = productTemp[0];
-
-  let categoryTemp = categorys.value.filter((item) => {
-    return item.value === row.categoryCode;
-  });
-  tempCategory.value = categoryTemp[0];
-
-  let tempCode: AccountCodes[] = accountCodes.value.filter((item) => {
-    return item.value === row.accountCode;
-  });
-  accountCode.value = tempCode[0];
-  let tempName = accountHeads.value.filter((item) => {
-    return item.value === row.accountId;
-  });
-  accountName.value = tempName[0];
-  editIsApplication.value = accountCodeDeposits.value[index].isApplication;
-  tempIsApplication.value = row.isApplication;
-};
 
 const saveEdited = async (index: number) => {
-  const row: AccountCodeDeposit = accountCodeDeposits.value[index];
-
   const rsp = await api.get('accountHead');
 
   let headObj = rsp.data.filter((item: { id: number }) => {
-    return item.id === row.accountId;
+    return (
+      item.id === accountCodeDeposits.value[editingRowIndex.value].accountId
+    );
   });
 
   const payLoad = {
     account: headObj[0],
-    accountCode: accountCode.value.value,
-    accountId: accountName.value.value,
-    categoryCode: row.categoryCode,
-    id: row.id,
-    isApplication: tempIsApplication.value,
-    productCode: row.productCode,
+    accountCode: tempConfig.accountCode,
+    accountId: tempConfig.accountId,
+    id: accountCodeDeposits.value[editingRowIndex.value].id,
+    isApplication: tempConfig.isApplication,
   };
 
   const rsp_ = await api.post('accountCodeDeposit', payLoad);
@@ -535,23 +535,15 @@ const saveEdited = async (index: number) => {
       msg: rsp_.data.displayMessage,
       icon: 'sync_alt',
     });
-    accountCodeDeposits.value[index].accountCode = accountCode.value.value;
-    accountCodeDeposits.value[index].accountId = accountName.value.value;
-    accountCodeDeposits.value[index].isApplication = tempIsApplication.value;
+    accountCodeDeposits.value[index].accountCode = tempConfig.accountCode;
+    accountCodeDeposits.value[index].accountId = tempConfig.accountId;
+    accountCodeDeposits.value[index].isApplication = tempConfig.isApplication;
     isEntryModalActive.value = false;
   }
 };
 
-const resetEditEntryForm = () => {
-  editEntryConfirmed(editingRowIndex.value);
-};
-
 const saveEntry = () => {
-  isEdit.value ? saveEdited(editingRowIndex.value) : saveNewEntry();
-};
-
-const resetEntryForm = () => {
-  isEdit.value ? resetEditEntryForm() : resetNewEntryForm();
+  mode === 'new' ? saveNewEntry() : saveEdited(editingRowIndex.value);
 };
 
 const deleteEntry = async (rowIndex: number) => {
@@ -599,7 +591,7 @@ const searchDeposits = () => {
 };
 
 const loadAccountCodeDeposits = async () => {
-  isApplication.value = false;
+  tempConfig.isApplication = false;
 
   const rsp = await api(
     `accountCodeDeposit/${product.value}/${category.value}`
@@ -614,18 +606,18 @@ const loadAccountCodeDeposits = async () => {
   }
 };
 
-watch(isApplication, () => {
-  if (isApplication.value === true) {
+const loadWithisApplication = () => {
+  if (tempConfig.isApplication === true) {
     accountCodeDeposits.value = accountCodeDepositsTemp.value.filter((item) => {
       return item.isApplication === true;
     });
   }
-  if (isApplication.value === false) {
+  if (tempConfig.isApplication === false) {
     accountCodeDeposits.value = accountCodeDepositsTemp.value.filter((item) => {
       return item.isApplication === false;
     });
   }
-});
+};
 
 watch(product, () => {
   if (
@@ -633,7 +625,7 @@ watch(product, () => {
     product.value === 'RD' ||
     product.value === 'DD'
   ) {
-    isApplication.value = false;
+    tempConfig.isApplication = false;
   }
   if (product.value !== '') {
     errorProduct.value = false;
@@ -645,20 +637,12 @@ watch(category, () => {
     errorCategory.value = false;
   }
 });
-watch(tempProduct, () => {
-  if (
-    tempProduct.value.value === 'FD' ||
-    tempProduct.value.value === 'RD' ||
-    tempProduct.value.value === 'DD'
-  ) {
-    tempIsApplication.value = false;
-  }
-});
-watch(accountName, () => {
-  if (accountName.value) {
-    accountNameBool.value = false;
-  } else {
-    accountNameBool.value = true;
+
+watch(tempConfig, () => {
+  if (tempConfig.accountId) {
+    accountNameOptions.value = accountHeads.value.filter((item) => {
+      return item.value === tempConfig.accountId;
+    });
   }
 });
 
