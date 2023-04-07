@@ -97,7 +97,7 @@
                   class="col-12 q-ml-none q-pl-sm q-pt-sm"
                 >
                   <q-checkbox
-                    v-model="tempConfig.isApplication"
+                    v-model="newCodeDeposit.isApplication"
                     disable
                     label="isApplication"
                   />
@@ -106,7 +106,7 @@
                 <div v-else class="col-12 q-ml-none q-pl-sm q-pt-sm">
                   <q-checkbox
                     @click="loadWithisApplication()"
-                    v-model="tempConfig.isApplication"
+                    v-model="newCodeDeposit.isApplication"
                     label="isApplication"
                   />
                 </div>
@@ -276,7 +276,7 @@
               <div class="col-12 q-mt-lg">
                 <q-select
                   v-if="mode === 'new'"
-                  v-model="tempConfig.productCode"
+                  v-model="newCodeDeposit.productCode"
                   dense
                   :options="products"
                   label="Select product"
@@ -290,7 +290,7 @@
               <div class="col-12 q-mt-lg">
                 <q-select
                   v-if="mode === 'new'"
-                  v-model="tempConfig.categoryCode"
+                  v-model="newCodeDeposit.categoryCode"
                   dense
                   :options="categorys"
                   label="Select category"
@@ -303,7 +303,7 @@
               </div>
               <div class="col-12 q-mt-lg">
                 <q-select
-                  v-model="tempConfig.accountCode"
+                  v-model="newCodeDeposit.accountCode"
                   dense
                   :options="accountCodes"
                   label="Select Code"
@@ -316,7 +316,7 @@
               </div>
               <div class="col-12 q-mt-lg">
                 <q-select
-                  v-model="tempConfig.accountId"
+                  v-model="newCodeDeposit.accountId"
                   dense
                   use-input
                   map-options
@@ -333,21 +333,21 @@
 
               <div
                 v-if="
-                  tempConfig.productCode === 'FD' ||
-                  tempConfig.productCode === 'RD' ||
-                  tempConfig.productCode === 'DD'
+                  newCodeDeposit.productCode === 'FD' ||
+                  newCodeDeposit.productCode === 'RD' ||
+                  newCodeDeposit.productCode === 'DD'
                 "
                 class="col-12 q-mt-sm"
               >
                 <q-checkbox
                   disable
-                  v-model="tempConfig.isApplication"
+                  v-model="newCodeDeposit.isApplication"
                   label="isApplication"
                 />
               </div>
               <div v-else class="col-12 q-mt-sm">
                 <q-checkbox
-                  v-model="tempConfig.isApplication"
+                  v-model="newCodeDeposit.isApplication"
                   label="isApplication"
                 />
               </div>
@@ -397,7 +397,7 @@ interface AccountCodeDeposit {
   accountId: number | null;
 }
 
-const tempConfig = reactive<AccountCodeDeposit>({
+const newCodeDeposit = reactive<AccountCodeDeposit>({
   accountCode: '',
   categoryCode: '',
   id: null,
@@ -476,30 +476,32 @@ const columns: {
 
 const setFormData = () => {
   if (mode === 'new') {
-    tempConfig.accountCode = '';
-    tempConfig.accountId = null;
-    tempConfig.categoryCode = '';
-    tempConfig.isApplication = false;
-    tempConfig.productCode = '';
+    newCodeDeposit.accountCode = '';
+    newCodeDeposit.accountId = null;
+    newCodeDeposit.categoryCode = '';
+    newCodeDeposit.isApplication = false;
+    newCodeDeposit.productCode = '';
   } else {
-    tempConfig.accountCode =
+    newCodeDeposit.accountCode =
       accountCodeDeposits.value[editingRowIndex.value].accountCode;
-    tempConfig.accountId =
+    newCodeDeposit.accountId =
       accountCodeDeposits.value[editingRowIndex.value].accountId;
-    tempConfig.isApplication =
+    newCodeDeposit.isApplication =
       accountCodeDeposits.value[editingRowIndex.value].isApplication;
-    tempConfig.productCode =
+    newCodeDeposit.productCode =
       accountCodeDeposits.value[editingRowIndex.value].productCode;
+    newCodeDeposit.categoryCode =
+      accountCodeDeposits.value[editingRowIndex.value].categoryCode;
   }
 };
 
 const saveNewEntry = async () => {
   const tempObj = {
-    accountCode: tempConfig.accountCode,
-    accountId: tempConfig.accountId,
-    categoryCode: tempConfig.categoryCode,
-    isApplication: tempConfig.isApplication,
-    productCode: tempConfig.productCode,
+    accountCode: newCodeDeposit.accountCode,
+    accountId: newCodeDeposit.accountId,
+    categoryCode: newCodeDeposit.categoryCode,
+    isApplication: newCodeDeposit.isApplication,
+    productCode: newCodeDeposit.productCode,
   };
   const rsp = await api.post('accountCodeDeposit', tempObj);
   if (rsp.data) {
@@ -523,10 +525,12 @@ const saveEdited = async (index: number) => {
 
   const payLoad = {
     account: headObj[0],
-    accountCode: tempConfig.accountCode,
-    accountId: tempConfig.accountId,
+    accountCode: newCodeDeposit.accountCode,
+    accountId: newCodeDeposit.accountId,
     id: accountCodeDeposits.value[editingRowIndex.value].id,
-    isApplication: tempConfig.isApplication,
+    isApplication: newCodeDeposit.isApplication,
+    productCode: newCodeDeposit.productCode,
+    categoryCode: newCodeDeposit.categoryCode,
   };
 
   const rsp_ = await api.post('accountCodeDeposit', payLoad);
@@ -535,9 +539,10 @@ const saveEdited = async (index: number) => {
       msg: rsp_.data.displayMessage,
       icon: 'sync_alt',
     });
-    accountCodeDeposits.value[index].accountCode = tempConfig.accountCode;
-    accountCodeDeposits.value[index].accountId = tempConfig.accountId;
-    accountCodeDeposits.value[index].isApplication = tempConfig.isApplication;
+    accountCodeDeposits.value[index].accountCode = newCodeDeposit.accountCode;
+    accountCodeDeposits.value[index].accountId = newCodeDeposit.accountId;
+    accountCodeDeposits.value[index].isApplication =
+      newCodeDeposit.isApplication;
     isEntryModalActive.value = false;
   }
 };
@@ -591,7 +596,7 @@ const searchDeposits = () => {
 };
 
 const loadAccountCodeDeposits = async () => {
-  tempConfig.isApplication = false;
+  newCodeDeposit.isApplication = false;
 
   const rsp = await api(
     `accountCodeDeposit/${product.value}/${category.value}`
@@ -607,12 +612,12 @@ const loadAccountCodeDeposits = async () => {
 };
 
 const loadWithisApplication = () => {
-  if (tempConfig.isApplication === true) {
+  if (newCodeDeposit.isApplication === true) {
     accountCodeDeposits.value = accountCodeDepositsTemp.value.filter((item) => {
       return item.isApplication === true;
     });
   }
-  if (tempConfig.isApplication === false) {
+  if (newCodeDeposit.isApplication === false) {
     accountCodeDeposits.value = accountCodeDepositsTemp.value.filter((item) => {
       return item.isApplication === false;
     });
@@ -625,7 +630,7 @@ watch(product, () => {
     product.value === 'RD' ||
     product.value === 'DD'
   ) {
-    tempConfig.isApplication = false;
+    newCodeDeposit.isApplication = false;
   }
   if (product.value !== '') {
     errorProduct.value = false;
@@ -638,10 +643,10 @@ watch(category, () => {
   }
 });
 
-watch(tempConfig, () => {
-  if (tempConfig.accountId) {
+watch(newCodeDeposit, () => {
+  if (newCodeDeposit.accountId) {
     accountNameOptions.value = accountHeads.value.filter((item) => {
-      return item.value === tempConfig.accountId;
+      return item.value === newCodeDeposit.accountId;
     });
   }
 });
