@@ -97,7 +97,7 @@
                   class="col-12 q-ml-none q-pl-sm q-pt-sm"
                 >
                   <q-checkbox
-                    v-model="newCodeDeposit.isApplication"
+                    v-model="checkBox"
                     disable
                     label="isApplication"
                   />
@@ -106,7 +106,7 @@
                 <div v-else class="col-12 q-ml-none q-pl-sm q-pt-sm">
                   <q-checkbox
                     @click="loadWithisApplication()"
-                    v-model="newCodeDeposit.isApplication"
+                    v-model="checkBox"
                     label="isApplication"
                   />
                 </div>
@@ -281,6 +281,7 @@
                   :options="products"
                   label="Select product"
                   map-options
+                  menu-shrink
                   emit-value
                   outlined
                   :rules="[(val:string) => val!=='']"
@@ -296,6 +297,7 @@
                   label="Select category"
                   outlined
                   map-options
+                  menu-shrink
                   emit-value
                   :rules="[(val:string) => val!=='']"
                   hide-bottom-space
@@ -310,6 +312,7 @@
                   outlined
                   map-options
                   emit-value
+                  menu-shrink
                   :rules="[(val:string) => val!=='']"
                   hide-bottom-space
                 />
@@ -320,6 +323,7 @@
                   dense
                   use-input
                   map-options
+                  menu-shrink
                   emit-value
                   hide-dropdown-icon
                   :options="accountNameOptions"
@@ -407,7 +411,7 @@ const newCodeDeposit = reactive<AccountCodeDeposit>({
 });
 
 let mode: 'new' | 'edit' = 'new';
-
+const checkBox = ref(false);
 const errorProduct = ref(false);
 const errorCategory = ref(false);
 const isEntryModalActive = ref(false);
@@ -435,7 +439,7 @@ const category = ref('');
 const accountCodeDeposits = ref<AccountCodeDeposit[]>([]);
 const accountCodeDepositsTemp = ref<AccountCodeDeposit[]>([]); // for isapplicable
 
-const editingRowIndex = ref(0);
+const editingRowIndex = ref<number | null>(null);
 const dropdown = ref(null);
 
 const columns: {
@@ -475,24 +479,18 @@ const columns: {
 ];
 
 const setFormData = () => {
-  if (mode === 'new') {
-    newCodeDeposit.accountCode = '';
-    newCodeDeposit.accountId = null;
-    newCodeDeposit.categoryCode = '';
-    newCodeDeposit.isApplication = false;
-    newCodeDeposit.productCode = '';
-  } else {
-    newCodeDeposit.accountCode =
-      accountCodeDeposits.value[editingRowIndex.value].accountCode;
-    newCodeDeposit.accountId =
-      accountCodeDeposits.value[editingRowIndex.value].accountId;
-    newCodeDeposit.isApplication =
-      accountCodeDeposits.value[editingRowIndex.value].isApplication;
-    newCodeDeposit.productCode =
-      accountCodeDeposits.value[editingRowIndex.value].productCode;
-    newCodeDeposit.categoryCode =
-      accountCodeDeposits.value[editingRowIndex.value].categoryCode;
-  }
+  const temp =
+    editingRowIndex.value !== null
+      ? accountCodeDeposits.value[editingRowIndex.value]
+      : undefined;
+  newCodeDeposit.accountCode = mode === 'new' ? '' : temp?.accountCode ?? '';
+  newCodeDeposit.accountId = mode === 'new' ? null : temp?.accountId ?? null;
+  newCodeDeposit.isApplication =
+    mode === 'new' ? checkBox.value : temp?.isApplication ?? false;
+  newCodeDeposit.productCode =
+    mode === 'new' ? product.value : temp?.productCode ?? '';
+  newCodeDeposit.categoryCode =
+    mode === 'new' ? category.value : temp?.categoryCode ?? '';
 };
 
 const saveNewEntry = async () => {
@@ -519,7 +517,7 @@ const saveEdited = async (index: number) => {
 
   let headObj = rsp.data.filter((item: { id: number }) => {
     return (
-      item.id === accountCodeDeposits.value[editingRowIndex.value].accountId
+      item.id === accountCodeDeposits.value[editingRowIndex.value!].accountId
     );
   });
 
@@ -527,7 +525,7 @@ const saveEdited = async (index: number) => {
     account: headObj[0],
     accountCode: newCodeDeposit.accountCode,
     accountId: newCodeDeposit.accountId,
-    id: accountCodeDeposits.value[editingRowIndex.value].id,
+    id: accountCodeDeposits.value[editingRowIndex.value!].id,
     isApplication: newCodeDeposit.isApplication,
     productCode: newCodeDeposit.productCode,
     categoryCode: newCodeDeposit.categoryCode,
@@ -539,16 +537,17 @@ const saveEdited = async (index: number) => {
       msg: rsp_.data.displayMessage,
       icon: 'sync_alt',
     });
-    accountCodeDeposits.value[index].accountCode = newCodeDeposit.accountCode;
-    accountCodeDeposits.value[index].accountId = newCodeDeposit.accountId;
-    accountCodeDeposits.value[index].isApplication =
-      newCodeDeposit.isApplication;
+    loadAccountCodeDeposits();
+    // accountCodeDeposits.value[index].accountCode = newCodeDeposit.accountCode;
+    // accountCodeDeposits.value[index].accountId = newCodeDeposit.accountId;
+    // accountCodeDeposits.value[index].isApplication =
+    //   newCodeDeposit.isApplication;
     isEntryModalActive.value = false;
   }
 };
 
 const saveEntry = () => {
-  mode === 'new' ? saveNewEntry() : saveEdited(editingRowIndex.value);
+  mode === 'new' ? saveNewEntry() : saveEdited(editingRowIndex.value!);
 };
 
 const deleteEntry = async (rowIndex: number) => {
@@ -596,15 +595,13 @@ const searchDeposits = () => {
 };
 
 const loadAccountCodeDeposits = async () => {
-  newCodeDeposit.isApplication = false;
-
   const rsp = await api(
     `accountCodeDeposit/${product.value}/${category.value}`
   );
   if (rsp.data) {
     accountCodeDeposits.value = rsp.data.filter(
       (item: { isApplication: boolean }) => {
-        return item.isApplication === false;
+        return item.isApplication === checkBox.value;
       }
     );
     accountCodeDepositsTemp.value = rsp.data;
@@ -612,12 +609,12 @@ const loadAccountCodeDeposits = async () => {
 };
 
 const loadWithisApplication = () => {
-  if (newCodeDeposit.isApplication === true) {
+  if (checkBox.value === true) {
     accountCodeDeposits.value = accountCodeDepositsTemp.value.filter((item) => {
       return item.isApplication === true;
     });
   }
-  if (newCodeDeposit.isApplication === false) {
+  if (checkBox.value === false) {
     accountCodeDeposits.value = accountCodeDepositsTemp.value.filter((item) => {
       return item.isApplication === false;
     });
@@ -630,7 +627,7 @@ watch(product, () => {
     product.value === 'RD' ||
     product.value === 'DD'
   ) {
-    newCodeDeposit.isApplication = false;
+    checkBox.value = false;
   }
   if (product.value !== '') {
     errorProduct.value = false;
