@@ -234,6 +234,7 @@
                   outlined
                   emit-value
                   map-options
+                  menu-shrink
                   :rules="[(val) => !!val || '']"
                 />
               </div>
@@ -247,6 +248,7 @@
                   outlined
                   emit-value
                   map-options
+                  menu-shrink
                   @input-value="loadAccountHeads"
                   ref="dropdown"
                   :rules="[(val) => !!val || '']"
