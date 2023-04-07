@@ -36,7 +36,7 @@
                 <div class="col-auto">
                   <q-btn
                     size="md"
-                    v-if="accountCodeLoan.length"
+                    v-if="showNew"
                     label="Add Account code loan"
                     icon="add"
                     color="blue-7"
@@ -207,7 +207,7 @@
       <q-form @submit.prevent="saveEntry" @reset="setFormData()">
         <q-card-section class="bg-grey-2">
           <div class="flex items-center">
-            <span class="text-h6 q-mr-xl"
+            <span class="text-bold q-mr-xl"
               >{{
                 mode === 'new'
                   ? 'Add account code loan'
@@ -314,10 +314,7 @@ const accountHeadOptions = ref<AccountHeadOptions[]>([]);
 const dropdown = ref(null);
 const editingRowIndex = ref(0);
 const isEntryModalActive = ref(false);
-const filteredAccountCode = computed(() => {
-  return accountCodeLoan.value;
-});
-
+const showNew = ref(false);
 let mode: 'new' | 'edit' = 'new';
 const newCodeLoan = reactive<AccountCodeLoan>({
   id: null,
@@ -354,6 +351,10 @@ const columns: {
     label: 'Account Name',
   },
 ];
+
+const filteredAccountCode = computed(() => {
+  return accountCodeLoan.value;
+});
 
 const setFormData = () => {
   if (mode === 'new') {
@@ -469,6 +470,7 @@ const deleteEntryConfirmed = async (rowIndex: number) => {
 const resetAccountCodeLoanSection = () => {
   accountCodeLoan.value = [];
   newCodeLoan.accountingCategoryCode = null;
+  showNew.value = false;
 };
 
 watch(newCodeLoan, async () => {
@@ -478,6 +480,7 @@ watch(newCodeLoan, async () => {
       `accountCodeLoanByAccountingCategory/${newCodeLoan.accountingCategoryCode}`
     );
     accountCodeLoan.value = rsp.data;
+    showNew.value = true;
     fetchingData.value = false;
   }
 });
