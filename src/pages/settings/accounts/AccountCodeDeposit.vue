@@ -30,17 +30,14 @@
               <div class="col-12">
                 <div class="row items-center q-gutter-md">
                   <div class="col-auto text-h6">Account Code Deposit</div>
-                  <div v-if="accountCodeDepositsTemp.length" class="col-auto">
+                  <div class="col-auto">
                     <q-btn
+                      v-if="showAddnew"
                       color="blue-7"
                       icon="add"
                       label="Add new"
                       size="md"
-                      @click="
-                        (mode = 'new'),
-                          setFormData(),
-                          (isEntryModalActive = true)
-                      "
+                      @click="newEntry()"
                     />
                   </div>
                 </div>
@@ -130,12 +127,7 @@
                     size="xs"
                     outline
                     color="accent"
-                    @click="
-                      (mode = 'edit'),
-                        setFormData(),
-                        (isEntryModalActive = true),
-                        (editingRowIndex = props.rowIndex)
-                    "
+                    @click="editEntry(props.rowIndex)"
                   >
                     <q-tooltip>Edit</q-tooltip>
                   </q-btn>
@@ -224,12 +216,7 @@
                       size="sm"
                       outline
                       color="accent"
-                      @click="
-                        (mode = 'edit'),
-                          setFormData(),
-                          (isEntryModalActive = true),
-                          (editingRowIndex = props.rowIndex)
-                      "
+                      @click="editEntry(props.rowIndex)"
                     >
                       <q-tooltip>Edit</q-tooltip>
                     </q-btn>
@@ -256,7 +243,7 @@
       <q-form @submit.prevent="saveEntry" @reset="setFormData()">
         <q-card-section class="bg-grey-2">
           <div class="flex items-center">
-            <span class="text-h6 q-mr-xl">{{
+            <span class="text-bold q-mr-xl">{{
               mode === 'new'
                 ? 'Add account code deposit'
                 : 'Edit account code deposit'
@@ -419,6 +406,14 @@ const fetchingData = ref(false);
 const accountHeads = ref<AccountHeads[]>([]);
 const accountNameOptions = ref<AccountHeads[]>([]);
 const accountCodes = ref<AccountCodes[]>([]);
+const product = ref('');
+const category = ref('');
+const accountCodeDeposits = ref<AccountCodeDeposit[]>([]);
+const accountCodeDepositsTemp = ref<AccountCodeDeposit[]>([]); // for isapplicable
+const editingRowIndex = ref<number | null>(null);
+const dropdown = ref(null);
+const showAddnew = ref(false);
+
 const products = ref<Options[]>([
   { value: 'FD', label: 'Fixed Deposit' },
   { value: 'RD', label: 'Recurring Deposit' },
@@ -434,14 +429,6 @@ const categorys = ref<Options[]>([
   { value: 'O', label: 'Others' },
   { value: 'DR', label: "Director's Relatives" },
 ]);
-const product = ref('');
-const category = ref('');
-const accountCodeDeposits = ref<AccountCodeDeposit[]>([]);
-const accountCodeDepositsTemp = ref<AccountCodeDeposit[]>([]); // for isapplicable
-
-const editingRowIndex = ref<number | null>(null);
-const dropdown = ref(null);
-
 const columns: {
   name: string;
   required?: boolean;
@@ -479,18 +466,28 @@ const columns: {
 ];
 
 const setFormData = () => {
-  const temp =
-    editingRowIndex.value !== null
-      ? accountCodeDeposits.value[editingRowIndex.value]
-      : undefined;
-  newCodeDeposit.accountCode = mode === 'new' ? '' : temp?.accountCode ?? '';
-  newCodeDeposit.accountId = mode === 'new' ? null : temp?.accountId ?? null;
-  newCodeDeposit.isApplication =
-    mode === 'new' ? checkBox.value : temp?.isApplication ?? false;
-  newCodeDeposit.productCode =
-    mode === 'new' ? product.value : temp?.productCode ?? '';
-  newCodeDeposit.categoryCode =
-    mode === 'new' ? category.value : temp?.categoryCode ?? '';
+  console.log(editingRowIndex.value);
+  let temp;
+  if (editingRowIndex.value !== null) {
+    temp = accountCodeDeposits.value[editingRowIndex.value];
+  }
+  newCodeDeposit.accountCode = temp ? temp.accountCode : '';
+  newCodeDeposit.accountId = temp ? temp.accountId : null;
+  newCodeDeposit.isApplication = temp ? temp.isApplication : checkBox.value;
+  newCodeDeposit.productCode = temp ? temp.productCode : product.value;
+  newCodeDeposit.categoryCode = temp ? temp.categoryCode : category.value;
+};
+
+const newEntry = () => {
+  mode = 'new';
+  editingRowIndex.value = null;
+  isEntryModalActive.value = true;
+  setFormData();
+};
+const editEntry = (index: number) => {
+  mode = 'edit';
+  editingRowIndex.value = index;
+  setFormData(), (isEntryModalActive.value = true);
 };
 
 const saveNewEntry = async () => {
@@ -512,7 +509,7 @@ const saveNewEntry = async () => {
   }
 };
 
-const saveEdited = async (index: number) => {
+const saveEdited = async () => {
   const rsp = await api.get('accountHead');
 
   let headObj = rsp.data.filter((item: { id: number }) => {
@@ -547,7 +544,7 @@ const saveEdited = async (index: number) => {
 };
 
 const saveEntry = () => {
-  mode === 'new' ? saveNewEntry() : saveEdited(editingRowIndex.value!);
+  mode === 'new' ? saveNewEntry() : saveEdited();
 };
 
 const deleteEntry = async (rowIndex: number) => {
@@ -583,6 +580,10 @@ const loadAccountNames = (searchName: string) => {
 const resetAccountCodeDeposits = () => {
   accountCodeDeposits.value = [];
   accountCodeDepositsTemp.value = [];
+  product.value = '';
+  category.value = '';
+  checkBox.value = false;
+  showAddnew.value = false;
 };
 
 const searchDeposits = () => {
@@ -605,6 +606,7 @@ const loadAccountCodeDeposits = async () => {
       }
     );
     accountCodeDepositsTemp.value = rsp.data;
+    showAddnew.value = true;
   }
 };
 
