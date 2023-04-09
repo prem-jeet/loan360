@@ -8,7 +8,7 @@
       <div class="col">
         <q-table
           :grid="$q.screen.width < 830"
-          :rows="configLedgerLoan"
+          :rows="ledgerLoanConfigurations"
           :columns="columns"
           table-header-class="bg-deep-purple-10 text-white"
         >
@@ -18,13 +18,13 @@
               <div class="col-auto">
                 <q-btn
                   size="md"
-                  v-if="configLedgerLoan.length"
+                  v-if="ledgerLoanConfigurations.length"
                   label="Add Ledger Loan Configuration"
                   icon="add"
                   color="blue-7"
                   @click="
-                    mode = 'new';
-                    resetHandler();
+                    editingRowIndex = null;
+                    setInitialFormdata();
                     isDialogActive = true;
                   "
                 />
@@ -51,8 +51,8 @@
                     flat
                     color="accent"
                     @click="
-                      mode = 'edit';
-                      resetHandler(props.rowIndex);
+                      editingRowIndex = props.rowIndex;
+                      setInitialFormdata(props.rowIndex);
                       isDialogActive = true;
                     "
                   />
@@ -225,6 +225,7 @@
                   map-options
                   menu-shrink
                   emit-value
+                  clearable
                 />
               </div>
               <!-- rate -> single-->
@@ -239,6 +240,7 @@
                   dense
                   hide-bottom-space
                   :min="0"
+                  type="number"
                 />
               </div>
             </div>
@@ -284,7 +286,7 @@
                       color="teal"
                       dense
                       outline
-                      @click.stop="addRate"
+                      @click.stop="addRateToBucket"
                       type="button"
                     />
                   </div>
@@ -298,7 +300,10 @@
                     v-for="(rate, index) in bucketBasedRateArr"
                     :key="`${rate.days1}-${rate.days2}-${rate.rate}`"
                   >
-                    <q-chip removable @remove="() => removeRate(index)">
+                    <q-chip
+                      removable
+                      @remove="() => removeRateFromBucket(index)"
+                    >
                       {{ `${rate.days1}-${rate.days2}-${rate.rate}` }}
                     </q-chip>
                   </div>
@@ -338,8 +343,8 @@
 
         <q-card-actions align="center" class="q-py-md bg-grey-2">
           <q-btn
-            :label="mode === 'new' ? 'Add' : 'Save '"
-            :icon="mode === 'new' ? 'add' : 'save '"
+            :label="editingRowIndex === null ? 'Add' : 'Save '"
+            :icon="editingRowIndex === null ? 'add' : 'save '"
             color="teal"
             type="submit"
           />
@@ -353,10 +358,11 @@
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { onMounted, reactive, ref } from 'vue';
+import { onFailure } from 'src/utils/notification';
+import { onMounted, reactive, ref, watch } from 'vue';
 
 interface LedgerAccount {
-  id: number;
+  id?: number;
   accountCode1: string | null;
   accountCode2: string | null;
   accountCode3: string | null;
@@ -379,11 +385,11 @@ interface BucketBasedRate {
 const breadcrumbs = [
   { path: '/module/settings', label: 'Settings' },
   {
-    path: '/module/settings/loanMaster/configLedgerLoan',
+    path: '/module/settings/loanMaster/ledgerLoanConfigurations',
     label: 'Loan Master',
   },
   {
-    path: '/module/settings/loanMaster/configLedgerLoan',
+    path: '/module/settings/loanMaster/ledgerLoanConfigurations',
     label: 'Config Ledger Loan',
   },
 ];
@@ -411,8 +417,6 @@ const rateTypes = {
   S: 'single',
   B: 'Buckets based',
 };
-
-const accountCodeTypes = ref<{ label: string; value: string }[]>([]);
 
 const columns: {
   name: string;
@@ -496,22 +500,25 @@ const columns: {
   },
 ];
 
-const mode = ref<'edit' | 'new'>('new');
+const accountCodeTypes = ref<{ label: string; value: string }[]>([]);
+
+const editingRowIndex = ref<null | number>(null);
+
 const isDialogActive = ref(true);
 const tempConfig = reactive<LedgerAccount>({
-  id: -1,
   accountCode1: null,
   accountCode2: null,
   accountCode3: null,
   itemOrder: null,
   ledgerType: null,
-  interestMethod: null,
   rate: null,
+  interestMethod: null,
   rateType: null,
   graceDays: null,
   negativeRate: null,
   viewType: 'Customer,Court',
 });
+
 const bucketBasedRateInput = reactive<BucketBasedRate>({
   days1: null,
   days2: null,
@@ -520,54 +527,45 @@ const bucketBasedRateInput = reactive<BucketBasedRate>({
 
 const bucketBasedRateArr = ref<BucketBasedRate[]>([]);
 
-const configLedgerLoan = ref<LedgerAccount[]>([]);
-
-const isAccountcodeValid = () => {
-  const check =
-    tempConfig.accountCode1 !== null || tempConfig.accountCode2 !== null;
-  if (tempConfig.ledgerType === 'I') {
-    return check;
-  }
-  if (tempConfig.ledgerType === 'L') {
-    return check || tempConfig.accountCode3 !== null;
-  }
-  return true;
-};
+const ledgerLoanConfigurations = ref<LedgerAccount[]>([]);
 
 const submitHandler = () => {
-  console.log('submitted');
+  const { itemOrder, rateType, rate } = tempConfig;
+
+  if (!isItemOrderValid(itemOrder!)) {
+    onFailure({
+      msg: 'Item order must be unique',
+      position: 'center',
+    });
+    return;
+  }
+
+  const data = { ...tempConfig };
+  if (editingRowIndex.value !== null) {
+    data.id = ledgerLoanConfigurations.value[editingRowIndex.value].id;
+  }
+
+  console.log(data);
 };
 
-const resetHandler = (index?: number) => {
-  if (mode.value === 'new') {
-    tempConfig.accountCode1 = null;
-    tempConfig.accountCode2 = null;
-    tempConfig.accountCode3 = null;
-    tempConfig.itemOrder = null;
-    tempConfig.ledgerType = null;
-    tempConfig.interestMethod = null;
-    tempConfig.rate = null;
-    tempConfig.rateType = null;
-    tempConfig.graceDays = null;
-    tempConfig.negativeRate = null;
-    tempConfig.viewType = 'Customer,Court';
-  } else {
-    if (index !== undefined) {
-      const row = configLedgerLoan.value[index];
-      tempConfig.accountCode1 = row.accountCode1;
-      tempConfig.accountCode2 = row.accountCode2;
-      tempConfig.accountCode3 = row.accountCode3;
-      tempConfig.itemOrder = row.itemOrder;
-      tempConfig.ledgerType = row.ledgerType;
-      tempConfig.interestMethod = row.interestMethod;
-      tempConfig.rate = row.rate;
-      tempConfig.rateType = row.rateType;
-      tempConfig.graceDays = row.graceDays;
-      tempConfig.negativeRate = row.negativeRate;
-      tempConfig.viewType = row.viewType;
+const isItemOrderValid = (itemorder: number) =>
+  !ledgerLoanConfigurations.value.some((item) => {
+    if (
+      editingRowIndex.value !== null &&
+      ledgerLoanConfigurations.value[editingRowIndex.value].id === item.id
+    ) {
+      return false;
+    } else {
+      return item.itemOrder === itemorder;
     }
-  }
+  });
+
+const resetHandler = (index?: number) => {
+  console.log('called resett');
+
+  return;
 };
+
 const getMultiselectOptions = (obj: { [key: string]: string }) => {
   const optionsArr = [];
 
@@ -578,7 +576,7 @@ const getMultiselectOptions = (obj: { [key: string]: string }) => {
   return optionsArr;
 };
 
-const addRate = () => {
+const addRateToBucket = () => {
   const { days1, days2, rate } = bucketBasedRateInput;
   if (
     !(Number.isFinite(days1) && Number.isFinite(days2) && Number.isFinite(rate))
@@ -590,19 +588,52 @@ const addRate = () => {
     ...bucketBasedRateArr.value,
     { ...bucketBasedRateInput },
   ];
+  fillRateFromBucket();
 };
 
-const removeRate = (index: number) => {
+const removeRateFromBucket = (index: number) => {
   bucketBasedRateArr.value = [
     ...bucketBasedRateArr.value.slice(0, index),
     ...bucketBasedRateArr.value.slice(index + 1),
   ];
+  fillRateFromBucket();
 };
+
+const fillRateFromBucket = () =>
+  (tempConfig.rate = bucketBasedRateArr.value
+    .map(({ days1, days2, rate }) => `${days1}-${days2}-${rate}`)
+    .join(','));
+
+const setInitialFormdata = (index?: number) => {
+  let row;
+  if (index !== undefined) {
+    row = ledgerLoanConfigurations.value[index];
+  }
+  tempConfig.accountCode1 = row?.accountCode1 || null;
+  tempConfig.accountCode2 = row?.accountCode2 || null;
+  tempConfig.accountCode3 = row?.accountCode3 || null;
+  tempConfig.itemOrder = row?.itemOrder || null;
+  tempConfig.ledgerType = row?.ledgerType || null;
+  tempConfig.interestMethod = row?.interestMethod || null;
+  tempConfig.rateType = row?.rateType || null;
+  tempConfig.rate = row?.rate || null;
+  tempConfig.graceDays = row?.graceDays || null;
+  tempConfig.negativeRate = row?.negativeRate || null;
+  tempConfig.viewType = row?.viewType || 'Customer,Court';
+
+  if (tempConfig.rateType === 'B' && tempConfig.rate) {
+    bucketBasedRateArr.value = tempConfig.rate.split(',').map((item) => {
+      const [days1, days2, rate] = item.split('-').map(Number);
+      return { days1, days2, rate };
+    });
+  }
+};
+
 onMounted(async () => {
   const rsp = await api('configLedgerLoan');
 
   if (rsp.data) {
-    configLedgerLoan.value = rsp.data;
+    ledgerLoanConfigurations.value = rsp.data;
   }
 
   const accountCodes = await api.get('accountCodeBySection/L');
@@ -615,6 +646,20 @@ onMounted(async () => {
     );
   }
 });
+
+watch(
+  () => tempConfig.rateType,
+  () => {
+    tempConfig.rate = null;
+    bucketBasedRateInput.days1 = null;
+    bucketBasedRateInput.days2 = null;
+    bucketBasedRateInput.rate = null;
+
+    if (tempConfig.rateType === 'B' && bucketBasedRateArr.value.length) {
+      fillRateFromBucket();
+    }
+  }
+);
 </script>
 
 <style scoped></style>
