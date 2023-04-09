@@ -40,9 +40,7 @@
                     label="Add Account code loan"
                     icon="add"
                     color="blue-7"
-                    @click="
-                      (mode = 'new'), setFormData(), (isEntryModalActive = true)
-                    "
+                    @click="newEntry()"
                   />
                 </div>
               </div>
@@ -99,12 +97,7 @@
                     size="xs"
                     outline
                     color="accent"
-                    @click="
-                      (mode = 'edit'),
-                        setFormData(),
-                        (isEntryModalActive = true),
-                        (editingRowIndex = props.rowIndex)
-                    "
+                    @click="editEntry(props.rowIndex)"
                   >
                     <q-tooltip>Edit</q-tooltip>
                   </q-btn>
@@ -172,12 +165,7 @@
                       size="sm"
                       outline
                       color="accent"
-                      @click="
-                        (mode = 'edit'),
-                          setFormData(),
-                          (isEntryModalActive = true),
-                          (editingRowIndex = props.rowIndex)
-                      "
+                      @click="editEntry(props.rowIndex)"
                     >
                       <q-tooltip>Edit</q-tooltip>
                     </q-btn>
@@ -312,7 +300,7 @@ const accountCodeLoan = ref<AccountCodeLoan[]>([]);
 const accountCodeOptions = ref<AccountCodeOptions[]>([]);
 const accountHeadOptions = ref<AccountHeadOptions[]>([]);
 const dropdown = ref(null);
-const editingRowIndex = ref(0);
+const editingRowIndex = ref<number | null>(null);
 const isEntryModalActive = ref(false);
 const showNew = ref(false);
 let mode: 'new' | 'edit' = 'new';
@@ -357,14 +345,25 @@ const filteredAccountCode = computed(() => {
 });
 
 const setFormData = () => {
-  if (mode === 'new') {
-    (newCodeLoan.accountCode = ''), (newCodeLoan.accountId = null);
-  } else {
-    newCodeLoan.accountCode =
-      accountCodeLoan.value[editingRowIndex.value].accountCode;
-    newCodeLoan.accountId =
-      accountCodeLoan.value[editingRowIndex.value].accountId;
+  let temp;
+  if (editingRowIndex.value !== null) {
+    temp = accountCodeLoan.value[editingRowIndex.value];
   }
+  newCodeLoan.accountCode = temp ? temp.accountCode : '';
+  newCodeLoan.accountId = temp ? temp.accountId : null;
+};
+
+const newEntry = () => {
+  mode = 'new';
+  isEntryModalActive.value = true;
+  editingRowIndex.value = null;
+  setFormData();
+};
+const editEntry = (index: number) => {
+  mode = 'edit';
+  isEntryModalActive.value = true;
+  editingRowIndex.value = index;
+  setFormData();
 };
 
 const loadAccountHeads = async (value: string) => {
@@ -433,16 +432,16 @@ const saveEdited = async () => {
     accountCode: newCodeLoan.accountCode,
     accountId: newCodeLoan.accountId,
     accountingCategoryCode: newCodeLoan.accountingCategoryCode,
-    id: accountCodeLoan.value[editingRowIndex.value].id,
+    id: accountCodeLoan.value[editingRowIndex.value!].id,
   };
 
   const rsp = await api.post('accountCodeLoan', payLoad);
   if (rsp.data) {
     onSuccess({ msg: rsp.data.displayMessage, icon: 'check' });
-    accountCodeLoan.value[editingRowIndex.value].accountCode =
+    accountCodeLoan.value[editingRowIndex.value!].accountCode =
       newCodeLoan.accountCode;
 
-    accountCodeLoan.value[editingRowIndex.value].accountId =
+    accountCodeLoan.value[editingRowIndex.value!].accountId =
       newCodeLoan.accountId;
     isEntryModalActive.value = false;
   }
