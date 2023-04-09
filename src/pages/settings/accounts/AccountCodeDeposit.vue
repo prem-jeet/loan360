@@ -466,7 +466,6 @@ const columns: {
 ];
 
 const setFormData = () => {
-  console.log(editingRowIndex.value);
   let temp;
   if (editingRowIndex.value !== null) {
     temp = accountCodeDeposits.value[editingRowIndex.value];
