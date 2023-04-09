@@ -52,7 +52,7 @@
                     color="accent"
                     @click="
                       editingRowIndex = props.rowIndex;
-                      setInitialFormdata(props.rowIndex);
+                      setInitialFormdata();
                       isDialogActive = true;
                     "
                   />
@@ -119,7 +119,7 @@
         <q-space />
         <q-btn icon="close" flat round dense v-close-popup />
       </q-card-section>
-      <q-form @submit.prevent="submitHandler" @reset="resetHandler">
+      <q-form @submit.prevent="submitHandler" @reset="setInitialFormdata">
         <q-card-section :style="{ maxHeight: '70vh' }" class="scroll">
           <div class="row justify-evenly q-gutter-md">
             <!-- item order -->
@@ -560,12 +560,6 @@ const isItemOrderValid = (itemorder: number) =>
     }
   });
 
-const resetHandler = (index?: number) => {
-  console.log('called resett');
-
-  return;
-};
-
 const getMultiselectOptions = (obj: { [key: string]: string }) => {
   const optionsArr = [];
 
@@ -604,11 +598,12 @@ const fillRateFromBucket = () =>
     .map(({ days1, days2, rate }) => `${days1}-${days2}-${rate}`)
     .join(','));
 
-const setInitialFormdata = (index?: number) => {
-  let row;
-  if (index !== undefined) {
-    row = ledgerLoanConfigurations.value[index];
-  }
+const setInitialFormdata = () => {
+  const row =
+    editingRowIndex.value === null
+      ? undefined
+      : ledgerLoanConfigurations.value[editingRowIndex.value];
+
   tempConfig.accountCode1 = row?.accountCode1 || null;
   tempConfig.accountCode2 = row?.accountCode2 || null;
   tempConfig.accountCode3 = row?.accountCode3 || null;
