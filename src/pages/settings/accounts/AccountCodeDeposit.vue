@@ -180,7 +180,6 @@
                           (item) => item.value === props.row.accountCode
                         )!.label
                       }}
-                      >
                     </div>
                   </div>
                 </q-card-section>
