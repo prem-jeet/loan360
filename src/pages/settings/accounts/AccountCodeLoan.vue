@@ -247,7 +247,12 @@
         </q-card-section>
         <q-separator class="q-mt-md" />
         <q-card-actions align="right" class="q-py-md bg-grey-2">
-          <q-btn label="save" color="green-5" type="submit" />
+          <q-btn
+            :label="editingRowIndex === null ? 'Add' : 'Save '"
+            :icon="editingRowIndex === null ? 'add' : 'save '"
+            color="teal"
+            type="submit"
+          />
           <q-btn label="Reset" color="red-5" type="reset" />
         </q-card-actions>
       </q-form>
@@ -364,7 +369,6 @@ const editEntry = (index: number) => {
   mode = 'edit';
   isEntryModalActive.value = true;
   editingRowIndex.value = index;
-  accountHeadOptions.value = [];
   setFormData();
 };
 
