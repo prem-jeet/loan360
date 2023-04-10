@@ -481,11 +481,14 @@ const newEntry = () => {
   mode = 'new';
   editingRowIndex.value = null;
   isEntryModalActive.value = true;
+  accountNameOptions.value = [];
+
   setFormData();
 };
 const editEntry = (index: number) => {
   mode = 'edit';
   editingRowIndex.value = index;
+  accountNameOptions.value = [];
   setFormData(), (isEntryModalActive.value = true);
 };
 
