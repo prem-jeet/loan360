@@ -357,12 +357,14 @@ const newEntry = () => {
   mode = 'new';
   isEntryModalActive.value = true;
   editingRowIndex.value = null;
+  accountHeadOptions.value = [];
   setFormData();
 };
 const editEntry = (index: number) => {
   mode = 'edit';
   isEntryModalActive.value = true;
   editingRowIndex.value = index;
+  accountHeadOptions.value = [];
   setFormData();
 };
 
