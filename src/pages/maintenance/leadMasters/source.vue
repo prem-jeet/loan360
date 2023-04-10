@@ -112,7 +112,7 @@
           </template>
 
           <!-- card for grid layout screens < 800px -->
-          <template v-slot:item="props">
+          <!-- <template v-slot:item="props">
             <div class="col-xs-12 col-sm-6 q-px-sm-sm">
               <q-card>
                 <q-card-section>
@@ -156,7 +156,7 @@
                 </q-card-actions>
               </q-card>
             </div>
-          </template>
+          </template> -->
         </q-table>
       </div>
     </div>
@@ -288,6 +288,7 @@ import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch } from 'vue';
 import { onSuccess, confirmDialog } from 'src/utils/notification';
+import { commonProductOptions } from './common-product-options';
 
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
@@ -303,6 +304,12 @@ interface Source {
   updatedOn: string;
 }
 
+interface ProductOptions {
+  code: string;
+  name: string;
+  loanType: string;
+}
+const productOptions = ref<ProductOptions[]>([]);
 const fetchingData = ref(false);
 const nameSearchQuery = ref('');
 const source = ref<Source[]>([]);
@@ -394,6 +401,11 @@ const changeActiveConfirm = async (index: number, state: boolean) => {
     source.value[index].inactive = !state;
   }
 };
+
+onMounted(() => {
+  productOptions.value = commonProductOptions();
+  console.log(productOptions.value, 'ko');
+});
 
 onMounted(async () => {
   fetchingData.value = true;
