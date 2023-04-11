@@ -37,7 +37,7 @@
                 <div class="col-12 q-mb-sm">
                   <span class="text-h6">Filter</span>
                 </div>
-                <div class="col-auto">
+                <div class="col-auto q-mt-sm">
                   <q-input
                     v-model="nameSearchQuery"
                     outlined
@@ -53,11 +53,11 @@
                   </q-input>
                 </div>
 
-                <div class="col-auto">
+                <div class="col-auto q-mt-sm">
                   <q-checkbox v-model="checkBox" label=" In-Active" />
                 </div>
 
-                <div class="col-auto">
+                <div class="col-auto q-mt-sm">
                   <q-input
                     v-model="leadName"
                     hide-bottom-space
