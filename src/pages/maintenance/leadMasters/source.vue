@@ -36,6 +36,7 @@
                       icon="add"
                       label="Add source"
                       size="md"
+                      @click="newEntry()"
                     />
                   </div>
                 </div>
@@ -52,6 +53,7 @@
                     dense
                     rounded
                     placeholder="search"
+                    @clear="nameSearchQuery = ''"
                   >
                     <template v-slot:prepend>
                       <q-icon name="search" />
@@ -77,7 +79,13 @@
             <q-tr :props="props">
               <q-td key="actions" auto-width>
                 <q-btn-group push unelevated>
-                  <q-btn icon="edit" size="xs" outline color="accent">
+                  <q-btn
+                    icon="edit"
+                    size="xs"
+                    outline
+                    color="accent"
+                    @click="editEntry(props.row.id)"
+                  >
                     <q-tooltip>Edit</q-tooltip>
                   </q-btn>
                   <q-btn
@@ -85,7 +93,7 @@
                     size="xs"
                     outline
                     color="red"
-                    @click="changeActive(props.rowIndex, props.row.inactive)"
+                    @click="changeActive(props.row.id, props.row.inactive)"
                   >
                   </q-btn>
                 </q-btn-group>
@@ -112,12 +120,12 @@
           </template>
 
           <!-- card for grid layout screens < 800px -->
-          <!-- <template v-slot:item="props">
+          <template v-slot:item="props">
             <div class="col-xs-12 col-sm-6 q-px-sm-sm">
               <q-card>
                 <q-card-section>
                   <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Account Code :</div>
+                    <div class="col-12 text-weight-medium">Name :</div>
                     <div class="col-12">
                       {{ props.row.name }}
                     </div>
@@ -125,51 +133,79 @@
                 </q-card-section>
                 <q-card-section>
                   <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Account Name :</div>
+                    <div class="col-12 text-weight-medium">Created :</div>
                     <div class="col-12">
-                      {{ props.row.createdOn }}
+                      {{
+                        props.row.createdOn.toLocaleString(
+                          'en-US',
+                          DateTimeOptions
+                        )
+                      }}
                     </div>
                   </div>
                 </q-card-section>
-
                 <q-card-section>
                   <div class="row q-gutter-y-xs">
+                    <div class="col-12 text-weight-medium">Updated :</div>
                     <div class="col-12">
-                      <q-checkbox
-                        v-model="props.row.isApplication"
-                        disable
-                        label="isApplication"
-                      />
+                      {{
+                        props.row.updatedOn.toLocaleString(
+                          'en-US',
+                          DateTimeOptions
+                        )
+                      }}
+                    </div>
+                  </div>
+                </q-card-section>
+                <q-card-section>
+                  <div class="row q-gutter-y-xs">
+                    <div class="col-12 text-weight-medium">Inactive :</div>
+                    <div class="col-12">
+                      {{
+                        props.row.inactiveOn.toLocaleString(
+                          'en-US',
+                          DateTimeOptions
+                        )
+                      }}
                     </div>
                   </div>
                 </q-card-section>
 
                 <q-card-actions align="right" class="q-py-md bg-grey-2">
                   <q-btn-group push unelevated>
-                    <q-btn icon="edit" size="sm" outline color="accent">
+                    <q-btn
+                      icon="edit"
+                      size="xs"
+                      outline
+                      color="accent"
+                      @click="editEntry(props.row.id)"
+                    >
                       <q-tooltip>Edit</q-tooltip>
                     </q-btn>
-                    <q-btn icon="delete" size="sm" outline color="red">
-                      <q-tooltip>Delete</q-tooltip>
+                    <q-btn
+                      :label="props.row.inactive ? 'active' : 'In-active '"
+                      size="xs"
+                      outline
+                      color="red"
+                      @click="changeActive(props.row.id, props.row.inactive)"
+                    >
                     </q-btn>
                   </q-btn-group>
                 </q-card-actions>
               </q-card>
             </div>
-          </template> -->
+          </template>
         </q-table>
       </div>
     </div>
   </div>
-  <!-- <q-dialog v-model="isEntryModalActive">
+  <q-dialog v-model="isEntryModalActive">
     <q-card>
       <q-form @submit.prevent="saveEntry" @reset="setFormData()">
         <q-card-section class="bg-grey-2">
           <div class="flex items-center">
             <span class="text-bold q-mr-xl">{{
-              mode === 'new'
-                ? 'Add account code deposit'
-                : 'Edit account code deposit'
+              mode === 'new' ? 'Add source' : 'Edit source'
             }}</span>
             <q-space />
             <q-btn
@@ -184,85 +220,12 @@
           <div class="row">
             <div class="col-12">
               <div class="col-12 q-mt-lg">
-                <q-select
-                  v-if="mode === 'new'"
-                  v-model="newCodeDeposit.productCode"
-                  dense
-                  :options="products"
-                  label="Select product"
-                  map-options
-                  menu-shrink
-                  emit-value
-                  outlined
-                  :rules="[(val:string) => val!=='']"
+                <q-input
+                  v-model="newSouce.name"
+                  label="Name"
                   hide-bottom-space
-                />
-              </div>
-              <div class="col-12 q-mt-lg">
-                <q-select
-                  v-if="mode === 'new'"
-                  v-model="newCodeDeposit.categoryCode"
-                  dense
-                  :options="categorys"
-                  label="Select category"
                   outlined
-                  map-options
-                  menu-shrink
-                  emit-value
-                  :rules="[(val:string) => val!=='']"
-                  hide-bottom-space
-                />
-              </div>
-              <div class="col-12 q-mt-lg">
-                <q-select
-                  v-model="newCodeDeposit.accountCode"
-                  dense
-                  :options="accountCodes"
-                  label="Select Code"
-                  outlined
-                  map-options
-                  emit-value
-                  menu-shrink
-                  :rules="[(val:string) => val!=='']"
-                  hide-bottom-space
-                />
-              </div>
-              <div class="col-12 q-mt-lg">
-                <q-select
-                  v-model="newCodeDeposit.accountId"
-                  dense
-                  use-input
-                  map-options
-                  menu-shrink
-                  emit-value
-                  hide-dropdown-icon
-                  :options="accountNameOptions"
-                  label="Account name"
-                  outlined
-                  :rules="[(val) => val !== null]"
-                  @input-value="loadAccountNames"
-                  ref="dropdown"
-                />
-              </div>
-
-              <div
-                v-if="
-                  newCodeDeposit.productCode === 'FD' ||
-                  newCodeDeposit.productCode === 'RD' ||
-                  newCodeDeposit.productCode === 'DD'
-                "
-                class="col-12 q-mt-sm"
-              >
-                <q-checkbox
-                  disable
-                  v-model="newCodeDeposit.isApplication"
-                  label="isApplication"
-                />
-              </div>
-              <div v-else class="col-12 q-mt-sm">
-                <q-checkbox
-                  v-model="newCodeDeposit.isApplication"
-                  label="isApplication"
+                  :rules="[(val) => !!val || '']"
                 />
               </div>
             </div>
@@ -271,8 +234,8 @@
         <q-separator class="q-mt-md" />
         <q-card-actions align="right" class="q-py-md bg-grey-2">
           <q-btn
-            :label="editingRowIndex === null ? 'Add' : 'Save '"
-            :icon="editingRowIndex === null ? 'add' : 'save '"
+            :label="editingRowId === null ? 'Add' : 'Save '"
+            :icon="editingRowId === null ? 'add' : 'save '"
             color="teal"
             type="submit"
           />
@@ -280,13 +243,13 @@
         </q-card-actions>
       </q-form>
     </q-card>
-  </q-dialog> -->
+  </q-dialog>
 </template>
 
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed, watch, reactive } from 'vue';
 import { onSuccess, confirmDialog } from 'src/utils/notification';
 
 const breadcrumbs = [
@@ -308,6 +271,18 @@ const nameSearchQuery = ref('');
 const source = ref<Source[]>([]);
 const sourceTemp = ref<Source[]>([]);
 const checkBox = ref(false);
+const isEntryModalActive = ref(false);
+const editingRowId = ref<number | null>(null);
+let mode: 'new' | 'edit' = 'new';
+
+const newSouce = reactive<Source>({
+  name: '',
+  id: null,
+  createdOn: '',
+  inactive: false,
+  inactiveOn: '',
+  updatedOn: '',
+});
 
 const columns: {
   name: string;
@@ -367,6 +342,65 @@ const filteredNatureEntry = computed(() => {
   });
 });
 
+const setFormData = () => {
+  let temp;
+  if (editingRowId.value !== null) {
+    let index = source.value.findIndex((obj) => obj.id === editingRowId.value);
+    temp = source.value[index];
+  }
+  newSouce.name = temp ? temp.name : '';
+};
+
+const newEntry = () => {
+  mode = 'new';
+  editingRowId.value = null;
+  isEntryModalActive.value = true;
+
+  setFormData();
+};
+const editEntry = (id: number) => {
+  mode = 'edit';
+  editingRowId.value = id;
+  isEntryModalActive.value = true;
+  setFormData();
+};
+const saveNewEntry = async () => {
+  let payLoad = {
+    name: newSouce.name,
+    inactive: false,
+    createdOn: new Date(),
+  };
+  const rsp = await api.post('/sourceLead', payLoad);
+  if (rsp.data) {
+    onSuccess({
+      msg: rsp.data.displayMessage,
+      icon: 'sync_alt',
+    });
+
+    loadSource();
+    isEntryModalActive.value = false;
+  }
+};
+const saveEdited = async () => {
+  let payLoad = {
+    name: newSouce.name,
+    id: editingRowId.value,
+    updatedOn: new Date(),
+  };
+  const rsp = await api.put('/sourceLead/update', payLoad);
+  if (rsp.data) {
+    onSuccess({
+      msg: rsp.data.displayMessage,
+      icon: 'sync_alt',
+    });
+    loadSource();
+    isEntryModalActive.value = false;
+  }
+};
+
+const saveEntry = () => {
+  mode === 'new' ? saveNewEntry() : saveEdited();
+};
 watch(nameSearchQuery, () => {
   source.value = sourceTemp.value.filter((item) => {
     return item.name
@@ -375,27 +409,28 @@ watch(nameSearchQuery, () => {
   });
 });
 
-const changeActive = async (rowIndex: number, state: boolean) => {
-  confirmDialog(() => changeActiveConfirm(rowIndex, state), {
+const changeActive = async (id: number, state: boolean) => {
+  confirmDialog(() => changeActiveConfirm(id, state), {
     msg: state
       ? 'Are you sure you want to make active ?'
       : 'Are you sure you want to make inactive ?',
   });
 };
 
-const changeActiveConfirm = async (index: number, state: boolean) => {
+const changeActiveConfirm = async (id: number, state: boolean) => {
   const payLoad = {
-    id: source.value[index].id,
+    id: id,
   };
+
   const str = state ? 'active' : 'inactive';
   const rsp = await api.put('/sourceLead/' + str, payLoad);
   if (rsp.data) {
     onSuccess({ msg: rsp.data.displayMessage });
-    source.value[index].inactive = !state;
   }
+  loadSource();
 };
 
-onMounted(async () => {
+const loadSource = async () => {
   fetchingData.value = true;
   const rsp = await api.get('sourceLead');
 
@@ -408,15 +443,18 @@ onMounted(async () => {
       }) => {
         return {
           ...item,
-          createdOn: new Date(item.createdOn),
-          updatedOn: new Date(item.updatedOn),
-          inactiveOn: new Date(item.inactiveOn),
+          createdOn: item.createdOn !== null ? new Date(item.createdOn) : '',
+          updatedOn: item.updatedOn !== null ? new Date(item.updatedOn) : '',
+          inactiveOn: item.inactiveOn !== null ? new Date(item.inactiveOn) : '',
         };
       }
     );
     sourceTemp.value = source.value;
   }
   fetchingData.value = false;
+};
+onMounted(() => {
+  loadSource();
 });
 </script>
 
