@@ -288,7 +288,6 @@ import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch } from 'vue';
 import { onSuccess, confirmDialog } from 'src/utils/notification';
-import { commonProductOptions } from './common-product-options';
 
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
@@ -304,12 +303,6 @@ interface Source {
   updatedOn: string;
 }
 
-interface ProductOptions {
-  code: string;
-  name: string;
-  loanType: string;
-}
-const productOptions = ref<ProductOptions[]>([]);
 const fetchingData = ref(false);
 const nameSearchQuery = ref('');
 const source = ref<Source[]>([]);
@@ -401,11 +394,6 @@ const changeActiveConfirm = async (index: number, state: boolean) => {
     source.value[index].inactive = !state;
   }
 };
-
-onMounted(() => {
-  productOptions.value = commonProductOptions();
-  console.log(productOptions.value, 'ko');
-});
 
 onMounted(async () => {
   fetchingData.value = true;
