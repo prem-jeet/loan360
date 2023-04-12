@@ -56,12 +56,12 @@
                 <div v-if="$q.screen.width < 830" class="col-auto q-mt-sm">
                   <q-input
                     v-model="leadName"
-                    hide-bottom-space
                     clearable
                     outlined
                     dense
                     no-error-icon
                     :error="error"
+                    :error-message="msg"
                   >
                     <template v-slot:prepend>
                       <p class="q-pt-md text-caption">Name:</p>
@@ -83,12 +83,12 @@
               <q-input
                 class="q-mt-md-lg q-pt-md-lg q-mt-sm-lg q-pt-sm-lg"
                 v-model="leadName"
-                hide-bottom-space
                 clearable
                 outlined
                 dense
                 no-error-icon
                 :error="error"
+                :error-message="msg"
               >
                 <template v-slot:prepend>
                   <p class="q-pt-md text-caption">Name:</p>
@@ -333,6 +333,7 @@ const isEditing = ref(false);
 const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
 const error = ref(false);
+const msg = ref('');
 
 const newSouce = reactive<Source>({
   name: '',
@@ -471,6 +472,19 @@ const saveEntry = () => {
 watch(leadName, () => {
   if (leadName.value) {
     error.value = false;
+    let temp = sourceTemp.value.filter((item) => {
+      return item.name === leadName.value;
+    });
+    if (temp.length) {
+      error.value = true;
+      msg.value = 'Item already exists!';
+    } else {
+      error.value = false;
+      msg.value = '';
+    }
+  } else {
+    error.value = false;
+    msg.value = '';
   }
 });
 watch(nameSearchQuery, () => {
