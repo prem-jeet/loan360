@@ -34,9 +34,6 @@
               </div>
 
               <div class="row items-center q-gutter-x-md">
-                <div class="col-12 q-mb-sm">
-                  <span class="text-h6">Filter</span>
-                </div>
                 <div class="col-auto q-mt-sm">
                   <q-input
                     v-model="nameSearchQuery"
@@ -56,8 +53,7 @@
                 <div class="col-auto q-mt-sm">
                   <q-checkbox v-model="checkBox" label=" In-Active" />
                 </div>
-
-                <div class="col-auto q-mt-sm">
+                <div v-if="$q.screen.width < 830" class="col-auto q-mt-sm">
                   <q-input
                     v-model="leadName"
                     hide-bottom-space
@@ -81,6 +77,31 @@
                   </q-input>
                 </div>
               </div>
+            </div>
+            <q-space />
+            <div v-if="$q.screen.width > 830">
+              <q-input
+                class="q-mt-md-lg q-pt-md-lg q-mt-sm-lg q-pt-sm-lg"
+                v-model="leadName"
+                hide-bottom-space
+                clearable
+                outlined
+                dense
+                no-error-icon
+                :error="error"
+              >
+                <template v-slot:prepend>
+                  <p class="q-pt-md text-caption">Name:</p>
+                </template>
+                <template v-slot:append>
+                  <q-btn
+                    :icon="'add '"
+                    color="teal"
+                    size="sm"
+                    @click="saveEntry()"
+                  />
+                </template>
+              </q-input>
             </div>
           </template>
 
