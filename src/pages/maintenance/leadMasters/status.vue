@@ -29,23 +29,12 @@
             <div class="row q-gutter-y-lg q-pb-xs-md">
               <div class="col-12">
                 <div class="row items-center q-gutter-md">
-                  <div class="col-auto text-h6">Status Lead</div>
-                  <div class="col-auto">
-                    <q-btn
-                      color="blue-7"
-                      icon="add"
-                      label="Add status"
-                      size="md"
-                      @click="newEntry()"
-                    />
-                  </div>
+                  <div class="col-auto text-h6">Status Leadd</div>
                 </div>
               </div>
+
               <div class="row items-center q-gutter-x-md">
-                <div class="col-12 q-mb-sm">
-                  <span class="text-h6">Filter</span>
-                </div>
-                <div class="col-auto">
+                <div class="col-auto q-mt-sm">
                   <q-input
                     v-model="nameSearchQuery"
                     outlined
@@ -61,10 +50,59 @@
                   </q-input>
                 </div>
 
-                <div class="col-auto">
+                <div class="col-auto q-mt-sm">
                   <q-checkbox v-model="checkBox" label=" In-Active" />
                 </div>
+                <div v-if="$q.screen.width < 830" class="col-auto q-mt-sm">
+                  <q-input
+                    class="q-pb-none"
+                    v-model="leadName"
+                    clearable
+                    outlined
+                    dense
+                    no-error-icon
+                    :error="error"
+                    :error-message="msg"
+                  >
+                    <template v-slot:prepend>
+                      <p class="q-pt-md text-caption">Name:</p>
+                    </template>
+                    <template v-slot:append>
+                      <q-btn
+                        :icon="'add '"
+                        color="teal"
+                        size="sm"
+                        @click="saveEntry()"
+                      />
+                    </template>
+                  </q-input>
+                </div>
               </div>
+            </div>
+            <q-space />
+            <div v-if="$q.screen.width > 830">
+              <q-input
+                class="q-mt-md-lg q-pt-md-lg q-mt-sm-lg q-pt-sm-lg q-pb-none"
+                v-model="leadName"
+                clearable
+                outlined
+                dense
+                no-error-icon
+                :error="error"
+                :error-message="msg"
+              >
+                <template v-slot:prepend>
+                  <p class="q-pt-md text-caption">Name:</p>
+                </template>
+                <template v-slot:append>
+                  <q-btn
+                    :icon="'add '"
+                    color="teal"
+                    size="sm"
+                    @click="saveEntry()"
+                  />
+                </template>
+              </q-input>
             </div>
           </template>
 
@@ -84,22 +122,54 @@
                     size="xs"
                     outline
                     color="accent"
-                    @click="editEntry(props.row.id)"
+                    v-if="!isEditing || editingRowIndex !== props.rowIndex"
+                    @click="() => editEntry(props.row.id, props.rowIndex)"
                   >
                     <q-tooltip>Edit</q-tooltip>
                   </q-btn>
+
                   <q-btn
-                    :label="props.row.inactive ? 'active' : 'In-active '"
+                    v-if="!isEditing || editingRowIndex !== props.rowIndex"
+                    :label="props.row.inactive ? 'activate' : 'deactivate'"
                     size="xs"
                     outline
                     color="red"
                     @click="changeActive(props.row.id, props.row.inactive)"
                   >
                   </q-btn>
+                  <q-btn
+                    icon="check"
+                    size="xs"
+                    outline
+                    color="green-10"
+                    v-if="isEditing && editingRowIndex === props.rowIndex"
+                    @click="() => saveEdited()"
+                  >
+                    <q-tooltip>Save</q-tooltip>
+                  </q-btn>
+                  <q-btn
+                    icon="close"
+                    size="xs"
+                    outline
+                    color="red"
+                    v-if="isEditing && editingRowIndex === props.rowIndex"
+                    @click="(isEditing = false), (editingRowIndex = null)"
+                  >
+                    <q-tooltip>Cancel</q-tooltip>
+                  </q-btn>
                 </q-btn-group>
               </q-td>
               <q-td key="name" :props="props">
-                {{ props.row.name }}
+                <q-input
+                  v-if="isEditing && editingRowIndex === props.rowIndex"
+                  v-model="newSouce.name"
+                  placeholder="Name required"
+                  dense
+                  outlined
+                  :color="newSouce.name ? 'green' : 'red'"
+                  autofocus
+                />
+                <span v-else>{{ props.row.name }}</span>
               </q-td>
               <q-td key="createdOn" :props="props">
                 {{
@@ -127,7 +197,16 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">Name :</div>
                     <div class="col-12">
-                      {{ props.row.name }}
+                      <q-input
+                        v-if="isEditing && editingRowIndex === props.rowIndex"
+                        v-model="newSouce.name"
+                        placeholder="Name required"
+                        dense
+                        outlined
+                        :color="newSouce.name ? 'green' : 'red'"
+                        autofocus
+                      />
+                      <span v-else>{{ props.row.name }}</span>
                     </div>
                   </div>
                 </q-card-section>
@@ -178,17 +257,40 @@
                       size="xs"
                       outline
                       color="accent"
-                      @click="editEntry(props.row.id)"
+                      v-if="!isEditing || editingRowIndex !== props.rowIndex"
+                      @click="() => editEntry(props.row.id, props.rowIndex)"
                     >
                       <q-tooltip>Edit</q-tooltip>
                     </q-btn>
+
                     <q-btn
-                      :label="props.row.inactive ? 'active' : 'In-active '"
+                      v-if="!isEditing || editingRowIndex !== props.rowIndex"
+                      :label="props.row.inactive ? 'activate' : 'deactivate'"
                       size="xs"
                       outline
                       color="red"
                       @click="changeActive(props.row.id, props.row.inactive)"
                     >
+                    </q-btn>
+                    <q-btn
+                      icon="check"
+                      size="xs"
+                      outline
+                      color="green-10"
+                      v-if="isEditing && editingRowIndex === props.rowIndex"
+                      @click="() => saveEdited()"
+                    >
+                      <q-tooltip>Save</q-tooltip>
+                    </q-btn>
+                    <q-btn
+                      icon="close"
+                      size="xs"
+                      outline
+                      color="red"
+                      v-if="isEditing && editingRowIndex === props.rowIndex"
+                      @click="(isEditing = false), (editingRowIndex = null)"
+                    >
+                      <q-tooltip>Cancel</q-tooltip>
                     </q-btn>
                   </q-btn-group>
                 </q-card-actions>
@@ -199,51 +301,6 @@
       </div>
     </div>
   </div>
-  <q-dialog v-model="isEntryModalActive">
-    <q-card>
-      <q-form @submit.prevent="saveEntry" @reset="setFormData()">
-        <q-card-section class="bg-grey-2">
-          <div class="flex items-center">
-            <span class="text-bold q-mr-xl">{{
-              mode === 'new' ? 'Add status' : 'Edit status'
-            }}</span>
-            <q-space />
-            <q-btn
-              class="q-ml-xs-md q-ml-sm-xl"
-              icon="close"
-              flat
-              @click="isEntryModalActive = false"
-            />
-          </div>
-        </q-card-section>
-        <q-card-section class="q-px-lg q-py-sm">
-          <div class="row">
-            <div class="col-12">
-              <div class="col-12 q-mt-lg">
-                <q-input
-                  v-model="newStatus.name"
-                  label="Name"
-                  hide-bottom-space
-                  outlined
-                  :rules="[(val) => !!val || '']"
-                />
-              </div>
-            </div>
-          </div>
-        </q-card-section>
-        <q-separator class="q-mt-md" />
-        <q-card-actions align="right" class="q-py-md bg-grey-2">
-          <q-btn
-            :label="editingRowId === null ? 'Add' : 'Save '"
-            :icon="editingRowId === null ? 'add' : 'save '"
-            color="teal"
-            type="submit"
-          />
-          <q-btn label="Reset" color="red-5" type="reset" />
-        </q-card-actions>
-      </q-form>
-    </q-card>
-  </q-dialog>
 </template>
 
 <script setup lang="ts">
@@ -254,7 +311,8 @@ import { onSuccess, confirmDialog } from 'src/utils/notification';
 
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
-  { path: '/module/maintenance/source', label: 'Status' },
+  { path: '/module/maintenance/leadMaster/status', label: 'LeadMaster' },
+  { path: '/module/maintenance/leadMaster/status', label: 'Status' },
 ];
 
 interface Status {
@@ -267,15 +325,18 @@ interface Status {
 }
 
 const fetchingData = ref(false);
+const leadName = ref('');
 const nameSearchQuery = ref('');
 const status = ref<Status[]>([]);
 const statusTemp = ref<Status[]>([]);
 const checkBox = ref(false);
-const isEntryModalActive = ref(false);
+const isEditing = ref(false);
+const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
-let mode: 'new' | 'edit' = 'new';
+const error = ref(false);
+const msg = ref('');
 
-const newStatus = reactive<Status>({
+const newSouce = reactive<Status>({
   name: '',
   id: null,
   createdOn: '',
@@ -302,7 +363,7 @@ const columns: {
     required: true,
     align: 'left',
     field: 'name',
-    label: 'sourceLead',
+    label: 'Status Lead',
   },
   {
     name: 'createdOn',
@@ -323,7 +384,7 @@ const columns: {
     required: true,
     align: 'left',
     field: 'inactiveOn',
-    label: 'Inactive',
+    label: 'In-Active',
   },
 ];
 
@@ -348,59 +409,85 @@ const setFormData = () => {
     let index = status.value.findIndex((obj) => obj.id === editingRowId.value);
     temp = status.value[index];
   }
-  newStatus.name = temp ? temp.name : '';
+  newSouce.name = temp ? temp.name : '';
 };
 
-const newEntry = () => {
-  mode = 'new';
-  editingRowId.value = null;
-  isEntryModalActive.value = true;
-
-  setFormData();
-};
-const editEntry = (id: number) => {
-  mode = 'edit';
+const editEntryConfirmed = (id: number, index: number) => {
+  editingRowIndex.value = index;
   editingRowId.value = id;
-  isEntryModalActive.value = true;
   setFormData();
+};
+
+const editEntry = (id: number, rowIndex: number) => {
+  if (isEditing.value) {
+    confirmDialog(() => editEntryConfirmed(id, rowIndex), {
+      msg: 'Are you sure you want to cancel editing the current Code?',
+    });
+  } else {
+    isEditing.value = true;
+    editingRowIndex.value = rowIndex;
+    editEntryConfirmed(id, rowIndex);
+  }
 };
 const saveNewEntry = async () => {
   let payLoad = {
-    name: newStatus.name,
+    name: leadName.value,
     inactive: false,
     createdOn: new Date(),
   };
-  const rsp = await api.post('/sourceLead', payLoad);
+  const rsp = await api.post('/statusLead', payLoad);
   if (rsp.data) {
     onSuccess({
       msg: rsp.data.displayMessage,
       icon: 'sync_alt',
     });
-
+    leadName.value = '';
     loadSource();
-    isEntryModalActive.value = false;
   }
 };
 const saveEdited = async () => {
   let payLoad = {
-    name: newStatus.name,
+    name: newSouce.name,
     id: editingRowId.value,
     updatedOn: new Date(),
   };
-  const rsp = await api.put('/sourceLead/update', payLoad);
+  const rsp = await api.put('/statusLead/update', payLoad);
   if (rsp.data) {
     onSuccess({
       msg: rsp.data.displayMessage,
       icon: 'sync_alt',
     });
+    isEditing.value = false;
+    editingRowIndex.value = null;
     loadSource();
-    isEntryModalActive.value = false;
   }
 };
 
 const saveEntry = () => {
-  mode === 'new' ? saveNewEntry() : saveEdited();
+  if (leadName.value) {
+    saveNewEntry();
+  } else {
+    error.value = true;
+  }
 };
+watch(leadName, () => {
+  if (leadName.value) {
+    error.value = false;
+    let temp = statusTemp.value.filter((item) => {
+      return item.name === leadName.value;
+    });
+    if (temp.length) {
+      error.value = true;
+      msg.value = 'Item already exists!';
+    } else {
+      error.value = false;
+      msg.value = '';
+    }
+  } else {
+    error.value = false;
+    msg.value = '';
+  }
+});
 watch(nameSearchQuery, () => {
   status.value = statusTemp.value.filter((item) => {
     return item.name
@@ -410,11 +497,15 @@ watch(nameSearchQuery, () => {
 });
 
 const changeActive = async (id: number, state: boolean) => {
-  confirmDialog(() => changeActiveConfirm(id, state), {
-    msg: state
-      ? 'Are you sure you want to make active ?'
-      : 'Are you sure you want to make inactive ?',
-  });
+  if (editingRowIndex.value === null) {
+    confirmDialog(() => changeActiveConfirm(id, state), {
+      msg: state
+        ? 'Are you sure you want to make active ?'
+        : 'Are you sure you want to make inactive ?',
+    });
+  } else {
+    return;
+  }
 };
 
 const changeActiveConfirm = async (id: number, state: boolean) => {
@@ -423,7 +514,7 @@ const changeActiveConfirm = async (id: number, state: boolean) => {
   };
 
   const str = state ? 'active' : 'inactive';
-  const rsp = await api.put('/sourceLead/' + str, payLoad);
+  const rsp = await api.put('/statusLead/' + str, payLoad);
   if (rsp.data) {
     onSuccess({ msg: rsp.data.displayMessage });
   }
