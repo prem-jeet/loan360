@@ -55,6 +55,7 @@
                 </div>
                 <div v-if="$q.screen.width < 830" class="col-auto q-mt-sm">
                   <q-input
+                    class="q-pb-none"
                     v-model="leadName"
                     clearable
                     outlined
@@ -81,7 +82,7 @@
             <q-space />
             <div v-if="$q.screen.width > 830">
               <q-input
-                class="q-mt-md-lg q-pt-md-lg q-mt-sm-lg q-pt-sm-lg"
+                class="q-mt-md-lg q-pt-md-lg q-mt-sm-lg q-pt-sm-lg q-pb-none"
                 v-model="leadName"
                 clearable
                 outlined
