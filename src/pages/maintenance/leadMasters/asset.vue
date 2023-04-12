@@ -1,9 +1,552 @@
 <template>
-  <div>
-    <h1>asset</h1>
+  <div class="absolute q-pa-md full-width full-height bg-gre-4">
+    <q-chip outline square size="md" class="shadow-4" :ripple="false">
+      <BreadCrumbs :ordered-paths="breadcrumbs" />
+    </q-chip>
+
+    <div class="row q-mt-lg q-pb-xl">
+      <div class="col">
+        <q-table
+          :rows="filteredNatureEntry"
+          :columns="columns"
+          row-key="code"
+          :loading="fetchingData"
+          table-header-class="bg-deep-purple-10 text-white"
+          separator="cell"
+          bordered
+          title="Nature entry"
+          :no-data-label="
+            assets.length
+              ? 'No result found'
+              : 'Select a filter product and category'
+          "
+          :rows-per-page-options="[0]"
+          :hide-bottom="!!filteredNatureEntry.length"
+          :grid="$q.screen.width < 830"
+          card-container-class="q-gutter-y-md q-mt-xs"
+        >
+          <template v-slot:top>
+            <div class="row q-gutter-y-lg q-pb-xs-md">
+              <div class="col-12">
+                <div class="row items-center q-gutter-md">
+                  <div class="col-auto text-h6">Asset Leadd</div>
+                </div>
+              </div>
+
+              <div class="row items-center q-gutter-x-md">
+                <div class="col-auto q-mt-sm">
+                  <q-input
+                    v-model="nameSearchQuery"
+                    outlined
+                    clearable
+                    dense
+                    rounded
+                    placeholder="search"
+                    @clear="nameSearchQuery = ''"
+                  >
+                    <template v-slot:prepend>
+                      <q-icon name="search" />
+                    </template>
+                  </q-input>
+                </div>
+
+                <div class="col-auto q-mt-sm">
+                  <q-checkbox v-model="checkBox" label=" In-Active" />
+                </div>
+                <div v-if="$q.screen.width < 830" class="col-auto q-mt-sm">
+                  <q-input
+                    class="q-pb-none"
+                    v-model="leadName"
+                    clearable
+                    outlined
+                    dense
+                    no-error-icon
+                    :error="error"
+                    :error-message="msg"
+                  >
+                    <template v-slot:prepend>
+                      <p class="q-pt-md text-caption">Name:</p>
+                    </template>
+                    <template v-slot:append>
+                      <q-btn
+                        :icon="'add '"
+                        color="teal"
+                        size="sm"
+                        @click="saveEntry()"
+                      />
+                    </template>
+                  </q-input>
+                </div>
+              </div>
+            </div>
+            <q-space />
+            <div v-if="$q.screen.width > 830">
+              <q-input
+                class="q-mt-md-lg q-pt-md-lg q-mt-sm-lg q-pt-sm-lg q-pb-none"
+                v-model="leadName"
+                clearable
+                outlined
+                dense
+                no-error-icon
+                :error="error"
+                :error-message="msg"
+              >
+                <template v-slot:prepend>
+                  <p class="q-pt-md text-caption">Name:</p>
+                </template>
+                <template v-slot:append>
+                  <q-btn
+                    :icon="'add '"
+                    color="teal"
+                    size="sm"
+                    @click="saveEntry()"
+                  />
+                </template>
+              </q-input>
+            </div>
+          </template>
+
+          <template v-slot:header-cell="props">
+            <q-th :props="props" style="font-size: 1rem">
+              {{ props.col.label }}
+            </q-th>
+          </template>
+
+          <!-- row design for screens > 800px-->
+          <template v-slot:body="props">
+            <q-tr :props="props">
+              <q-td key="actions" auto-width>
+                <q-btn-group push unelevated>
+                  <q-btn
+                    icon="edit"
+                    size="xs"
+                    outline
+                    color="accent"
+                    v-if="!isEditing || editingRowIndex !== props.rowIndex"
+                    @click="() => editEntry(props.row.id, props.rowIndex)"
+                  >
+                    <q-tooltip>Edit</q-tooltip>
+                  </q-btn>
+
+                  <q-btn
+                    v-if="!isEditing || editingRowIndex !== props.rowIndex"
+                    :label="props.row.inactive ? 'activate' : 'deactivate'"
+                    size="xs"
+                    outline
+                    color="red"
+                    @click="changeActive(props.row.id, props.row.inactive)"
+                  >
+                  </q-btn>
+                  <q-btn
+                    icon="check"
+                    size="xs"
+                    outline
+                    color="green-10"
+                    v-if="isEditing && editingRowIndex === props.rowIndex"
+                    @click="() => saveEdited()"
+                  >
+                    <q-tooltip>Save</q-tooltip>
+                  </q-btn>
+                  <q-btn
+                    icon="close"
+                    size="xs"
+                    outline
+                    color="red"
+                    v-if="isEditing && editingRowIndex === props.rowIndex"
+                    @click="(isEditing = false), (editingRowIndex = null)"
+                  >
+                    <q-tooltip>Cancel</q-tooltip>
+                  </q-btn>
+                </q-btn-group>
+              </q-td>
+              <q-td key="name" :props="props">
+                <q-input
+                  v-if="isEditing && editingRowIndex === props.rowIndex"
+                  v-model="newSouce.name"
+                  placeholder="Name required"
+                  dense
+                  outlined
+                  :color="newSouce.name ? 'green' : 'red'"
+                  autofocus
+                />
+                <span v-else>{{ props.row.name }}</span>
+              </q-td>
+              <q-td key="createdOn" :props="props">
+                {{
+                  props.row.createdOn.toLocaleString('en-US', DateTimeOptions)
+                }}
+              </q-td>
+              <q-td key="updatedOn" :props="props">
+                {{
+                  props.row.updatedOn.toLocaleString('en-US', DateTimeOptions)
+                }}
+              </q-td>
+              <q-td key="inactiveOn" :props="props">
+                {{
+                  props.row.inactiveOn.toLocaleString('en-US', DateTimeOptions)
+                }}
+              </q-td>
+            </q-tr>
+          </template>
+
+          <!-- card for grid layout screens < 800px -->
+          <template v-slot:item="props">
+            <div class="col-xs-12 col-sm-6 q-px-sm-sm">
+              <q-card>
+                <q-card-section>
+                  <div class="row q-gutter-y-xs">
+                    <div class="col-12 text-weight-medium">Name :</div>
+                    <div class="col-12">
+                      <q-input
+                        v-if="isEditing && editingRowIndex === props.rowIndex"
+                        v-model="newSouce.name"
+                        placeholder="Name required"
+                        dense
+                        outlined
+                        :color="newSouce.name ? 'green' : 'red'"
+                        autofocus
+                      />
+                      <span v-else>{{ props.row.name }}</span>
+                    </div>
+                  </div>
+                </q-card-section>
+                <q-card-section>
+                  <div class="row q-gutter-y-xs">
+                    <div class="col-12 text-weight-medium">Created :</div>
+                    <div class="col-12">
+                      {{
+                        props.row.createdOn.toLocaleString(
+                          'en-US',
+                          DateTimeOptions
+                        )
+                      }}
+                    </div>
+                  </div>
+                </q-card-section>
+                <q-card-section>
+                  <div class="row q-gutter-y-xs">
+                    <div class="col-12 text-weight-medium">Updated :</div>
+                    <div class="col-12">
+                      {{
+                        props.row.updatedOn.toLocaleString(
+                          'en-US',
+                          DateTimeOptions
+                        )
+                      }}
+                    </div>
+                  </div>
+                </q-card-section>
+                <q-card-section>
+                  <div class="row q-gutter-y-xs">
+                    <div class="col-12 text-weight-medium">Inactive :</div>
+                    <div class="col-12">
+                      {{
+                        props.row.inactiveOn.toLocaleString(
+                          'en-US',
+                          DateTimeOptions
+                        )
+                      }}
+                    </div>
+                  </div>
+                </q-card-section>
+
+                <q-card-actions align="right" class="q-py-md bg-grey-2">
+                  <q-btn-group push unelevated>
+                    <q-btn
+                      icon="edit"
+                      size="xs"
+                      outline
+                      color="accent"
+                      v-if="!isEditing || editingRowIndex !== props.rowIndex"
+                      @click="() => editEntry(props.row.id, props.rowIndex)"
+                    >
+                      <q-tooltip>Edit</q-tooltip>
+                    </q-btn>
+
+                    <q-btn
+                      v-if="!isEditing || editingRowIndex !== props.rowIndex"
+                      :label="props.row.inactive ? 'activate' : 'deactivate'"
+                      size="xs"
+                      outline
+                      color="red"
+                      @click="changeActive(props.row.id, props.row.inactive)"
+                    >
+                    </q-btn>
+                    <q-btn
+                      icon="check"
+                      size="xs"
+                      outline
+                      color="green-10"
+                      v-if="isEditing && editingRowIndex === props.rowIndex"
+                      @click="() => saveEdited()"
+                    >
+                      <q-tooltip>Save</q-tooltip>
+                    </q-btn>
+                    <q-btn
+                      icon="close"
+                      size="xs"
+                      outline
+                      color="red"
+                      v-if="isEditing && editingRowIndex === props.rowIndex"
+                      @click="(isEditing = false), (editingRowIndex = null)"
+                    >
+                      <q-tooltip>Cancel</q-tooltip>
+                    </q-btn>
+                  </q-btn-group>
+                </q-card-actions>
+              </q-card>
+            </div>
+          </template>
+        </q-table>
+      </div>
+    </div>
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { api } from 'src/boot/axios';
+import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
+import { ref, onMounted, computed, watch, reactive } from 'vue';
+import { onSuccess, confirmDialog } from 'src/utils/notification';
+
+const breadcrumbs = [
+  { path: '/module/maintenance', label: 'Maintenance' },
+  { path: '/module/maintenance/leadMaster/asset', label: 'LeadMaster' },
+  { path: '/module/maintenance/leadMaster/asset', label: 'Assets' },
+];
+
+interface Assets {
+  name: string;
+  id: number | null;
+  createdOn: string;
+  inactive: boolean;
+  inactiveOn: string;
+  updatedOn: string;
+}
+
+const fetchingData = ref(false);
+const leadName = ref('');
+const nameSearchQuery = ref('');
+const assets = ref<Assets[]>([]);
+const assetsTemp = ref<Assets[]>([]);
+const checkBox = ref(false);
+const isEditing = ref(false);
+const editingRowIndex = ref<number | null>(null);
+const editingRowId = ref<number | null>(null);
+const error = ref(false);
+const msg = ref('');
+
+const newSouce = reactive<Assets>({
+  name: '',
+  id: null,
+  createdOn: '',
+  inactive: false,
+  inactiveOn: '',
+  updatedOn: '',
+});
+
+const columns: {
+  name: string;
+  required?: boolean;
+  label: string;
+  field: string;
+  align: 'left';
+}[] = [
+  {
+    name: 'actions',
+    label: 'Actions',
+    align: 'left',
+    field: '',
+  },
+  {
+    name: 'name',
+    required: true,
+    align: 'left',
+    field: 'name',
+    label: 'Asset Lead',
+  },
+  {
+    name: 'createdOn',
+    required: true,
+    align: 'left',
+    field: 'createdOn',
+    label: 'Created',
+  },
+  {
+    name: 'updatedOn',
+    required: true,
+    align: 'left',
+    field: 'updatedOn',
+    label: 'Updated',
+  },
+  {
+    name: 'inactiveOn',
+    required: true,
+    align: 'left',
+    field: 'inactiveOn',
+    label: 'In-Active',
+  },
+];
+
+const DateTimeOptions = {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: 'numeric',
+  minute: 'numeric',
+  hour12: true, // Use 12-hour format
+};
+
+const filteredNatureEntry = computed(() => {
+  return assets.value.filter((item) => {
+    return item.inactive === checkBox.value;
+  });
+});
+
+const setFormData = () => {
+  let temp;
+  if (editingRowId.value !== null) {
+    let index = assets.value.findIndex((obj) => obj.id === editingRowId.value);
+    temp = assets.value[index];
+  }
+  newSouce.name = temp ? temp.name : '';
+};
+
+const editEntryConfirmed = (id: number, index: number) => {
+  editingRowIndex.value = index;
+  editingRowId.value = id;
+  setFormData();
+};
+
+const editEntry = (id: number, rowIndex: number) => {
+  if (isEditing.value) {
+    confirmDialog(() => editEntryConfirmed(id, rowIndex), {
+      msg: 'Are you sure you want to cancel editing the current Code?',
+    });
+  } else {
+    isEditing.value = true;
+    editingRowIndex.value = rowIndex;
+    editEntryConfirmed(id, rowIndex);
+  }
+};
+const saveNewEntry = async () => {
+  let payLoad = {
+    name: leadName.value,
+    inactive: false,
+    createdOn: new Date(),
+  };
+  const rsp = await api.post('/assetLead', payLoad);
+  if (rsp.data) {
+    onSuccess({
+      msg: rsp.data.displayMessage,
+      icon: 'sync_alt',
+    });
+    leadName.value = '';
+    loadSource();
+  }
+};
+const saveEdited = async () => {
+  let payLoad = {
+    name: newSouce.name,
+    id: editingRowId.value,
+    updatedOn: new Date(),
+  };
+  const rsp = await api.put('/assetLead/update', payLoad);
+  if (rsp.data) {
+    onSuccess({
+      msg: rsp.data.displayMessage,
+      icon: 'sync_alt',
+    });
+    isEditing.value = false;
+    editingRowIndex.value = null;
+    loadSource();
+  }
+};
+
+const saveEntry = () => {
+  if (leadName.value) {
+    saveNewEntry();
+  } else {
+    error.value = true;
+  }
+};
+watch(leadName, () => {
+  if (leadName.value) {
+    error.value = false;
+    let temp = assetsTemp.value.filter((item) => {
+      return item.name === leadName.value;
+    });
+    if (temp.length) {
+      error.value = true;
+      msg.value = 'Item already exists!';
+    } else {
+      error.value = false;
+      msg.value = '';
+    }
+  } else {
+    error.value = false;
+    msg.value = '';
+  }
+});
+watch(nameSearchQuery, () => {
+  assets.value = assetsTemp.value.filter((item) => {
+    return item.name
+      .toLowerCase()
+      .includes(nameSearchQuery.value.toLowerCase());
+  });
+});
+
+const changeActive = async (id: number, state: boolean) => {
+  if (editingRowIndex.value === null) {
+    confirmDialog(() => changeActiveConfirm(id, state), {
+      msg: state
+        ? 'Are you sure you want to make active ?'
+        : 'Are you sure you want to make inactive ?',
+    });
+  } else {
+    return;
+  }
+};
+
+const changeActiveConfirm = async (id: number, state: boolean) => {
+  const payLoad = {
+    id: id,
+  };
+
+  const str = state ? 'active' : 'inactive';
+  const rsp = await api.put('/assetLead/' + str, payLoad);
+  if (rsp.data) {
+    onSuccess({ msg: rsp.data.displayMessage });
+  }
+  loadSource();
+};
+
+const loadSource = async () => {
+  fetchingData.value = true;
+  const rsp = await api.get('assetLead');
+
+  if (rsp.data) {
+    assets.value = rsp.data.map(
+      (item: {
+        createdOn: string | number | Date;
+        updatedOn: string | number | Date;
+        inactiveOn: string | number | Date;
+      }) => {
+        return {
+          ...item,
+          createdOn: item.createdOn !== null ? new Date(item.createdOn) : '',
+          updatedOn: item.updatedOn !== null ? new Date(item.updatedOn) : '',
+          inactiveOn: item.inactiveOn !== null ? new Date(item.inactiveOn) : '',
+        };
+      }
+    );
+    assetsTemp.value = assets.value;
+  }
+  fetchingData.value = false;
+};
+onMounted(() => {
+  loadSource();
+});
+</script>
 
 <style scoped></style>
