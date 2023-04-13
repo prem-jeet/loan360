@@ -59,8 +59,8 @@
                   v-model="leadName"
                   clearable
                   outlined
-                  dense
                   hide-bottom-space
+                  dense
                   no-error-icon
                   :error="error"
                   :error-message="msg"
