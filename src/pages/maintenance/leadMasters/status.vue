@@ -445,21 +445,14 @@ const saveEntry = () => {
   }
 };
 watch(leadName, () => {
-  if (leadName.value) {
-    error.value = false;
-    let temp = statusTemp.value.filter((item) => {
-      return item.name === leadName.value;
-    });
-    if (temp.length) {
-      error.value = true;
-      msg.value = 'Item already exists!';
-    } else {
-      error.value = false;
-      msg.value = '';
-    }
-  } else {
-    error.value = false;
-    msg.value = '';
+  error.value = false;
+  msg.value = '';
+
+  const temp = statusTemp.value.find((item) => item.name === leadName.value);
+
+  if (temp) {
+    error.value = true;
+    msg.value = 'Item already exists!';
   }
 });
 watch(nameSearchQuery, () => {
