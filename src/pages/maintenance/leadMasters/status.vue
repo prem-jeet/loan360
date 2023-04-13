@@ -29,7 +29,7 @@
             <div class="row q-gutter-y-lg q-pb-xs-md">
               <div class="col-12">
                 <div class="row items-center q-gutter-md">
-                  <div class="col-auto text-h6">Asset Lead</div>
+                  <div class="col-auto text-h6">Status Lead</div>
                 </div>
               </div>
             </div>
