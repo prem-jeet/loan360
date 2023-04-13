@@ -60,6 +60,7 @@
                   clearable
                   outlined
                   dense
+                  hide-bottom-space
                   no-error-icon
                   :error="error"
                   :error-message="msg"
@@ -444,21 +445,14 @@ const saveEntry = () => {
   }
 };
 watch(leadName, () => {
-  if (leadName.value) {
-    error.value = false;
-    let temp = assetsTemp.value.filter((item) => {
-      return item.name === leadName.value;
-    });
-    if (temp.length) {
-      error.value = true;
-      msg.value = 'Item already exists!';
-    } else {
-      error.value = false;
-      msg.value = '';
-    }
-  } else {
-    error.value = false;
-    msg.value = '';
+  error.value = false;
+  msg.value = '';
+
+  const temp = assetsTemp.value.find((item) => item.name === leadName.value);
+
+  if (temp) {
+    error.value = true;
+    msg.value = 'Item already exists!';
   }
 });
 watch(nameSearchQuery, () => {
