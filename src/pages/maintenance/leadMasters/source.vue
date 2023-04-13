@@ -35,7 +35,7 @@
             </div>
 
             <div class="row items-center full-width">
-              <div class="col-xs-12 col-sm-4 col-md-3">
+              <div class="col-xs-12 col-sm-4 col-md-3 q-pb-sm">
                 <q-input
                   v-model="nameSearchQuery"
                   outlined
@@ -51,10 +51,10 @@
                 </q-input>
               </div>
 
-              <div class="col-xs-12 col-sm-3 col-md-6">
+              <div class="col-xs-12 col-sm-3 col-md-6 q-pb-sm">
                 <q-checkbox v-model="checkBox" label=" In-Active" />
               </div>
-              <div class="col-xs-12 col-sm-5 col-md-3">
+              <div class="col-xs-12 col-sm-5 col-md-3 q-pb-sm">
                 <q-input
                   v-model="leadName"
                   clearable
