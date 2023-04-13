@@ -29,80 +29,53 @@
             <div class="row q-gutter-y-lg q-pb-xs-md">
               <div class="col-12">
                 <div class="row items-center q-gutter-md">
-                  <div class="col-auto text-h6">Asset Leadd</div>
-                </div>
-              </div>
-
-              <div class="row items-center q-gutter-x-md">
-                <div class="col-auto q-mt-sm">
-                  <q-input
-                    v-model="nameSearchQuery"
-                    outlined
-                    clearable
-                    dense
-                    rounded
-                    placeholder="search"
-                    @clear="nameSearchQuery = ''"
-                  >
-                    <template v-slot:prepend>
-                      <q-icon name="search" />
-                    </template>
-                  </q-input>
-                </div>
-
-                <div class="col-auto q-mt-sm">
-                  <q-checkbox v-model="checkBox" label=" In-Active" />
-                </div>
-                <div v-if="$q.screen.width < 830" class="col-auto q-mt-sm">
-                  <q-input
-                    class="q-pb-none"
-                    v-model="leadName"
-                    clearable
-                    outlined
-                    dense
-                    no-error-icon
-                    :error="error"
-                    :error-message="msg"
-                  >
-                    <template v-slot:prepend>
-                      <p class="q-pt-md text-caption">Name:</p>
-                    </template>
-                    <template v-slot:append>
-                      <q-btn
-                        :icon="'add '"
-                        color="teal"
-                        size="sm"
-                        @click="saveEntry()"
-                      />
-                    </template>
-                  </q-input>
+                  <div class="col-auto text-h6">Asset Lead</div>
                 </div>
               </div>
             </div>
-            <q-space />
-            <div v-if="$q.screen.width > 830">
-              <q-input
-                class="q-mt-md-lg q-pt-md-lg q-mt-sm-lg q-pt-sm-lg q-pb-none"
-                v-model="leadName"
-                clearable
-                outlined
-                dense
-                no-error-icon
-                :error="error"
-                :error-message="msg"
-              >
-                <template v-slot:prepend>
-                  <p class="q-pt-md text-caption">Name:</p>
-                </template>
-                <template v-slot:append>
-                  <q-btn
-                    :icon="'add '"
-                    color="teal"
-                    size="sm"
-                    @click="saveEntry()"
-                  />
-                </template>
-              </q-input>
+
+            <div class="row items-center full-width">
+              <div class="col-xs-12 col-sm-4 col-md-3">
+                <q-input
+                  v-model="nameSearchQuery"
+                  outlined
+                  clearable
+                  dense
+                  rounded
+                  placeholder="search"
+                  @clear="nameSearchQuery = ''"
+                >
+                  <template v-slot:prepend>
+                    <q-icon name="search" />
+                  </template>
+                </q-input>
+              </div>
+
+              <div class="col-xs-12 col-sm-3 col-md-6">
+                <q-checkbox v-model="checkBox" label=" In-Active" />
+              </div>
+              <div class="col-xs-12 col-sm-5 col-md-3">
+                <q-input
+                  v-model="leadName"
+                  clearable
+                  outlined
+                  dense
+                  no-error-icon
+                  :error="error"
+                  :error-message="msg"
+                  placeholder="name"
+                >
+                  <template v-slot:prepend> Lead </template>
+                  <template v-slot:after>
+                    <q-btn
+                      :icon="'add '"
+                      color="teal"
+                      size="md"
+                      @click="saveEntry()"
+                    />
+                  </template>
+                </q-input>
+              </div>
             </div>
           </template>
 
@@ -500,8 +473,8 @@ const changeActive = async (id: number, state: boolean) => {
   if (editingRowIndex.value === null) {
     confirmDialog(() => changeActiveConfirm(id, state), {
       msg: state
-        ? 'Are you sure you want to make active ?'
-        : 'Are you sure you want to make inactive ?',
+        ? 'Are you sure you want to activate ?'
+        : 'Are you sure you want to make deactivate ?',
     });
   } else {
     return;
