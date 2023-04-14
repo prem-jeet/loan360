@@ -143,7 +143,10 @@
                   :color="newSouce.name ? 'green' : 'red'"
                   autofocus
                 />
-                <span v-else>{{ props.row.name }}</span>
+                <span v-else>{{
+                  props.row.name.charAt(0).toUpperCase() +
+                  props.row.name.slice(1)
+                }}</span>
               </q-td>
               <q-td key="createdOn" :props="props">
                 {{
@@ -180,7 +183,10 @@
                         :color="newSouce.name ? 'green' : 'red'"
                         autofocus
                       />
-                      <span v-else>{{ props.row.name }}</span>
+                      <span v-else>{{
+                        props.row.name.charAt(0).toUpperCase() +
+                        props.row.name.slice(1)
+                      }}</span>
                     </div>
                   </div>
                 </q-card-section>
