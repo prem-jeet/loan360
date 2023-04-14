@@ -8,10 +8,18 @@
       <div class="col">
         <q-table
           :grid="$q.screen.width < 830"
+          :hide-bottom="$q.screen.width < 830"
           :rows="ledgerLoanConfigurations"
           :columns="columns"
           table-header-class="bg-deep-purple-10 text-white"
+          :rows-per-page-options="[0]"
+          :loading="isPerformingAction"
+          card-container-class="q-gutter-y-md q-mt-xs"
         >
+          <template v-slot:loading>
+            <q-inner-loading showing color="primary" />
+          </template>
+
           <template v-slot:top>
             <div class="row items-center q-gutter-md">
               <div class="col-12 text-h4">Ledger Loan Configuration</div>
@@ -62,23 +70,29 @@
                     size="xs"
                     flat
                     color="red"
+                    @click="() => deleteConfig(props.row.id)"
                   />
                 </q-btn-group>
               </q-td>
               <q-td key="ledgerType" :props="props">
-                <span>{{
-                  ledgerTypes[props.row.ledgerType as keyof typeof ledgerTypes]
-                }}</span>
+                <span>
+                  {{
+                    ledgerTypes[
+                      props.row.ledgerType as keyof typeof ledgerTypes
+                    ]
+                  }}
+                </span>
               </q-td>
-              <q-td key="accountCode1" :props="props">
-                <span>{{ props.row.accountCode1 }}</span>
-              </q-td>
-              <q-td key="accountCode2" :props="props">
-                <span>{{ props.row.accountCode2 }}</span>
-              </q-td>
-              <q-td key="accountCode3" :props="props">
-                <span>{{ props.row.accountCode3 }}</span>
-              </q-td>
+              <td
+                v-for="key in new Array(3)
+                  .fill(0)
+                  .map((item, index) => `accountCode${index + 1}`)"
+                :key="key"
+                :props="props"
+              >
+                <span>{{ props.row[key] }}</span>
+              </td>
+
               <q-td key="interestMethod" :props="props">
                 <span>
                   {{
@@ -93,37 +107,110 @@
                   {{ rateTypes[props.row.rateType as keyof typeof rateTypes] }}
                 </span>
               </q-td>
-              <q-td key="rate" :props="props">
-                <span>{{ props.row.rate }}</span>
-              </q-td>
-              <q-td key="negativeRate" :props="props">
-                <span>{{ props.row.negativeRate }}</span>
-              </q-td>
-              <q-td key="graceDays" :props="props">
-                <span>{{ props.row.graceDays }}</span>
-              </q-td>
-              <q-td key="viewType" :props="props">
-                <span>{{ props.row.viewType }}</span>
+
+              <q-td
+                v-for="key in ['rate', 'negativeRate', 'graceDays', 'viewType']"
+                :key="key"
+                :props="props"
+              >
+                <span>{{ props.row[key] }}</span>
               </q-td>
             </q-tr>
+          </template>
+
+          <!-- card for grid layout screens < 800px -->
+          <template v-slot:item="props">
+            <div class="col-xs-12 col-sm-6 q-px-sm-sm">
+              <q-card>
+                <template v-for="field in fields">
+                  <q-card-section
+                    :key="field"
+                    class="q-pb-none"
+                    v-if="props.row[field] !== null && props.row[field] !== ''"
+                  >
+                    <div class="row q-gutter-sm">
+                      <div class="col-12 text-weight-medium">
+                        {{
+                          columns.find((column) => column.field === field)!
+                            .label
+                        }}
+                      </div>
+                      <div class="col-12">
+                        {{
+                          field === 'ledgerType'
+                            ? ledgerTypes[
+                                props.row.ledgerType as keyof typeof ledgerTypes
+                              ]
+                            : field === 'interestMethod'
+                            ? interestMethods[
+                                props.row
+                                  .interestMethod as keyof typeof interestMethods
+                              ]
+                            : props.row[field]
+                        }}
+                      </div>
+                    </div>
+                  </q-card-section>
+                </template>
+                <q-card-actions
+                  align="center"
+                  class="q-py-md bg-grey-2 q-mt-md"
+                >
+                  <q-btn
+                    label="edit"
+                    icon="edit"
+                    color="teal"
+                    size="sm"
+                    @click="
+                      editingRowIndex = props.rowIndex;
+                      setInitialFormdata();
+                      isDialogActive = true;
+                    "
+                  />
+                  <q-btn
+                    label="Delete"
+                    color="red"
+                    icon="delete"
+                    size="sm"
+                    @click="() => deleteConfig(props.row.id)"
+                  />
+                </q-card-actions>
+              </q-card>
+            </div>
           </template>
         </q-table>
       </div>
     </div>
   </div>
 
-  <q-dialog v-model="isDialogActive" persistent>
-    <q-card :style="{ minWidth: '40vw' }">
-      <q-card-section class="row items-center bg-grey-2">
+  <q-dialog
+    v-model="isDialogActive"
+    persistent
+    :maximized="$q.screen.width < 830"
+    full-height
+  >
+    <q-card
+      :style="{ minWidth: $q.screen.width < 1200 ? '60vw' : '40vw' }"
+      class="column"
+    >
+      <q-card-section class="row items-center bg-grey-2 col-auto">
         <div class="text-h6">Ledger loan configuration</div>
         <q-space />
         <q-btn icon="close" flat round dense v-close-popup />
       </q-card-section>
-      <q-form @submit.prevent="submitHandler" @reset="setInitialFormdata">
-        <q-card-section :style="{ maxHeight: '70vh' }" class="scroll">
+      <q-form
+        @submit.prevent="submitHandler"
+        @reset="setInitialFormdata"
+        class="column col"
+      >
+        <!-- :style="{ maxHeight: $q.screen.width < 830 ? '75vh' : '75vh' }" -->
+        <q-card-section
+          :style="{ maxHeight: $q.screen.width < 830 ? '82vh' : '75vh' }"
+          class="scroll q-px-lg"
+        >
           <div class="row justify-evenly q-gutter-md">
             <!-- item order -->
-            <div class="col">
+            <div class="col-12 col-md">
               <q-input
                 type="number"
                 v-model.number="tempConfig.itemOrder"
@@ -133,7 +220,7 @@
               />
             </div>
             <!-- ledger type -->
-            <div class="col">
+            <div class="col-12 col-md">
               <q-select
                 v-model="tempConfig.ledgerType"
                 label="Ledger Type"
@@ -142,6 +229,7 @@
                 map-options
                 menu-shrink
                 :rules="[(val) => val !== null]"
+                behavior="menu"
               />
             </div>
           </div>
@@ -165,6 +253,7 @@
 
                 return true;
                 }]"
+                behavior="menu"
               />
             </div>
             <!-- account code 2 -->
@@ -184,10 +273,11 @@
                   } 
                 return true;
                 }]"
+                behavior="menu"
               />
             </div>
             <!-- account code 3 -->
-            <div class="col" v-if="tempConfig.ledgerType === 'L'">
+            <div class="col-12 col-md" v-if="tempConfig.ledgerType === 'L'">
               <q-select
                 v-model="tempConfig.accountCode3"
                 label="Accout Code 3"
@@ -197,14 +287,15 @@
                 menu-shrink
                 emit-value
                 clearable
+                behavior="menu"
               />
             </div>
           </div>
 
           <template v-if="tempConfig.ledgerType === 'I'">
-            <!-- interest methods -->
-            <div class="row justify-evenly q-gutter-md">
-              <div class="col">
+            <div class="row q-gutter-x-md">
+              <!-- interest methods -->
+              <div class="col-12 col-md">
                 <q-select
                   v-model="tempConfig.interestMethod"
                   label="Interest Methods"
@@ -214,6 +305,7 @@
                   emit-value
                   options-dense
                   :rules="[(val:string) => val !== null]"
+                  behavior="menu"
                 />
               </div>
               <!-- rate type -->
@@ -226,6 +318,7 @@
                   menu-shrink
                   emit-value
                   clearable
+                  behavior="menu"
                 />
               </div>
               <!-- rate -> single-->
@@ -239,21 +332,19 @@
                   outlined
                   dense
                   hide-bottom-space
-                  :min="0"
-                  type="number"
                 />
               </div>
             </div>
 
             <div
-              class="row justify-evenly q-gutter-md"
+              class="row justify-evenly q-gutter-md q-mt-xs q-mt-md-none"
               v-if="tempConfig.rateType === 'B'"
             >
               <div class="col flex items-center">
                 <!-- rate -> bucket -->
-                <div class="row justify-evenly items-center">
+                <div class="row justify-evenly items-center q-gutter-x-xs">
                   <q-input
-                    class="col-3"
+                    class="col"
                     dense
                     outlined
                     label="Days"
@@ -262,7 +353,7 @@
                     hide-bottom-space
                   />
                   <q-input
-                    class="col-3"
+                    class="col"
                     dense
                     outlined
                     label="Days"
@@ -271,7 +362,7 @@
                     hide-bottom-space
                   />
                   <q-input
-                    class="col-3"
+                    class="col"
                     dense
                     outlined
                     label="Rate"
@@ -293,7 +384,7 @@
                 </div>
               </div>
               <!-- rate -> bucket display-->
-              <div class="col">
+              <div class="col" v-if="bucketBasedRateArr.length">
                 <div class="row">
                   <div
                     class="col-auto"
@@ -310,7 +401,8 @@
                 </div>
               </div>
             </div>
-            <div class="row justify-evenly q-gutter-md">
+
+            <div class="row justify-evenly q-gutter-md q-mt-xs">
               <!-- negative rate -->
               <div class="col">
                 <q-input
@@ -331,7 +423,8 @@
               </div>
             </div>
           </template>
-          <div class="col-12">
+
+          <div class="col-12 q-mt-md">
             <q-input
               v-model="tempConfig.viewType"
               label="View type"
@@ -341,7 +434,7 @@
           </div>
         </q-card-section>
 
-        <q-card-actions align="center" class="q-py-md bg-grey-2">
+        <q-card-actions align="center" class="q-py-md bg-grey-2 q-mt-auto">
           <q-btn
             :label="editingRowIndex === null ? 'Add' : 'Save '"
             :icon="editingRowIndex === null ? 'add' : 'save '"
@@ -358,8 +451,8 @@
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { onFailure } from 'src/utils/notification';
-import { onMounted, reactive, ref, watch } from 'vue';
+import { confirmDialog, onFailure, onSuccess } from 'src/utils/notification';
+import { onMounted, reactive, ref, watch, watchEffect } from 'vue';
 
 interface LedgerAccount {
   id?: number;
@@ -371,8 +464,8 @@ interface LedgerAccount {
   interestMethod: keyof typeof interestMethods | null;
   rate: string | null;
   rateType: keyof typeof rateTypes | null;
-  graceDays: number | null;
-  negativeRate: string | null;
+  graceDays: string | number | null;
+  negativeRate: string | number | null;
   viewType: string | null;
 }
 
@@ -499,13 +592,14 @@ const columns: {
     align: 'left',
   },
 ];
-
+const fields = columns.map((column) => column.field);
 const accountCodeTypes = ref<{ label: string; value: string }[]>([]);
 
 const editingRowIndex = ref<null | number>(null);
 
-const isDialogActive = ref(true);
-const tempConfig = reactive<LedgerAccount>({
+const isPerformingAction = ref(false);
+const isDialogActive = ref(false);
+const tempConfig = reactive<Omit<LedgerAccount, 'id'>>({
   accountCode1: null,
   accountCode2: null,
   accountCode3: null,
@@ -529,8 +623,8 @@ const bucketBasedRateArr = ref<BucketBasedRate[]>([]);
 
 const ledgerLoanConfigurations = ref<LedgerAccount[]>([]);
 
-const submitHandler = () => {
-  const { itemOrder, rateType, rate } = tempConfig;
+const submitHandler = async () => {
+  const { itemOrder } = tempConfig;
 
   if (!isItemOrderValid(itemOrder!)) {
     onFailure({
@@ -540,12 +634,37 @@ const submitHandler = () => {
     return;
   }
 
-  const data = { ...tempConfig };
+  const data: LedgerAccount = { ...tempConfig };
+
   if (editingRowIndex.value !== null) {
     data.id = ledgerLoanConfigurations.value[editingRowIndex.value].id;
   }
 
-  console.log(data);
+  const rsp = await api.post('configLedgerLoan', data);
+
+  if (rsp.data) {
+    onSuccess({
+      msg:
+        editingRowIndex.value !== null
+          ? 'Updated successfully'
+          : rsp.data.displayMessage,
+    });
+    await fetchLedgerLoanConfiguration();
+  }
+
+  isDialogActive.value = false;
+};
+
+const deleteConfig = (id: number) => {
+  confirmDialog(async () => {
+    const rsp = await api.delete(`configLedgerLoan/${id}`);
+    if (rsp.data) {
+      onSuccess({
+        msg: rsp.data.displayMessage,
+      });
+      await fetchLedgerLoanConfiguration();
+    }
+  }, {});
 };
 
 const isItemOrderValid = (itemorder: number) =>
@@ -590,13 +709,19 @@ const removeRateFromBucket = (index: number) => {
     ...bucketBasedRateArr.value.slice(0, index),
     ...bucketBasedRateArr.value.slice(index + 1),
   ];
+
   fillRateFromBucket();
 };
 
-const fillRateFromBucket = () =>
-  (tempConfig.rate = bucketBasedRateArr.value
+const fillRateFromBucket = () => {
+  if (!bucketBasedRateArr.value.length) {
+    tempConfig.rate = null;
+    return;
+  }
+  tempConfig.rate = bucketBasedRateArr.value
     .map(({ days1, days2, rate }) => `${days1}-${days2}-${rate}`)
-    .join(','));
+    .join(',');
+};
 
 const setInitialFormdata = () => {
   const row =
@@ -610,27 +735,32 @@ const setInitialFormdata = () => {
   tempConfig.itemOrder = row?.itemOrder || null;
   tempConfig.ledgerType = row?.ledgerType || null;
   tempConfig.interestMethod = row?.interestMethod || null;
-  tempConfig.rateType = row?.rateType || null;
-  tempConfig.rate = row?.rate || null;
   tempConfig.graceDays = row?.graceDays || null;
   tempConfig.negativeRate = row?.negativeRate || null;
   tempConfig.viewType = row?.viewType || 'Customer,Court';
+  tempConfig.rateType = row?.rateType || null;
+  tempConfig.rate = row?.rate || null;
 
-  if (tempConfig.rateType === 'B' && tempConfig.rate) {
-    bucketBasedRateArr.value = tempConfig.rate.split(',').map((item) => {
+  if (row && row.rateType === 'B' && row.rate) {
+    bucketBasedRateArr.value = row.rate.split(',').map((item) => {
       const [days1, days2, rate] = item.split('-').map(Number);
       return { days1, days2, rate };
     });
   }
 };
 
-onMounted(async () => {
+const fetchLedgerLoanConfiguration = async () => {
+  isPerformingAction.value = true;
   const rsp = await api('configLedgerLoan');
 
   if (rsp.data) {
     ledgerLoanConfigurations.value = rsp.data;
   }
+  isPerformingAction.value = false;
+};
 
+onMounted(async () => {
+  await fetchLedgerLoanConfiguration();
   const accountCodes = await api.get('accountCodeBySection/L');
   if (accountCodes.data) {
     accountCodeTypes.value = accountCodes.data.map(
@@ -644,17 +774,43 @@ onMounted(async () => {
 
 watch(
   () => tempConfig.rateType,
-  () => {
-    tempConfig.rate = null;
+  (newValue, oldValue) => {
+    if (oldValue !== null) {
+      tempConfig.rate = null;
+    }
     bucketBasedRateInput.days1 = null;
     bucketBasedRateInput.days2 = null;
     bucketBasedRateInput.rate = null;
 
-    if (tempConfig.rateType === 'B' && bucketBasedRateArr.value.length) {
+    if (tempConfig.rateType === 'B') {
       fillRateFromBucket();
     }
   }
 );
+
+watch(
+  () => tempConfig.rate,
+  (newVal, oldVal) => {
+    if (tempConfig.rateType === 'S') {
+      if (oldVal !== null && !Number.isFinite(newVal)) {
+        tempConfig.rate = oldVal;
+      }
+    }
+  }
+);
+
+watchEffect(() => {
+  const { negativeRate, graceDays, rate } = tempConfig;
+  if (rate === null) {
+    tempConfig.rate = '';
+  }
+  if (negativeRate === '') {
+    tempConfig.negativeRate = null;
+  }
+  if (graceDays === '') {
+    tempConfig.graceDays = null;
+  }
+});
 </script>
 
 <style scoped></style>
