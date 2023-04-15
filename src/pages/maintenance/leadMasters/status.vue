@@ -57,7 +57,6 @@
               <div class="col-xs-12 col-sm-5 col-md-3 q-pb-sm">
                 <q-input
                   v-model="leadName"
-                  clearable
                   outlined
                   hide-bottom-space
                   dense
