@@ -72,6 +72,7 @@
                       :icon="'add '"
                       color="teal"
                       size="md"
+                      :disable="error ? true : false"
                       @click="saveEntry()"
                     />
                   </template>
@@ -230,49 +231,46 @@
                   </div>
                 </q-card-section>
 
-                <q-card-actions align="right" class="q-py-md bg-grey-2">
-                  <q-btn-group push unelevated>
-                    <q-btn
-                      icon="edit"
-                      size="xs"
-                      outline
-                      color="accent"
-                      v-if="!isEditing || editingRowIndex !== props.rowIndex"
-                      @click="() => editEntry(props.row.id, props.rowIndex)"
-                    >
-                      <q-tooltip>Edit</q-tooltip>
-                    </q-btn>
+                <q-card-actions align="center" class="q-py-md bg-grey-2">
+                  <q-btn
+                    label="edit"
+                    icon="edit"
+                    size="xs"
+                    color="teal"
+                    v-if="!isEditing || editingRowIndex !== props.rowIndex"
+                    @click="() => editEntry(props.row.id, props.rowIndex)"
+                  >
+                    <q-tooltip>Edit</q-tooltip>
+                  </q-btn>
 
-                    <q-btn
-                      v-if="!isEditing || editingRowIndex !== props.rowIndex"
-                      :label="props.row.inactive ? 'activate' : 'deactivate'"
-                      size="xs"
-                      outline
-                      color="red"
-                      @click="changeActive(props.row.id, props.row.inactive)"
-                    >
-                    </q-btn>
-                    <q-btn
-                      icon="check"
-                      size="xs"
-                      outline
-                      color="green-10"
-                      v-if="isEditing && editingRowIndex === props.rowIndex"
-                      @click="() => saveEdited()"
-                    >
-                      <q-tooltip>Save</q-tooltip>
-                    </q-btn>
-                    <q-btn
-                      icon="close"
-                      size="xs"
-                      outline
-                      color="red"
-                      v-if="isEditing && editingRowIndex === props.rowIndex"
-                      @click="(isEditing = false), (editingRowIndex = null)"
-                    >
-                      <q-tooltip>Cancel</q-tooltip>
-                    </q-btn>
-                  </q-btn-group>
+                  <q-btn
+                    v-if="!isEditing || editingRowIndex !== props.rowIndex"
+                    :label="props.row.inactive ? 'activate' : 'deactivate'"
+                    size="xs"
+                    color="red"
+                    @click="changeActive(props.row.id, props.row.inactive)"
+                  >
+                  </q-btn>
+                  <q-btn
+                    label="save"
+                    icon="save"
+                    size="xs"
+                    color="teal"
+                    v-if="isEditing && editingRowIndex === props.rowIndex"
+                    @click="() => saveEdited()"
+                  >
+                    <q-tooltip>Save</q-tooltip>
+                  </q-btn>
+                  <q-btn
+                    label="close"
+                    icon="close"
+                    size="xs"
+                    color="red"
+                    v-if="isEditing && editingRowIndex === props.rowIndex"
+                    @click="(isEditing = false), (editingRowIndex = null)"
+                  >
+                    <q-tooltip>Cancel</q-tooltip>
+                  </q-btn>
                 </q-card-actions>
               </q-card>
             </div>
@@ -287,7 +285,7 @@
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch, reactive } from 'vue';
-import { onSuccess, confirmDialog } from 'src/utils/notification';
+import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
 
 interface Source {
   name: string;
@@ -426,6 +424,21 @@ const saveNewEntry = async () => {
   }
 };
 const saveEdited = async () => {
+  const temp = sourceTemp.value.filter(
+    (item) => item.id !== editingRowId.value
+  );
+
+  const isDuplicate = temp.find(
+    (item) => item.name.toLowerCase() === newSouce.name.toLowerCase()
+  );
+  if (isDuplicate) {
+    onFailure({
+      msg: 'Duplicate Account Found',
+      icon: 'warning',
+    });
+    return;
+  }
+
   let payLoad = {
     name: newSouce.name,
     id: editingRowId.value,
@@ -508,7 +521,9 @@ watch(leadName, () => {
     return;
   }
 
-  const temp = sourceTemp.value.find((item) => item.name === leadName.value);
+  const temp = sourceTemp.value.find(
+    (item) => item.name.toLowerCase() === leadName.value.toLocaleLowerCase()
+  );
 
   if (temp) {
     error.value = true;
