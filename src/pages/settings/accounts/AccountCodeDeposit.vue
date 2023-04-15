@@ -365,11 +365,6 @@ import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { onSuccess, confirmDialog } from 'src/utils/notification';
 import { ref, onMounted, computed, watch, reactive } from 'vue';
 
-const breadcrumbs = [
-  { path: '/module/settings', label: 'Settings' },
-  { path: '/module/settings/accountcode', label: 'Account Code Deposit' },
-];
-
 interface AccountHeads {
   label: string;
   value: number;
@@ -391,6 +386,47 @@ interface AccountCodeDeposit {
   productCode: string;
   accountId: number | null;
 }
+
+const breadcrumbs = [
+  { path: '/module/settings', label: 'Settings' },
+  { path: '/module/settings/accountcode', label: 'Account Code Deposit' },
+];
+
+const columns: {
+  name: string;
+  required?: boolean;
+  label: string;
+  field: string;
+  align: 'left';
+}[] = [
+  {
+    name: 'actions',
+    label: 'Actions',
+    align: 'left',
+    field: '',
+  },
+  {
+    name: 'accountCode',
+    required: true,
+    align: 'left',
+    field: 'code',
+    label: 'Account Code',
+  },
+  {
+    name: 'accountId',
+    required: true,
+    align: 'left',
+    field: 'name',
+    label: 'Account Name',
+  },
+  {
+    name: 'isApplication',
+    required: true,
+    align: 'left',
+    field: 'isApplication',
+    label: 'Is Application',
+  },
+];
 
 const newCodeDeposit = reactive<AccountCodeDeposit>({
   accountCode: '',
@@ -433,41 +469,6 @@ const categorys = ref<Options[]>([
   { value: 'O', label: 'Others' },
   { value: 'DR', label: "Director's Relatives" },
 ]);
-const columns: {
-  name: string;
-  required?: boolean;
-  label: string;
-  field: string;
-  align: 'left';
-}[] = [
-  {
-    name: 'actions',
-    label: 'Actions',
-    align: 'left',
-    field: '',
-  },
-  {
-    name: 'accountCode',
-    required: true,
-    align: 'left',
-    field: 'code',
-    label: 'Account Code',
-  },
-  {
-    name: 'accountId',
-    required: true,
-    align: 'left',
-    field: 'name',
-    label: 'Account Name',
-  },
-  {
-    name: 'isApplication',
-    required: true,
-    align: 'left',
-    field: 'isApplication',
-    label: 'Is Application',
-  },
-];
 
 const setFormData = () => {
   let temp;
