@@ -293,6 +293,15 @@ import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch, reactive } from 'vue';
 import { onSuccess, confirmDialog } from 'src/utils/notification';
 
+interface NamePrefix {
+  name: string;
+  id: number | null;
+  createdOn: string;
+  inactive: boolean;
+  inactiveOn: string;
+  updatedOn: string;
+}
+
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
   {
@@ -304,36 +313,6 @@ const breadcrumbs = [
     label: 'Name Prefix',
   },
 ];
-
-interface NamePrefix {
-  name: string;
-  id: number | null;
-  createdOn: string;
-  inactive: boolean;
-  inactiveOn: string;
-  updatedOn: string;
-}
-
-const fetchingData = ref(false);
-const name = ref('');
-const nameSearchQuery = ref('');
-const namePrefix = ref<NamePrefix[]>([]);
-const namePrefixTemp = ref<NamePrefix[]>([]);
-const checkBox = ref(false);
-const isEditing = ref(false);
-const editingRowIndex = ref<number | null>(null);
-const editingRowId = ref<number | null>(null);
-const error = ref(false);
-const msg = ref('');
-
-const newSouce = reactive<NamePrefix>({
-  name: '',
-  id: null,
-  createdOn: '',
-  inactive: false,
-  inactiveOn: '',
-  updatedOn: '',
-});
 
 const columns: {
   name: string;
@@ -386,6 +365,27 @@ const DateTimeOptions = {
   minute: 'numeric',
   hour12: true, // Use 12-hour format
 };
+
+const fetchingData = ref(false);
+const name = ref('');
+const nameSearchQuery = ref('');
+const namePrefix = ref<NamePrefix[]>([]);
+const namePrefixTemp = ref<NamePrefix[]>([]);
+const checkBox = ref(false);
+const isEditing = ref(false);
+const editingRowIndex = ref<number | null>(null);
+const editingRowId = ref<number | null>(null);
+const error = ref(false);
+const msg = ref('');
+
+const newSouce = reactive<NamePrefix>({
+  name: '',
+  id: null,
+  createdOn: '',
+  inactive: false,
+  inactiveOn: '',
+  updatedOn: '',
+});
 
 const filteredNatureEntry = computed(() => {
   return namePrefix.value.filter((item) => {
@@ -462,24 +462,6 @@ const saveEntry = () => {
     error.value = true;
   }
 };
-watch(name, () => {
-  error.value = false;
-  msg.value = '';
-
-  const temp = namePrefixTemp.value.find((item) => item.name === name.value);
-
-  if (temp) {
-    error.value = true;
-    msg.value = 'Item already exists!';
-  }
-});
-watch(nameSearchQuery, () => {
-  namePrefix.value = namePrefixTemp.value.filter((item) => {
-    return item.name
-      .toLowerCase()
-      .includes(nameSearchQuery.value.toLowerCase());
-  });
-});
 
 const changeActive = async (id: number, state: boolean) => {
   if (editingRowIndex.value === null) {
@@ -532,6 +514,24 @@ const loadSource = async () => {
     fetchingData.value = false;
   }
 };
+watch(name, () => {
+  error.value = false;
+  msg.value = '';
+
+  const temp = namePrefixTemp.value.find((item) => item.name === name.value);
+
+  if (temp) {
+    error.value = true;
+    msg.value = 'Item already exists!';
+  }
+});
+watch(nameSearchQuery, () => {
+  namePrefix.value = namePrefixTemp.value.filter((item) => {
+    return item.name
+      .toLowerCase()
+      .includes(nameSearchQuery.value.toLowerCase());
+  });
+});
 onMounted(() => {
   loadSource();
 });
