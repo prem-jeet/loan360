@@ -293,12 +293,6 @@ import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch, reactive } from 'vue';
 import { onSuccess, confirmDialog } from 'src/utils/notification';
 
-const breadcrumbs = [
-  { path: '/module/maintenance', label: 'Maintenance' },
-  { path: '/module/maintenance/leadMaster/asset', label: 'LeadMaster' },
-  { path: '/module/maintenance/leadMaster/asset', label: 'Assets' },
-];
-
 interface Assets {
   name: string;
   id: number | null;
@@ -308,26 +302,11 @@ interface Assets {
   updatedOn: string;
 }
 
-const fetchingData = ref(false);
-const leadName = ref('');
-const nameSearchQuery = ref('');
-const assets = ref<Assets[]>([]);
-const assetsTemp = ref<Assets[]>([]);
-const checkBox = ref(false);
-const isEditing = ref(false);
-const editingRowIndex = ref<number | null>(null);
-const editingRowId = ref<number | null>(null);
-const error = ref(false);
-const msg = ref('');
-
-const newSouce = reactive<Assets>({
-  name: '',
-  id: null,
-  createdOn: '',
-  inactive: false,
-  inactiveOn: '',
-  updatedOn: '',
-});
+const breadcrumbs = [
+  { path: '/module/maintenance', label: 'Maintenance' },
+  { path: '/module/maintenance/leadMaster/asset', label: 'LeadMaster' },
+  { path: '/module/maintenance/leadMaster/asset', label: 'Assets' },
+];
 
 const columns: {
   name: string;
@@ -380,6 +359,27 @@ const DateTimeOptions = {
   minute: 'numeric',
   hour12: true, // Use 12-hour format
 };
+
+const fetchingData = ref(false);
+const leadName = ref('');
+const nameSearchQuery = ref('');
+const assets = ref<Assets[]>([]);
+const assetsTemp = ref<Assets[]>([]);
+const checkBox = ref(false);
+const isEditing = ref(false);
+const editingRowIndex = ref<number | null>(null);
+const editingRowId = ref<number | null>(null);
+const error = ref(false);
+const msg = ref('');
+
+const newSouce = reactive<Assets>({
+  name: '',
+  id: null,
+  createdOn: '',
+  inactive: false,
+  inactiveOn: '',
+  updatedOn: '',
+});
 
 const filteredNatureEntry = computed(() => {
   return assets.value.filter((item) => {
@@ -454,24 +454,6 @@ const saveEntry = () => {
     error.value = true;
   }
 };
-watch(leadName, () => {
-  error.value = false;
-  msg.value = '';
-
-  const temp = assetsTemp.value.find((item) => item.name === leadName.value);
-
-  if (temp) {
-    error.value = true;
-    msg.value = 'Item already exists!';
-  }
-});
-watch(nameSearchQuery, () => {
-  assets.value = assetsTemp.value.filter((item) => {
-    return item.name
-      .toLowerCase()
-      .includes(nameSearchQuery.value.toLowerCase());
-  });
-});
 
 const changeActive = async (id: number, state: boolean) => {
   if (editingRowIndex.value === null) {
@@ -521,6 +503,26 @@ const loadSource = async () => {
   }
   fetchingData.value = false;
 };
+
+watch(leadName, () => {
+  error.value = false;
+  msg.value = '';
+
+  const temp = assetsTemp.value.find((item) => item.name === leadName.value);
+
+  if (temp) {
+    error.value = true;
+    msg.value = 'Item already exists!';
+  }
+});
+watch(nameSearchQuery, () => {
+  assets.value = assetsTemp.value.filter((item) => {
+    return item.name
+      .toLowerCase()
+      .includes(nameSearchQuery.value.toLowerCase());
+  });
+});
+
 onMounted(() => {
   loadSource();
 });
