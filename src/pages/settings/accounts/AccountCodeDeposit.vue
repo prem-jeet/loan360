@@ -208,27 +208,28 @@
                   </div>
                 </q-card-section>
 
-                <q-card-actions align="right" class="q-py-md bg-grey-2">
-                  <q-btn-group push unelevated>
-                    <q-btn
-                      icon="edit"
-                      size="sm"
-                      outline
-                      color="accent"
-                      @click="editEntry(props.rowIndex)"
-                    >
-                      <q-tooltip>Edit</q-tooltip>
-                    </q-btn>
-                    <q-btn
-                      icon="delete"
-                      size="sm"
-                      outline
-                      color="red"
-                      @click="() => deleteEntry(props.rowIndex)"
-                    >
-                      <q-tooltip>Delete</q-tooltip>
-                    </q-btn>
-                  </q-btn-group>
+                <q-card-actions
+                  align="center"
+                  class="q-py-md bg-grey-2 q-mt-md"
+                >
+                  <q-btn
+                    label="edit"
+                    icon="edit"
+                    size="sm"
+                    color="teal"
+                    @click="editEntry(props.rowIndex)"
+                  >
+                    <q-tooltip>Edit</q-tooltip>
+                  </q-btn>
+                  <q-btn
+                    label="Delete"
+                    icon="delete"
+                    size="sm"
+                    color="red"
+                    @click="() => deleteEntry(props.rowIndex)"
+                  >
+                    <q-tooltip>Delete</q-tooltip>
+                  </q-btn>
                 </q-card-actions>
               </q-card>
             </div>
@@ -345,14 +346,14 @@
           </div>
         </q-card-section>
         <q-separator class="q-mt-md" />
-        <q-card-actions align="right" class="q-py-md bg-grey-2">
+        <q-card-actions align="center" class="q-py-md bg-grey-2 q-mt-auto">
           <q-btn
             :label="editingRowIndex === null ? 'Add' : 'Save '"
             :icon="editingRowIndex === null ? 'add' : 'save '"
             color="teal"
             type="submit"
           />
-          <q-btn label="Reset" color="red-5" type="reset" />
+          <q-btn label="Reset" color="red-5" type="reset" icon="refresh" />
         </q-card-actions>
       </q-form>
     </q-card>
