@@ -298,23 +298,6 @@ const breadcrumbs = [
   { path: '/module/settings', label: 'Settings' },
   { path: '/module/settings/natureEntry', label: 'Account Code Loan' },
 ];
-const fetchingData = ref(false);
-const accountCodes = ref<AccountCodes[]>([]);
-const accountHeads = ref<AccountHeads[]>([]);
-const accountCodeLoan = ref<AccountCodeLoan[]>([]);
-const accountCodeOptions = ref<AccountCodeOptions[]>([]);
-const accountHeadOptions = ref<AccountHeadOptions[]>([]);
-const dropdown = ref(null);
-const editingRowIndex = ref<number | null>(null);
-const isEntryModalActive = ref(false);
-const showNew = ref(false);
-let mode: 'new' | 'edit' = 'new';
-const newCodeLoan = reactive<AccountCodeLoan>({
-  id: null,
-  accountCode: '',
-  accountId: null,
-  accountingCategoryCode: null,
-});
 
 const columns: {
   name: string;
@@ -344,6 +327,24 @@ const columns: {
     label: 'Account Name',
   },
 ];
+
+const fetchingData = ref(false);
+const accountCodes = ref<AccountCodes[]>([]);
+const accountHeads = ref<AccountHeads[]>([]);
+const accountCodeLoan = ref<AccountCodeLoan[]>([]);
+const accountCodeOptions = ref<AccountCodeOptions[]>([]);
+const accountHeadOptions = ref<AccountHeadOptions[]>([]);
+const dropdown = ref(null);
+const editingRowIndex = ref<number | null>(null);
+const isEntryModalActive = ref(false);
+const showNew = ref(false);
+let mode: 'new' | 'edit' = 'new';
+const newCodeLoan = reactive<AccountCodeLoan>({
+  id: null,
+  accountCode: '',
+  accountId: null,
+  accountingCategoryCode: null,
+});
 
 const filteredAccountCode = computed(() => {
   return accountCodeLoan.value;
