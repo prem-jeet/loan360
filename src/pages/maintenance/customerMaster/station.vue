@@ -344,15 +344,6 @@ import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch, reactive } from 'vue';
 import { onSuccess, confirmDialog } from 'src/utils/notification';
 
-const breadcrumbs = [
-  { path: '/module/maintenance', label: 'Maintenance' },
-  {
-    path: '/module/maintenance/customerMaster/station',
-    label: 'Customer Master',
-  },
-  { path: '/module/maintenance/customerMaster/station', label: 'Station' },
-];
-
 interface Stations {
   name: string;
   id: number | null;
@@ -363,28 +354,14 @@ interface Stations {
   location: string;
 }
 
-const fetchingData = ref(false);
-const name = ref('');
-const location = ref('');
-const nameSearchQuery = ref('');
-const stations = ref<Stations[]>([]);
-const stationsTemp = ref<Stations[]>([]);
-const checkBox = ref(false);
-const isEditing = ref(false);
-const editingRowIndex = ref<number | null>(null);
-const editingRowId = ref<number | null>(null);
-const error = ref(false);
-const msg = ref('');
-
-const newSouce = reactive<Stations>({
-  name: '',
-  id: null,
-  createdOn: '',
-  inactive: false,
-  inactiveOn: '',
-  updatedOn: '',
-  location: '',
-});
+const breadcrumbs = [
+  { path: '/module/maintenance', label: 'Maintenance' },
+  {
+    path: '/module/maintenance/customerMaster/station',
+    label: 'Customer Master',
+  },
+  { path: '/module/maintenance/customerMaster/station', label: 'Station' },
+];
 
 const columns: {
   name: string;
@@ -444,6 +421,29 @@ const DateTimeOptions = {
   minute: 'numeric',
   hour12: true, // Use 12-hour format
 };
+
+const fetchingData = ref(false);
+const name = ref('');
+const location = ref('');
+const nameSearchQuery = ref('');
+const stations = ref<Stations[]>([]);
+const stationsTemp = ref<Stations[]>([]);
+const checkBox = ref(false);
+const isEditing = ref(false);
+const editingRowIndex = ref<number | null>(null);
+const editingRowId = ref<number | null>(null);
+const error = ref(false);
+const msg = ref('');
+
+const newSouce = reactive<Stations>({
+  name: '',
+  id: null,
+  createdOn: '',
+  inactive: false,
+  inactiveOn: '',
+  updatedOn: '',
+  location: '',
+});
 
 const filteredNatureEntry = computed(() => {
   return stations.value.filter((item) => {
@@ -523,24 +523,6 @@ const saveEntry = () => {
     error.value = true;
   }
 };
-watch(name, () => {
-  error.value = false;
-  msg.value = '';
-
-  const temp = stationsTemp.value.find((item) => item.name === name.value);
-
-  if (temp) {
-    error.value = true;
-    msg.value = 'Item already exists!';
-  }
-});
-watch(nameSearchQuery, () => {
-  stations.value = stationsTemp.value.filter((item) => {
-    return item.name
-      .toLowerCase()
-      .includes(nameSearchQuery.value.toLowerCase());
-  });
-});
 
 const changeActive = async (id: number, state: boolean) => {
   if (editingRowIndex.value === null) {
@@ -595,6 +577,26 @@ const loadSource = async () => {
     fetchingData.value = false;
   }
 };
+
+watch(name, () => {
+  error.value = false;
+  msg.value = '';
+
+  const temp = stationsTemp.value.find((item) => item.name === name.value);
+
+  if (temp) {
+    error.value = true;
+    msg.value = 'Item already exists!';
+  }
+});
+watch(nameSearchQuery, () => {
+  stations.value = stationsTemp.value.filter((item) => {
+    return item.name
+      .toLowerCase()
+      .includes(nameSearchQuery.value.toLowerCase());
+  });
+});
+
 onMounted(() => {
   loadSource();
 });
