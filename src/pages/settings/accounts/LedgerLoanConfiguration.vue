@@ -592,13 +592,15 @@ const columns: {
     align: 'left',
   },
 ];
+
 const fields = columns.map((column) => column.field);
+
 const accountCodeTypes = ref<{ label: string; value: string }[]>([]);
-
 const editingRowIndex = ref<null | number>(null);
-
 const isPerformingAction = ref(false);
 const isDialogActive = ref(false);
+const bucketBasedRateArr = ref<BucketBasedRate[]>([]);
+const ledgerLoanConfigurations = ref<LedgerAccount[]>([]);
 const tempConfig = reactive<Omit<LedgerAccount, 'id'>>({
   accountCode1: null,
   accountCode2: null,
@@ -612,16 +614,11 @@ const tempConfig = reactive<Omit<LedgerAccount, 'id'>>({
   negativeRate: null,
   viewType: 'Customer,Court',
 });
-
 const bucketBasedRateInput = reactive<BucketBasedRate>({
   days1: null,
   days2: null,
   rate: null,
 });
-
-const bucketBasedRateArr = ref<BucketBasedRate[]>([]);
-
-const ledgerLoanConfigurations = ref<LedgerAccount[]>([]);
 
 const submitHandler = async () => {
   const { itemOrder } = tempConfig;
@@ -792,7 +789,7 @@ watch(
   () => tempConfig.rate,
   (newVal, oldVal) => {
     if (tempConfig.rateType === 'S') {
-      if (oldVal !== null && !Number.isFinite(newVal)) {
+      if (oldVal !== null && Number.isNaN(+newVal!)) {
         tempConfig.rate = oldVal;
       }
     }
