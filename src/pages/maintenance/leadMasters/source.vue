@@ -15,11 +15,6 @@
           separator="cell"
           bordered
           title="Nature entry"
-          :no-data-label="
-            source.length
-              ? 'No result found'
-              : 'Select a filter product and category'
-          "
           :rows-per-page-options="[0]"
           :hide-bottom="!!filteredNatureEntry.length"
           :grid="$q.screen.width < 830"
@@ -71,7 +66,7 @@
                       :icon="'add '"
                       color="teal"
                       size="md"
-                      :disable="error ? true : false"
+                      :disable="error"
                       @click="saveEntry()"
                     />
                   </template>
@@ -96,14 +91,14 @@
                     size="xs"
                     outline
                     color="accent"
-                    v-if="!isEditing || editingRowIndex !== props.rowIndex"
+                    v-if="editingRowIndex !== props.rowIndex"
                     @click="() => editEntry(props.row.id, props.rowIndex)"
                   >
                     <q-tooltip>Edit</q-tooltip>
                   </q-btn>
 
                   <q-btn
-                    v-if="!isEditing || editingRowIndex !== props.rowIndex"
+                    v-if="editingRowIndex !== props.rowIndex"
                     :label="props.row.inactive ? 'activate' : 'deactivate'"
                     size="xs"
                     outline
@@ -116,7 +111,7 @@
                     size="xs"
                     outline
                     color="green-10"
-                    v-if="isEditing && editingRowIndex === props.rowIndex"
+                    v-if="editingRowIndex === props.rowIndex"
                     @click="() => saveEdited()"
                   >
                     <q-tooltip>Save</q-tooltip>
@@ -126,7 +121,7 @@
                     size="xs"
                     outline
                     color="red"
-                    v-if="isEditing && editingRowIndex === props.rowIndex"
+                    v-if="editingRowIndex === props.rowIndex"
                     @click="(isEditing = false), (editingRowIndex = null)"
                   >
                     <q-tooltip>Cancel</q-tooltip>
@@ -234,18 +229,18 @@
                   <q-btn
                     label="edit"
                     icon="edit"
-                    size="xs"
+                    size="sm"
                     color="teal"
-                    v-if="!isEditing || editingRowIndex !== props.rowIndex"
+                    v-if="editingRowIndex !== props.rowIndex"
                     @click="() => editEntry(props.row.id, props.rowIndex)"
                   >
                     <q-tooltip>Edit</q-tooltip>
                   </q-btn>
 
                   <q-btn
-                    v-if="!isEditing || editingRowIndex !== props.rowIndex"
+                    v-if="editingRowIndex !== props.rowIndex"
                     :label="props.row.inactive ? 'activate' : 'deactivate'"
-                    size="xs"
+                    size="sm"
                     color="red"
                     @click="changeActive(props.row.id, props.row.inactive)"
                   >
@@ -253,9 +248,9 @@
                   <q-btn
                     label="save"
                     icon="save"
-                    size="xs"
+                    size="sm"
                     color="teal"
-                    v-if="isEditing && editingRowIndex === props.rowIndex"
+                    v-if="editingRowIndex === props.rowIndex"
                     @click="() => saveEdited()"
                   >
                     <q-tooltip>Save</q-tooltip>
@@ -263,9 +258,9 @@
                   <q-btn
                     label="close"
                     icon="close"
-                    size="xs"
+                    size="sm"
                     color="red"
-                    v-if="isEditing && editingRowIndex === props.rowIndex"
+                    v-if="editingRowIndex === props.rowIndex"
                     @click="(isEditing = false), (editingRowIndex = null)"
                   >
                     <q-tooltip>Cancel</q-tooltip>
