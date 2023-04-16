@@ -29,7 +29,7 @@
               </div>
             </div>
 
-            <div class="row items-center full-width">
+            <div class="row full-width q-mt-sm">
               <div class="col-xs-12 col-sm-4 col-md-3 q-pb-sm">
                 <q-input
                   v-model="nameSearchQuery"
@@ -54,7 +54,6 @@
                   v-model="leadName"
                   outlined
                   dense
-                  hide-bottom-space
                   no-error-icon
                   :error="error"
                   :error-message="msg"
