@@ -54,13 +54,12 @@
                   v-model="name"
                   outlined
                   dense
-                  hide-bottom-space
                   no-error-icon
                   :error="error"
                   :error-message="msg"
                   placeholder="name"
                 >
-                  <template v-slot:prepend> Lead </template>
+                  <template v-slot:prepend> Prefix </template>
                   <template v-slot:after>
                     <q-btn
                       :disable="error"
