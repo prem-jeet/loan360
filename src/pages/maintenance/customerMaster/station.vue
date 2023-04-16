@@ -15,11 +15,6 @@
           separator="cell"
           bordered
           title="Nature entry"
-          :no-data-label="
-            stations.length
-              ? 'No result found'
-              : 'Select a filter product and category'
-          "
           :rows-per-page-options="[0]"
           :hide-bottom="!!filteredNatureEntry.length"
           :grid="$q.screen.width < 830"
@@ -34,7 +29,7 @@
               </div>
             </div>
 
-            <div class="row items-center full-width q-col-gutter-y-md">
+            <div class="row full-width q-col-gutter-y-md">
               <div class="col-xs-12 col-sm-3 col-md-3">
                 <q-input
                   v-model="nameSearchQuery"
@@ -57,10 +52,8 @@
               <div class="col-xs-12 col-sm-3 col-md-3 q-pr-sm">
                 <q-input
                   v-model="name"
-                  clearable
                   outlined
                   dense
-                  hide-bottom-space
                   no-error-icon
                   :error="error"
                   :error-message="msg"
@@ -81,6 +74,7 @@
                 >
                   <template v-slot:after>
                     <q-btn
+                      :disable="error"
                       :icon="'add '"
                       color="teal"
                       size="md"
@@ -108,14 +102,14 @@
                     size="xs"
                     outline
                     color="accent"
-                    v-if="!isEditing || editingRowIndex !== props.rowIndex"
+                    v-if="editingRowIndex !== props.rowIndex"
                     @click="() => editEntry(props.row.id, props.rowIndex)"
                   >
                     <q-tooltip>Edit</q-tooltip>
                   </q-btn>
 
                   <q-btn
-                    v-if="!isEditing || editingRowIndex !== props.rowIndex"
+                    v-if="editingRowIndex !== props.rowIndex"
                     :label="props.row.inactive ? 'activate' : 'deactivate'"
                     size="xs"
                     outline
@@ -128,7 +122,7 @@
                     size="xs"
                     outline
                     color="green-10"
-                    v-if="isEditing && editingRowIndex === props.rowIndex"
+                    v-if="editingRowIndex === props.rowIndex"
                     @click="() => saveEdited()"
                   >
                     <q-tooltip>Save</q-tooltip>
@@ -138,7 +132,7 @@
                     size="xs"
                     outline
                     color="red"
-                    v-if="isEditing && editingRowIndex === props.rowIndex"
+                    v-if="editingRowIndex === props.rowIndex"
                     @click="(isEditing = false), (editingRowIndex = null)"
                   >
                     <q-tooltip>Cancel</q-tooltip>
@@ -285,49 +279,46 @@
                   </div>
                 </q-card-section>
 
-                <q-card-actions align="right" class="q-py-md bg-grey-2">
-                  <q-btn-group push unelevated>
-                    <q-btn
-                      icon="edit"
-                      size="xs"
-                      outline
-                      color="accent"
-                      v-if="!isEditing || editingRowIndex !== props.rowIndex"
-                      @click="() => editEntry(props.row.id, props.rowIndex)"
-                    >
-                      <q-tooltip>Edit</q-tooltip>
-                    </q-btn>
+                <q-card-actions align="center" class="q-py-md bg-grey-2">
+                  <q-btn
+                    label="edit"
+                    icon="edit"
+                    size="sm"
+                    color="teal"
+                    v-if="editingRowIndex !== props.rowIndex"
+                    @click="() => editEntry(props.row.id, props.rowIndex)"
+                  >
+                    <q-tooltip>Edit</q-tooltip>
+                  </q-btn>
 
-                    <q-btn
-                      v-if="!isEditing || editingRowIndex !== props.rowIndex"
-                      :label="props.row.inactive ? 'activate' : 'deactivate'"
-                      size="xs"
-                      outline
-                      color="red"
-                      @click="changeActive(props.row.id, props.row.inactive)"
-                    >
-                    </q-btn>
-                    <q-btn
-                      icon="check"
-                      size="xs"
-                      outline
-                      color="green-10"
-                      v-if="isEditing && editingRowIndex === props.rowIndex"
-                      @click="() => saveEdited()"
-                    >
-                      <q-tooltip>Save</q-tooltip>
-                    </q-btn>
-                    <q-btn
-                      icon="close"
-                      size="xs"
-                      outline
-                      color="red"
-                      v-if="isEditing && editingRowIndex === props.rowIndex"
-                      @click="(isEditing = false), (editingRowIndex = null)"
-                    >
-                      <q-tooltip>Cancel</q-tooltip>
-                    </q-btn>
-                  </q-btn-group>
+                  <q-btn
+                    v-if="editingRowIndex !== props.rowIndex"
+                    :label="props.row.inactive ? 'activate' : 'deactivate'"
+                    size="sm"
+                    color="red"
+                    @click="changeActive(props.row.id, props.row.inactive)"
+                  >
+                  </q-btn>
+                  <q-btn
+                    label="save"
+                    icon="save"
+                    size="sm"
+                    color="green-10"
+                    v-if="editingRowIndex === props.rowIndex"
+                    @click="() => saveEdited()"
+                  >
+                    <q-tooltip>Save</q-tooltip>
+                  </q-btn>
+                  <q-btn
+                    label="close"
+                    icon="close"
+                    size="sm"
+                    color="red"
+                    v-if="editingRowIndex === props.rowIndex"
+                    @click="(isEditing = false), (editingRowIndex = null)"
+                  >
+                    <q-tooltip>Cancel</q-tooltip>
+                  </q-btn>
                 </q-card-actions>
               </q-card>
             </div>
@@ -342,7 +333,7 @@
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch, reactive } from 'vue';
-import { onSuccess, confirmDialog } from 'src/utils/notification';
+import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
 
 interface Stations {
   name: string;
@@ -498,6 +489,21 @@ const saveNewEntry = async () => {
   }
 };
 const saveEdited = async () => {
+  const temp = stationsTemp.value.filter(
+    (item) => item.id !== editingRowId.value
+  );
+
+  const isDuplicate = temp.find(
+    (item) => item.name.toLowerCase() === newSouce.name.toLowerCase()
+  );
+  if (isDuplicate) {
+    onFailure({
+      msg: 'Duplicate Account Found',
+      icon: 'warning',
+    });
+    return;
+  }
+
   let payLoad = {
     name: newSouce.name,
     id: editingRowId.value,
@@ -582,7 +588,9 @@ watch(name, () => {
   error.value = false;
   msg.value = '';
 
-  const temp = stationsTemp.value.find((item) => item.name === name.value);
+  const temp = stationsTemp.value.find(
+    (item) => item.name.toLowerCase() === name.value.toLowerCase()
+  );
 
   if (temp) {
     error.value = true;
