@@ -7,7 +7,7 @@
     <div class="row q-mt-lg q-pb-xl">
       <div class="col">
         <q-table
-          :rows="filteredNatureEntry"
+          :rows="filteredData"
           :columns="columns"
           row-key="code"
           :loading="fetchingData"
@@ -16,7 +16,7 @@
           bordered
           title="Nature entry"
           :rows-per-page-options="[0]"
-          :hide-bottom="!!filteredNatureEntry.length"
+          :hide-bottom="!!filteredData.length"
           :grid="$q.screen.width < 830"
           card-container-class="q-gutter-y-md q-mt-xs"
         >
@@ -156,7 +156,7 @@
               </q-td>
               <q-td key="forward" :props="props">
                 <q-input
-                  v-if="isEditing && editingRowIndex === props.rowIndex"
+                  v-if="editingRowIndex === props.rowIndex"
                   v-model="newSouce.forward"
                   placeholder="Name required"
                   dense
@@ -173,7 +173,7 @@
               </q-td>
               <q-td key="backward" :props="props">
                 <q-input
-                  v-if="isEditing && editingRowIndex === props.rowIndex"
+                  v-if="editingRowIndex === props.rowIndex"
                   v-model="newSouce.backward"
                   placeholder="Name required"
                   dense
@@ -215,7 +215,7 @@
                     <div class="col-12 text-weight-medium">Name :</div>
                     <div class="col-12">
                       <q-input
-                        v-if="isEditing && editingRowIndex === props.rowIndex"
+                        v-if="editingRowIndex === props.rowIndex"
                         v-model="newSouce.forward"
                         placeholder="Name required"
                         dense
@@ -237,7 +237,7 @@
                     <div class="col-12 text-weight-medium">Location :</div>
                     <div class="col-12">
                       <q-input
-                        v-if="isEditing && editingRowIndex === props.rowIndex"
+                        v-if="editingRowIndex === props.rowIndex"
                         v-model="newSouce.backward"
                         placeholder="Name required"
                         dense
@@ -455,7 +455,7 @@ const newSouce = reactive<Relations>({
   backward: '',
 });
 
-const filteredNatureEntry = computed(() => {
+const filteredData = computed(() => {
   const _forwardSearchQuery =
     forwardSearchQuery.value?.toLocaleLowerCase() || '';
   const _backwardSearchQuery =
@@ -619,7 +619,7 @@ const loadSource = async () => {
         })
       );
       relations.value = transformedData.filter(
-        (item: { inactive: boolean }) => item.inactive === false
+        (item: { inactive: boolean }) => item.inactive === checkBox.value
       );
       relationsTemp.value = transformedData;
     }
