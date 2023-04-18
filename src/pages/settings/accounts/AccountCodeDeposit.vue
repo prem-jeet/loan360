@@ -7,7 +7,7 @@
     <div class="row q-mt-lg q-pb-xl">
       <div class="col">
         <q-table
-          :rows="filteredNatureEntry"
+          :rows="filteredData"
           :columns="columns"
           row-key="code"
           :loading="fetchingData"
@@ -21,7 +21,7 @@
               : 'Select a filter product and category'
           "
           :rows-per-page-options="[0]"
-          :hide-bottom="!!filteredNatureEntry.length"
+          :hide-bottom="!!filteredData.length"
           :grid="$q.screen.width < 830"
           card-container-class="q-gutter-y-md q-mt-xs"
         >
@@ -471,6 +471,10 @@ const categorys = ref<Options[]>([
   { value: 'DR', label: "Director's Relatives" },
 ]);
 
+const filteredData = computed(() => {
+  return accountCodeDeposits.value;
+});
+
 const setFormData = () => {
   let temp;
   if (editingRowIndex.value !== null) {
@@ -569,9 +573,6 @@ const deleteEntryConfirmed = async (rowIndex: number) => {
   }
 };
 
-const filteredNatureEntry = computed(() => {
-  return accountCodeDeposits.value;
-});
 const loadAccountNames = (searchName: string) => {
   if (searchName.length > 1) {
     accountNameOptions.value = accountHeads.value.filter((item) => {
