@@ -618,7 +618,9 @@ const loadSource = async () => {
           inactiveOn: item.inactiveOn ? new Date(item.inactiveOn) : '',
         })
       );
-      relations.value = transformedData;
+      relations.value = transformedData.filter(
+        (item: { inactive: boolean }) => item.inactive === false
+      );
       relationsTemp.value = transformedData;
     }
   } catch (error) {
