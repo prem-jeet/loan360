@@ -57,8 +57,8 @@
                   no-error-icon
                   :error="error"
                   :error-message="msg"
-                  placeholder="Forward"
-                >
+                  placeholder="code"
+                  ><template v-slot:prepend> Category </template>
                 </q-input>
               </div>
               <div class="col-xs-12 col-sm-3 col-md-3">
@@ -68,9 +68,8 @@
                   outlined
                   dense
                   hide-bottom-space
-                  :error="backwardError"
                   no-error-icon
-                  placeholder="Backward"
+                  placeholder="name"
                 >
                   <template v-slot:after>
                     <q-btn
@@ -103,7 +102,7 @@
                     outline
                     color="accent"
                     v-if="editingRowIndex !== props.rowIndex"
-                    @click="() => editEntry(props.row.id, props.rowIndex)"
+                    @click="() => editEntry(props.row.code, props.rowIndex)"
                   >
                     <q-tooltip>Edit</q-tooltip>
                   </q-btn>
@@ -141,13 +140,14 @@
               </q-td>
               <q-td key="code" :props="props">
                 <q-input
-                  v-if="isEditing && editingRowIndex === props.rowIndex"
+                  v-if="editingRowIndex === props.rowIndex"
                   v-model="newSouce.code"
-                  placeholder="Name required"
+                  placeholder="code"
                   dense
                   outlined
                   :color="newSouce.code ? 'green' : 'red'"
                   autofocus
+                  disable
                 />
                 <span v-else>
                   {{
@@ -158,9 +158,9 @@
               </q-td>
               <q-td key="name" :props="props">
                 <q-input
-                  v-if="isEditing && editingRowIndex === props.rowIndex"
+                  v-if="editingRowIndex === props.rowIndex"
                   v-model="newSouce.name"
-                  placeholder="Name required"
+                  placeholder="Name "
                   dense
                   outlined
                   color="green"
@@ -197,21 +197,22 @@
               <q-card>
                 <q-card-section>
                   <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Name :</div>
+                    <div class="col-12 text-weight-medium">Code :</div>
                     <div class="col-12">
                       <q-input
-                        v-if="isEditing && editingRowIndex === props.rowIndex"
+                        v-if="editingRowIndex === props.rowIndex"
                         v-model="newSouce.code"
                         placeholder="Name required"
                         dense
                         outlined
                         :color="newSouce.code ? 'green' : 'red'"
                         autofocus
+                        disable
                       />
                       <span v-else>
                         {{
-                          props.row.forward.charAt(0).toUpperCase() +
-                          props.row.forward.slice(1)
+                          props.row.code.charAt(0).toUpperCase() +
+                          props.row.code.slice(1)
                         }}
                       </span>
                     </div>
@@ -219,10 +220,10 @@
                 </q-card-section>
                 <q-card-section>
                   <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Location :</div>
+                    <div class="col-12 text-weight-medium">Name :</div>
                     <div class="col-12">
                       <q-input
-                        v-if="isEditing && editingRowIndex === props.rowIndex"
+                        v-if="editingRowIndex === props.rowIndex"
                         v-model="newSouce.name"
                         placeholder="Name required"
                         dense
@@ -286,7 +287,7 @@
                     size="sm"
                     color="teal"
                     v-if="editingRowIndex !== props.rowIndex"
-                    @click="() => editEntry(props.row.id, props.rowIndex)"
+                    @click="() => editEntry(props.row.code, props.rowIndex)"
                   >
                     <q-tooltip>Edit</q-tooltip>
                   </q-btn>
@@ -427,9 +428,8 @@ const customerCategorysTemp = ref<CustomerCategory[]>([]);
 const checkBox = ref(false);
 const isEditing = ref(false);
 const editingRowIndex = ref<number | null>(null);
-const editingRowId = ref<number | null>(null);
+const editingRowCode = ref('');
 const error = ref(false);
-const backwardError = ref(false);
 const msg = ref('');
 
 const newSouce = reactive<CustomerCategory>({
@@ -460,9 +460,9 @@ const filteredNatureEntry = computed(() => {
 
 const setFormData = () => {
   let temp;
-  if (editingRowId.value !== null) {
+  if (editingRowCode.value !== null) {
     let index = customerCategorys.value.findIndex(
-      (obj) => obj.id === editingRowId.value
+      (obj) => obj.code === editingRowCode.value
     );
     temp = customerCategorys.value[index];
   }
@@ -470,27 +470,27 @@ const setFormData = () => {
   newSouce.name = temp ? temp.name : '';
 };
 
-const editEntryConfirmed = (id: number, index: number) => {
+const editEntryConfirmed = (code: string, index: number) => {
   editingRowIndex.value = index;
-  editingRowId.value = id;
+  editingRowCode.value = code;
   setFormData();
 };
 
-const editEntry = (id: number, rowIndex: number) => {
+const editEntry = (code: string, rowIndex: number) => {
   if (isEditing.value) {
-    confirmDialog(() => editEntryConfirmed(id, rowIndex), {
+    confirmDialog(() => editEntryConfirmed(code, rowIndex), {
       msg: 'Are you sure you want to cancel editing the current Code?',
     });
   } else {
     isEditing.value = true;
     editingRowIndex.value = rowIndex;
-    editEntryConfirmed(id, rowIndex);
+    editEntryConfirmed(code, rowIndex);
   }
 };
 const saveNewEntry = async () => {
   let payLoad = {
-    forward: code.value,
-    backward: name.value,
+    code: code.value,
+    name: name.value,
     inactive: false,
     createdOn: new Date(),
   };
@@ -507,7 +507,7 @@ const saveNewEntry = async () => {
 };
 const saveEdited = async () => {
   const temp = customerCategorysTemp.value.filter(
-    (item) => item.id !== editingRowId.value
+    (item) => item.code !== editingRowCode.value
   );
 
   const isDuplicate = temp.find(
@@ -523,7 +523,6 @@ const saveEdited = async () => {
 
   let payLoad = {
     code: newSouce.code,
-    id: editingRowId.value,
     updatedOn: new Date(),
     name: newSouce.name,
   };
@@ -540,12 +539,10 @@ const saveEdited = async () => {
 };
 
 const saveEntry = () => {
-  if (code.value && name.value) {
+  if (code.value) {
     saveNewEntry();
-  } else if (!code.value) {
-    error.value = true;
   } else {
-    backwardError.value = true;
+    error.value = true;
   }
 };
 
@@ -591,7 +588,9 @@ const loadSource = async () => {
           inactiveOn: item.inactiveOn ? new Date(item.inactiveOn) : '',
         })
       );
-      customerCategorys.value = transformedData;
+      customerCategorys.value = transformedData.filter(
+        (item: { inactive: boolean }) => item.inactive === checkBox.value
+      );
       customerCategorysTemp.value = transformedData;
     }
   } catch (error) {
@@ -613,10 +612,6 @@ watch(code, () => {
     error.value = true;
     msg.value = 'Item already exists!';
   }
-});
-
-watch(name, () => {
-  backwardError.value = false;
 });
 
 watch(checkBox, () => {
