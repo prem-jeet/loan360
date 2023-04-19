@@ -1,106 +1,223 @@
 <template>
   <div class="absolute q-pa-md full-width full-height bg-gre-4">
-    <div class="row q-gutter-md">
-      <div class="col-12">
-        <div class="row q-gutter-md">
-          <div class="col-4">
-            <q-select
-              :options="allowedCompany"
-              label="Company"
-              v-model="searchObject.companyCode"
-              option-label="name"
-              option-value="code"
-              emit-value
-              map-options
-            />
-          </div>
-          <div class="col-4">
-            <q-select
-              :options="allowedBranch"
-              label="Branch"
-              v-model="searchObject.branchCode"
-              option-label="name"
-              option-value="code"
-              emit-value
-              map-options
-            />
-          </div>
-        </div>
-      </div>
-      <div class="col-12">
-        <div class="row q-gutter-md">
-          <div class="col-4">
-            <q-select
-              :options="accountGroupOptions"
-              label="A/c Group"
-              v-model="searchObject.accountGroupCode"
-              option-label="name"
-              option-value="code"
-              emit-value
-              map-options
-            />
-          </div>
-          <div class="col-4">
-            <q-select
-              :options="subLedgerCodeOptions"
-              label="Sub-Ledger Code"
-              v-model="searchObject.subLedgerCode"
-              option-label="name"
-              option-value="code"
-              emit-value
-              map-options
-            />
-          </div>
-        </div>
-      </div>
-      <div class="col-12">
-        <div class="row q-gutter-md items-center">
-          <div class="col-auto">Name:</div>
-          <div class="col-auto">
-            <q-option-group
-              v-model="nameSearchcriteria"
-              :options="[
-                { label: 'Starts with', value: 'sw' },
-                { label: 'Contains', value: 'c' },
-              ]"
-              color="primary"
-              inline
-            />
-          </div>
-          <div class="col-2">
-            <q-input
-              v-model="searchObject.accountName"
-              placeholder="Account name (min 3 char)"
-              outlined
-              dense
-            />
-          </div>
-          <div class="col-auto">
-            <q-checkbox
-              dense
-              v-model="searchObject.inActive"
-              label="In-Active"
-            />
-          </div>
-          <div class="col-auto">
-            <q-btn
-              color="grey-4"
-              text-color="black"
-              label="Search"
-              icon="search"
-              @click="search"
-            />
-          </div>
-          <div class="col-auto">
-            <q-btn
-              color="red-5"
-              text-color="black"
-              label="reset"
-              icon="restart_alt"
-              @click="resetSearchParameters"
-            />
-          </div>
-        </div>
+    <div class="row">
+      <div class="col">
+        <q-table
+          :rows="accountHeads"
+          :columns="tableColumns"
+          :loading="isPerformingAction"
+          table-header-class="bg-deep-purple-10 text-white"
+          separator="cell"
+          bordered
+          :rows-per-page-options="[0]"
+          :grid="$q.screen.width < 830"
+          card-container-class="q-gutter-y-md q-mt-xs"
+          :hide-bottom="!!accountHeads.length"
+        >
+          <template v-slot:loading>
+            <q-inner-loading showing color="primary" />
+          </template>
+
+          <template v-slot:top>
+            <div class="q-gutter-y-md q-pb-xs-md">
+              <div class="row items-center q-gutter-md">
+                <div class="col-auto text-h4">Account Heads</div>
+                <div class="col-auto">
+                  <q-btn
+                    size="md"
+                    label="Add Account heads"
+                    icon="add"
+                    color="blue-7"
+                  />
+                </div>
+              </div>
+              <div class="row q-gutter-md">
+                <div class="col-12">
+                  <div class="row q-gutter-md">
+                    <div class="col-4">
+                      <q-select
+                        :options="allowedCompany"
+                        label="Company"
+                        v-model="searchObject.companyCode"
+                        option-label="name"
+                        option-value="code"
+                        emit-value
+                        map-options
+                      />
+                    </div>
+                    <div class="col-4">
+                      <q-select
+                        :options="allowedBranch"
+                        label="Branch"
+                        v-model="searchObject.branchCode"
+                        option-label="name"
+                        option-value="code"
+                        emit-value
+                        map-options
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="row q-gutter-md">
+                    <div class="col-4">
+                      <q-select
+                        :options="accountGroupOptions"
+                        label="A/c Group"
+                        v-model="searchObject.accountGroupCode"
+                        option-label="name"
+                        option-value="code"
+                        emit-value
+                        map-options
+                      />
+                    </div>
+                    <div class="col-4">
+                      <q-select
+                        :options="subLedgerCodeOptions"
+                        label="Sub-Ledger Code"
+                        v-model="searchObject.subLedgerCode"
+                        option-label="name"
+                        option-value="code"
+                        emit-value
+                        map-options
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="row q-gutter-md items-center">
+                    <div class="col-auto">Name:</div>
+                    <div class="col-2">
+                      <q-select
+                        v-model="nameSearchcriteria"
+                        :options="[
+                          {
+                            label: 'Starts with',
+                            value: 'sw',
+                          },
+                          { label: 'Contains', value: 'c' },
+                        ]"
+                        emit-value
+                        map-options
+                        outlined
+                        dense
+                      />
+                    </div>
+                    <div class="col-3">
+                      <q-input
+                        v-model="searchObject.accountName"
+                        placeholder="Account name (min 3 char)"
+                        outlined
+                        dense
+                      />
+                    </div>
+                    <div class="col-auto">
+                      <q-checkbox
+                        dense
+                        v-model="searchObject.inActive"
+                        label="In-Active"
+                      />
+                    </div>
+                    <div class="col-auto">
+                      <q-btn
+                        color="grey-4"
+                        text-color="black"
+                        label="Search"
+                        icon="search"
+                        @click="search"
+                      />
+                    </div>
+                    <div class="col-auto">
+                      <q-btn
+                        color="red-5"
+                        text-color="black"
+                        label="reset"
+                        icon="restart_alt"
+                        @click="resetSearchParameters"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </template>
+
+          <template v-slot:header-cell="props">
+            <q-th :props="props" style="font-size: 1rem">
+              {{ props.col.label }}
+            </q-th>
+          </template>
+
+          <!-- row design for screens > 800px-->
+          <template v-slot:body="props">
+            <q-tr :props="props">
+              <q-td key="actions" auto-width>
+                <q-btn-group push unelevated>
+                  <q-btn
+                    padding="sm"
+                    push
+                    unelevated
+                    icon="edit"
+                    size="sm"
+                    color="teal-2"
+                    text-color="black"
+                  />
+                  <q-btn
+                    padding="sm"
+                    push
+                    unelevated
+                    icon="attach_file"
+                    size="sm"
+                    color="blue-2"
+                    text-color="black"
+                  >
+                    <q-tooltip>Attach</q-tooltip>
+                  </q-btn>
+                  <q-btn
+                    push
+                    unelevated
+                    label="de-activate"
+                    size="sm"
+                    color="red-2"
+                    text-color="black"
+                  />
+                </q-btn-group>
+              </q-td>
+              <q-td
+                v-for="key in ['name', 'alias', 'code']"
+                :key="key"
+                :props="props"
+              >
+                {{ props.row[key] }}
+              </q-td>
+              <q-td key="inactive">
+                <q-icon
+                  v-if="props.row.inactive"
+                  name="disabled_by_default"
+                  coloe="red"
+                />
+              </q-td>
+              <q-td
+                :key="key"
+                v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
+              >
+                {{ props.row[key] && getDate(props.row[key]) }}
+                <div>
+                  <q-chip
+                    v-if="props.row[key] && props.row[`${key}By`]"
+                    color="yellow"
+                    size="sm"
+                  >
+                    <q-avatar color="teal" text-color="white">BY</q-avatar>
+                    <span class="text-weight-medium">
+                      {{ props.row[`${key}By`] }}
+                    </span>
+                  </q-chip>
+                </div>
+              </q-td>
+            </q-tr>
+          </template>
+        </q-table>
       </div>
     </div>
   </div>
@@ -110,7 +227,8 @@
 import { storeToRefs } from 'pinia';
 import { api } from 'src/boot/axios';
 import { useUserStore } from 'src/stores/user/userStore';
-import { onMounted, reactive, ref, watch } from 'vue';
+import dayjs from 'dayjs';
+import { onMounted, reactive, ref } from 'vue';
 
 interface SearchObject {
   companyCode: string | null;
@@ -121,11 +239,92 @@ interface SearchObject {
   inActive: boolean;
 }
 
+interface AccountHead {
+  id: number;
+  branchCode: string | null;
+  accountGroupCode: string;
+  accountType: string;
+  companyCode: string | null;
+  addressId: string | null;
+  subLedgerCode: string | null;
+  automatic: boolean | null;
+  name: string;
+  alias: string | null;
+  creditDays: number | null;
+  rateInt: number | null;
+  sharePercent: number | null;
+  lockedOn: string | null;
+  panNo: string | null;
+  costCenter: string | null;
+  refrenceAdjust: string | null;
+  createdOn: string | null;
+  updatedOn: string | null;
+  inactive: boolean;
+  inactiveOn: string | null;
+  code: string | null;
+  chequeFormatFile: string | null;
+  accountNo: string | null;
+  createdOnBy: string | null;
+  updatedOnBy: string;
+  inactiveOnBy: string | null;
+  nachUniqueId: string | null;
+  nachBankCode: string | null;
+  reverseAccountGroupCode: string | null;
+  ecsUserCode: string | null;
+  micrCode: string | null;
+  bankFormatCode: string | null;
+  showInAllBranches: boolean;
+  taxClassId: number | null;
+  stateId: number;
+  taxNo: string | null;
+  hsnCode: string | null;
+  attachments: string | null;
+  kyc: string | null;
+  taxCategory: string | null;
+  lockedUpdatedOn: string | null;
+  tdsClassId: number | null;
+  tdsType: string | null;
+  tdsEditable: boolean;
+  tds: boolean;
+  ndsi500ItemCode: string | null;
+  nbs7ItemCode: string | null;
+  tax: boolean;
+  roleCode: string;
+  drFromAmount: number | null;
+  drToAmount: number | null;
+  crFromAmount: number | null;
+  crToAmount: number | null;
+}
+
+const tableColumns: {
+  name: string;
+  required?: boolean;
+  label: string;
+  field: string;
+  align: 'left';
+  sortable?: boolean;
+}[] = [
+  { name: 'actions', field: '', align: 'left', label: 'Actions' },
+  { name: 'name', field: 'name', align: 'left', label: 'Name' },
+  { name: 'alias', field: 'alias', align: 'left', label: 'Alias' },
+  { name: 'code', field: 'code', align: 'left', label: 'Code' },
+  { name: 'inactive', field: 'inactive', align: 'left', label: 'In-active' },
+  { name: 'createdOn', field: 'createdOn', align: 'left', label: 'Created' },
+  { name: 'updated', field: 'updated', align: 'left', label: 'Updated' },
+  {
+    name: 'Inactive Date',
+    field: 'inactiveDate',
+    align: 'left',
+    label: 'Inactive Date',
+  },
+];
+
 const isPerformingAction = ref(false);
 const { allowedCompany, allowedBranch } = storeToRefs(useUserStore());
 const accountGroupOptions = ref<{ code: string; name: string }[]>([]);
 const subLedgerCodeOptions = ref<{ code: string; name: string }[]>([]);
-
+const nameSearchcriteria = ref<'sw' | 'c'>('sw');
+const accountHeads = ref<AccountHead[]>([]);
 const searchObject = reactive<SearchObject>({
   companyCode: null,
   branchCode: null,
@@ -134,7 +333,10 @@ const searchObject = reactive<SearchObject>({
   accountName: null,
   inActive: false,
 });
-const nameSearchcriteria = ref<'sw' | 'c'>('sw');
+
+const getDate = (date: Date) => {
+  return dayjs(date).format('DD/MM/YY @h:mma');
+};
 
 const buildQuery = () => {
   const parameters = [
@@ -182,12 +384,10 @@ const search = async () => {
 
   if (rsp.data) {
     console.log(rsp.data);
+
+    accountHeads.value = [...rsp.data];
   }
 };
-
-watch(searchObject, () => {
-  console.log(searchObject);
-});
 
 onMounted(async () => {
   isPerformingAction.value = true;
@@ -199,24 +399,8 @@ onMounted(async () => {
   if (subLedger.data) {
     subLedgerCodeOptions.value = [...subLedger.data];
   }
+  isPerformingAction.value = false;
 });
 </script>
 
 <style scoped></style>
-
-<!-- 
-    1=1  
-    and 
-    companyCode='IKF' 
-    and 
-    branchCode='ANK' 
-    and 
-    accountGroupCode='EXPENSES_IND' 
-    and
-    subLedgerCode='COLLEXEC' 
-    and 
-    lower(name) like lower('a%')  
-    and 
-    (c.inactive is null or c.inactive is false) 
-    ORDER BY c.name ASC
--->
