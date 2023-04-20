@@ -356,8 +356,8 @@ const DateTimeOptions = {
 const fetchingData = ref(false);
 const name = ref('');
 const nameSearchQuery = ref('');
-const stopGuaranteeReason = ref<GoldItems[]>([]);
-const stopGuaranteeReasonTemp = ref<GoldItems[]>([]);
+const goldItems = ref<GoldItems[]>([]);
+const goldItemsTemp = ref<GoldItems[]>([]);
 const checkBox = ref(false);
 const isEditing = ref(false);
 const editingRowIndex = ref<number | null>(null);
@@ -375,14 +375,14 @@ const newSouce = reactive<GoldItems>({
 });
 
 const filteredData = computed(() =>
-  stopGuaranteeReason.value.filter((item) => item.inactive === checkBox.value)
+  goldItems.value.filter((item) => item.inactive === checkBox.value)
 );
 
 const setFormData = () => {
-  const index = stopGuaranteeReason.value.findIndex(
+  const index = goldItems.value.findIndex(
     (obj) => obj.id === editingRowId.value
   );
-  newSouce.name = index >= 0 ? stopGuaranteeReason.value[index].name : '';
+  newSouce.name = index >= 0 ? goldItems.value[index].name : '';
 };
 
 const editEntryConfirmed = (id: number, index: number) => {
@@ -419,7 +419,7 @@ const saveNewEntry = async () => {
   }
 };
 const saveEdited = async () => {
-  const temp = stopGuaranteeReasonTemp.value.filter(
+  const temp = goldItemsTemp.value.filter(
     (item) => item.id !== editingRowId.value
   );
 
@@ -489,7 +489,7 @@ const loadSource = async () => {
   const rsp = await api.get('goldItem');
 
   if (rsp.data) {
-    stopGuaranteeReason.value = rsp.data.map(
+    goldItems.value = rsp.data.map(
       (item: {
         createdOn: string | number | Date;
         updatedOn: string | number | Date;
@@ -503,7 +503,7 @@ const loadSource = async () => {
         };
       }
     );
-    stopGuaranteeReasonTemp.value = stopGuaranteeReason.value;
+    goldItemsTemp.value = goldItems.value;
   }
   fetchingData.value = false;
 };
@@ -516,7 +516,7 @@ watch(name, () => {
     return;
   }
 
-  const temp = stopGuaranteeReasonTemp.value.find(
+  const temp = goldItemsTemp.value.find(
     (item) => item.name.toLowerCase() === name.value.toLocaleLowerCase()
   );
 
@@ -527,7 +527,7 @@ watch(name, () => {
 });
 
 watch(nameSearchQuery, () => {
-  stopGuaranteeReason.value = stopGuaranteeReasonTemp.value.filter((item) => {
+  goldItems.value = goldItemsTemp.value.filter((item) => {
     return item.name
       .toLowerCase()
       .includes(nameSearchQuery.value.toLowerCase());
