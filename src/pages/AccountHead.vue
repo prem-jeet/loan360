@@ -13,7 +13,30 @@
           :grid="$q.screen.width < 830"
           card-container-class="q-gutter-y-md q-mt-xs"
           :hide-bottom="!!accountHeads.length"
+          selection="multiple"
+          v-model:selected="selectedAccountHeads"
+          row-key="id"
+          @selection="({ rows }) => varifySelectedAccountHead(rows as AccountHead[])"
         >
+          <template v-slot:header-selection>
+            <q-btn-group>
+              <q-btn size="sm" color="orange" icon="dynamic_feed" padding="sm">
+                <q-tooltip> Remove duplicate</q-tooltip>
+              </q-btn>
+              <q-btn
+                dense
+                icon="close"
+                size="sm"
+                color="red"
+                padding="sm"
+                @click="selectedAccountHeads = []"
+                v-if="selectedAccountHeads.length"
+              >
+                <q-tooltip>Remove selection</q-tooltip>
+              </q-btn>
+            </q-btn-group>
+          </template>
+
           <template v-slot:loading>
             <q-inner-loading showing color="primary" />
           </template>
@@ -151,6 +174,49 @@
           <!-- row design for screens > 800px-->
           <template v-slot:body="props">
             <q-tr :props="props">
+              <q-td class="flex flex-center">
+                <q-checkbox
+                  v-model="props.selected"
+                  :color="props.selected ? 'orange' : ''"
+                />
+              </q-td>
+              <q-td
+                v-for="key in ['name', 'alias', 'code']"
+                :key="key"
+                :props="props"
+              >
+                {{ props.row[key] }}
+              </q-td>
+              <q-td key="inactive">
+                <div class="flex flex-center">
+                  <q-icon
+                    :name="props.row.inactive ? 'check' : 'close'"
+                    size="sm"
+                    class="text-weight-bold"
+                    :class="[
+                      props.row.inactive ? 'text-red-5' : 'text-green-5',
+                    ]"
+                  />
+                </div>
+              </q-td>
+              <q-td
+                :key="key"
+                v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
+              >
+                {{ props.row[key] && getDate(props.row[key]) }}
+                <div>
+                  <q-chip
+                    v-if="props.row[key] && props.row[`${key}By`]"
+                    color="yellow"
+                    size="sm"
+                  >
+                    <q-avatar color="teal" text-color="white">BY</q-avatar>
+                    <span class="text-weight-medium">
+                      {{ props.row[`${key}By`] }}
+                    </span>
+                  </q-chip>
+                </div>
+              </q-td>
               <q-td key="actions" auto-width>
                 <q-btn-group push unelevated>
                   <q-btn
@@ -176,44 +242,19 @@
                   <q-btn
                     push
                     unelevated
-                    label="de-activate"
+                    :label="props.row.inactive ? 'activate' : 'de-activate'"
                     size="sm"
                     color="red-2"
                     text-color="black"
+                    @click="
+                      confirmDialog(
+                        () =>
+                          toggleActivation(props.row.id, props.row.inactive),
+                        {}
+                      )
+                    "
                   />
                 </q-btn-group>
-              </q-td>
-              <q-td
-                v-for="key in ['name', 'alias', 'code']"
-                :key="key"
-                :props="props"
-              >
-                {{ props.row[key] }}
-              </q-td>
-              <q-td key="inactive">
-                <q-icon
-                  v-if="props.row.inactive"
-                  name="disabled_by_default"
-                  coloe="red"
-                />
-              </q-td>
-              <q-td
-                :key="key"
-                v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
-              >
-                {{ props.row[key] && getDate(props.row[key]) }}
-                <div>
-                  <q-chip
-                    v-if="props.row[key] && props.row[`${key}By`]"
-                    color="yellow"
-                    size="sm"
-                  >
-                    <q-avatar color="teal" text-color="white">BY</q-avatar>
-                    <span class="text-weight-medium">
-                      {{ props.row[`${key}By`] }}
-                    </span>
-                  </q-chip>
-                </div>
               </q-td>
             </q-tr>
           </template>
@@ -229,6 +270,8 @@ import { api } from 'src/boot/axios';
 import { useUserStore } from 'src/stores/user/userStore';
 import dayjs from 'dayjs';
 import { onMounted, reactive, ref } from 'vue';
+import { confirmDialog, onSuccess } from 'src/utils/notification';
+import { alertDialog } from 'src/utils/notification';
 
 interface SearchObject {
   companyCode: string | null;
@@ -304,7 +347,6 @@ const tableColumns: {
   align: 'left';
   sortable?: boolean;
 }[] = [
-  { name: 'actions', field: '', align: 'left', label: 'Actions' },
   { name: 'name', field: 'name', align: 'left', label: 'Name' },
   { name: 'alias', field: 'alias', align: 'left', label: 'Alias' },
   { name: 'code', field: 'code', align: 'left', label: 'Code' },
@@ -317,6 +359,7 @@ const tableColumns: {
     align: 'left',
     label: 'Inactive Date',
   },
+  { name: 'actions', field: '', align: 'left', label: 'Actions' },
 ];
 
 const isPerformingAction = ref(false);
@@ -325,6 +368,7 @@ const accountGroupOptions = ref<{ code: string; name: string }[]>([]);
 const subLedgerCodeOptions = ref<{ code: string; name: string }[]>([]);
 const nameSearchcriteria = ref<'sw' | 'c'>('sw');
 const accountHeads = ref<AccountHead[]>([]);
+const selectedAccountHeads = ref<AccountHead[]>([]);
 const searchObject = reactive<SearchObject>({
   companyCode: null,
   branchCode: null,
@@ -374,6 +418,7 @@ const resetSearchParameters = () => {
 };
 
 const search = async () => {
+  isPerformingAction.value = true;
   const query = buildQuery();
 
   const rsp = await api.post('accountHead/search', {
@@ -383,11 +428,55 @@ const search = async () => {
   });
 
   if (rsp.data) {
-    console.log(rsp.data);
+    // console.log(rsp.data);
 
     accountHeads.value = [...rsp.data];
   }
+  isPerformingAction.value = false;
 };
+
+const toggleActivation = async (id: number, isInactive: boolean) => {
+  const url = `accountHead/${isInactive ? 'active' : 'inactive'}`;
+  const rsp = await api.put(url, { id });
+  if (rsp.data) {
+    onSuccess({ msg: rsp.data.displayMessage });
+  }
+  search();
+};
+
+const varifySelectedAccountHead = (currentSelectedAccount: AccountHead[]) => {
+  if (selectedAccountHeads.value.length) {
+    const { subLedgerCode } = selectedAccountHeads.value[0];
+
+    if (!currentSelectedAccount[0].subLedgerCode && subLedgerCode) {
+      alertDialog(
+        "Currently selected account doesn't has subledger but Already selected accounts has subledger",
+        'Error'
+      );
+      setTimeout(
+        () => removeSelectedAccountHead(currentSelectedAccount[0].id),
+        0
+      );
+    }
+    if (currentSelectedAccount[0].subLedgerCode && !subLedgerCode) {
+      alertDialog(
+        "Currently selected account has subledger but Already selected accounts doesn't have subledger",
+        'Error'
+      );
+      setTimeout(
+        () => removeSelectedAccountHead(currentSelectedAccount[0].id),
+        0
+      );
+    }
+  }
+};
+
+const removeSelectedAccountHead = (id: number) =>
+  (selectedAccountHeads.value = selectedAccountHeads.value.filter(
+    (accountHead) => {
+      return accountHead.id !== id;
+    }
+  ));
 
 onMounted(async () => {
   isPerformingAction.value = true;
