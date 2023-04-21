@@ -249,8 +249,16 @@
                     @click="
                       confirmDialog(
                         () =>
-                          toggleActivation(props.row.id, props.row.inactive),
-                        {}
+                          toggleActivation(
+                            props.row.id,
+                            props.row.inactive,
+                            props.rowIndex
+                          ),
+                        {
+                          msg: `Are you sure you want to ${
+                            props.row.inactive ? 'Activate' : 'De-Activate'
+                          }?`,
+                        }
                       )
                     "
                   />
@@ -435,13 +443,17 @@ const search = async () => {
   isPerformingAction.value = false;
 };
 
-const toggleActivation = async (id: number, isInactive: boolean) => {
+const toggleActivation = async (
+  id: number,
+  isInactive: boolean,
+  index: number
+) => {
   const url = `accountHead/${isInactive ? 'active' : 'inactive'}`;
   const rsp = await api.put(url, { id });
   if (rsp.data) {
     onSuccess({ msg: rsp.data.displayMessage });
   }
-  search();
+  accountHeads.value[index].inactive = !accountHeads.value[index].inactive;
 };
 
 const varifySelectedAccountHead = (currentSelectedAccount: AccountHead[]) => {
