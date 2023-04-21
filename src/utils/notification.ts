@@ -1,4 +1,5 @@
 import { Dialog, Notify } from 'quasar';
+import AlertDialog from 'src/components/ui/AlertDialog.vue';
 
 type NotifyPositions =
   | 'top'
@@ -84,4 +85,18 @@ export const confirmDialog = (
     .onOk(okHandler)
     .onCancel(cancelHandler)
     .onDismiss(dismissHandler);
+};
+export const alertDialog = (
+  msg: string,
+  title = 'Alert',
+  position?: DialogPositions
+) => {
+  Dialog.create({
+    component: AlertDialog,
+    componentProps: {
+      title,
+      msg,
+      position: position || 'top',
+    },
+  });
 };
