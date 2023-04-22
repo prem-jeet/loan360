@@ -174,11 +174,13 @@
           <!-- row design for screens > 800px-->
           <template v-slot:body="props">
             <q-tr :props="props">
-              <q-td class="flex flex-center">
-                <q-checkbox
-                  v-model="props.selected"
-                  :color="props.selected ? 'orange' : ''"
-                />
+              <q-td :key="`${props.selected}`">
+                <div class="flex flex-center">
+                  <q-checkbox
+                    v-model="props.selected"
+                    :color="props.selected ? 'orange' : ''"
+                  />
+                </div>
               </q-td>
               <q-td
                 v-for="key in ['name', 'alias', 'code']"
