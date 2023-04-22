@@ -244,10 +244,10 @@
                   <q-btn
                     push
                     unelevated
-                    :label="props.row.inactive ? 'activate' : 'de-activate'"
                     size="sm"
                     color="red-2"
                     text-color="black"
+                    :label="props.row.inactive ? 'activate' : 'de-activate'"
                     @click="
                       confirmDialog(
                         () =>
@@ -267,6 +267,105 @@
                 </q-btn-group>
               </q-td>
             </q-tr>
+          </template>
+
+          <!-- card for grid layout screens < 800px -->
+          <template v-slot:item="props">
+            <div class="col-xs-12 col-sm-6 q-px-sm-sm">
+              <q-card>
+                <template v-for="key in ['name', 'alias', 'code']" :key="key">
+                  <q-card-section v-if="props.row[key]">
+                    <div class="row">
+                      <div class="col-12 text-weight-medium text-uppercase">
+                        {{ key }}
+                      </div>
+                      <div class="col-12">{{ props.row[key] }}</div>
+                    </div>
+                  </q-card-section>
+                </template>
+                <template
+                  :key="key"
+                  v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
+                >
+                  <q-card-section v-if="props.row[key]">
+                    <div class="row">
+                      <div class="col-12 text-weight-medium text-uppercase">
+                        {{ key }}
+                      </div>
+                      <div class="col-12">
+                        <div>
+                          {{ getDate(props.row[key]) }}
+                        </div>
+                        <div>
+                          <q-chip
+                            v-if="props.row[key] && props.row[`${key}By`]"
+                            color="yellow"
+                            size="sm"
+                          >
+                            <q-avatar color="teal" text-color="white"
+                              >BY</q-avatar
+                            >
+                            <span class="text-weight-medium">
+                              {{ props.row[`${key}By`] }}
+                            </span>
+                          </q-chip>
+                        </div>
+                      </div>
+                    </div>
+                  </q-card-section>
+                </template>
+                <q-separator />
+                <q-card-actions class="q-py-md bg-grey-2">
+                  <div
+                    class="row justify-evenly"
+                    :style="{ rowGap: '20px', columnGap: '10px' }"
+                  >
+                    <q-btn
+                      label="edit"
+                      icon="edit"
+                      color="teal-2"
+                      text-color="black"
+                    />
+                    <q-btn
+                      label="attachment"
+                      icon="attach_file"
+                      color="blue-2"
+                      text-color="black"
+                    />
+                    <q-btn
+                      :label="props.row.inactive ? 'activate' : 'de-activate'"
+                      @click="
+                        confirmDialog(
+                          () =>
+                            toggleActivation(
+                              props.row.id,
+                              props.row.inactive,
+                              props.rowIndex
+                            ),
+                          {
+                            msg: `Are you sure you want to ${
+                              props.row.inactive ? 'Activate' : 'De-Activate'
+                            }?`,
+                          }
+                        )
+                      "
+                      color="red-2"
+                      text-color="black"
+                    />
+                    <q-btn
+                      @click="props.selected = !props.selected"
+                      color="primary"
+                    >
+                      {{ props.selected ? 'Deselect' : 'Select' }}
+                      <q-checkbox
+                        v-model="props.selected"
+                        :color="props.selected ? 'orange' : ''"
+                      />
+                    </q-btn>
+                  </div>
+                </q-card-actions>
+              </q-card>
+            </div>
           </template>
         </q-table>
       </div>
@@ -362,10 +461,10 @@ const tableColumns: {
   { name: 'code', field: 'code', align: 'left', label: 'Code' },
   { name: 'inactive', field: 'inactive', align: 'left', label: 'In-active' },
   { name: 'createdOn', field: 'createdOn', align: 'left', label: 'Created' },
-  { name: 'updated', field: 'updated', align: 'left', label: 'Updated' },
+  { name: 'updatedOn', field: 'updated', align: 'left', label: 'Updated' },
   {
-    name: 'Inactive Date',
-    field: 'inactiveDate',
+    name: 'inactiveOn',
+    field: 'inactiveOn',
     align: 'left',
     label: 'Inactive Date',
   },
