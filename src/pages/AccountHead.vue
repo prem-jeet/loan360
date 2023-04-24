@@ -20,7 +20,13 @@
         >
           <template v-slot:header-selection>
             <q-btn-group>
-              <q-btn size="sm" color="orange" icon="dynamic_feed" padding="sm">
+              <q-btn
+                size="sm"
+                color="orange"
+                icon="dynamic_feed"
+                padding="sm"
+                @click="removeDuplicate"
+              >
                 <q-tooltip> Remove duplicate</q-tooltip>
               </q-btn>
               <q-btn
@@ -370,6 +376,12 @@
         </q-table>
       </div>
     </div>
+    <MergeDuplicateAccoutheadsForm
+      v-if="isMergeFormActive"
+      @close="isMergeFormActive = false"
+      :duplicateList="duplicateAccountHeads"
+      @merge="mergeAccountHeads"
+    />
   </div>
 </template>
 
@@ -378,9 +390,10 @@ import { storeToRefs } from 'pinia';
 import { api } from 'src/boot/axios';
 import { useUserStore } from 'src/stores/user/userStore';
 import dayjs from 'dayjs';
-import { onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { confirmDialog, onSuccess } from 'src/utils/notification';
 import { alertDialog } from 'src/utils/notification';
+import MergeDuplicateAccoutheadsForm from 'src/components/maintenance/accountMaster/accountHead/MergeDuplicateAccountheadsForm.vue';
 
 interface SearchObject {
   companyCode: string | null;
@@ -447,7 +460,6 @@ interface AccountHead {
   crFromAmount: number | null;
   crToAmount: number | null;
 }
-
 const tableColumns: {
   name: string;
   required?: boolean;
@@ -485,6 +497,16 @@ const searchObject = reactive<SearchObject>({
   subLedgerCode: null,
   accountName: null,
   inActive: false,
+});
+const isMergeFormActive = ref(false);
+const duplicateAccountHeads = computed(() => {
+  if (!selectedAccountHeads.value.length) {
+    return [];
+  }
+  return selectedAccountHeads.value.map((accountHead) => ({
+    id: accountHead.id,
+    name: accountHead.name,
+  }));
 });
 
 const getDate = (date: Date) => {
@@ -537,8 +559,6 @@ const search = async () => {
   });
 
   if (rsp.data) {
-    // console.log(rsp.data);
-
     accountHeads.value = [...rsp.data];
   }
   isPerformingAction.value = false;
@@ -591,6 +611,31 @@ const removeSelectedAccountHead = (id: number) =>
     }
   ));
 
+const removeDuplicate = () => {
+  if (!selectedAccountHeads.value.length) {
+    alertDialog('Please select Account Heads.', 'Error');
+    return;
+  }
+  if (selectedAccountHeads.value.length === 1) {
+    alertDialog('Please select atleast 2 Accountn Heads', 'Error');
+    return;
+  }
+  isMergeFormActive.value = true;
+};
+
+const mergeAccountHeads = async (payload: { id: number; ids: number[] }) => {
+  const rsp = await api.post('accountHead/dedupe', payload);
+
+  if (rsp.data) {
+    onSuccess({ msg: rsp.data.displayMessage });
+  }
+
+  accountHeads.value = accountHeads.value.filter(
+    ({ id }) => !payload.ids.includes(id)
+  );
+};
+
+watch(accountHeads, () => (selectedAccountHeads.value = []));
 onMounted(async () => {
   isPerformingAction.value = true;
   const accountGroup = await api.get('accountGroup');
