@@ -25,6 +25,15 @@
               <div class="col-12">
                 <div class="row items-center q-gutter-md">
                   <div class="col-auto text-h6">Advertisement</div>
+                  <div class="col-auto">
+                    <q-btn
+                      color="blue-7"
+                      icon="add"
+                      label="Add new"
+                      size="md"
+                      @click="newEntry()"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -39,6 +48,7 @@
                   menu-shrink
                   emit-value
                   label="Select Media"
+                  :error="selectError"
                 />
               </div>
             </div>
@@ -78,39 +88,6 @@
               <div class="col-xs-12 col-sm-3 col-md-2">
                 <q-checkbox v-model="checkBox" label=" In-Active" />
               </div>
-              <div class="col-xs-12 col-sm-2 col-md-3 q-pr-sm">
-                <q-input
-                  v-model="name"
-                  outlined
-                  dense
-                  no-error-icon
-                  :error="error"
-                  :error-message="msg"
-                  placeholder="name"
-                >
-                </q-input>
-              </div>
-              <div class="col-xs-12 col-sm-3 col-md-3">
-                <q-input
-                  v-model="description"
-                  clearable
-                  outlined
-                  dense
-                  hide-bottom-space
-                  no-error-icon
-                  placeholder="Backward"
-                >
-                  <template v-slot:after>
-                    <q-btn
-                      :disable="error"
-                      :icon="'add '"
-                      color="teal"
-                      size="md"
-                      @click="saveEntry()"
-                    />
-                  </template>
-                </q-input>
-              </div>
             </div>
           </template>
 
@@ -130,14 +107,12 @@
                     size="xs"
                     outline
                     color="accent"
-                    v-if="editingRowIndex !== props.rowIndex"
-                    @click="() => editEntry(props.row.id, props.rowIndex)"
+                    @click="editEntry(props.rowIndex)"
                   >
                     <q-tooltip>Edit</q-tooltip>
                   </q-btn>
 
                   <q-btn
-                    v-if="editingRowIndex !== props.rowIndex"
                     :label="props.row.inactive ? 'activate' : 'deactivate'"
                     size="xs"
                     outline
@@ -145,72 +120,25 @@
                     @click="changeActive(props.row.id, props.row.inactive)"
                   >
                   </q-btn>
-                  <q-btn
-                    icon="check"
-                    size="xs"
-                    outline
-                    color="green-10"
-                    v-if="editingRowIndex === props.rowIndex"
-                    @click="() => saveEdited()"
-                  >
-                    <q-tooltip>Save</q-tooltip>
-                  </q-btn>
-                  <q-btn
-                    icon="close"
-                    size="xs"
-                    outline
-                    color="red"
-                    v-if="editingRowIndex === props.rowIndex"
-                    @click="(isEditing = false), (editingRowIndex = null)"
-                  >
-                    <q-tooltip>Cancel</q-tooltip>
-                  </q-btn>
                 </q-btn-group>
               </q-td>
 
               <q-td key="advertisementMediaId" :props="props">
-                <q-input
-                  v-if="editingRowIndex === props.rowIndex"
-                  v-model="newSouce.name"
-                  placeholder="Name required"
-                  dense
-                  outlined
-                  :color="newSouce.name ? 'green' : 'red'"
-                  autofocus
-                />
-                <span v-else>{{
+                <span>{{
                   AdvertisementMedia.find(
                     (item) => item.value === props.row.advertisementMediaId
                   )!.label
                 }}</span>
               </q-td>
               <q-td key="name" :props="props">
-                <q-input
-                  v-if="editingRowIndex === props.rowIndex"
-                  v-model="newSouce.name"
-                  placeholder="Name required"
-                  dense
-                  outlined
-                  :color="newSouce.name ? 'green' : 'red'"
-                  autofocus
-                />
-                <span v-else>{{
+                <span>{{
                   props.row.name.charAt(0).toUpperCase() +
                   props.row.name.slice(1)
                 }}</span>
               </q-td>
 
               <q-td key="description" :props="props">
-                <q-input
-                  v-if="editingRowIndex === props.rowIndex"
-                  v-model="newSouce.name"
-                  placeholder="Name required"
-                  dense
-                  outlined
-                  :color="newSouce.name ? 'green' : 'red'"
-                  autofocus
-                />
-                <span v-else>{{
+                <span>{{
                   props.row.description.charAt(0).toUpperCase() +
                   props.row.description.slice(1)
                 }}</span>
@@ -338,6 +266,83 @@
       </div>
     </div>
   </div>
+
+  <q-dialog v-model="isEntryModalActive">
+    <q-card style="width: 500px">
+      <q-form @submit.prevent="saveEntry" @reset="setFormData()">
+        <q-card-section class="bg-grey-2">
+          <div class="flex items-center">
+            <span class="text-bold q-mr-xl">{{
+              mode === 'new' ? 'Add Advertisement' : 'Edit Advertisement'
+            }}</span>
+            <q-space />
+            <q-btn
+              class="q-ml-xs-md q-ml-sm-xl"
+              icon="close"
+              flat
+              @click="isEntryModalActive = false"
+            />
+          </div>
+        </q-card-section>
+        <q-card-section class="q-px-lg q-py-sm">
+          <div class="row">
+            <div class="col-12 q-mt-sm">
+              <q-select
+                outlined
+                dense
+                v-model="newSouce.advertisementMediaId"
+                :options="AdvertisementMedia"
+                map-options
+                menu-shrink
+                :error="selectError"
+                label="Select media"
+              />
+            </div>
+            <div class="col-12">
+              <div class="col-12 q-mt-sm">
+                <q-input
+                  v-model="newSouce.name"
+                  outlined
+                  dense
+                  no-error-icon
+                  :error="error"
+                  :error-message="msg"
+                  placeholder="name"
+                >
+                </q-input>
+              </div>
+              <div class="col-12 q-mt-sm">
+                <q-input
+                  v-model="newSouce.description"
+                  clearable
+                  outlined
+                  dense
+                  hide-bottom-space
+                  no-error-icon
+                  placeholder="description"
+                >
+                </q-input>
+              </div>
+              <div class="col-12 q-mt-sm">
+                <q-input outlined v-model="newSouce.date" type="date" dense />
+              </div>
+            </div>
+          </div>
+        </q-card-section>
+        <q-separator class="q-mt-md" />
+        <q-card-actions align="center" class="q-py-md bg-grey-2 q-mt-auto">
+          <q-btn
+            :label="editingRowIndex === null ? 'Add' : 'Save '"
+            :icon="editingRowIndex === null ? 'add' : 'save '"
+            color="teal"
+            type="submit"
+            :disable="error"
+          />
+          <q-btn label="Reset" color="red-5" type="reset" icon="refresh" />
+        </q-card-actions>
+      </q-form>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script setup lang="ts">
@@ -434,8 +439,6 @@ const DateTimeOptions = {
 };
 
 const fetchingData = ref(false);
-const name = ref('');
-const description = ref('');
 const nameSearchQuery = ref('');
 const descriptionSearchQuery = ref('');
 const advertisement = ref<Advertisement[]>([]);
@@ -446,8 +449,11 @@ const isEditing = ref(false);
 const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
 const error = ref(false);
+const selectError = ref(false);
 const msg = ref('');
 const media = ref<number | null>(null);
+let mode: 'new' | 'edit' = 'new';
+const isEntryModalActive = ref(false);
 
 const newSouce = reactive<Advertisement>({
   name: '',
@@ -459,41 +465,67 @@ const newSouce = reactive<Advertisement>({
   advertisementMediaId: null,
 });
 
-const filteredData = computed(() =>
-  advertisement.value.filter((item) => item.inactive === checkBox.value)
-);
+const filteredData = computed(() => {
+  const _nameSearchQuery = nameSearchQuery.value?.toLocaleLowerCase() || '';
+  const _descriptionSearchQuery =
+    descriptionSearchQuery.value?.toLocaleLowerCase() || '';
+
+  return advertisement.value.filter((item) => {
+    const namePresent = item.name
+      .toLocaleLowerCase()
+      .includes(_nameSearchQuery);
+    const descriptionPresent = item.description
+      .toLocaleLowerCase()
+      .includes(_descriptionSearchQuery);
+
+    if (_nameSearchQuery && _descriptionSearchQuery) {
+      return namePresent && descriptionPresent;
+    }
+
+    if (_nameSearchQuery) {
+      return namePresent;
+    }
+
+    if (_descriptionSearchQuery) {
+      return descriptionPresent;
+    }
+
+    return true;
+  });
+});
 
 const setFormData = () => {
-  const index = advertisement.value.findIndex(
-    (obj) => obj.id === editingRowId.value
-  );
-  newSouce.name = index >= 0 ? advertisement.value[index].name : '';
-};
-
-const editEntryConfirmed = (id: number, index: number) => {
-  editingRowIndex.value = index;
-  editingRowId.value = id;
-  setFormData();
-};
-
-const editEntry = (id: number, rowIndex: number) => {
-  if (isEditing.value) {
-    confirmDialog(() => editEntryConfirmed(id, rowIndex), {
-      msg: 'Are you sure you want to cancel editing the current Code?',
-    });
-  } else {
-    isEditing.value = true;
-    editingRowIndex.value = rowIndex;
-    editEntryConfirmed(id, rowIndex);
+  let temp;
+  if (editingRowIndex.value !== null) {
+    temp = advertisement.value[editingRowIndex.value];
   }
+  newSouce.name = temp ? temp.name : '';
+  newSouce.advertisementMediaId = temp ? temp.advertisementMediaId : null;
+  newSouce.description = temp ? temp.description : '';
+  newSouce.date = temp ? temp.date : '';
 };
+
+const newEntry = () => {
+  mode = 'new';
+  editingRowIndex.value = null;
+  setFormData();
+  isEntryModalActive.value = true;
+};
+
+const editEntry = (index: number) => {
+  mode = 'edit';
+  editingRowIndex.value = index;
+  setFormData();
+  isEntryModalActive.value = true;
+};
+
 const saveNewEntry = async () => {
   let payLoad = {
     name: name.value,
     inactive: false,
     createdOn: new Date(),
   };
-  const rsp = await api.post('/advertisementMedia', payLoad);
+  const rsp = await api.post('/advertisement', payLoad);
   if (rsp.data) {
     onSuccess({
       msg: rsp.data.displayMessage,
@@ -524,7 +556,7 @@ const saveEdited = async () => {
     id: editingRowId.value,
     updatedOn: new Date(),
   };
-  const rsp = await api.put('/advertisementMedia/update', payLoad);
+  const rsp = await api.put('/advertisement/update', payLoad);
   if (rsp.data) {
     onSuccess({
       msg: rsp.data.displayMessage,
@@ -537,8 +569,10 @@ const saveEdited = async () => {
 };
 
 const saveEntry = () => {
-  if (name.value) {
+  if (newSouce.name && newSouce.advertisementMediaId) {
     saveNewEntry();
+  } else if (!newSouce.advertisementMediaId) {
+    selectError.value = true;
   } else {
     error.value = true;
   }
@@ -562,7 +596,7 @@ const changeActiveConfirm = async (id: number, state: boolean) => {
   };
 
   const str = state ? 'active' : 'inactive';
-  const rsp = await api.put('/advertisementMedia/' + str, payLoad);
+  const rsp = await api.put('/advertisement/' + str, payLoad);
   if (rsp.data) {
     onSuccess({ msg: rsp.data.displayMessage });
   }
@@ -574,7 +608,7 @@ const loadSource = async () => {
   const rsp = await api.get('advertisement');
 
   if (rsp.data) {
-    advertisement.value = rsp.data.map(
+    const transformedData = rsp.data.map(
       (item: {
         date: string | number | Date;
         inactiveOn: string | number | Date;
@@ -588,7 +622,10 @@ const loadSource = async () => {
         };
       }
     );
-    advertisementTemp.value = advertisement.value;
+    advertisement.value = transformedData.filter(
+      (item: { inactive: boolean }) => item.inactive === checkBox.value
+    );
+    advertisementTemp.value = transformedData;
   }
   fetchingData.value = false;
 };
@@ -611,21 +648,23 @@ const loadadvertisementMedia = async () => {
   fetchingData.value = false;
 };
 
-watch(name, () => {
-  error.value = false;
-  msg.value = '';
+watch(newSouce, () => {
+  if (newSouce.name) {
+    error.value = false;
+    msg.value = '';
 
-  if (!name.value) {
-    return;
-  }
+    if (!newSouce.name) {
+      return;
+    }
 
-  const temp = advertisementTemp.value.find(
-    (item) => item.name.toLowerCase() === name.value.toLocaleLowerCase()
-  );
+    const temp = advertisementTemp.value.find(
+      (item) => item.name.toLowerCase() === newSouce.name.toLocaleLowerCase()
+    );
 
-  if (temp) {
-    error.value = true;
-    msg.value = 'Item already exists!';
+    if (temp) {
+      error.value = true;
+      msg.value = 'Item already exists!';
+    }
   }
 });
 
@@ -633,6 +672,17 @@ watch(media, () => {
   advertisement.value = advertisementTemp.value.filter(
     (temp) => temp.advertisementMediaId === media.value
   );
+});
+watch(checkBox, () => {
+  advertisement.value = advertisementTemp.value.filter((item) => {
+    return item.inactive === checkBox.value;
+  });
+});
+
+watch(newSouce, () => {
+  if (newSouce.advertisementMediaId) {
+    selectError.value = false;
+  }
 });
 
 onMounted(() => {
