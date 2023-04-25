@@ -48,7 +48,6 @@
                   menu-shrink
                   emit-value
                   label="Select Media"
-                  :error="selectError"
                 />
               </div>
             </div>
@@ -294,6 +293,7 @@
                 :options="AdvertisementMedia"
                 map-options
                 menu-shrink
+                emit-value
                 :error="selectError"
                 label="Select media"
               />
@@ -445,7 +445,6 @@ const advertisement = ref<Advertisement[]>([]);
 const advertisementTemp = ref<Advertisement[]>([]);
 const AdvertisementMedia = ref<AdvertisementMedia[]>([]);
 const checkBox = ref(false);
-const isEditing = ref(false);
 const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
 const error = ref(false);
@@ -496,13 +495,22 @@ const filteredData = computed(() => {
 
 const setFormData = () => {
   let temp;
+  let date;
   if (editingRowIndex.value !== null) {
     temp = advertisement.value[editingRowIndex.value];
+    if (temp.date) {
+      let tempDate = new Date(temp.date);
+      date = `${tempDate.getFullYear()}-${(tempDate.getMonth() + 1)
+        .toString()
+        .padStart(2, '0')}-${tempDate.getDate().toString().padStart(2, '0')}`;
+    }
   }
+
   newSouce.name = temp ? temp.name : '';
   newSouce.advertisementMediaId = temp ? temp.advertisementMediaId : null;
   newSouce.description = temp ? temp.description : '';
-  newSouce.date = temp ? temp.date : '';
+  newSouce.date = date ? date : '';
+  newSouce.id = temp ? temp.id : null;
 };
 
 const newEntry = () => {
@@ -521,9 +529,11 @@ const editEntry = (index: number) => {
 
 const saveNewEntry = async () => {
   let payLoad = {
-    name: name.value,
+    advertisementMediaId: newSouce.advertisementMediaId,
     inactive: false,
-    createdOn: new Date(),
+    date: newSouce.date,
+    description: newSouce.description,
+    name: newSouce.name,
   };
   const rsp = await api.post('/advertisement', payLoad);
   if (rsp.data) {
@@ -531,13 +541,13 @@ const saveNewEntry = async () => {
       msg: rsp.data.displayMessage,
       icon: 'sync_alt',
     });
-    name.value = '';
-    loadSource();
+    loadadvertisementMedia();
+    isEntryModalActive.value = false;
   }
 };
 const saveEdited = async () => {
   const temp = advertisementTemp.value.filter(
-    (item) => item.id !== editingRowId.value
+    (item) => item.id !== newSouce.id
   );
 
   const isDuplicate = temp.find(
@@ -550,11 +560,13 @@ const saveEdited = async () => {
     });
     return;
   }
-
   let payLoad = {
+    advertisementMediaId: newSouce.advertisementMediaId,
+    inactive: false,
+    date: newSouce.date,
+    description: newSouce.description,
     name: newSouce.name,
-    id: editingRowId.value,
-    updatedOn: new Date(),
+    id: newSouce.id,
   };
   const rsp = await api.put('/advertisement/update', payLoad);
   if (rsp.data) {
@@ -562,13 +574,13 @@ const saveEdited = async () => {
       msg: rsp.data.displayMessage,
       icon: 'sync_alt',
     });
-    isEditing.value = false;
     editingRowIndex.value = null;
-    loadSource();
+    loadadvertisementMedia();
+    isEntryModalActive.value = false;
   }
 };
 
-const saveEntry = () => {
+const saveEntryConfirm = () => {
   if (newSouce.name && newSouce.advertisementMediaId) {
     saveNewEntry();
   } else if (!newSouce.advertisementMediaId) {
@@ -576,6 +588,10 @@ const saveEntry = () => {
   } else {
     error.value = true;
   }
+};
+
+const saveEntry = () => {
+  mode === 'new' ? saveEntryConfirm() : saveEdited();
 };
 
 const changeActive = async (id: number, state: boolean) => {
@@ -600,7 +616,7 @@ const changeActiveConfirm = async (id: number, state: boolean) => {
   if (rsp.data) {
     onSuccess({ msg: rsp.data.displayMessage });
   }
-  loadSource();
+  loadadvertisementMedia();
 };
 
 const loadSource = async () => {
@@ -625,6 +641,11 @@ const loadSource = async () => {
     advertisement.value = transformedData.filter(
       (item: { inactive: boolean }) => item.inactive === checkBox.value
     );
+    if (media.value) {
+      advertisement.value = advertisement.value.filter(
+        (item) => item.advertisementMediaId === media.value
+      );
+    }
     advertisementTemp.value = transformedData;
   }
   fetchingData.value = false;
@@ -643,7 +664,7 @@ const loadadvertisementMedia = async () => {
         };
       }
     );
-    console.log(AdvertisementMedia.value);
+    loadSource();
   }
   fetchingData.value = false;
 };
@@ -661,7 +682,7 @@ watch(newSouce, () => {
       (item) => item.name.toLowerCase() === newSouce.name.toLocaleLowerCase()
     );
 
-    if (temp) {
+    if (temp && mode == 'new') {
       error.value = true;
       msg.value = 'Item already exists!';
     }
@@ -677,6 +698,11 @@ watch(checkBox, () => {
   advertisement.value = advertisementTemp.value.filter((item) => {
     return item.inactive === checkBox.value;
   });
+  if (media.value) {
+    advertisement.value = advertisement.value.filter(
+      (item) => item.advertisementMediaId === media.value
+    );
+  }
 });
 
 watch(newSouce, () => {
@@ -686,7 +712,6 @@ watch(newSouce, () => {
 });
 
 onMounted(() => {
-  loadSource();
   loadadvertisementMedia();
 });
 </script>
