@@ -154,58 +154,58 @@
           </template>
 
           <!-- card for grid layout screens < 800px -->
-          <!-- <template v-slot:item="props">
+          <template v-slot:item="props">
             <div class="col-xs-12 col-sm-6 q-px-sm-sm">
               <q-card>
                 <q-card-section>
                   <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Name :</div>
+                    <div class="col-12 text-weight-medium">Media :</div>
                     <div class="col-12">
-                      <q-input
-                        v-if="editingRowIndex === props.rowIndex"
-                        v-model="newSouce.name"
-                        placeholder="Name required"
-                        dense
-                        outlined
-                        :color="newSouce.name ? 'green' : 'red'"
-                        autofocus
-                      />
-                      <span v-else>{{
-                        props.row.name.charAt(0).toUpperCase() +
-                        props.row.name.slice(1)
+                      <span>{{
+                        AdvertisementMedia.find(
+                          (item) =>
+                            item.value === props.row.advertisementMediaId
+                        )!.label
                       }}</span>
                     </div>
                   </div>
                 </q-card-section>
                 <q-card-section>
                   <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Created :</div>
+                    <div class="col-12 text-weight-medium">Name :</div>
                     <div class="col-12">
                       {{
-                        props.row.createdOn.toLocaleString(
-                          'en-US',
-                          DateTimeOptions
-                        )
+                        props.row.name.charAt(0).toUpperCase() +
+                        props.row.name.slice(1)
                       }}
                     </div>
                   </div>
                 </q-card-section>
                 <q-card-section>
                   <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Updated :</div>
+                    <div class="col-12 text-weight-medium">Description :</div>
                     <div class="col-12">
                       {{
-                        props.row.updatedOn.toLocaleString(
-                          'en-US',
-                          DateTimeOptions
-                        )
+                        props.row.description.charAt(0).toUpperCase() +
+                        props.row.description.slice(1)
                       }}
                     </div>
                   </div>
                 </q-card-section>
                 <q-card-section>
                   <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Inactive :</div>
+                    <div class="col-12 text-weight-medium">Date :</div>
+                    <div class="col-12">
+                      {{
+                        props.row.date.toLocaleString('en-US', DateTimeOptions)
+                      }}
+                    </div>
+                  </div>
+                </q-card-section>
+
+                <q-card-section>
+                  <div class="row q-gutter-y-xs">
+                    <div class="col-12 text-weight-medium">InactiveOn :</div>
                     <div class="col-12">
                       {{
                         props.row.inactiveOn.toLocaleString(
@@ -223,44 +223,21 @@
                     icon="edit"
                     size="sm"
                     color="teal"
-                    v-if="editingRowIndex !== props.rowIndex"
-                    @click="() => editEntry(props.row.id, props.rowIndex)"
+                    @click="editEntry(props.rowIndex)"
                   >
-                    <q-tooltip>Edit</q-tooltip>
                   </q-btn>
 
                   <q-btn
-                    v-if="editingRowIndex !== props.rowIndex"
                     :label="props.row.inactive ? 'activate' : 'deactivate'"
                     size="sm"
                     color="red"
                     @click="changeActive(props.row.id, props.row.inactive)"
                   >
                   </q-btn>
-                  <q-btn
-                    label="save"
-                    icon="save"
-                    size="sm"
-                    color="teal"
-                    v-if="editingRowIndex === props.rowIndex"
-                    @click="() => saveEdited()"
-                  >
-                    <q-tooltip>Save</q-tooltip>
-                  </q-btn>
-                  <q-btn
-                    label="close"
-                    icon="close"
-                    size="sm"
-                    color="red"
-                    v-if="editingRowIndex === props.rowIndex"
-                    @click="(isEditing = false), (editingRowIndex = null)"
-                  >
-                    <q-tooltip>Cancel</q-tooltip>
-                  </q-btn>
                 </q-card-actions>
               </q-card>
             </div>
-          </template> -->
+          </template>
         </q-table>
       </div>
     </div>
@@ -446,7 +423,6 @@ const advertisementTemp = ref<Advertisement[]>([]);
 const AdvertisementMedia = ref<AdvertisementMedia[]>([]);
 const checkBox = ref(false);
 const editingRowIndex = ref<number | null>(null);
-const editingRowId = ref<number | null>(null);
 const error = ref(false);
 const selectError = ref(false);
 const msg = ref('');
@@ -507,7 +483,9 @@ const setFormData = () => {
   }
 
   newSouce.name = temp ? temp.name : '';
-  newSouce.advertisementMediaId = temp ? temp.advertisementMediaId : null;
+  newSouce.advertisementMediaId = temp
+    ? temp.advertisementMediaId
+    : media.value;
   newSouce.description = temp ? temp.description : '';
   newSouce.date = date ? date : '';
   newSouce.id = temp ? temp.id : null;
@@ -542,6 +520,7 @@ const saveNewEntry = async () => {
       icon: 'sync_alt',
     });
     loadadvertisementMedia();
+    editingRowIndex.value = null;
     isEntryModalActive.value = false;
   }
 };
