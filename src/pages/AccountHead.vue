@@ -167,6 +167,18 @@
                     </div>
                   </div>
                 </div>
+                <div class="col-12" v-if="$q.screen.width < 830">
+                  <div class="row justify-end">
+                    <q-btn
+                      label="remove duplicate"
+                      @click="removeDuplicate"
+                      color="orange"
+                      icon="dynamic_feed"
+                      padding="sm"
+                      text-color="black"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </template>
@@ -279,7 +291,31 @@
           <template v-slot:item="props">
             <div class="col-xs-12 col-sm-6 q-px-sm-sm">
               <q-card>
-                <template v-for="key in ['name', 'alias', 'code']" :key="key">
+                <q-card-section>
+                  <div class="row">
+                    <div class="col-12 text-weight-medium text-uppercase">
+                      name
+                    </div>
+                    <div class="col-12">
+                      <q-chip
+                        color="light-blue-2"
+                        clickable
+                        @click="props.selected = !props.selected"
+                      >
+                        <q-avatar
+                          :icon="props.selected ? 'check' : 'add'"
+                          color="teal"
+                          text-color="white"
+                          size="md"
+                        />
+                        <span class="text-weight-medium">
+                          {{ props.row.name }}
+                        </span>
+                      </q-chip>
+                    </div>
+                  </div>
+                </q-card-section>
+                <template v-for="key in ['alias', 'code']" :key="key">
                   <q-card-section v-if="props.row[key]">
                     <div class="row">
                       <div class="col-12 text-weight-medium text-uppercase">
@@ -296,7 +332,7 @@
                   <q-card-section v-if="props.row[key]">
                     <div class="row">
                       <div class="col-12 text-weight-medium text-uppercase">
-                        {{ key }}
+                        {{ `${key.split('On').join('-')}ON` }}
                       </div>
                       <div class="col-12">
                         <div>
@@ -358,16 +394,6 @@
                       color="red-2"
                       text-color="black"
                     />
-                    <q-btn
-                      @click="props.selected = !props.selected"
-                      color="primary"
-                    >
-                      {{ props.selected ? 'Deselect' : 'Select' }}
-                      <q-checkbox
-                        v-model="props.selected"
-                        :color="props.selected ? 'orange' : ''"
-                      />
-                    </q-btn>
                   </div>
                 </q-card-actions>
               </q-card>
