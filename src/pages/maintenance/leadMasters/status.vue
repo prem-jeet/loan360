@@ -47,7 +47,11 @@
               </div>
 
               <div class="col-xs-12 col-sm-3 col-md-6 q-pb-sm">
-                <q-checkbox v-model="checkBox" label=" In-Active" />
+                <q-checkbox
+                  v-model="checkBox"
+                  label=" In-Active"
+                  @click="(editingRowIndex = null), (isEditing = false)"
+                />
               </div>
               <div class="col-xs-12 col-sm-5 col-md-3 q-pb-sm">
                 <q-input
