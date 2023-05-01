@@ -360,7 +360,9 @@ const newSouce = reactive<Source>({
 
 const filteredData = computed(() => {
   return source.value.filter((item) => {
-    return item.inactive === checkBox.value;
+    return item.name
+      .toLowerCase()
+      .includes(nameSearchQuery.value.toLowerCase());
   });
 });
 
@@ -488,15 +490,10 @@ const loadSource = async () => {
       }
     );
     sourceTemp.value = transformedData;
-    if (nameSearchQuery.value) {
-      source.value = transformedData.filter((item: { name: string }) => {
-        return item.name
-          .toLowerCase()
-          .includes(nameSearchQuery.value.toLowerCase());
-      });
-    } else {
-      source.value = transformedData;
-    }
+
+    source.value = transformedData.filter((item: { inactive: boolean }) => {
+      return item.inactive === checkBox.value;
+    });
   }
   fetchingData.value = false;
 };
@@ -511,6 +508,9 @@ watch(leadName, () => {
   watch(checkBox, () => {
     editingRowIndex.value = null;
     isEditing.value = false;
+    source.value = sourceTemp.value.filter((item) => {
+      return item.inactive === checkBox.value;
+    });
   });
   const temp = sourceTemp.value.find(
     (item) => item.name.toLowerCase() === leadName.value.toLocaleLowerCase()
@@ -525,11 +525,6 @@ watch(leadName, () => {
 watch(nameSearchQuery, () => {
   editingRowIndex.value = null;
   isEditing.value = false;
-  source.value = sourceTemp.value.filter((item) => {
-    return item.name
-      .toLowerCase()
-      .includes(nameSearchQuery.value.toLowerCase());
-  });
 });
 
 onMounted(() => {
