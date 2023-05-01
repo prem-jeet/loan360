@@ -205,10 +205,10 @@
                 </q-card-section>
                 <q-card-section>
                   <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">
+                    <div class="col-6 text-weight-medium q-pt-sm">
                       Technical Reason :
                     </div>
-                    <div class="col-12">
+                    <div class="col-6">
                       <q-checkbox
                         v-if="editingRowIndex === props.rowIndex"
                         v-model="newSouce.technicalReason"
