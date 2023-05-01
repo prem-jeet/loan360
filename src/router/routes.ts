@@ -71,22 +71,22 @@ const routes: RouteRecordRaw[] = [
             component: () =>
               import('pages/settings/accounts/InterestDepositGenerate.vue'),
           },
+
+          {
+            path: 'accounts',
+            children: [
+              {
+                path: 'accountHead',
+                name: 'accountHead',
+                component: () => import('pages/AccountHead.vue'),
+              },
+            ],
+          },
         ],
       },
     ],
   },
 
-  {
-    path: '/accounts',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [
-      {
-        path: 'accountHead',
-        name: 'accountHead',
-        component: () => import('pages/AccountHead.vue'),
-      },
-    ],
-  },
   // Always leave this as last one,
   // but you can also remove it
   {
