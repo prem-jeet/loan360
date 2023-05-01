@@ -497,6 +497,8 @@ const loadSource = async () => {
 watch(leadName, () => {
   error.value = false;
   msg.value = '';
+  editingRowIndex.value = null;
+  isEditing.value = false;
 
   const temp = assetsTemp.value.find(
     (item) => item.name.toLowerCase() === leadName.value.toLowerCase()
