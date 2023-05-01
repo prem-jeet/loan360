@@ -147,19 +147,13 @@
                 }}</span>
               </q-td>
               <q-td key="createdOn" :props="props">
-                {{
-                  props.row.createdOn.toLocaleString('en-US', DateTimeOptions)
-                }}
+                {{ date.formatDate(props.row.createdOn, 'DD/MM/YYYY@hh:mmA') }}
               </q-td>
               <q-td key="updatedOn" :props="props">
-                {{
-                  props.row.updatedOn.toLocaleString('en-US', DateTimeOptions)
-                }}
+                {{ date.formatDate(props.row.updatedOn, 'DD/MM/YYYY@hh:mmA') }}
               </q-td>
               <q-td key="inactiveOn" :props="props">
-                {{
-                  props.row.inactiveOn.toLocaleString('en-US', DateTimeOptions)
-                }}
+                {{ date.formatDate(props.row.inactiveOn, 'DD/MM/YYYY@hh:mmA') }}
               </q-td>
             </q-tr>
           </template>
@@ -193,9 +187,9 @@
                     <div class="col-12 text-weight-medium">Created :</div>
                     <div class="col-12">
                       {{
-                        props.row.createdOn.toLocaleString(
-                          'en-US',
-                          DateTimeOptions
+                        date.formatDate(
+                          props.row.createdOn,
+                          'DD/MM/YYYY@hh:mmA'
                         )
                       }}
                     </div>
@@ -206,9 +200,9 @@
                     <div class="col-12 text-weight-medium">Updated :</div>
                     <div class="col-12">
                       {{
-                        props.row.updatedOn.toLocaleString(
-                          'en-US',
-                          DateTimeOptions
+                        date.formatDate(
+                          props.row.updatedOn,
+                          'DD/MM/YYYY@hh:mmA'
                         )
                       }}
                     </div>
@@ -219,9 +213,9 @@
                     <div class="col-12 text-weight-medium">Inactive :</div>
                     <div class="col-12">
                       {{
-                        props.row.inactiveOn.toLocaleString(
-                          'en-US',
-                          DateTimeOptions
+                        date.formatDate(
+                          props.row.inactiveOn,
+                          'DD/MM/YYYY@hh:mmA'
                         )
                       }}
                     </div>
@@ -283,6 +277,7 @@ import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch, reactive } from 'vue';
 import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
+import { date } from 'quasar';
 
 interface Source {
   name: string;
@@ -342,15 +337,6 @@ const columns: {
   },
 ];
 
-const DateTimeOptions = {
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-  hour: 'numeric',
-  minute: 'numeric',
-  hour12: true, // Use 12-hour format
-};
-
 const fetchingData = ref(false);
 const leadName = ref('');
 const nameSearchQuery = ref('');
@@ -396,7 +382,7 @@ const editEntryConfirmed = (id: number, index: number) => {
 const editEntry = (id: number, rowIndex: number) => {
   if (isEditing.value) {
     confirmDialog(() => editEntryConfirmed(id, rowIndex), {
-      msg: 'Are you sure you want to cancel editing the current Source?',
+      msg: 'Are you sure you want to cancel editing the current row?',
     });
   } else {
     isEditing.value = true;
@@ -492,11 +478,7 @@ const loadSource = async () => {
 
   if (rsp.data) {
     const transformedData = rsp.data.map(
-      (item: {
-        createdOn: string | number | Date;
-        updatedOn: string | number | Date;
-        inactiveOn: string | number | Date;
-      }) => {
+      (item: { createdOn: string; updatedOn: string; inactiveOn: string }) => {
         return {
           ...item,
           createdOn: item.createdOn !== null ? new Date(item.createdOn) : '',
@@ -507,7 +489,7 @@ const loadSource = async () => {
     );
     sourceTemp.value = transformedData;
     if (nameSearchQuery.value) {
-      source.value = transformedData.value.filter((item: { name: string }) => {
+      source.value = transformedData.filter((item: { name: string }) => {
         return item.name
           .toLowerCase()
           .includes(nameSearchQuery.value.toLowerCase());
