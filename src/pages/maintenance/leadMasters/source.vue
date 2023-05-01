@@ -47,7 +47,11 @@
               </div>
 
               <div class="col-xs-12 col-sm-3 col-md-6 q-pb-sm">
-                <q-checkbox v-model="checkBox" label=" In-Active" />
+                <q-checkbox
+                  v-model="checkBox"
+                  label=" In-Active"
+                  @click="(editingRowIndex = null), (isEditing = false)"
+                />
               </div>
               <div class="col-xs-12 col-sm-5 col-md-3 q-pb-sm">
                 <q-input
@@ -392,7 +396,7 @@ const editEntryConfirmed = (id: number, index: number) => {
 const editEntry = (id: number, rowIndex: number) => {
   if (isEditing.value) {
     confirmDialog(() => editEntryConfirmed(id, rowIndex), {
-      msg: 'Are you sure you want to cancel editing the current Code?',
+      msg: 'Are you sure you want to cancel editing the current Source?',
     });
   } else {
     isEditing.value = true;
@@ -487,7 +491,7 @@ const loadSource = async () => {
   const rsp = await api.get('sourceLead');
 
   if (rsp.data) {
-    source.value = rsp.data.map(
+    const transformedData = rsp.data.map(
       (item: {
         createdOn: string | number | Date;
         updatedOn: string | number | Date;
@@ -501,7 +505,16 @@ const loadSource = async () => {
         };
       }
     );
-    sourceTemp.value = source.value;
+    sourceTemp.value = transformedData;
+    if (nameSearchQuery.value) {
+      source.value = transformedData.value.filter((item: { name: string }) => {
+        return item.name
+          .toLowerCase()
+          .includes(nameSearchQuery.value.toLowerCase());
+      });
+    } else {
+      source.value = transformedData;
+    }
   }
   fetchingData.value = false;
 };
@@ -525,6 +538,8 @@ watch(leadName, () => {
 });
 
 watch(nameSearchQuery, () => {
+  editingRowIndex.value = null;
+  isEditing.value = false;
   source.value = sourceTemp.value.filter((item) => {
     return item.name
       .toLowerCase()
