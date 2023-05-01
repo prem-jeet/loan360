@@ -396,7 +396,7 @@ const editEntryConfirmed = (id: number, index: number) => {
 const editEntry = (id: number, rowIndex: number) => {
   if (isEditing.value) {
     confirmDialog(() => editEntryConfirmed(id, rowIndex), {
-      msg: 'Are you sure you want to cancel editing the current Code?',
+      msg: 'Are you sure you want to cancel editing the current status?',
     });
   } else {
     isEditing.value = true;
@@ -430,7 +430,7 @@ const saveEdited = async () => {
   );
   if (isDuplicate) {
     onFailure({
-      msg: 'Duplicate Account Found',
+      msg: 'Item already exists',
       icon: 'warning',
     });
     return;
@@ -491,7 +491,7 @@ const loadSource = async () => {
   const rsp = await api.get('statusLead');
 
   if (rsp.data) {
-    status.value = rsp.data.map(
+    const transformedData = rsp.data.map(
       (item: {
         createdOn: string | number | Date;
         updatedOn: string | number | Date;
@@ -505,7 +505,16 @@ const loadSource = async () => {
         };
       }
     );
-    statusTemp.value = status.value;
+    statusTemp.value = transformedData;
+    if (nameSearchQuery.value) {
+      status.value = transformedData.value.filter((item: { name: string }) => {
+        return item.name
+          .toLowerCase()
+          .includes(nameSearchQuery.value.toLowerCase());
+      });
+    } else {
+      status.value = transformedData;
+    }
   }
   fetchingData.value = false;
 };
@@ -524,11 +533,18 @@ watch(leadName, () => {
   }
 });
 watch(nameSearchQuery, () => {
+  editingRowIndex.value = null;
+  isEditing.value = false;
   status.value = statusTemp.value.filter((item) => {
     return item.name
       .toLowerCase()
       .includes(nameSearchQuery.value.toLowerCase());
   });
+});
+
+watch(checkBox, () => {
+  editingRowIndex.value = null;
+  isEditing.value = false;
 });
 
 onMounted(() => {
