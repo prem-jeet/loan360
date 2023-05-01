@@ -134,11 +134,11 @@
               <q-td key="name" :props="props">
                 <q-input
                   v-if="editingRowIndex === props.rowIndex"
-                  v-model="newSouce.name"
+                  v-model="editName"
                   placeholder="Name required"
                   dense
                   outlined
-                  :color="newSouce.name ? 'green' : 'red'"
+                  :color="editName ? 'green' : 'red'"
                   autofocus
                 />
                 <span v-else>{{
@@ -168,11 +168,11 @@
                     <div class="col-12">
                       <q-input
                         v-if="editingRowIndex === props.rowIndex"
-                        v-model="newSouce.name"
+                        v-model="editName"
                         placeholder="Name required"
                         dense
                         outlined
-                        :color="newSouce.name ? 'green' : 'red'"
+                        :color="editName ? 'green' : 'red'"
                         autofocus
                       />
                       <span v-else>{{
@@ -275,7 +275,7 @@
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { ref, onMounted, computed, watch, reactive } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
 import { date } from 'quasar';
 
@@ -348,15 +348,7 @@ const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
 const error = ref(false);
 const msg = ref('');
-
-const newSouce = reactive<Source>({
-  name: '',
-  id: null,
-  createdOn: '',
-  inactive: false,
-  inactiveOn: '',
-  updatedOn: '',
-});
+const editName = ref('');
 
 const filteredData = computed(() => {
   return source.value.filter((item) => {
@@ -372,7 +364,7 @@ const setFormData = () => {
     let index = source.value.findIndex((obj) => obj.id === editingRowId.value);
     temp = source.value[index];
   }
-  newSouce.name = temp ? temp.name : '';
+  editName.value = temp ? temp.name : '';
 };
 
 const editEntryConfirmed = (id: number, index: number) => {
@@ -414,7 +406,7 @@ const saveEdited = async () => {
   );
 
   const isDuplicate = temp.find(
-    (item) => item.name.toLowerCase() === newSouce.name.toLowerCase()
+    (item) => item.name.toLowerCase() === editName.value.toLowerCase()
   );
   if (isDuplicate) {
     onFailure({
@@ -425,7 +417,7 @@ const saveEdited = async () => {
   }
 
   let payLoad = {
-    name: newSouce.name,
+    name: editName.value,
     id: editingRowId.value,
     updatedOn: new Date(),
   };
