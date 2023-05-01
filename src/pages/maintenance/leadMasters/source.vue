@@ -430,7 +430,7 @@ const saveEdited = async () => {
   );
   if (isDuplicate) {
     onFailure({
-      msg: 'Duplicate Account Found',
+      msg: 'Item already exist',
       icon: 'warning',
     });
     return;
@@ -526,7 +526,10 @@ watch(leadName, () => {
   if (!leadName.value) {
     return;
   }
-
+  watch(checkBox, () => {
+    editingRowIndex.value = null;
+    isEditing.value = false;
+  });
   const temp = sourceTemp.value.find(
     (item) => item.name.toLowerCase() === leadName.value.toLocaleLowerCase()
   );
