@@ -47,7 +47,11 @@
               </div>
 
               <div class="col-xs-12 col-sm-3 col-md-6 q-pb-sm">
-                <q-checkbox v-model="checkBox" label=" In-Active" />
+                <q-checkbox
+                  v-model="checkBox"
+                  label=" In-Active"
+                  @click="(editingRowIndex = null), (isEditing = false)"
+                />
               </div>
               <div class="col-xs-12 col-sm-5 col-md-3 q-pb-sm">
                 <q-input
@@ -396,7 +400,7 @@ const editEntryConfirmed = (id: number, index: number) => {
 const editEntry = (id: number, rowIndex: number) => {
   if (isEditing.value) {
     confirmDialog(() => editEntryConfirmed(id, rowIndex), {
-      msg: 'Are you sure you want to cancel editing the current Code?',
+      msg: 'Are you sure you want to cancel editing the current asset?',
     });
   } else {
     isEditing.value = true;
@@ -430,7 +434,7 @@ const saveEdited = async () => {
   );
   if (isDuplicate) {
     onFailure({
-      msg: 'Duplicate Account Found',
+      msg: 'Item already exists',
       icon: 'warning',
     });
     return;
@@ -491,7 +495,7 @@ const loadSource = async () => {
   const rsp = await api.get('assetLead');
 
   if (rsp.data) {
-    assets.value = rsp.data.map(
+    const transformedData = rsp.data.map(
       (item: {
         createdOn: string | number | Date;
         updatedOn: string | number | Date;
@@ -505,7 +509,17 @@ const loadSource = async () => {
         };
       }
     );
-    assetsTemp.value = assets.value;
+    assetsTemp.value = transformedData;
+
+    if (nameSearchQuery.value) {
+      assets.value = transformedData.value.filter((item: { name: string }) => {
+        return item.name
+          .toLowerCase()
+          .includes(nameSearchQuery.value.toLowerCase());
+      });
+    } else {
+      assets.value = transformedData;
+    }
   }
   fetchingData.value = false;
 };
@@ -524,11 +538,18 @@ watch(leadName, () => {
   }
 });
 watch(nameSearchQuery, () => {
+  editingRowIndex.value = null;
+  isEditing.value = false;
   assets.value = assetsTemp.value.filter((item) => {
     return item.name
       .toLowerCase()
       .includes(nameSearchQuery.value.toLowerCase());
   });
+});
+
+watch(checkBox, () => {
+  editingRowIndex.value = null;
+  isEditing.value = false;
 });
 
 onMounted(() => {
