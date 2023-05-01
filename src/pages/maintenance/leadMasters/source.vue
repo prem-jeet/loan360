@@ -493,17 +493,13 @@ const loadSource = async () => {
 watch(leadName, () => {
   error.value = false;
   msg.value = '';
+  editingRowIndex.value = null;
+  isEditing.value = false;
 
   if (!leadName.value) {
     return;
   }
-  watch(checkBox, () => {
-    editingRowIndex.value = null;
-    isEditing.value = false;
-    source.value = sourceTemp.value.filter((item) => {
-      return item.inactive === checkBox.value;
-    });
-  });
+
   const temp = sourceTemp.value.find(
     (item) => item.name.toLowerCase() === leadName.value.toLocaleLowerCase()
   );
@@ -512,6 +508,14 @@ watch(leadName, () => {
     error.value = true;
     msg.value = 'Item already exists!';
   }
+});
+
+watch(checkBox, () => {
+  editingRowIndex.value = null;
+  isEditing.value = false;
+  source.value = sourceTemp.value.filter((item) => {
+    return item.inactive === checkBox.value;
+  });
 });
 
 watch(nameSearchQuery, () => {
