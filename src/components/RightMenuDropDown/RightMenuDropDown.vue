@@ -86,9 +86,6 @@
           </q-item-section>
           <q-item-section>Log Out</q-item-section>
         </q-item>
-        <q-item clickable :to="{ name: 'accountHead' }">
-          <q-item-section> Account head </q-item-section>
-        </q-item>
       </q-list>
     </q-menu>
   </q-btn>
