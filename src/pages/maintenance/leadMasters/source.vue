@@ -147,13 +147,13 @@
                 }}</span>
               </q-td>
               <q-td key="createdOn" :props="props">
-                {{ date.formatDate(props.row.createdOn, 'DD/MM/YYYY@hh:mmA') }}
+                {{ formatDate(props.row.createdOn) }}
               </q-td>
               <q-td key="updatedOn" :props="props">
-                {{ date.formatDate(props.row.updatedOn, 'DD/MM/YYYY@hh:mmA') }}
+                {{ formatDate(props.row.updatedOn) }}
               </q-td>
               <q-td key="inactiveOn" :props="props">
-                {{ date.formatDate(props.row.inactiveOn, 'DD/MM/YYYY@hh:mmA') }}
+                {{ formatDate(props.row.inactiveOn) }}
               </q-td>
             </q-tr>
           </template>
@@ -186,12 +186,7 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">Created :</div>
                     <div class="col-12">
-                      {{
-                        date.formatDate(
-                          props.row.createdOn,
-                          'DD/MM/YYYY@hh:mmA'
-                        )
-                      }}
+                      {{ formatDate(props.row.createdOn) }}
                     </div>
                   </div>
                 </q-card-section>
@@ -199,12 +194,7 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">Updated :</div>
                     <div class="col-12">
-                      {{
-                        date.formatDate(
-                          props.row.updatedOn,
-                          'DD/MM/YYYY@hh:mmA'
-                        )
-                      }}
+                      {{ formatDate(props.row.updatedOn) }}
                     </div>
                   </div>
                 </q-card-section>
@@ -212,12 +202,7 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">Inactive :</div>
                     <div class="col-12">
-                      {{
-                        date.formatDate(
-                          props.row.inactiveOn,
-                          'DD/MM/YYYY@hh:mmA'
-                        )
-                      }}
+                      {{ date.formatDate(props.row.inactiveOn) }}
                     </div>
                   </div>
                 </q-card-section>
@@ -277,6 +262,7 @@ import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch } from 'vue';
 import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
+import { formatDate } from 'src/utils/date';
 import { date } from 'quasar';
 
 interface Source {
