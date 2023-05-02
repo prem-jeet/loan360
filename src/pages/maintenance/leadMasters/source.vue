@@ -147,13 +147,13 @@
                 }}</span>
               </q-td>
               <q-td key="createdOn" :props="props">
-                {{ formatDate(props.row.createdOn) }}
+                {{ formatDate(props.row.createdOn, 'DD/MM/YYYY@hh:mmA') }}
               </q-td>
               <q-td key="updatedOn" :props="props">
-                {{ formatDate(props.row.updatedOn) }}
+                {{ formatDate(props.row.updatedOn, 'DD/MM/YYYY@hh:mmA') }}
               </q-td>
               <q-td key="inactiveOn" :props="props">
-                {{ formatDate(props.row.inactiveOn) }}
+                {{ formatDate(props.row.inactiveOn, 'DD/MM/YYYY@hh:mmA') }}
               </q-td>
             </q-tr>
           </template>
@@ -186,7 +186,7 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">Created :</div>
                     <div class="col-12">
-                      {{ formatDate(props.row.createdOn) }}
+                      {{ formatDate(props.row.createdOn, 'DD/MM/YYYY@hh:mmA') }}
                     </div>
                   </div>
                 </q-card-section>
@@ -194,7 +194,7 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">Updated :</div>
                     <div class="col-12">
-                      {{ formatDate(props.row.updatedOn) }}
+                      {{ formatDate(props.row.updatedOn, 'DD/MM/YYYY@hh:mmA') }}
                     </div>
                   </div>
                 </q-card-section>
@@ -202,7 +202,9 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">Inactive :</div>
                     <div class="col-12">
-                      {{ date.formatDate(props.row.inactiveOn) }}
+                      {{
+                        formatDate(props.row.inactiveOn, 'DD/MM/YYYY@hh:mmA')
+                      }}
                     </div>
                   </div>
                 </q-card-section>
