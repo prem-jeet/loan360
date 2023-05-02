@@ -70,7 +70,7 @@
                       :icon="'add '"
                       color="teal"
                       size="md"
-                      :disable="error"
+                      :disable="error || leadName === ''"
                       @click="saveEntry()"
                     />
                   </template>
