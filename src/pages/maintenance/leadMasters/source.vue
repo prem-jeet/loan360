@@ -147,13 +147,13 @@
                 }}</span>
               </q-td>
               <q-td key="createdOn" :props="props">
-                {{ formatDate(props.row.createdOn, 'DD/MM/YYYY@hh:mmA') }}
+                {{ formatDate(props.row.createdOn, format) }}
               </q-td>
               <q-td key="updatedOn" :props="props">
-                {{ formatDate(props.row.updatedOn, 'DD/MM/YYYY@hh:mmA') }}
+                {{ formatDate(props.row.updatedOn, format) }}
               </q-td>
               <q-td key="inactiveOn" :props="props">
-                {{ formatDate(props.row.inactiveOn, 'DD/MM/YYYY@hh:mmA') }}
+                {{ formatDate(props.row.inactiveOn, format) }}
               </q-td>
             </q-tr>
           </template>
@@ -186,7 +186,7 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">Created :</div>
                     <div class="col-12">
-                      {{ formatDate(props.row.createdOn, 'DD/MM/YYYY@hh:mmA') }}
+                      {{ formatDate(props.row.createdOn, format) }}
                     </div>
                   </div>
                 </q-card-section>
@@ -194,7 +194,7 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">Updated :</div>
                     <div class="col-12">
-                      {{ formatDate(props.row.updatedOn, 'DD/MM/YYYY@hh:mmA') }}
+                      {{ formatDate(props.row.updatedOn, format) }}
                     </div>
                   </div>
                 </q-card-section>
@@ -202,9 +202,7 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">Inactive :</div>
                     <div class="col-12">
-                      {{
-                        formatDate(props.row.inactiveOn, 'DD/MM/YYYY@hh:mmA')
-                      }}
+                      {{ formatDate(props.row.inactiveOn, format) }}
                     </div>
                   </div>
                 </q-card-section>
@@ -265,7 +263,6 @@ import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch } from 'vue';
 import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
 import { formatDate } from 'src/utils/date';
-import { date } from 'quasar';
 
 interface Source {
   name: string;
@@ -337,6 +334,7 @@ const editingRowId = ref<number | null>(null);
 const error = ref(false);
 const msg = ref('');
 const editName = ref('');
+const format = ref('DD/MM/YYYY@hh:mmA');
 
 const filteredData = computed(() => {
   return source.value.filter((item) => {
