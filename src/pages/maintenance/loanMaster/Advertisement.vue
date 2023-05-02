@@ -45,10 +45,18 @@
                   v-model="media"
                   :options="AdvertisementMedia"
                   map-options
-                  menu-shrink
                   emit-value
                   label="Select Media"
-                />
+                >
+                  <template v-slot:append>
+                    <q-icon
+                      v-if="media"
+                      name="close"
+                      @click.stop.prevent="media = null"
+                      class="cursor-pointer"
+                    ></q-icon>
+                  </template>
+                </q-select>
               </div>
             </div>
 
@@ -143,12 +151,10 @@
                 }}</span>
               </q-td>
               <q-td key="date" :props="props">
-                {{ props.row.date.toLocaleString('en-US', DateTimeOptions) }}
+                {{ date.formatDate(props.row.date, 'DD/MM/YYYY@hh:mmA') }}
               </q-td>
               <q-td key="inactiveOn" :props="props">
-                {{
-                  props.row.inactiveOn.toLocaleString('en-US', DateTimeOptions)
-                }}
+                {{ date.formatDate(props.row.inactiveOn, 'DD/MM/YYYY@hh:mmA') }}
               </q-td>
             </q-tr>
           </template>
@@ -196,9 +202,7 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">Date :</div>
                     <div class="col-12">
-                      {{
-                        props.row.date.toLocaleString('en-US', DateTimeOptions)
-                      }}
+                      {{ date.formatDate(props.row.date, 'DD/MM/YYYY@hh:mmA') }}
                     </div>
                   </div>
                 </q-card-section>
@@ -208,9 +212,9 @@
                     <div class="col-12 text-weight-medium">InactiveOn :</div>
                     <div class="col-12">
                       {{
-                        props.row.inactiveOn.toLocaleString(
-                          'en-US',
-                          DateTimeOptions
+                        date.formatDate(
+                          props.row.inactiveOn,
+                          'DD/MM/YYYY@hh:mmA'
                         )
                       }}
                     </div>
@@ -269,11 +273,19 @@
                 v-model="newSouce.advertisementMediaId"
                 :options="AdvertisementMedia"
                 map-options
-                menu-shrink
                 emit-value
                 :error="selectError"
                 label="Select media"
-              />
+              >
+                <template v-slot:append>
+                  <q-icon
+                    v-if="newSouce.advertisementMediaId"
+                    name="close"
+                    @click.stop.prevent="newSouce.advertisementMediaId = null"
+                    class="cursor-pointer"
+                  ></q-icon>
+                </template>
+              </q-select>
             </div>
             <div class="col-12">
               <div class="col-12 q-mt-sm">
@@ -291,7 +303,6 @@
               <div class="col-12 q-mt-sm">
                 <q-input
                   v-model="newSouce.description"
-                  clearable
                   outlined
                   dense
                   hide-bottom-space
@@ -300,7 +311,7 @@
                 >
                 </q-input>
               </div>
-              <div class="col-12 q-mt-sm">
+              <div class="col-12 q-mt-lg">
                 <q-input outlined v-model="newSouce.date" type="date" dense />
               </div>
             </div>
@@ -327,6 +338,7 @@ import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch, reactive } from 'vue';
 import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
+import { date } from 'quasar';
 
 interface Advertisement {
   name: string;
@@ -406,15 +418,6 @@ const columns: {
   },
 ];
 
-const DateTimeOptions = {
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-  hour: 'numeric',
-  minute: 'numeric',
-  hour12: true, // Use 12-hour format
-};
-
 const fetchingData = ref(false);
 const nameSearchQuery = ref('');
 const descriptionSearchQuery = ref('');
@@ -471,14 +474,11 @@ const filteredData = computed(() => {
 
 const setFormData = () => {
   let temp;
-  let date;
+  let dateTemp;
   if (editingRowIndex.value !== null) {
     temp = advertisement.value[editingRowIndex.value];
     if (temp.date) {
-      let tempDate = new Date(temp.date);
-      date = `${tempDate.getFullYear()}-${(tempDate.getMonth() + 1)
-        .toString()
-        .padStart(2, '0')}-${tempDate.getDate().toString().padStart(2, '0')}`;
+      dateTemp = date.formatDate(temp.date, 'YYYY-MM-DD');
     }
   }
 
@@ -487,7 +487,7 @@ const setFormData = () => {
     ? temp.advertisementMediaId
     : media.value;
   newSouce.description = temp ? temp.description : '';
-  newSouce.date = date ? date : '';
+  newSouce.date = dateTemp ? dateTemp : '';
   newSouce.id = temp ? temp.id : null;
 };
 
@@ -495,6 +495,8 @@ const newEntry = () => {
   mode = 'new';
   editingRowIndex.value = null;
   setFormData();
+  error.value = false;
+  msg.value = '';
   isEntryModalActive.value = true;
 };
 
@@ -617,6 +619,7 @@ const loadSource = async () => {
         };
       }
     );
+    advertisementTemp.value = transformedData;
     advertisement.value = transformedData.filter(
       (item: { inactive: boolean }) => item.inactive === checkBox.value
     );
@@ -625,7 +628,6 @@ const loadSource = async () => {
         (item) => item.advertisementMediaId === media.value
       );
     }
-    advertisementTemp.value = transformedData;
   }
   fetchingData.value = false;
 };
@@ -669,9 +671,19 @@ watch(newSouce, () => {
 });
 
 watch(media, () => {
-  advertisement.value = advertisementTemp.value.filter(
-    (temp) => temp.advertisementMediaId === media.value
-  );
+  if (media.value) {
+    advertisement.value = advertisementTemp.value.filter(
+      (temp) => temp.advertisementMediaId === media.value
+    );
+    advertisement.value = advertisement.value.filter((item) => {
+      return item.inactive === checkBox.value;
+    });
+  } else {
+    advertisement.value = advertisementTemp.value;
+    advertisement.value = advertisement.value.filter((item) => {
+      return item.inactive === checkBox.value;
+    });
+  }
 });
 watch(checkBox, () => {
   advertisement.value = advertisementTemp.value.filter((item) => {
