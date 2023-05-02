@@ -421,6 +421,8 @@ const saveEdited = async () => {
 
 const saveEntry = () => {
   if (leadName.value) {
+    editingRowIndex.value = null;
+    isEditing.value = false;
     saveNewEntry();
   } else {
     error.value = true;
@@ -479,8 +481,6 @@ const loadSource = async () => {
 watch(leadName, () => {
   error.value = false;
   msg.value = '';
-  editingRowIndex.value = null;
-  isEditing.value = false;
 
   if (!leadName.value) {
     return;
