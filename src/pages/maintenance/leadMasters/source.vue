@@ -459,19 +459,8 @@ const loadSource = async () => {
   const rsp = await api.get('sourceLead');
 
   if (rsp.data) {
-    const transformedData = rsp.data.map(
-      (item: { createdOn: string; updatedOn: string; inactiveOn: string }) => {
-        return {
-          ...item,
-          createdOn: item.createdOn !== null ? new Date(item.createdOn) : '',
-          updatedOn: item.updatedOn !== null ? new Date(item.updatedOn) : '',
-          inactiveOn: item.inactiveOn !== null ? new Date(item.inactiveOn) : '',
-        };
-      }
-    );
-    sourceTemp.value = transformedData;
-
-    source.value = transformedData.filter((item: { inactive: boolean }) => {
+    sourceTemp.value = rsp.data;
+    source.value = rsp.data.filter((item: { inactive: boolean }) => {
       return item.inactive === checkBox.value;
     });
   }
