@@ -326,7 +326,6 @@ const fetchingData = ref(false);
 const leadName = ref('');
 const nameSearchQuery = ref('');
 const source = ref<Source[]>([]);
-const sourceTemp = ref<Source[]>([]);
 const checkBox = ref(false);
 const isEditing = ref(false);
 const editingRowIndex = ref<number | null>(null);
@@ -337,11 +336,11 @@ const editName = ref('');
 const format = ref('DD/MM/YYYY @hh:mmA');
 
 const filteredData = computed(() => {
-  return source.value.filter((item) => {
-    return item.name
-      .toLowerCase()
-      .includes(nameSearchQuery.value.toLowerCase());
-  });
+  return source.value.filter(
+    (item) =>
+      item.name.toLowerCase().includes(nameSearchQuery.value.toLowerCase()) &&
+      item.inactive === checkBox.value
+  );
 });
 
 const setFormData = () => {
@@ -387,9 +386,7 @@ const saveNewEntry = async () => {
   }
 };
 const saveEdited = async () => {
-  const temp = sourceTemp.value.filter(
-    (item) => item.id !== editingRowId.value
-  );
+  const temp = source.value.filter((item) => item.id !== editingRowId.value);
 
   const isDuplicate = temp.find(
     (item) => item.name.toLowerCase() === editName.value.toLowerCase()
@@ -413,16 +410,12 @@ const saveEdited = async () => {
       msg: rsp.data.displayMessage,
       icon: 'sync_alt',
     });
-    isEditing.value = false;
-    editingRowIndex.value = null;
     loadSource();
   }
 };
 
 const saveEntry = () => {
   if (leadName.value) {
-    editingRowIndex.value = null;
-    isEditing.value = false;
     saveNewEntry();
   } else {
     error.value = true;
@@ -459,10 +452,7 @@ const loadSource = async () => {
   const rsp = await api.get('sourceLead');
 
   if (rsp.data) {
-    sourceTemp.value = rsp.data;
-    source.value = rsp.data.filter((item: { inactive: boolean }) => {
-      return item.inactive === checkBox.value;
-    });
+    source.value = rsp.data;
   }
   fetchingData.value = false;
 };
@@ -475,7 +465,7 @@ watch(leadName, () => {
     return;
   }
 
-  const temp = sourceTemp.value.find(
+  const temp = source.value.find(
     (item) => item.name.toLowerCase() === leadName.value.toLocaleLowerCase()
   );
 
@@ -485,15 +475,7 @@ watch(leadName, () => {
   }
 });
 
-watch(checkBox, () => {
-  editingRowIndex.value = null;
-  isEditing.value = false;
-  source.value = sourceTemp.value.filter((item) => {
-    return item.inactive === checkBox.value;
-  });
-});
-
-watch(nameSearchQuery, () => {
+watch(filteredData, () => {
   editingRowIndex.value = null;
   isEditing.value = false;
 });
