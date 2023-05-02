@@ -334,7 +334,7 @@ const editingRowId = ref<number | null>(null);
 const error = ref(false);
 const msg = ref('');
 const editName = ref('');
-const format = ref('DD/MM/YYYY@hh:mmA');
+const format = ref('DD/MM/YYYY @hh:mmA');
 
 const filteredData = computed(() => {
   return source.value.filter((item) => {
