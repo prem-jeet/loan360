@@ -62,6 +62,7 @@
                   :error="error"
                   :error-message="msg"
                   placeholder="name"
+                  @update:model-value="validateInputName"
                 >
                   <template v-slot:prepend> Lead </template>
                   <template v-slot:after>
@@ -369,22 +370,6 @@ const editEntry = (id: number, rowIndex: number) => {
     editEntryConfirmed(id, rowIndex);
   }
 };
-const saveNewEntry = async () => {
-  let payLoad = {
-    name: leadName.value,
-    inactive: false,
-    createdOn: new Date(),
-  };
-  const rsp = await api.post('/sourceLead', payLoad);
-  if (rsp.data) {
-    onSuccess({
-      msg: rsp.data.displayMessage,
-      icon: 'sync_alt',
-    });
-    leadName.value = '';
-    loadSource();
-  }
-};
 const saveEdited = async () => {
   const temp = source.value.filter((item) => item.id !== editingRowId.value);
 
@@ -414,9 +399,22 @@ const saveEdited = async () => {
   }
 };
 
-const saveEntry = () => {
+const saveEntry = async () => {
   if (leadName.value) {
-    saveNewEntry();
+    let payLoad = {
+      name: leadName.value,
+      inactive: false,
+      createdOn: new Date(),
+    };
+    const rsp = await api.post('/sourceLead', payLoad);
+    if (rsp.data) {
+      onSuccess({
+        msg: rsp.data.displayMessage,
+        icon: 'sync_alt',
+      });
+      leadName.value = '';
+      loadSource();
+    }
   } else {
     error.value = true;
   }
@@ -457,7 +455,7 @@ const loadSource = async () => {
   fetchingData.value = false;
 };
 
-watch(leadName, () => {
+const validateInputName = () => {
   error.value = false;
   msg.value = '';
 
@@ -473,7 +471,7 @@ watch(leadName, () => {
     error.value = true;
     msg.value = 'Item already exists!';
   }
-});
+};
 
 watch(filteredData, () => {
   editingRowIndex.value = null;
