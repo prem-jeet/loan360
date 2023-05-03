@@ -337,13 +337,13 @@ const editingRowId = ref<number | null>(null);
 const editName = ref('');
 const format = ref('DD/MM/YYYY @hh:mmA');
 
-const filteredData = computed(() => {
-  return source.value.filter(
+const filteredData = computed(() =>
+  source.value.filter(
     (item) =>
       item.name.toLowerCase().includes(nameSearchQuery.value.toLowerCase()) &&
       item.inactive === checkBox.value
-  );
-});
+  )
+);
 
 const isDuplicate = computed(
   () =>
