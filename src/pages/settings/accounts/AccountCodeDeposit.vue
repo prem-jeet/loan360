@@ -268,7 +268,6 @@
                   :options="products"
                   label="Select product"
                   map-options
-                  menu-shrink
                   emit-value
                   outlined
                   :rules="[(val:string) => val!=='']"
@@ -284,7 +283,6 @@
                   label="Select category"
                   outlined
                   map-options
-                  menu-shrink
                   emit-value
                   :rules="[(val:string) => val!=='']"
                   hide-bottom-space
@@ -299,7 +297,6 @@
                   outlined
                   map-options
                   emit-value
-                  menu-shrink
                   :rules="[(val:string) => val!=='']"
                   hide-bottom-space
                 />
@@ -310,7 +307,6 @@
                   dense
                   use-input
                   map-options
-                  menu-shrink
                   emit-value
                   hide-dropdown-icon
                   :options="accountNameOptions"
@@ -631,6 +627,34 @@ const loadWithisApplication = () => {
   }
 };
 
+const loadAccountHeads = async () => {
+  fetchingData.value = true;
+  const rsp = await api.get('accountHead');
+
+  if (rsp.data) {
+    accountHeads.value = rsp.data.map((item: { id: number; name: string }) => ({
+      value: item.id,
+      label: item.name,
+    }));
+  }
+  fetchingData.value = false;
+};
+
+const loadAccountCodes = async () => {
+  fetchingData.value = true;
+  const rsp = await api.get('accountCodeBySection/D');
+
+  if (rsp.data) {
+    accountCodes.value = rsp.data.map(
+      (item: { code: string; name: string }) => ({
+        value: item.code,
+        label: item.name,
+      })
+    );
+  }
+  fetchingData.value = false;
+};
+
 watch(product, () => {
   if (
     product.value === 'FD' ||
@@ -658,32 +682,9 @@ watch(newCodeDeposit, () => {
   }
 });
 
-onMounted(async () => {
-  fetchingData.value = true;
-  const rsp = await api.get('accountHead');
-
-  if (rsp.data) {
-    accountHeads.value = rsp.data.map((item: { id: number; name: string }) => ({
-      value: item.id,
-      label: item.name,
-    }));
-  }
-  fetchingData.value = false;
-});
-
-onMounted(async () => {
-  fetchingData.value = true;
-  const rsp = await api.get('accountCodeBySection/D');
-
-  if (rsp.data) {
-    accountCodes.value = rsp.data.map(
-      (item: { code: string; name: string }) => ({
-        value: item.code,
-        label: item.name,
-      })
-    );
-  }
-  fetchingData.value = false;
+onMounted(() => {
+  loadAccountCodes();
+  loadAccountHeads();
 });
 </script>
 
