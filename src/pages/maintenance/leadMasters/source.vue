@@ -106,7 +106,9 @@
                     size="xs"
                     outline
                     color="red"
-                    @click="changeActive(props.row.id, props.row.inactive)"
+                    @click="
+                      () => changeActive(props.row.id, props.row.inactive)
+                    "
                   >
                   </q-btn>
                   <q-btn
@@ -224,7 +226,9 @@
                     :label="props.row.inactive ? 'activate' : 'deactivate'"
                     size="sm"
                     color="red"
-                    @click="changeActive(props.row.id, props.row.inactive)"
+                    @click="
+                      () => changeActive(props.row.id, props.row.inactive)
+                    "
                   >
                   </q-btn>
                   <q-btn
@@ -341,13 +345,12 @@ const filteredData = computed(() => {
   );
 });
 
-const isDuplicate = computed(() => {
-  return source.value.find(
-    (item) => item.name.toLocaleLowerCase() === leadName.value
-  )
-    ? true
-    : false;
-});
+const isDuplicate = computed(
+  () =>
+    !!source.value.find(
+      (item) => item.name.toLocaleLowerCase() === leadName.value
+    )
+);
 
 const setFormData = () => {
   let temp;
@@ -395,7 +398,7 @@ const saveEdited = async () => {
     updatedOn: new Date(),
   };
   const rsp = await api.put('/sourceLead/update', payLoad);
-  if (rsp.data) {
+  if (rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
       icon: 'sync_alt',
@@ -411,7 +414,7 @@ const saveEntry = async () => {
     createdOn: new Date(),
   };
   const rsp = await api.post('/sourceLead', payLoad);
-  if (rsp.data) {
+  if (rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
       icon: 'sync_alt',
@@ -434,7 +437,7 @@ const changeActive = (id: number, state: boolean) => {
 const changeActiveConfirm = async (id: number, state: boolean) => {
   const str = state ? 'active' : 'inactive';
   const rsp = await api.put('/sourceLead/' + str, {
-    id: id,
+    id,
   });
   if (rsp.data && rsp.data.displayMessage) {
     onSuccess({ msg: rsp.data.displayMessage });
