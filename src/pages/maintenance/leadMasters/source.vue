@@ -59,19 +59,18 @@
                   outlined
                   dense
                   no-error-icon
-                  :error="error"
-                  :error-message="msg"
+                  :error="isDuplicate"
+                  error-message="Item alredy exits"
                   placeholder="name"
-                  @update:model-value="validateInputName"
                 >
                   <template v-slot:prepend> Lead </template>
                   <template v-slot:after>
                     <q-btn
-                      :icon="'add '"
+                      icon="add"
                       color="teal"
                       size="md"
-                      :disable="error || leadName === ''"
-                      @click="saveEntry()"
+                      :disable="isDuplicate || leadName === ''"
+                      @click="saveEntry"
                     />
                   </template>
                 </q-input>
@@ -116,7 +115,7 @@
                     outline
                     color="green-10"
                     v-if="editingRowIndex === props.rowIndex"
-                    @click="() => saveEdited()"
+                    @click="saveEdited"
                   >
                     <q-tooltip>Save</q-tooltip>
                   </q-btn>
@@ -234,7 +233,7 @@
                     size="sm"
                     color="teal"
                     v-if="editingRowIndex === props.rowIndex"
-                    @click="() => saveEdited()"
+                    @click="saveEdited"
                   >
                     <q-tooltip>Save</q-tooltip>
                   </q-btn>
@@ -305,21 +304,21 @@ const columns: {
     required: true,
     align: 'left',
     field: 'createdOn',
-    label: 'Created',
+    label: 'CreatedOn',
   },
   {
     name: 'updatedOn',
     required: true,
     align: 'left',
     field: 'updatedOn',
-    label: 'Updated',
+    label: 'UpdatedOn',
   },
   {
     name: 'inactiveOn',
     required: true,
     align: 'left',
     field: 'inactiveOn',
-    label: 'In-Active',
+    label: 'In-ActiveOn',
   },
 ];
 
@@ -331,8 +330,6 @@ const checkBox = ref(false);
 const isEditing = ref(false);
 const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
-const error = ref(false);
-const msg = ref('');
 const editName = ref('');
 const format = ref('DD/MM/YYYY @hh:mmA');
 
@@ -342,6 +339,14 @@ const filteredData = computed(() => {
       item.name.toLowerCase().includes(nameSearchQuery.value.toLowerCase()) &&
       item.inactive === checkBox.value
   );
+});
+
+const isDuplicate = computed(() => {
+  return source.value.find(
+    (item) => item.name.toLocaleLowerCase() === leadName.value
+  )
+    ? true
+    : false;
 });
 
 const setFormData = () => {
@@ -400,49 +405,41 @@ const saveEdited = async () => {
 };
 
 const saveEntry = async () => {
-  if (leadName.value) {
-    let payLoad = {
-      name: leadName.value,
-      inactive: false,
-      createdOn: new Date(),
-    };
-    const rsp = await api.post('/sourceLead', payLoad);
-    if (rsp.data) {
-      onSuccess({
-        msg: rsp.data.displayMessage,
-        icon: 'sync_alt',
-      });
-      leadName.value = '';
-      loadSource();
-    }
-  } else {
-    error.value = true;
+  let payLoad = {
+    name: leadName.value,
+    inactive: false,
+    createdOn: new Date(),
+  };
+  const rsp = await api.post('/sourceLead', payLoad);
+  if (rsp.data) {
+    onSuccess({
+      msg: rsp.data.displayMessage,
+      icon: 'sync_alt',
+    });
+    leadName.value = '';
+    loadSource();
   }
 };
 
-const changeActive = async (id: number, state: boolean) => {
+const changeActive = (id: number, state: boolean) => {
   if (editingRowIndex.value === null) {
     confirmDialog(() => changeActiveConfirm(id, state), {
       msg: state
         ? 'Are you sure you want to activate ?'
         : 'Are you sure you want to deactivate ?',
     });
-  } else {
-    return;
   }
 };
 
 const changeActiveConfirm = async (id: number, state: boolean) => {
-  const payLoad = {
-    id: id,
-  };
-
   const str = state ? 'active' : 'inactive';
-  const rsp = await api.put('/sourceLead/' + str, payLoad);
-  if (rsp.data) {
+  const rsp = await api.put('/sourceLead/' + str, {
+    id: id,
+  });
+  if (rsp.data && rsp.data.displayMessage) {
     onSuccess({ msg: rsp.data.displayMessage });
+    loadSource();
   }
-  loadSource();
 };
 
 const loadSource = async () => {
@@ -453,24 +450,6 @@ const loadSource = async () => {
     source.value = rsp.data;
   }
   fetchingData.value = false;
-};
-
-const validateInputName = () => {
-  error.value = false;
-  msg.value = '';
-
-  if (!leadName.value) {
-    return;
-  }
-
-  const temp = source.value.find(
-    (item) => item.name.toLowerCase() === leadName.value.toLocaleLowerCase()
-  );
-
-  if (temp) {
-    error.value = true;
-    msg.value = 'Item already exists!';
-  }
 };
 
 watch(filteredData, () => {
