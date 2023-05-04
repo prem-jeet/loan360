@@ -29,7 +29,7 @@
               </div>
             </div>
 
-            <div class="row full-width q-pt-sm">
+            <div class="row full-width q-mt-sm">
               <div class="col-xs-12 col-sm-4 col-md-3 q-pb-sm">
                 <q-input
                   v-model="nameSearchQuery"
@@ -59,18 +59,18 @@
                   outlined
                   dense
                   no-error-icon
-                  :error="error"
-                  :error-message="msg"
+                  :error="isDuplicate"
+                  error-message="Item alredy exits"
                   placeholder="name"
                 >
                   <template v-slot:prepend> Lead </template>
                   <template v-slot:after>
                     <q-btn
-                      :icon="'add '"
+                      icon="add"
                       color="teal"
                       size="md"
-                      :disable="error"
-                      @click="saveEntry()"
+                      :disable="isDuplicate || leadName === ''"
+                      @click="saveEntry"
                     />
                   </template>
                 </q-input>
@@ -106,7 +106,9 @@
                     size="xs"
                     outline
                     color="red"
-                    @click="changeActive(props.row.id, props.row.inactive)"
+                    @click="
+                      () => changeActive(props.row.id, props.row.inactive)
+                    "
                   >
                   </q-btn>
                   <q-btn
@@ -115,7 +117,7 @@
                     outline
                     color="green-10"
                     v-if="editingRowIndex === props.rowIndex"
-                    @click="() => saveEdited()"
+                    @click="saveEdited"
                   >
                     <q-tooltip>Save</q-tooltip>
                   </q-btn>
@@ -141,21 +143,15 @@
                   :color="editName ? 'green' : 'red'"
                   autofocus
                 />
-                <span v-else>
-                  {{
-                    props.row.name.charAt(0).toUpperCase() +
-                    props.row.name.slice(1)
-                  }}
-                </span>
+                <span v-else> {{ firstLetterCpitalze(props.row.name) }} </span>
               </q-td>
-              <q-td key="createdOn" :props="props">
-                {{ date.formatDate(props.row.createdOn, 'DD/MM/YYYY@hh:mmA') }}
-              </q-td>
-              <q-td key="updatedOn" :props="props">
-                {{ date.formatDate(props.row.updatedOn, 'DD/MM/YYYY@hh:mmA') }}
-              </q-td>
-              <q-td key="inactiveOn" :props="props">
-                {{ date.formatDate(props.row.inactiveOn, 'DD/MM/YYYY@hh:mmA') }}
+
+              <q-td
+                :props="props"
+                v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
+                :key="key"
+              >
+                {{ formatDate(props.row[key], format) }}
               </q-td>
             </q-tr>
           </template>
@@ -178,53 +174,26 @@
                         autofocus
                       />
                       <span v-else>
-                        {{
-                          props.row.name.charAt(0).toUpperCase() +
-                          props.row.name.slice(1)
-                        }}
+                        {{ firstLetterCpitalze(props.row.name) }}
                       </span>
                     </div>
                   </div>
                 </q-card-section>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Created :</div>
-                    <div class="col-12">
-                      {{
-                        date.formatDate(
-                          props.row.createdOn,
-                          'DD/MM/YYYY@hh:mmA'
-                        )
-                      }}
+                <template
+                  v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
+                  :key="key"
+                >
+                  <q-card-section v-if="props.row[key]">
+                    <div class="row q-gutter-y-xs">
+                      <div class="col-12 text-weight-medium">
+                        {{ capitalCase(key.split('On').join(' on')) }} :
+                      </div>
+                      <div class="col-12">
+                        {{ formatDate(props.row[key], format) }}
+                      </div>
                     </div>
-                  </div>
-                </q-card-section>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Updated :</div>
-                    <div class="col-12">
-                      {{
-                        date.formatDate(
-                          props.row.updatedOn,
-                          'DD/MM/YYYY@hh:mmA'
-                        )
-                      }}
-                    </div>
-                  </div>
-                </q-card-section>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Inactive :</div>
-                    <div class="col-12">
-                      {{
-                        date.formatDate(
-                          props.row.inactiveOn,
-                          'DD/MM/YYYY@hh:mmA'
-                        )
-                      }}
-                    </div>
-                  </div>
-                </q-card-section>
+                  </q-card-section>
+                </template>
 
                 <q-card-actions align="center" class="q-py-md bg-grey-2">
                   <q-btn
@@ -243,16 +212,18 @@
                     :label="props.row.inactive ? 'activate' : 'deactivate'"
                     size="sm"
                     color="red"
-                    @click="changeActive(props.row.id, props.row.inactive)"
+                    @click="
+                      () => changeActive(props.row.id, props.row.inactive)
+                    "
                   >
                   </q-btn>
                   <q-btn
                     label="save"
                     icon="save"
                     size="sm"
-                    color="green-10"
+                    color="teal"
                     v-if="editingRowIndex === props.rowIndex"
-                    @click="() => saveEdited()"
+                    @click="saveEdited"
                   >
                     <q-tooltip>Save</q-tooltip>
                   </q-btn>
@@ -281,9 +252,10 @@ import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch } from 'vue';
 import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
-import { date } from 'quasar';
-
-interface Status {
+import { formatDate } from 'src/utils/date';
+import { useQuasar } from 'quasar';
+import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
+interface Source {
   name: string;
   id: number | null;
   createdOn: string;
@@ -323,44 +295,50 @@ const columns: {
     required: true,
     align: 'left',
     field: 'createdOn',
-    label: 'Created',
+    label: 'Created On',
   },
   {
     name: 'updatedOn',
     required: true,
     align: 'left',
     field: 'updatedOn',
-    label: 'Updated',
+    label: 'Updated On',
   },
   {
     name: 'inactiveOn',
     required: true,
     align: 'left',
     field: 'inactiveOn',
-    label: 'In-Active',
+    label: 'In-Active On',
   },
 ];
 
+const $q = useQuasar();
 const fetchingData = ref(false);
 const leadName = ref('');
 const nameSearchQuery = ref('');
-const status = ref<Status[]>([]);
-const statusTemp = ref<Status[]>([]);
+const status = ref<Source[]>([]);
 const checkBox = ref(false);
 const isEditing = ref(false);
 const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
-const error = ref(false);
-const msg = ref('');
 const editName = ref('');
+const format = 'DD/MM/YYYY @hh:mmA';
 
-const filteredData = computed(() => {
-  return status.value.filter((item) => {
-    return item.name
-      .toLowerCase()
-      .includes(nameSearchQuery.value.toLowerCase());
-  });
-});
+const filteredData = computed(() =>
+  status.value.filter(
+    (item) =>
+      item.name.toLowerCase().includes(nameSearchQuery.value.toLowerCase()) &&
+      item.inactive === checkBox.value
+  )
+);
+
+const isDuplicate = computed(
+  () =>
+    !!status.value.find(
+      (item) => item.name.toLocaleLowerCase() === leadName.value
+    )
+);
 
 const setFormData = () => {
   let temp;
@@ -388,33 +366,15 @@ const editEntry = (id: number, rowIndex: number) => {
     editEntryConfirmed(id, rowIndex);
   }
 };
-const saveNewEntry = async () => {
-  let payLoad = {
-    name: leadName.value,
-    inactive: false,
-    createdOn: new Date(),
-  };
-  const rsp = await api.post('/statusLead', payLoad);
-  if (rsp.data) {
-    onSuccess({
-      msg: rsp.data.displayMessage,
-      icon: 'sync_alt',
-    });
-    leadName.value = '';
-    loadSource();
-  }
-};
 const saveEdited = async () => {
-  const temp = statusTemp.value.filter(
-    (item) => item.id !== editingRowId.value
-  );
+  const temp = status.value.filter((item) => item.id !== editingRowId.value);
 
   const isDuplicate = temp.find(
     (item) => item.name.toLowerCase() === editName.value.toLowerCase()
   );
   if (isDuplicate) {
     onFailure({
-      msg: 'Item already exists',
+      msg: 'Item already exist',
       icon: 'warning',
     });
     return;
@@ -426,48 +386,51 @@ const saveEdited = async () => {
     updatedOn: new Date(),
   };
   const rsp = await api.put('/statusLead/update', payLoad);
-  if (rsp.data) {
+  if (rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
       icon: 'sync_alt',
     });
-    isEditing.value = false;
-    editingRowIndex.value = null;
     loadSource();
   }
 };
 
-const saveEntry = () => {
-  if (leadName.value) {
-    saveNewEntry();
-  } else {
-    error.value = true;
+const saveEntry = async () => {
+  let payLoad = {
+    name: leadName.value,
+    inactive: false,
+    createdOn: new Date(),
+  };
+  const rsp = await api.post('/statusLead', payLoad);
+  if (rsp.data.displayMessage) {
+    onSuccess({
+      msg: rsp.data.displayMessage,
+      icon: 'sync_alt',
+    });
+    leadName.value = '';
+    loadSource();
   }
 };
 
-const changeActive = async (id: number, state: boolean) => {
+const changeActive = (id: number, state: boolean) => {
   if (editingRowIndex.value === null) {
     confirmDialog(() => changeActiveConfirm(id, state), {
       msg: state
         ? 'Are you sure you want to activate ?'
         : 'Are you sure you want to deactivate ?',
     });
-  } else {
-    return;
   }
 };
 
 const changeActiveConfirm = async (id: number, state: boolean) => {
-  const payLoad = {
-    id: id,
-  };
-
   const str = state ? 'active' : 'inactive';
-  const rsp = await api.put('/statusLead/' + str, payLoad);
-  if (rsp.data) {
+  const rsp = await api.put('/statusLead/' + str, {
+    id,
+  });
+  if (rsp.data && rsp.data.displayMessage) {
     onSuccess({ msg: rsp.data.displayMessage });
+    loadSource();
   }
-  loadSource();
 };
 
 const loadSource = async () => {
@@ -475,52 +438,14 @@ const loadSource = async () => {
   const rsp = await api.get('statusLead');
 
   if (rsp.data) {
-    const transformedData = rsp.data.map(
-      (item: { createdOn: string; updatedOn: string; inactiveOn: string }) => {
-        return {
-          ...item,
-          createdOn: item.createdOn !== null ? new Date(item.createdOn) : '',
-          updatedOn: item.updatedOn !== null ? new Date(item.updatedOn) : '',
-          inactiveOn: item.inactiveOn !== null ? new Date(item.inactiveOn) : '',
-        };
-      }
-    );
-
-    statusTemp.value = transformedData;
-
-    status.value = transformedData.filter((item: { inactive: boolean }) => {
-      return item.inactive === checkBox.value;
-    });
+    status.value = rsp.data;
   }
   fetchingData.value = false;
 };
 
-watch(leadName, () => {
-  error.value = false;
-  msg.value = '';
+watch(filteredData, () => {
   editingRowIndex.value = null;
   isEditing.value = false;
-
-  const temp = statusTemp.value.find(
-    (item) => item.name.toLowerCase() === leadName.value.toLowerCase()
-  );
-
-  if (temp) {
-    error.value = true;
-    msg.value = 'Item already exists!';
-  }
-});
-watch(nameSearchQuery, () => {
-  editingRowIndex.value = null;
-  isEditing.value = false;
-});
-
-watch(checkBox, () => {
-  editingRowIndex.value = null;
-  isEditing.value = false;
-  status.value = statusTemp.value.filter((item) => {
-    return item.inactive === checkBox.value;
-  });
 });
 
 onMounted(() => {
