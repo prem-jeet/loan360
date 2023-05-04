@@ -267,6 +267,7 @@ import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch } from 'vue';
 import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
 import { formatDate } from 'src/utils/date';
+import { useQuasar } from 'quasar';
 
 interface Source {
   name: string;
@@ -326,6 +327,7 @@ const columns: {
   },
 ];
 
+const $q = useQuasar();
 const fetchingData = ref(false);
 const leadName = ref('');
 const nameSearchQuery = ref('');
@@ -335,7 +337,7 @@ const isEditing = ref(false);
 const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
 const editName = ref('');
-const format = ref('DD/MM/YYYY @hh:mmA');
+const format = 'DD/MM/YYYY @hh:mmA';
 
 const filteredData = computed(() =>
   source.value.filter(
