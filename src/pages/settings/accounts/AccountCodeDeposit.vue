@@ -26,7 +26,7 @@
           card-container-class="q-gutter-y-md q-mt-xs"
         >
           <template v-slot:top>
-            <div class="row q-gutter-y-lg q-pb-xs-md">
+            <div class="row q-gutter-y-sm q-pb-xs-md">
               <div class="col-12">
                 <div class="row items-center q-gutter-md">
                   <div class="col-auto text-h6">Account Code Deposit</div>
@@ -43,7 +43,7 @@
                 </div>
               </div>
               <div class="row items-center q-gutter-x-md">
-                <div class="col-12 q-mb-sm">
+                <div class="col-12">
                   <span class="text-h6">Filter</span>
                   <span v-if="accountCodeDeposits.length" class="q-ml-md">
                     <q-btn
