@@ -16,7 +16,7 @@
           bordered
           title="Nature entry"
           :no-data-label="
-            accountCodeDepositsTemp.length
+            accountCodeDeposits.length
               ? 'No result found'
               : 'Select a filter product and category'
           "
@@ -45,7 +45,7 @@
               <div class="row items-center q-gutter-x-md">
                 <div class="col-12 q-mb-sm">
                   <span class="text-h6">Filter</span>
-                  <span v-if="accountCodeDepositsTemp.length" class="q-ml-md">
+                  <span v-if="accountCodeDeposits.length" class="q-ml-md">
                     <q-btn
                       label="Clear"
                       color="red"
@@ -54,7 +54,15 @@
                     ></q-btn
                   ></span>
                 </div>
-                <div class="col-xs-12 col-sm-4 col-md-4 q-pt-md">
+              </div>
+            </div>
+
+            <q-form
+              class="full-width"
+              @submit.prevent="loadAccountCodeDeposits"
+            >
+              <div class="row">
+                <div class="col-xs-12 col-sm-3 col-md-2 q-pt-sm q-pr-sm">
                   <q-select
                     v-model="product"
                     dense
@@ -63,11 +71,20 @@
                     emit-value
                     label="Select product"
                     outlined
-                    :error="errorProduct"
                     hide-bottom-space
-                  />
+                    :rules="[(val) => !!val || '']"
+                  >
+                    <template v-slot:append>
+                      <q-icon
+                        v-if="product"
+                        name="close"
+                        @click.stop.prevent="product = ''"
+                        class="cursor-pointer"
+                      />
+                    </template>
+                  </q-select>
                 </div>
-                <div class="col-xs-12 col-sm-4 col-md-4 q-pt-md">
+                <div class="col-xs-12 col-sm-3 col-md-2 q-pt-sm q-pr-sm">
                   <q-select
                     v-model="category"
                     dense
@@ -76,37 +93,31 @@
                     outlined
                     map-options
                     emit-value
-                    :error="errorCategory"
                     hide-bottom-space
-                  />
+                    :rules="[(val) => !!val || '']"
+                  >
+                    <template v-slot:append>
+                      <q-icon
+                        v-if="category"
+                        name="close"
+                        @click.stop.prevent="category = ''"
+                        class="cursor-pointer"
+                      />
+                    </template>
+                  </q-select>
                 </div>
-                <div class="col-xs-12 col-sm-2 col-md-2 q-pt-md">
-                  <q-btn
-                    color="primary"
-                    label="search"
-                    @click="searchDeposits"
-                  />
+                <div class="col-xs-12 col-sm-2 col-md-2 q-pt-sm">
+                  <q-btn color="primary" label="search" type="submit" />
                 </div>
-                <div
-                  v-if="
-                    product === 'FD' || product === 'RD' || product === 'DD'
-                  "
-                  class="col-12 q-ml-none q-pl-sm q-pt-sm"
-                >
-                  <q-checkbox
-                    v-model="checkBox"
-                    disable
-                    label="isApplication"
-                  />
-                </div>
-
-                <div v-else class="col-12 q-ml-none q-pl-sm q-pt-sm">
-                  <q-checkbox
-                    @click="loadWithisApplication()"
-                    v-model="checkBox"
-                    label="isApplication"
-                  />
-                </div>
+              </div>
+            </q-form>
+            <div class="row">
+              <div class="col-12 q-py-sm">
+                <q-checkbox
+                  v-model="checkBox"
+                  :disable="isApplicationCondition"
+                  label="isApplication"
+                />
               </div>
             </div>
           </template>
@@ -127,7 +138,7 @@
                     size="xs"
                     outline
                     color="accent"
-                    @click="editEntry(props.rowIndex)"
+                    @click="editEntry(props.row.id)"
                   >
                     <q-tooltip>Edit</q-tooltip>
                   </q-btn>
@@ -136,7 +147,7 @@
                     size="xs"
                     outline
                     color="red"
-                    @click="() => deleteEntry(props.rowIndex)"
+                    @click="() => deleteEntry(props.row.id)"
                   >
                     <q-tooltip>Delete</q-tooltip>
                   </q-btn>
@@ -217,7 +228,7 @@
                     icon="edit"
                     size="sm"
                     color="teal"
-                    @click="editEntry(props.rowIndex)"
+                    @click="editEntry(props.row.id)"
                   >
                     <q-tooltip>Edit</q-tooltip>
                   </q-btn>
@@ -226,7 +237,7 @@
                     icon="delete"
                     size="sm"
                     color="red"
-                    @click="() => deleteEntry(props.rowIndex)"
+                    @click="() => deleteEntry(props.row.id)"
                   >
                     <q-tooltip>Delete</q-tooltip>
                   </q-btn>
@@ -272,7 +283,16 @@
                   outlined
                   :rules="[(val:string) => val!=='']"
                   hide-bottom-space
-                />
+                >
+                  <template v-slot:append>
+                    <q-icon
+                      v-if="newCodeDeposit.productCode"
+                      name="close"
+                      @click.stop.prevent="newCodeDeposit.productCode = ''"
+                      class="cursor-pointer"
+                    />
+                  </template>
+                </q-select>
               </div>
               <div class="col-12 q-mt-lg">
                 <q-select
@@ -286,7 +306,16 @@
                   emit-value
                   :rules="[(val:string) => val!=='']"
                   hide-bottom-space
-                />
+                >
+                  <template v-slot:append>
+                    <q-icon
+                      v-if="newCodeDeposit.categoryCode"
+                      name="close"
+                      @click.stop.prevent="newCodeDeposit.categoryCode = ''"
+                      class="cursor-pointer"
+                    />
+                  </template>
+                </q-select>
               </div>
               <div class="col-12 q-mt-lg">
                 <q-select
@@ -299,7 +328,16 @@
                   emit-value
                   :rules="[(val:string) => val!=='']"
                   hide-bottom-space
-                />
+                >
+                  <template v-slot:append>
+                    <q-icon
+                      v-if="newCodeDeposit.accountCode"
+                      name="close"
+                      @click.stop.prevent="newCodeDeposit.accountCode = ''"
+                      class="cursor-pointer"
+                    />
+                  </template>
+                </q-select>
               </div>
               <div class="col-12 q-mt-lg">
                 <q-select
@@ -315,25 +353,21 @@
                   :rules="[(val) => val !== null]"
                   @input-value="loadAccountNames"
                   ref="dropdown"
-                />
+                >
+                  <template v-slot:append>
+                    <q-icon
+                      v-if="newCodeDeposit.accountId"
+                      name="close"
+                      @click.stop.prevent="newCodeDeposit.accountId = null"
+                      class="cursor-pointer"
+                    />
+                  </template>
+                </q-select>
               </div>
 
-              <div
-                v-if="
-                  newCodeDeposit.productCode === 'FD' ||
-                  newCodeDeposit.productCode === 'RD' ||
-                  newCodeDeposit.productCode === 'DD'
-                "
-                class="col-12 q-mt-sm"
-              >
+              <div class="col-12 q-mt-sm">
                 <q-checkbox
-                  disable
-                  v-model="newCodeDeposit.isApplication"
-                  label="isApplication"
-                />
-              </div>
-              <div v-else class="col-12 q-mt-sm">
-                <q-checkbox
+                  :disable="formCheckboxCondition"
                   v-model="newCodeDeposit.isApplication"
                   label="isApplication"
                 />
@@ -344,8 +378,8 @@
         <q-separator class="q-mt-md" />
         <q-card-actions align="center" class="q-py-md bg-grey-2 q-mt-auto">
           <q-btn
-            :label="editingRowIndex === null ? 'Add' : 'Save '"
-            :icon="editingRowIndex === null ? 'add' : 'save '"
+            :label="editingRowId === null ? 'Add' : 'Save '"
+            :icon="editingRowId === null ? 'add' : 'save '"
             color="teal"
             type="submit"
           />
@@ -436,8 +470,6 @@ const newCodeDeposit = reactive<AccountCodeDeposit>({
 
 let mode: 'new' | 'edit' = 'new';
 const checkBox = ref(false);
-const errorProduct = ref(false);
-const errorCategory = ref(false);
 const isEntryModalActive = ref(false);
 const fetchingData = ref(false);
 const accountHeads = ref<AccountHeads[]>([]);
@@ -446,8 +478,7 @@ const accountCodes = ref<AccountCodes[]>([]);
 const product = ref('');
 const category = ref('');
 const accountCodeDeposits = ref<AccountCodeDeposit[]>([]);
-const accountCodeDepositsTemp = ref<AccountCodeDeposit[]>([]); // for isapplicable
-const editingRowIndex = ref<number | null>(null);
+const editingRowId = ref<number | null>(null);
 const dropdown = ref(null);
 const showAddnew = ref(false);
 
@@ -467,14 +498,32 @@ const categorys = ref<Options[]>([
   { value: 'DR', label: "Director's Relatives" },
 ]);
 
-const filteredData = computed(() => {
-  return accountCodeDeposits.value;
-});
+const filteredData = computed(() =>
+  accountCodeDeposits.value.filter(
+    (item) => item.isApplication === checkBox.value
+  )
+);
+
+// This for may change product in newform
+const isApplicationCondition = computed(
+  () =>
+    product.value === 'FD' || product.value === 'RD' || product.value === 'DD'
+);
+
+const formCheckboxCondition = computed(
+  () =>
+    newCodeDeposit.productCode === 'FD' ||
+    newCodeDeposit.productCode === 'RD' ||
+    newCodeDeposit.productCode === 'DD'
+);
 
 const setFormData = () => {
   let temp;
-  if (editingRowIndex.value !== null) {
-    temp = accountCodeDeposits.value[editingRowIndex.value];
+  if (editingRowId.value !== null) {
+    let index = accountCodeDeposits.value.findIndex(
+      (obj) => obj.id === editingRowId.value
+    );
+    temp = accountCodeDeposits.value[index];
   }
   newCodeDeposit.accountCode = temp ? temp.accountCode : '';
   newCodeDeposit.accountId = temp ? temp.accountId : null;
@@ -485,16 +534,16 @@ const setFormData = () => {
 
 const newEntry = () => {
   mode = 'new';
-  editingRowIndex.value = null;
+  editingRowId.value = null;
   isEntryModalActive.value = true;
   accountNameOptions.value = [];
-
   setFormData();
 };
-const editEntry = (index: number) => {
+const editEntry = (id: number) => {
   mode = 'edit';
-  editingRowIndex.value = index;
-  setFormData(), (isEntryModalActive.value = true);
+  editingRowId.value = id;
+  setFormData();
+  isEntryModalActive.value = true;
 };
 
 const saveNewEntry = async () => {
@@ -506,7 +555,7 @@ const saveNewEntry = async () => {
     productCode: newCodeDeposit.productCode,
   };
   const rsp = await api.post('accountCodeDeposit', tempObj);
-  if (rsp.data) {
+  if (rsp.data && rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
       icon: 'sync_alt',
@@ -517,35 +566,30 @@ const saveNewEntry = async () => {
 };
 
 const saveEdited = async () => {
+  console.log('hi');
   const rsp = await api.get('accountHead');
 
   let headObj = rsp.data.filter((item: { id: number }) => {
-    return (
-      item.id === accountCodeDeposits.value[editingRowIndex.value!].accountId
-    );
+    return item.id === newCodeDeposit.accountId;
   });
 
   const payLoad = {
     account: headObj[0],
     accountCode: newCodeDeposit.accountCode,
     accountId: newCodeDeposit.accountId,
-    id: accountCodeDeposits.value[editingRowIndex.value!].id,
+    id: editingRowId.value,
     isApplication: newCodeDeposit.isApplication,
     productCode: newCodeDeposit.productCode,
     categoryCode: newCodeDeposit.categoryCode,
   };
 
   const rsp_ = await api.post('accountCodeDeposit', payLoad);
-  if (rsp_.data) {
+  if (rsp_.data && rsp_.data.displayMessage) {
     onSuccess({
       msg: rsp_.data.displayMessage,
       icon: 'sync_alt',
     });
     loadAccountCodeDeposits();
-    // accountCodeDeposits.value[index].accountCode = newCodeDeposit.accountCode;
-    // accountCodeDeposits.value[index].accountId = newCodeDeposit.accountId;
-    // accountCodeDeposits.value[index].isApplication =
-    //   newCodeDeposit.isApplication;
     isEntryModalActive.value = false;
   }
 };
@@ -554,18 +598,18 @@ const saveEntry = () => {
   mode === 'new' ? saveNewEntry() : saveEdited();
 };
 
-const deleteEntry = async (rowIndex: number) => {
-  confirmDialog(() => deleteEntryConfirmed(rowIndex), {});
+const deleteEntry = (id: number) => {
+  confirmDialog(() => deleteEntryConfirmed(id), {
+    msg: 'Are you sure you want to delete ?',
+  });
 };
 
-const deleteEntryConfirmed = async (rowIndex: number) => {
-  const rsp = await api.delete(
-    `accountCodeDeposit/${accountCodeDeposits.value[rowIndex].id}`
-  );
-  if (rsp.data) {
+const deleteEntryConfirmed = async (id: number) => {
+  const rsp = await api.delete(`accountCodeDeposit/${id}`);
+  if (rsp.data && rsp.data.displayMessage) {
     onSuccess({ msg: rsp.data.displayMessage, icon: 'delete' });
 
-    accountCodeDeposits.value.splice(rowIndex, 1);
+    loadAccountCodeDeposits();
   }
 };
 
@@ -583,20 +627,10 @@ const loadAccountNames = (searchName: string) => {
 };
 const resetAccountCodeDeposits = () => {
   accountCodeDeposits.value = [];
-  accountCodeDepositsTemp.value = [];
   product.value = '';
   category.value = '';
   checkBox.value = false;
   showAddnew.value = false;
-};
-
-const searchDeposits = () => {
-  if (product.value === '' || category.value === '') {
-    errorProduct.value = true;
-    errorCategory.value = true;
-  } else {
-    loadAccountCodeDeposits();
-  }
 };
 
 const loadAccountCodeDeposits = async () => {
@@ -604,26 +638,8 @@ const loadAccountCodeDeposits = async () => {
     `accountCodeDeposit/${product.value}/${category.value}`
   );
   if (rsp.data) {
-    accountCodeDeposits.value = rsp.data.filter(
-      (item: { isApplication: boolean }) => {
-        return item.isApplication === checkBox.value;
-      }
-    );
-    accountCodeDepositsTemp.value = rsp.data;
+    accountCodeDeposits.value = rsp.data;
     showAddnew.value = true;
-  }
-};
-
-const loadWithisApplication = () => {
-  if (checkBox.value === true) {
-    accountCodeDeposits.value = accountCodeDepositsTemp.value.filter((item) => {
-      return item.isApplication === true;
-    });
-  }
-  if (checkBox.value === false) {
-    accountCodeDeposits.value = accountCodeDepositsTemp.value.filter((item) => {
-      return item.isApplication === false;
-    });
   }
 };
 
@@ -662,15 +678,6 @@ watch(product, () => {
     product.value === 'DD'
   ) {
     checkBox.value = false;
-  }
-  if (product.value !== '') {
-    errorProduct.value = false;
-  }
-});
-
-watch(category, () => {
-  if (category.value !== '') {
-    errorCategory.value = false;
   }
 });
 
