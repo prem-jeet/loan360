@@ -148,14 +148,13 @@
                   props.row.name.slice(1)
                 }}</span>
               </q-td>
-              <q-td key="createdOn" :props="props">
-                {{ formatDate(props.row.createdOn, format) }}
-              </q-td>
-              <q-td key="updatedOn" :props="props">
-                {{ formatDate(props.row.updatedOn, format) }}
-              </q-td>
-              <q-td key="inactiveOn" :props="props">
-                {{ formatDate(props.row.inactiveOn, format) }}
+
+              <q-td
+                :props="props"
+                v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
+                :key="key"
+              >
+                {{ formatDate(props.row[key], format) }}
               </q-td>
             </q-tr>
           </template>
