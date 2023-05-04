@@ -10,6 +10,8 @@
     menu-shrink
     popup-content-style="height: 300px"
     options-dense
+    :emit-value="returnValue"
+    :map-options="returnValue"
   >
     <template v-slot:before-options>
       <q-item>
@@ -105,6 +107,7 @@ interface Props {
   label: string;
   maxChips: number;
   chipKey: string;
+  returnValue?: boolean;
 }
 
 const props = defineProps<Props>();
