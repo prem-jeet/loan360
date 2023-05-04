@@ -143,10 +143,7 @@
                   :color="editName ? 'green' : 'red'"
                   autofocus
                 />
-                <span v-else>{{
-                  props.row.name.charAt(0).toUpperCase() +
-                  props.row.name.slice(1)
-                }}</span>
+                <span v-else> {{ firstLetterCpitalze(props.row.name) }} </span>
               </q-td>
 
               <q-td
@@ -176,37 +173,27 @@
                         :color="editName ? 'green' : 'red'"
                         autofocus
                       />
-                      <span v-else>{{
-                        props.row.name.charAt(0).toUpperCase() +
-                        props.row.name.slice(1)
-                      }}</span>
+                      <span v-else>
+                        {{ firstLetterCpitalze(props.row.name) }}
+                      </span>
                     </div>
                   </div>
                 </q-card-section>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Created :</div>
-                    <div class="col-12">
-                      {{ formatDate(props.row.createdOn, format) }}
+                <template
+                  v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
+                  :key="key"
+                >
+                  <q-card-section v-if="props.row[key]">
+                    <div class="row q-gutter-y-xs">
+                      <div class="col-12 text-weight-medium">
+                        {{ capitalCase(key.split('On').join(' on')) }} :
+                      </div>
+                      <div class="col-12">
+                        {{ formatDate(props.row[key], format) }}
+                      </div>
                     </div>
-                  </div>
-                </q-card-section>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Updated :</div>
-                    <div class="col-12">
-                      {{ formatDate(props.row.updatedOn, format) }}
-                    </div>
-                  </div>
-                </q-card-section>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Inactive :</div>
-                    <div class="col-12">
-                      {{ formatDate(props.row.inactiveOn, format) }}
-                    </div>
-                  </div>
-                </q-card-section>
+                  </q-card-section>
+                </template>
 
                 <q-card-actions align="center" class="q-py-md bg-grey-2">
                   <q-btn
@@ -267,7 +254,7 @@ import { ref, onMounted, computed, watch } from 'vue';
 import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
 import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
-
+import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
 interface Source {
   name: string;
   id: number | null;
