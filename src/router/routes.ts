@@ -74,7 +74,7 @@ const routes: RouteRecordRaw[] = [
           {
             path: 'leadMaster/status',
             name: 'status',
-            component: () => import('pages/maintenance/leadMasters/status.vue'),
+            component: () => import('pages/maintenance/leadMasters/Status.vue'),
           },
         ],
       },
