@@ -309,21 +309,21 @@ const columns: {
     required: true,
     align: 'left',
     field: 'createdOn',
-    label: 'CreatedOn',
+    label: 'Created On',
   },
   {
     name: 'updatedOn',
     required: true,
     align: 'left',
     field: 'updatedOn',
-    label: 'UpdatedOn',
+    label: 'Updated On',
   },
   {
     name: 'inactiveOn',
     required: true,
     align: 'left',
     field: 'inactiveOn',
-    label: 'In-ActiveOn',
+    label: 'In-Active On',
   },
 ];
 
