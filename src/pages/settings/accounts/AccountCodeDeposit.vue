@@ -250,22 +250,20 @@
     </div>
   </div>
   <q-dialog v-model="isEntryModalActive">
-    <q-card>
+    <q-card style="width: 400px">
       <q-form @submit.prevent="saveEntry" @reset="setFormData()">
         <q-card-section class="bg-grey-2">
-          <div class="flex items-center">
-            <span class="text-bold q-mr-xl">{{
-              mode === 'new'
-                ? 'Add account code deposit'
-                : 'Edit account code deposit'
-            }}</span>
-            <q-space />
-            <q-btn
-              class="q-ml-xs-md q-ml-sm-xl"
-              icon="close"
-              flat
-              @click="isEntryModalActive = false"
-            />
+          <div class="row">
+            <div class="col-10 items-center text-h6">
+              {{
+                mode === 'new'
+                  ? 'Add account code deposit'
+                  : 'Edit account code deposit'
+              }}
+            </div>
+            <div class="col-2">
+              <q-btn icon="close" flat @click="isEntryModalActive = false" />
+            </div>
           </div>
         </q-card-section>
         <q-card-section class="q-px-lg q-py-sm">
