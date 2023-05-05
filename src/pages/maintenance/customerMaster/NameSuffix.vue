@@ -29,7 +29,7 @@
               </div>
             </div>
 
-            <div class="row full-width q-col-gutter-y-md">
+            <div class="row full-width q-mt-sm">
               <div class="col-xs-12 col-sm-4 col-md-3 q-pb-sm">
                 <q-input
                   v-model="nameSearchQuery"
@@ -47,7 +47,11 @@
               </div>
 
               <div class="col-xs-12 col-sm-3 col-md-6 q-pb-sm">
-                <q-checkbox v-model="checkBox" label=" In-Active" />
+                <q-checkbox
+                  v-model="checkBox"
+                  label=" In-Active"
+                  @click="(editingRowIndex = null), (isEditing = false)"
+                />
               </div>
               <div class="col-xs-12 col-sm-5 col-md-3 q-pb-sm">
                 <q-input
@@ -55,18 +59,18 @@
                   outlined
                   dense
                   no-error-icon
-                  :error="error"
-                  :error-message="msg"
+                  :error="isDuplicate"
+                  error-message="Item alredy exits"
                   placeholder="name"
                 >
                   <template v-slot:prepend> Suffix </template>
                   <template v-slot:after>
                     <q-btn
-                      :disable="error"
-                      :icon="'add '"
+                      icon="add"
                       color="teal"
                       size="md"
-                      @click="saveEntry()"
+                      :disable="isDuplicate || name === ''"
+                      @click="saveEntry"
                     />
                   </template>
                 </q-input>
@@ -102,7 +106,9 @@
                     size="xs"
                     outline
                     color="red"
-                    @click="changeActive(props.row.id, props.row.inactive)"
+                    @click="
+                      () => changeActive(props.row.id, props.row.inactive)
+                    "
                   >
                   </q-btn>
                   <q-btn
@@ -111,7 +117,7 @@
                     outline
                     color="green-10"
                     v-if="editingRowIndex === props.rowIndex"
-                    @click="() => saveEdited()"
+                    @click="saveEdited"
                   >
                     <q-tooltip>Save</q-tooltip>
                   </q-btn>
@@ -130,34 +136,22 @@
               <q-td key="name" :props="props">
                 <q-input
                   v-if="editingRowIndex === props.rowIndex"
-                  v-model="newSouce.name"
+                  v-model="editName"
                   placeholder="Name required"
                   dense
                   outlined
-                  :color="newSouce.name ? 'green' : 'red'"
+                  :color="editName ? 'green' : 'red'"
                   autofocus
                 />
-                <span v-else>
-                  {{
-                    props.row.name.charAt(0).toUpperCase() +
-                    props.row.name.slice(1)
-                  }}
-                </span>
+                <span v-else> {{ firstLetterCpitalze(props.row.name) }} </span>
               </q-td>
-              <q-td key="createdOn" :props="props">
-                {{
-                  props.row.createdOn.toLocaleString('en-US', DateTimeOptions)
-                }}
-              </q-td>
-              <q-td key="updatedOn" :props="props">
-                {{
-                  props.row.updatedOn.toLocaleString('en-US', DateTimeOptions)
-                }}
-              </q-td>
-              <q-td key="inactiveOn" :props="props">
-                {{
-                  props.row.inactiveOn.toLocaleString('en-US', DateTimeOptions)
-                }}
+
+              <q-td
+                :props="props"
+                v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
+                :key="key"
+              >
+                {{ formatDate(props.row[key], format) }}
               </q-td>
             </q-tr>
           </template>
@@ -172,61 +166,34 @@
                     <div class="col-12">
                       <q-input
                         v-if="editingRowIndex === props.rowIndex"
-                        v-model="newSouce.name"
+                        v-model="editName"
                         placeholder="Name required"
                         dense
                         outlined
-                        :color="newSouce.name ? 'green' : 'red'"
+                        :color="editName ? 'green' : 'red'"
                         autofocus
                       />
                       <span v-else>
-                        {{
-                          props.row.name.charAt(0).toUpperCase() +
-                          props.row.name.slice(1)
-                        }}
+                        {{ firstLetterCpitalze(props.row.name) }}
                       </span>
                     </div>
                   </div>
                 </q-card-section>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Created :</div>
-                    <div class="col-12">
-                      {{
-                        props.row.createdOn.toLocaleString(
-                          'en-US',
-                          DateTimeOptions
-                        )
-                      }}
+                <template
+                  v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
+                  :key="key"
+                >
+                  <q-card-section v-if="props.row[key]">
+                    <div class="row q-gutter-y-xs">
+                      <div class="col-12 text-weight-medium">
+                        {{ capitalCase(key.split('On').join(' on')) }} :
+                      </div>
+                      <div class="col-12">
+                        {{ formatDate(props.row[key], format) }}
+                      </div>
                     </div>
-                  </div>
-                </q-card-section>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Updated :</div>
-                    <div class="col-12">
-                      {{
-                        props.row.updatedOn.toLocaleString(
-                          'en-US',
-                          DateTimeOptions
-                        )
-                      }}
-                    </div>
-                  </div>
-                </q-card-section>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Inactive :</div>
-                    <div class="col-12">
-                      {{
-                        props.row.inactiveOn.toLocaleString(
-                          'en-US',
-                          DateTimeOptions
-                        )
-                      }}
-                    </div>
-                  </div>
-                </q-card-section>
+                  </q-card-section>
+                </template>
 
                 <q-card-actions align="center" class="q-py-md bg-grey-2">
                   <q-btn
@@ -245,7 +212,9 @@
                     :label="props.row.inactive ? 'activate' : 'deactivate'"
                     size="sm"
                     color="red"
-                    @click="changeActive(props.row.id, props.row.inactive)"
+                    @click="
+                      () => changeActive(props.row.id, props.row.inactive)
+                    "
                   >
                   </q-btn>
                   <q-btn
@@ -254,7 +223,7 @@
                     size="sm"
                     color="teal"
                     v-if="editingRowIndex === props.rowIndex"
-                    @click="() => saveEdited()"
+                    @click="saveEdited"
                   >
                     <q-tooltip>Save</q-tooltip>
                   </q-btn>
@@ -281,9 +250,11 @@
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { ref, onMounted, computed, watch, reactive } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
-
+import { formatDate } from 'src/utils/date';
+import { useQuasar } from 'quasar';
+import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
 interface NameSuffix {
   name: string;
   id: number | null;
@@ -297,7 +268,7 @@ const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
   {
     path: '/module/maintenance/customerMaster/nameSuffix',
-    label: 'Customer Master',
+    label: 'LeadMaster',
   },
   {
     path: '/module/maintenance/customerMaster/nameSuffix',
@@ -330,59 +301,50 @@ const columns: {
     required: true,
     align: 'left',
     field: 'createdOn',
-    label: 'Created',
+    label: 'Created On',
   },
   {
     name: 'updatedOn',
     required: true,
     align: 'left',
     field: 'updatedOn',
-    label: 'Updated',
+    label: 'Updated On',
   },
   {
     name: 'inactiveOn',
     required: true,
     align: 'left',
     field: 'inactiveOn',
-    label: 'In-Active',
+    label: 'In-Active On',
   },
 ];
 
-const DateTimeOptions = {
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-  hour: 'numeric',
-  minute: 'numeric',
-  hour12: true, // Use 12-hour format
-};
-
+const $q = useQuasar();
 const fetchingData = ref(false);
 const name = ref('');
 const nameSearchQuery = ref('');
 const nameSuffix = ref<NameSuffix[]>([]);
-const nameSuffixTemp = ref<NameSuffix[]>([]);
 const checkBox = ref(false);
 const isEditing = ref(false);
 const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
-const error = ref(false);
-const msg = ref('');
+const editName = ref('');
+const format = 'DD/MM/YYYY @hh:mmA';
 
-const newSouce = reactive<NameSuffix>({
-  name: '',
-  id: null,
-  createdOn: '',
-  inactive: false,
-  inactiveOn: '',
-  updatedOn: '',
-});
+const filteredData = computed(() =>
+  nameSuffix.value.filter(
+    (item) =>
+      item.name.toLowerCase().includes(nameSearchQuery.value.toLowerCase()) &&
+      item.inactive === checkBox.value
+  )
+);
 
-const filteredData = computed(() => {
-  return nameSuffix.value.filter((item) => {
-    return item.inactive === checkBox.value;
-  });
-});
+const isDuplicate = computed(
+  () =>
+    !!nameSuffix.value.find(
+      (item) => item.name.toLocaleLowerCase() === name.value
+    )
+);
 
 const setFormData = () => {
   let temp;
@@ -392,7 +354,7 @@ const setFormData = () => {
     );
     temp = nameSuffix.value[index];
   }
-  newSouce.name = temp ? temp.name : '';
+  editName.value = temp ? temp.name : '';
 };
 
 const editEntryConfirmed = (id: number, index: number) => {
@@ -404,7 +366,7 @@ const editEntryConfirmed = (id: number, index: number) => {
 const editEntry = (id: number, rowIndex: number) => {
   if (isEditing.value) {
     confirmDialog(() => editEntryConfirmed(id, rowIndex), {
-      msg: 'Are you sure you want to cancel editing the current Code?',
+      msg: 'Are you sure you want to cancel editing the current row?',
     });
   } else {
     isEditing.value = true;
@@ -412,14 +374,45 @@ const editEntry = (id: number, rowIndex: number) => {
     editEntryConfirmed(id, rowIndex);
   }
 };
-const saveNewEntry = async () => {
+const saveEdited = async () => {
+  const temp = nameSuffix.value.filter(
+    (item) => item.id !== editingRowId.value
+  );
+
+  const isDuplicate = temp.find(
+    (item) => item.name.toLowerCase() === editName.value.toLowerCase()
+  );
+  if (isDuplicate) {
+    onFailure({
+      msg: 'Item already exist',
+      icon: 'warning',
+    });
+    return;
+  }
+
+  let payLoad = {
+    name: editName.value,
+    id: editingRowId.value,
+    updatedOn: new Date(),
+  };
+  const rsp = await api.put('/nameSuffix/update', payLoad);
+  if (rsp.data.displayMessage) {
+    onSuccess({
+      msg: rsp.data.displayMessage,
+      icon: 'sync_alt',
+    });
+    loadSource();
+  }
+};
+
+const saveEntry = async () => {
   let payLoad = {
     name: name.value,
     inactive: false,
     createdOn: new Date(),
   };
   const rsp = await api.post('/nameSuffix', payLoad);
-  if (rsp.data) {
+  if (rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
       icon: 'sync_alt',
@@ -428,118 +421,43 @@ const saveNewEntry = async () => {
     loadSource();
   }
 };
-const saveEdited = async () => {
-  const temp = nameSuffixTemp.value.filter(
-    (item) => item.id !== editingRowId.value
-  );
 
-  const isDuplicate = temp.find(
-    (item) => item.name.toLowerCase() === newSouce.name.toLowerCase()
-  );
-  if (isDuplicate) {
-    onFailure({
-      msg: 'Duplicate Account Found',
-      icon: 'warning',
-    });
-    return;
-  }
-
-  let payLoad = {
-    name: newSouce.name,
-    id: editingRowId.value,
-    updatedOn: new Date(),
-  };
-  const rsp = await api.put('/nameSuffix/update', payLoad);
-  if (rsp.data) {
-    onSuccess({
-      msg: rsp.data.displayMessage,
-      icon: 'sync_alt',
-    });
-    isEditing.value = false;
-    editingRowIndex.value = null;
-    loadSource();
-  }
-};
-
-const saveEntry = () => {
-  if (name.value) {
-    saveNewEntry();
-  } else {
-    error.value = true;
-  }
-};
-
-const changeActive = async (id: number, state: boolean) => {
+const changeActive = (id: number, state: boolean) => {
   if (editingRowIndex.value === null) {
     confirmDialog(() => changeActiveConfirm(id, state), {
       msg: state
         ? 'Are you sure you want to activate ?'
-        : 'Are you sure you want to make deactivate ?',
+        : 'Are you sure you want to deactivate ?',
     });
-  } else {
-    return;
   }
 };
 
 const changeActiveConfirm = async (id: number, state: boolean) => {
-  const payLoad = {
-    id: id,
-  };
-
   const str = state ? 'active' : 'inactive';
-  const rsp = await api.put('/nameSuffix/' + str, payLoad);
-  if (rsp.data) {
+  const rsp = await api.put('/nameSuffix/' + str, {
+    id,
+  });
+  if (rsp.data && rsp.data.displayMessage) {
     onSuccess({ msg: rsp.data.displayMessage });
+    loadSource();
   }
-  loadSource();
 };
 
 const loadSource = async () => {
   fetchingData.value = true;
-  try {
-    const rsp = await api.get('nameSuffix');
-    if (rsp.data) {
-      const transformedData = rsp.data.map(
-        (item: {
-          createdOn: string | number | Date;
-          updatedOn: string | number | Date;
-          inactiveOn: string | number | Date;
-        }) => ({
-          ...item,
-          createdOn: item.createdOn ? new Date(item.createdOn) : '',
-          updatedOn: item.updatedOn ? new Date(item.updatedOn) : '',
-          inactiveOn: item.inactiveOn ? new Date(item.inactiveOn) : '',
-        })
-      );
-      nameSuffix.value = transformedData;
-      nameSuffixTemp.value = transformedData;
-    }
-  } catch (error) {
-    // handle error
-  } finally {
-    fetchingData.value = false;
+  const rsp = await api.get('nameSuffix');
+
+  if (rsp.data) {
+    nameSuffix.value = rsp.data;
   }
+  fetchingData.value = false;
 };
-watch(name, () => {
-  error.value = false;
-  msg.value = '';
 
-  const temp = nameSuffixTemp.value.find(
-    (item) => item.name.toLowerCase() === name.value.toLowerCase()
-  );
+watch(filteredData, () => {
+  editingRowIndex.value = null;
+  isEditing.value = false;
+});
 
-  if (temp) {
-    error.value = true;
-    msg.value = 'Item already exists!';
-  }
-});
-watch(nameSearchQuery, () => {
-  nameSuffix.value = nameSuffixTemp.value.filter((item) => {
-    return item.name
-      .toLowerCase()
-      .includes(nameSearchQuery.value.toLowerCase());
-  });
-});
 onMounted(() => {
   loadSource();
 });
