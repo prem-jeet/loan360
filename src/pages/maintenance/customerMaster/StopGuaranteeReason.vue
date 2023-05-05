@@ -268,7 +268,7 @@ const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
   {
     path: '/module/maintenance/customerMaster/stopGuaranteeReason',
-    label: 'LeadMaster',
+    label: 'Customer Master',
   },
   {
     path: '/module/maintenance/customerMaster/stopGuaranteeReason',
