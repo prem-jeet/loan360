@@ -348,7 +348,7 @@
                   :options="accountNameOptions"
                   label="Account name"
                   outlined
-                  :rules="[(val) => val !== null]"
+                  :rules="[(val) => val !== null || 'Please enter valid input']"
                   @input-value="loadAccountNames"
                   ref="dropdown"
                 >
