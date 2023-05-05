@@ -376,12 +376,19 @@
         <q-separator class="q-mt-md" />
         <q-card-actions align="center" class="q-py-md bg-grey-2 q-mt-auto">
           <q-btn
+            padding="sm md"
             :label="editingRowId === null ? 'Add' : 'Save '"
             :icon="editingRowId === null ? 'add' : 'save '"
             color="teal"
             type="submit"
           />
-          <q-btn label="Reset" color="red-5" type="reset" icon="refresh" />
+          <q-btn
+            padding="sm md"
+            label="Reset"
+            color="red-5"
+            type="reset"
+            icon="refresh"
+          />
         </q-card-actions>
       </q-form>
     </q-card>
