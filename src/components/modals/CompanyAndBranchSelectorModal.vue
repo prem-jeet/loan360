@@ -59,10 +59,12 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 import { useUserStore } from 'src/stores/user/userStore';
 import { Branch, Company, FinancialYear } from 'src/stores/user/userStoreTypes';
+
+const router = useRouter();
 
 const emit = defineEmits(['close']);
 
@@ -92,6 +94,11 @@ const submit = () => {
   userStore.selectedCompany = selectedCompany.value;
   userStore.selectedBranch = selectedBranch.value;
   userStore.selectedFinancialYear = selectedFinancialYear.value;
+  localStorage.setItem(
+    'selectedCompany',
+    JSON.stringify(selectedCompany.value)
+  );
+  localStorage.setItem('selectedBranch', JSON.stringify(selectedBranch.value));
 };
 
 const close = () => {
@@ -104,6 +111,25 @@ watch(
 );
 
 onMounted(async () => {
+  // Header Set and Authentication
+  const authToken = localStorage.getItem('authToken') || '';
+  const expires_in = localStorage.getItem('expires_in') || 0;
+
+  if (userStore.token && userStore.token.id_token) {
+    userStore.setAuthHeader(userStore.token.id_token);
+    console.log(userStore.token.id_token, '1');
+  } else if (authToken) {
+    userStore.setAuthHeader(authToken);
+    userStore.setToken({
+      id_token: authToken,
+      expires_in: Number(expires_in),
+    });
+    console.log(authToken, 'authToken 2');
+  } else {
+    userStore.setAuthHeader('');
+    router.push({ name: 'login' });
+  }
+
   if (!(userStore.allowedCompany.length && userStore.allowedBranch.length)) {
     await userStore.fetchAllowedCompany();
     await userStore.fetchAllowedBranch();

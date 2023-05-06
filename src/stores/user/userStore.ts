@@ -62,10 +62,8 @@ export const useUserStore = defineStore('userStore', {
     setToken(token: Token) {
       this.token = token;
       this.isAuthenticated = true;
-
-      localStorage.setItem('jaguar', JSON.stringify(token));
-
-      api.defaults.headers.common.Authorization = `Bearer ${token.id_token}`;
+      // const authToken = LocalStorage.getItem('authToken');
+      // console.log(authToken, 'Auth');
     },
     setAccessToken(token: string) {
       this.accessToken = token;
@@ -123,6 +121,11 @@ export const useUserStore = defineStore('userStore', {
 
       this.appRole = rsp.data;
       return rsp.data;
+    },
+    setAuthHeader(authToken: string) {
+      authToken !== ''
+        ? (api.defaults.headers.common['Authorization'] = `Bearer ${authToken}`)
+        : delete api.defaults.headers.common['Authorization'];
     },
   },
 });

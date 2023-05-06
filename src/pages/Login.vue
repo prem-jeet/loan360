@@ -67,6 +67,8 @@ onMounted(async () => {
         expires_in: rsp.expires_in,
       });
       userStore.setAccessToken(rsp.access_token);
+      localStorage.setItem('authToken', rsp.id_token);
+      localStorage.setItem('expires_in', rsp.expires_in);
       router.push({ name: 'authenticated' });
     } else {
       router.push({ name: 'noFound' });

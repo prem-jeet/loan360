@@ -31,8 +31,15 @@
 <script setup lang="ts">
 import NavBar from 'src/components/NavBar.vue';
 import LeftMenu from 'src/components/LeftMenu.vue';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useMenuStore } from 'src/stores/menu/menuStore';
+import { useRouter } from 'vue-router';
+
+import { useUserStore } from 'src/stores/user/userStore';
+
+const router = useRouter();
+
+const userStore = useUserStore();
 
 const goToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -42,4 +49,25 @@ const menuStore = useMenuStore();
 const openMenu = () => {
   drawerLeft.value = !drawerLeft.value;
 };
+
+onMounted(() => {
+  // Header Set and Authentication
+  const authToken = localStorage.getItem('authToken') || '';
+  const expires_in = localStorage.getItem('expires_in') || 0;
+
+  if (userStore.token && userStore.token.id_token) {
+    userStore.setAuthHeader(userStore.token.id_token);
+    console.log(userStore.token.id_token, '1');
+  } else if (authToken) {
+    userStore.setAuthHeader(authToken);
+    userStore.setToken({
+      id_token: authToken,
+      expires_in: Number(expires_in),
+    });
+    console.log(authToken, 'authToken 2 Layout ');
+  } else {
+    userStore.setAuthHeader('');
+    router.push({ name: 'login' });
+  }
+});
 </script>
