@@ -76,6 +76,12 @@ const routes: RouteRecordRaw[] = [
             name: 'status',
             component: () => import('pages/maintenance/leadMasters/Status.vue'),
           },
+
+          {
+            path: 'leadMaster/source',
+            name: 'source',
+            component: () => import('pages/maintenance/leadMasters/Source.vue'),
+          },
         ],
       },
     ],
