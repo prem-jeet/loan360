@@ -31,18 +31,18 @@
                   outlined
                   dense
                   no-error-icon
-                  :error="error"
-                  :error-message="msg"
-                  placeholder="rate"
+                  :error="isDuplicate"
+                  error-message="Item alredy exits"
+                  placeholder="Rate"
                 >
                   <template v-slot:prepend> Gold </template>
                   <template v-slot:after>
                     <q-btn
-                      :icon="'add '"
+                      icon="add"
                       color="teal"
                       size="md"
-                      :disable="error"
-                      @click="saveEntry()"
+                      :disable="isDuplicate || rate === ''"
+                      @click="saveEntry"
                     />
                   </template>
                 </q-input>
@@ -87,7 +87,7 @@
                     outline
                     color="green-10"
                     v-if="editingRowIndex === props.rowIndex"
-                    @click="() => saveEdited()"
+                    @click="saveEdited"
                   >
                     <q-tooltip>Save</q-tooltip>
                   </q-btn>
@@ -106,20 +106,18 @@
               <q-td key="rate" :props="props">
                 <q-input
                   v-if="editingRowIndex === props.rowIndex"
-                  v-model="newSouce.rate"
+                  v-model="editRate"
                   placeholder="Name required"
                   dense
                   outlined
-                  :color="newSouce.rate ? 'green' : 'red'"
+                  :color="editRate ? 'green' : 'red'"
                   autofocus
                 />
-                <span v-else>{{ props.row.rate }}</span>
+                <span v-else>{{ props.row.rate }} </span>
               </q-td>
 
-              <q-td key="updatedOn" :props="props">
-                {{
-                  props.row.updatedOn.toLocaleString('en-US', DateTimeOptions)
-                }}
+              <q-td :props="props" key="updatedOn">
+                {{ formatDate(props.row.updatedOn, format) }}
               </q-td>
             </q-tr>
           </template>
@@ -130,35 +128,35 @@
               <q-card>
                 <q-card-section>
                   <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Gold Rate :</div>
+                    <div class="col-12 text-weight-medium">Rate :</div>
                     <div class="col-12">
                       <q-input
                         v-if="editingRowIndex === props.rowIndex"
-                        v-model="newSouce.rate"
+                        v-model="editRate"
                         placeholder="Name required"
                         dense
                         outlined
-                        :color="newSouce.rate ? 'green' : 'red'"
+                        :color="editRate ? 'green' : 'red'"
                         autofocus
                       />
-                      <span v-else>{{ props.row.rate }}</span>
+                      <span v-else>
+                        {{ props.row.rate }}
+                      </span>
                     </div>
                   </div>
                 </q-card-section>
-
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Updated :</div>
-                    <div class="col-12">
-                      {{
-                        props.row.updatedOn.toLocaleString(
-                          'en-US',
-                          DateTimeOptions
-                        )
-                      }}
+                <template v-for="key in ['updatedOn']" :key="key">
+                  <q-card-section v-if="props.row[key]">
+                    <div class="row q-gutter-y-xs">
+                      <div class="col-12 text-weight-medium">
+                        {{ capitalCase(key.split('On').join(' on')) }} :
+                      </div>
+                      <div class="col-12">
+                        {{ formatDate(props.row[key], format) }}
+                      </div>
                     </div>
-                  </div>
-                </q-card-section>
+                  </q-card-section>
+                </template>
 
                 <q-card-actions align="center" class="q-py-md bg-grey-2">
                   <q-btn
@@ -186,7 +184,7 @@
                     size="sm"
                     color="teal"
                     v-if="editingRowIndex === props.rowIndex"
-                    @click="() => saveEdited()"
+                    @click="saveEdited"
                   >
                     <q-tooltip>Save</q-tooltip>
                   </q-btn>
@@ -213,8 +211,11 @@
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { ref, onMounted, computed, watch, reactive } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
+import { formatDate } from 'src/utils/date';
+import { useQuasar } from 'quasar';
+import { capitalCase } from 'src/utils/string';
 
 interface GoldRates {
   rate: number | null;
@@ -226,7 +227,7 @@ const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
   {
     path: '/module/maintenance/loanMaster/goldRate',
-    label: 'Loan Master',
+    label: 'Loan Masterr',
   },
   {
     path: '/module/maintenance/loanMaster/goldRate',
@@ -252,7 +253,7 @@ const columns: {
     required: true,
     align: 'left',
     field: 'rate',
-    label: 'Gold Rate',
+    label: 'Rate',
   },
 
   {
@@ -260,42 +261,35 @@ const columns: {
     required: true,
     align: 'left',
     field: 'updatedOn',
-    label: 'Updated',
+    label: 'Updated On',
   },
 ];
 
-const DateTimeOptions = {
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-  hour: 'numeric',
-  minute: 'numeric',
-  hour12: true, // Use 12-hour format
-};
-
+const $q = useQuasar();
 const fetchingData = ref(false);
 const rate = ref('');
 const goldRates = ref<GoldRates[]>([]);
-const goldRatesTemp = ref<GoldRates[]>([]);
 const isEditing = ref(false);
 const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
-const error = ref(false);
-const msg = ref('');
-
-const newSouce = reactive<GoldRates>({
-  rate: null,
-  id: null,
-  updatedOn: '',
-});
+const editRate = ref<number | null>(null);
+const format = 'DD/MM/YYYY @hh:mmA';
 
 const filteredData = computed(() => goldRates.value);
 
+const isDuplicate = computed(
+  () => !!goldRates.value.find((item) => item.rate === parseInt(rate.value))
+);
+
 const setFormData = () => {
-  const index = goldRates.value.findIndex(
-    (obj) => obj.id === editingRowId.value
-  );
-  newSouce.rate = index >= 0 ? goldRates.value[index].rate : null;
+  let temp;
+  if (editingRowId.value !== null) {
+    let index = goldRates.value.findIndex(
+      (obj) => obj.id === editingRowId.value
+    );
+    temp = goldRates.value[index];
+  }
+  editRate.value = temp ? temp.rate : null;
 };
 
 const editEntryConfirmed = (id: number, index: number) => {
@@ -307,7 +301,7 @@ const editEntryConfirmed = (id: number, index: number) => {
 const editEntry = (id: number, rowIndex: number) => {
   if (isEditing.value) {
     confirmDialog(() => editEntryConfirmed(id, rowIndex), {
-      msg: 'Are you sure you want to cancel editing the current Code?',
+      msg: 'Are you sure you want to cancel editing the current row?',
     });
   } else {
     isEditing.value = true;
@@ -315,56 +309,43 @@ const editEntry = (id: number, rowIndex: number) => {
     editEntryConfirmed(id, rowIndex);
   }
 };
-const saveNewEntry = async () => {
-  let payLoad = {
-    rate: rate.value,
-  };
-  const rsp = await api.post('/goldRate', payLoad);
-  if (rsp.data) {
-    onSuccess({
-      msg: rsp.data.displayMessage,
-      icon: 'sync_alt',
-    });
-    rate.value = '';
-    loadSource();
-  }
-};
 const saveEdited = async () => {
-  const temp = goldRatesTemp.value.filter(
-    (item) => item.id !== editingRowId.value
-  );
+  const temp = goldRates.value.filter((item) => item.id !== editingRowId.value);
 
-  const isDuplicate = temp.find((item) => item.rate === newSouce.rate);
+  const isDuplicate = temp.find((item) => item.rate === editRate.value);
   if (isDuplicate) {
     onFailure({
-      msg: 'Duplicate Account Found',
+      msg: 'Item already exist',
       icon: 'warning',
     });
     return;
   }
 
   let payLoad = {
-    rate: newSouce.rate,
+    rate: editRate.value,
     id: editingRowId.value,
     updatedOn: new Date(),
   };
   const rsp = await api.post('/goldRate', payLoad);
-  if (rsp.data) {
+  if (rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
       icon: 'sync_alt',
     });
-    isEditing.value = false;
     editingRowIndex.value = null;
     loadSource();
   }
 };
 
-const saveEntry = () => {
-  if (rate.value) {
-    saveNewEntry();
-  } else {
-    error.value = true;
+const saveEntry = async () => {
+  const rsp = await api.post('/goldRate', { rate: rate.value });
+  if (rsp.data.displayMessage) {
+    onSuccess({
+      msg: rsp.data.displayMessage,
+      icon: 'sync_alt',
+    });
+    rate.value = '';
+    loadSource();
   }
 };
 
@@ -391,35 +372,14 @@ const loadSource = async () => {
   const rsp = await api.get('goldRate/getTop10Rates');
 
   if (rsp.data) {
-    goldRates.value = rsp.data.map(
-      (item: { updatedOn: string | number | Date }) => {
-        return {
-          ...item,
-          updatedOn: item.updatedOn !== null ? new Date(item.updatedOn) : '',
-        };
-      }
-    );
-    goldRatesTemp.value = goldRates.value;
+    goldRates.value = rsp.data;
   }
   fetchingData.value = false;
 };
 
-watch(rate, () => {
-  error.value = false;
-  msg.value = '';
-
-  if (!rate.value) {
-    return;
-  }
-
-  const temp = goldRatesTemp.value.find(
-    (item) => item.rate === parseInt(rate.value)
-  );
-
-  if (temp) {
-    error.value = true;
-    msg.value = 'Item already exists!';
-  }
+watch(filteredData, () => {
+  editingRowIndex.value = null;
+  isEditing.value = false;
 });
 
 onMounted(() => {
