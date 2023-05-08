@@ -18,6 +18,8 @@
           :no-data-label="
             accountCodeDeposits.length
               ? 'No result found'
+              : noDataLabel
+              ? 'No result found'
               : 'Select a filter product and category'
           "
           :rows-per-page-options="[0]"
@@ -485,6 +487,7 @@ const accountCodeDeposits = ref<AccountCodeDeposit[]>([]);
 const editingRowId = ref<number | null>(null);
 const dropdown = ref(null);
 const showAddNew = ref(false);
+const noDataLabel = ref(false);
 
 const products = {
   FD: 'Fixed Deposit',
@@ -645,6 +648,7 @@ const loadAccountCodeDeposits = async () => {
   if (rsp.data) {
     accountCodeDeposits.value = rsp.data;
     showAddNew.value = true;
+    noDataLabel.value = accountCodeDeposits.value.length ? false : true;
   }
   fetchingData.value = false;
 };
