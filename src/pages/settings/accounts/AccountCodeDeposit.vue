@@ -32,7 +32,7 @@
                   <div class="col-auto text-h6">Account Code Deposit</div>
                   <div class="col-auto">
                     <q-btn
-                      v-if="showAddnew"
+                      v-if="showAddNew"
                       color="blue-7"
                       icon="add"
                       label="Add new"
@@ -485,7 +485,7 @@ const category = ref('');
 const accountCodeDeposits = ref<AccountCodeDeposit[]>([]);
 const editingRowId = ref<number | null>(null);
 const dropdown = ref(null);
-const showAddnew = ref(false);
+const showAddNew = ref(false);
 
 const products = ref<Options[]>([
   { value: 'FD', label: 'Fixed Deposit' },
@@ -635,7 +635,7 @@ const resetAccountCodeDeposits = () => {
   product.value = '';
   category.value = '';
   checkBox.value = false;
-  showAddnew.value = false;
+  showAddNew.value = false;
 };
 
 const loadAccountCodeDeposits = async () => {
@@ -644,7 +644,7 @@ const loadAccountCodeDeposits = async () => {
   );
   if (rsp.data) {
     accountCodeDeposits.value = rsp.data;
-    showAddnew.value = true;
+    showAddNew.value = true;
   }
 };
 
