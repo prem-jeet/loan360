@@ -71,11 +71,18 @@ const routes: RouteRecordRaw[] = [
             component: () =>
               import('pages/settings/accounts/InterestDepositGenerate.vue'),
           },
+
           {
             path: 'customerMaster/namePrefix',
             name: 'namePrefix',
             component: () =>
               import('pages/maintenance/customerMaster/NamePrefix.vue'),
+          },
+
+          {
+            path: 'leadMaster/source',
+            name: 'source',
+            component: () => import('pages/maintenance/leadMasters/Source.vue'),
           },
         ],
       },
