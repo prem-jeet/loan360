@@ -268,7 +268,7 @@ const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
   {
     path: '/module/maintenance/loanMaster/goldItem',
-    label: 'Loan Masterr',
+    label: 'Loan Master',
   },
   {
     path: '/module/maintenance/loanMaster/goldItem',
