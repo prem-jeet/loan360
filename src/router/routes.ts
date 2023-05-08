@@ -71,6 +71,7 @@ const routes: RouteRecordRaw[] = [
             component: () =>
               import('pages/settings/accounts/InterestDepositGenerate.vue'),
           },
+
           {
             path: 'customerMaster/stopGuaranteeReason',
             name: 'stopGuaranteeReason',
@@ -78,6 +79,12 @@ const routes: RouteRecordRaw[] = [
               import(
                 'pages/maintenance/customerMaster/StopGuaranteeReason.vue'
               ),
+          },
+
+          {
+            path: 'leadMaster/source',
+            name: 'source',
+            component: () => import('pages/maintenance/leadMasters/Source.vue'),
           },
         ],
       },
