@@ -10,6 +10,8 @@
     menu-shrink
     popup-content-style="height: 300px"
     options-dense
+    :emit-value="returnValue"
+    :map-options="returnValue"
   >
     <template v-slot:before-options>
       <q-item>
@@ -55,24 +57,17 @@
     <template v-slot:no-option>
       <q-item>
         <q-item-section>
-          <q-checkbox
-            v-model="allSelected"
-            unchecked-icon="playlist_add_check"
-            checked-icon="playlist_remove"
-            color="grey-10"
+          <q-input
+            v-model="query"
+            placeholder="search"
+            autofocus
+            dense
+            class="q-ml-sm"
           >
-            <q-input
-              v-model="query"
-              placeholder="search"
-              autofocus
-              dense
-              class="q-ml-sm"
-            >
-              <template v-slot:prepend>
-                <q-icon name="search" />
-              </template>
-            </q-input>
-          </q-checkbox>
+            <template v-slot:prepend>
+              <q-icon name="search" />
+            </template>
+          </q-input>
         </q-item-section>
       </q-item>
       <q-item>
@@ -112,6 +107,7 @@ interface Props {
   label: string;
   maxChips: number;
   chipKey: string;
+  returnValue?: boolean;
 }
 
 const props = defineProps<Props>();
