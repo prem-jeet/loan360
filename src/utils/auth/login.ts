@@ -105,8 +105,3 @@ export const getAuthTokenFromAws = async function (
 export const login = () => {
   window.location.assign(loginURL);
 };
-export const logOut = () => {
-  console.log('called Logout');
-
-  window.location.assign(logoutURL);
-};
