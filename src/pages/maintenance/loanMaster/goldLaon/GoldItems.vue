@@ -255,7 +255,7 @@ import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
 import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
-interface NameSuffix {
+interface GoldItems {
   name: string;
   id: number | null;
   createdOn: string;
@@ -323,7 +323,7 @@ const $q = useQuasar();
 const fetchingData = ref(false);
 const name = ref('');
 const nameSearchQuery = ref('');
-const nameSuffix = ref<NameSuffix[]>([]);
+const goldItems = ref<GoldItems[]>([]);
 const checkBox = ref(false);
 const isEditing = ref(false);
 const editingRowIndex = ref<number | null>(null);
@@ -332,7 +332,7 @@ const editName = ref('');
 const format = 'DD/MM/YYYY @hh:mmA';
 
 const filteredData = computed(() =>
-  nameSuffix.value.filter(
+  goldItems.value.filter(
     (item) =>
       item.name.toLowerCase().includes(nameSearchQuery.value.toLowerCase()) &&
       item.inactive === checkBox.value
@@ -341,7 +341,7 @@ const filteredData = computed(() =>
 
 const isDuplicate = computed(
   () =>
-    !!nameSuffix.value.find(
+    !!goldItems.value.find(
       (item) => item.name.toLocaleLowerCase() === name.value
     )
 );
@@ -349,10 +349,10 @@ const isDuplicate = computed(
 const setFormData = () => {
   let temp;
   if (editingRowId.value !== null) {
-    let index = nameSuffix.value.findIndex(
+    let index = goldItems.value.findIndex(
       (obj) => obj.id === editingRowId.value
     );
-    temp = nameSuffix.value[index];
+    temp = goldItems.value[index];
   }
   editName.value = temp ? temp.name : '';
 };
@@ -375,9 +375,7 @@ const editEntry = (id: number, rowIndex: number) => {
   }
 };
 const saveEdited = async () => {
-  const temp = nameSuffix.value.filter(
-    (item) => item.id !== editingRowId.value
-  );
+  const temp = goldItems.value.filter((item) => item.id !== editingRowId.value);
 
   const isDuplicate = temp.find(
     (item) => item.name.toLowerCase() === editName.value.toLowerCase()
@@ -448,7 +446,7 @@ const loadSource = async () => {
   const rsp = await api.get('goldItem');
 
   if (rsp.data) {
-    nameSuffix.value = rsp.data;
+    goldItems.value = rsp.data;
   }
   fetchingData.value = false;
 };
