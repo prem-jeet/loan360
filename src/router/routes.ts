@@ -74,7 +74,7 @@ const routes: RouteRecordRaw[] = [
           {
             path: 'leadMaster/asset',
             name: 'asset',
-            component: () => import('pages/maintenance/leadMasters/asset.vue'),
+            component: () => import('pages/maintenance/leadMasters/Asset.vue'),
           },
         ],
       },
