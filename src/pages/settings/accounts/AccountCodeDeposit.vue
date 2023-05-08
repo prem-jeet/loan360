@@ -66,7 +66,7 @@
                   <q-select
                     v-model="product"
                     dense
-                    :options="products"
+                    :options="getMultiSelectOptions_Util(products)"
                     map-options
                     emit-value
                     label="Select product"
@@ -88,7 +88,7 @@
                   <q-select
                     v-model="category"
                     dense
-                    :options="categorys"
+                    :options="getMultiSelectOptions_Util(categorys)"
                     label="Select category"
                     outlined
                     map-options
@@ -274,7 +274,7 @@
                   v-if="mode === 'new'"
                   v-model="newCodeDeposit.productCode"
                   dense
-                  :options="products"
+                  :options="getMultiSelectOptions_Util(products)"
                   label="Select product"
                   map-options
                   emit-value
@@ -297,7 +297,7 @@
                   v-if="mode === 'new'"
                   v-model="newCodeDeposit.categoryCode"
                   dense
-                  :options="categorys"
+                  :options="getMultiSelectOptions_Util(categorys)"
                   label="Select category"
                   outlined
                   map-options
@@ -400,6 +400,7 @@ import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { onSuccess, confirmDialog } from 'src/utils/notification';
 import { ref, onMounted, computed, watch, reactive } from 'vue';
+import { getMultiSelectOptions_Util } from 'src/utils/commonUtils';
 
 interface AccountHeads {
   label: string;
@@ -487,21 +488,21 @@ const editingRowId = ref<number | null>(null);
 const dropdown = ref(null);
 const showAddNew = ref(false);
 
-const products = ref<Options[]>([
-  { value: 'FD', label: 'Fixed Deposit' },
-  { value: 'RD', label: 'Recurring Deposit' },
-  { value: 'DD', label: 'Daily Deposit' },
-  { value: 'DB', label: 'Debenture' },
-  { value: 'SB', label: 'Sub-oridinate Debentures' },
-  { value: 'FC', label: 'Fully Convertible Debentures' },
-]);
+const products = {
+  FD: 'Fixed Deposit',
+  RD: 'Recurring Deposit',
+  DD: 'Daily Deposit',
+  DB: 'Debenture',
+  SB: 'Sub-oridinate Debentures',
+  FC: 'Fully Convertible Debentures',
+};
 
-const categorys = ref<Options[]>([
-  { value: 'S', label: 'Share Holders' },
-  { value: 'D', label: 'Directors' },
-  { value: 'O', label: 'Others' },
-  { value: 'DR', label: "Director's Relatives" },
-]);
+const categorys = {
+  S: 'Share Holders',
+  D: 'Directors',
+  O: 'Others',
+  DR: "Director's Relatives",
+};
 
 const filteredData = computed(() =>
   accountCodeDeposits.value.filter(
