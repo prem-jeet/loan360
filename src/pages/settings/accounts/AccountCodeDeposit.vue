@@ -401,6 +401,7 @@ import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { onSuccess, confirmDialog } from 'src/utils/notification';
 import { ref, onMounted, computed, watch, reactive } from 'vue';
 import { getMultiSelectOptions_Util } from 'src/utils/commonUtils';
+import { useQuasar } from 'quasar';
 
 interface AccountHeads {
   label: string;
@@ -411,10 +412,6 @@ interface AccountCodes {
   value: string;
 }
 
-interface Options {
-  value: string;
-  label: string;
-}
 interface AccountCodeDeposit {
   accountCode: string;
   categoryCode: string;
@@ -474,6 +471,7 @@ const newCodeDeposit = reactive<AccountCodeDeposit>({
   accountId: null,
 });
 
+const $q = useQuasar();
 let mode: 'new' | 'edit' = 'new';
 const checkBox = ref(false);
 const isEntryModalActive = ref(false);
@@ -640,6 +638,7 @@ const resetAccountCodeDeposits = () => {
 };
 
 const loadAccountCodeDeposits = async () => {
+  fetchingData.value = true;
   const rsp = await api(
     `accountCodeDeposit/${product.value}/${category.value}`
   );
@@ -647,6 +646,7 @@ const loadAccountCodeDeposits = async () => {
     accountCodeDeposits.value = rsp.data;
     showAddNew.value = true;
   }
+  fetchingData.value = false;
 };
 
 const loadAccountHeads = async () => {
