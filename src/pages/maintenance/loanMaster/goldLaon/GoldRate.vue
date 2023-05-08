@@ -32,6 +32,7 @@
                   dense
                   no-error-icon
                   :error="isDuplicate"
+                  type="number"
                   error-message="Item alredy exits"
                   placeholder="Rate"
                 >
@@ -41,7 +42,7 @@
                       icon="add"
                       color="teal"
                       size="md"
-                      :disable="isDuplicate || rate === ''"
+                      :disable="isDuplicate || rate === null"
                       @click="saveEntry"
                     />
                   </template>
@@ -107,10 +108,11 @@
                 <q-input
                   v-if="editingRowIndex === props.rowIndex"
                   v-model="editRate"
-                  placeholder="Name required"
+                  placeholder="rate required"
                   dense
                   outlined
                   :color="editRate ? 'green' : 'red'"
+                  type="number"
                   autofocus
                 />
                 <span v-else>{{ props.row.rate }} </span>
@@ -133,10 +135,11 @@
                       <q-input
                         v-if="editingRowIndex === props.rowIndex"
                         v-model="editRate"
-                        placeholder="Name required"
+                        placeholder="rate required"
                         dense
                         outlined
                         :color="editRate ? 'green' : 'red'"
+                        type="number"
                         autofocus
                       />
                       <span v-else>
@@ -267,7 +270,7 @@ const columns: {
 
 const $q = useQuasar();
 const fetchingData = ref(false);
-const rate = ref('');
+const rate = ref<number | null>(null);
 const goldRates = ref<GoldRates[]>([]);
 const isEditing = ref(false);
 const editingRowIndex = ref<number | null>(null);
@@ -278,7 +281,7 @@ const format = 'DD/MM/YYYY @hh:mmA';
 const filteredData = computed(() => goldRates.value);
 
 const isDuplicate = computed(
-  () => !!goldRates.value.find((item) => item.rate === parseInt(rate.value))
+  () => !!goldRates.value.find((item) => item.rate == rate.value)
 );
 
 const setFormData = () => {
@@ -312,7 +315,7 @@ const editEntry = (id: number, rowIndex: number) => {
 const saveEdited = async () => {
   const temp = goldRates.value.filter((item) => item.id !== editingRowId.value);
 
-  const isDuplicate = temp.find((item) => item.rate === editRate.value);
+  const isDuplicate = temp.find((item) => item.rate == editRate.value);
   if (isDuplicate) {
     onFailure({
       msg: 'Item already exist',
@@ -344,7 +347,7 @@ const saveEntry = async () => {
       msg: rsp.data.displayMessage,
       icon: 'sync_alt',
     });
-    rate.value = '';
+    rate.value = null;
     loadSource();
   }
 };
