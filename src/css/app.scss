@@ -17,3 +17,14 @@
 .remove-input-number-indicator[type='number'] {
   -moz-appearance: textfield;
 }
+
+/* Custom Padding */
+@media screen and (max-width: 560px) {
+  .py-xs-medium {
+    padding-top: 34px;
+    padding-bottom: 34px;
+  }
+  .mx-sm-zero {
+    margin: 0 auto;
+  }
+}

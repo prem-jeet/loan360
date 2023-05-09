@@ -25,7 +25,7 @@
               :options="userStore.allowedBranch"
               option-value="code"
               option-label="name"
-              label="Brach"
+              label="Branch"
               :error="error && !selectedBranch"
               error-message="select a branch"
             />

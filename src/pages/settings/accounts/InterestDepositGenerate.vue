@@ -1,8 +1,8 @@
 <template>
-  <div class="absolute q-pa-md full-width full-height bg-gre-4">
-    <q-chip outline square size="md" class="shadow-4" :ripple="false">
-      <BreadCrumbs :ordered-paths="breadcrumbs" />
-    </q-chip>
+  <div
+    class="absolute q-px-md q-pt-md-sm q-pt-xs-md q-pb-md full-width full-height bg-gre-4"
+  >
+    <BreadCrumbs :ordered-paths="breadcrumbs" :style-css="'q-mx-xs'" />
     <div class="q-mt-lg q-pb-xl">
       <div class="row justify-center q-py-lg q-mt-lg">
         <div class="col-12 col-sm-8 col-md-5">
@@ -62,10 +62,11 @@ import { onSuccess } from 'src/utils/notification';
 import { ref, computed } from 'vue';
 
 const breadcrumbs = [
-  { path: '/module/settings', label: 'Settings' },
+  { path: '/module/settings', label: 'Settings', disable: false },
   {
     path: '/module/settings/interestDepositGenerate',
     label: 'Deposite Interest Generate',
+    disable: false,
   },
 ];
 
