@@ -61,7 +61,7 @@ export const useUserStore = defineStore('userStore', {
   actions: {
     setToken(token: Token) {
       this.token = token;
-      this.isAuthenticated = true;
+      // this.isAuthenticated = true;
       // const authToken = LocalStorage.getItem('authToken');
       // console.log(authToken, 'Auth');
     },
@@ -126,6 +126,12 @@ export const useUserStore = defineStore('userStore', {
       authToken !== ''
         ? (api.defaults.headers.common['Authorization'] = `Bearer ${authToken}`)
         : delete api.defaults.headers.common['Authorization'];
+    },
+    fetchUser() {
+      const authToken = localStorage.getItem('authToken') || ''; // local storage
+
+      return (this.isAuthenticated =
+        authToken || (this.token && this.token.id_token) ? true : false);
     },
   },
 });

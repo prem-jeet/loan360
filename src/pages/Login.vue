@@ -59,7 +59,7 @@ watch([selectedBranch, selectedCompany, selectedFinancialYear], () => {
 });
 
 onMounted(async () => {
-  if (route.query.code) {
+  if (route.query.code && !userStore.isAuthenticated) {
     const rsp = await getAuthTokenFromAws(route.query.code);
     if (rsp.access_token) {
       userStore.setToken({

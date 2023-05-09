@@ -57,14 +57,12 @@ onMounted(() => {
 
   if (userStore.token && userStore.token.id_token) {
     userStore.setAuthHeader(userStore.token.id_token);
-    console.log(userStore.token.id_token, '1');
   } else if (authToken) {
     userStore.setAuthHeader(authToken);
     userStore.setToken({
       id_token: authToken,
       expires_in: Number(expires_in),
     });
-    console.log(authToken, 'authToken 2 Layout ');
   } else {
     userStore.setAuthHeader('');
     router.push({ name: 'login' });

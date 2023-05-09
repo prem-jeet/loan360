@@ -7,6 +7,8 @@ import {
 } from 'vue-router';
 
 import routes from './routes';
+// import { authGuard } from 'src/router/guards/authGuards';
+import { useUserStore } from 'src/stores/user/userStore';
 
 /*
  * If not building with SSR mode, you can
@@ -17,7 +19,8 @@ import routes from './routes';
  * with the Router instance.
  */
 
-export default route(function (/* { store, ssrContext } */) {
+export default route(function (/* store , ssrContext } */) {
+  const userStore = useUserStore();
   const createHistory = process.env.SERVER
     ? createMemoryHistory
     : process.env.VUE_ROUTER_MODE === 'history'
@@ -32,6 +35,28 @@ export default route(function (/* { store, ssrContext } */) {
     // quasar.conf.js -> build -> vueRouterMode
     // quasar.conf.js -> build -> publicPath
     history: createHistory(process.env.VUE_ROUTER_BASE),
+  });
+
+  Router.beforeEach((to, from, next) => {
+    const isAuthenticated = userStore.fetchUser();
+    console.log(isAuthenticated, 'authernticated', to);
+
+    if (to.matched.some((record) => record.meta.requiresAuth)) {
+      // authGuard(to, from, next);
+      if (isAuthenticated) {
+        next();
+      } else {
+        next('/login');
+      }
+    } else if (to.matched.some((record) => !record.meta.requiresAuth)) {
+      console.log('second ');
+
+      if (isAuthenticated) {
+        next({ path: '/moduleselector' });
+      } else {
+        next();
+      }
+    }
   });
 
   return Router;
