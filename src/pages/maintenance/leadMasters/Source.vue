@@ -127,7 +127,11 @@
                     outline
                     color="red"
                     v-if="editingRowIndex === props.rowIndex"
-                    @click="(isEditing = false), (editingRowIndex = null)"
+                    @click="
+                      (isEditing = false),
+                        (editingRowIndex = null),
+                        (isEditModalActive = false)
+                    "
                   >
                     <q-tooltip>Cancel</q-tooltip>
                   </q-btn>
@@ -245,6 +249,10 @@
       </div>
     </div>
   </div>
+
+  <q-dialog v-model="isEditModalActive">
+    <CommonEditForMaintenancePages></CommonEditForMaintenancePages>
+  </q-dialog>
 </template>
 
 <script setup lang="ts">
@@ -255,6 +263,7 @@ import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
 import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
+import CommonEditForMaintenancePages from 'src/components/modals/CommonEditForMaintenancePages.vue';
 interface Source {
   name: string;
   id: number | null;
@@ -324,7 +333,7 @@ const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
 const editName = ref('');
 const format = 'DD/MM/YYYY @hh:mmA';
-
+const isEditModalActive = ref(false);
 const filteredData = computed(() =>
   source.value.filter(
     (item) =>
@@ -352,6 +361,7 @@ const setFormData = () => {
 const editEntryConfirmed = (id: number, index: number) => {
   editingRowIndex.value = index;
   editingRowId.value = id;
+  isEditModalActive.value = true;
   setFormData();
 };
 
