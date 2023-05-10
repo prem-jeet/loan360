@@ -15,19 +15,19 @@
           separator="cell"
           bordered
           title="Nature entry"
+          :no-data-label="
+            stageReason.length ? 'No data available' : 'selecte stage'
+          "
           :rows-per-page-options="[0]"
           :hide-bottom="!!filteredData.length"
           :grid="$q.screen.width < 830"
           card-container-class="q-gutter-y-md q-mt-xs"
-          :no-data-label="
-            selectedSatge ? 'No result found' : 'Select a segment'
-          "
         >
           <template v-slot:top>
             <div class="row q-gutter-y-lg q-pb-xs-md">
               <div class="col-12">
                 <div class="row items-center q-gutter-md">
-                  <div class="col-auto text-h6">Stage Reason check</div>
+                  <div class="col-auto text-h6">Stage Reason</div>
                 </div>
               </div>
             </div>
@@ -40,11 +40,22 @@
                   :options="stages"
                   map-options
                   emit-value
-                  label="Select segment"
+                  label="Select stage"
                   outlined
                   hide-bottom-space
                   :error="selectedError"
-                />
+                >
+                  <template v-slot:append>
+                    <q-icon
+                      v-if="selectedSatge"
+                      name="close"
+                      @click.stop.prevent="
+                        (selectedSatge = ''), (stageReason = [])
+                      "
+                      class="cursor-pointer"
+                    />
+                  </template>
+                </q-select>
               </div>
             </div>
 
@@ -66,26 +77,30 @@
               </div>
 
               <div class="col-xs-12 col-sm-3 col-md-6 q-pb-sm">
-                <q-checkbox v-model="checkBox" label=" In-Active" />
+                <q-checkbox
+                  v-model="checkBox"
+                  label=" In-Active"
+                  @click="(editingRowIndex = null), (isEditing = false)"
+                />
               </div>
               <div class="col-xs-12 col-sm-5 col-md-3 q-pb-sm">
                 <q-input
-                  v-model="name"
+                  v-model="reason"
                   outlined
                   dense
                   no-error-icon
-                  :error="error"
-                  :error-message="msg"
-                  placeholder="name"
+                  :error="isDuplicate"
+                  error-message="Item alredy exits"
+                  placeholder="Reason"
                 >
-                  <template v-slot:prepend> Reason </template>
+                  <template v-slot:prepend> Stage </template>
                   <template v-slot:after>
                     <q-btn
-                      :icon="'add '"
+                      icon="add"
                       color="teal"
                       size="md"
-                      :disable="error"
-                      @click="saveEntry()"
+                      :disable="isDuplicate || reason === ''"
+                      @click="saveEntry"
                     />
                   </template>
                 </q-input>
@@ -121,7 +136,9 @@
                     size="xs"
                     outline
                     color="red"
-                    @click="changeActive(props.row.id, props.row.inactive)"
+                    @click="
+                      () => changeActive(props.row.id, props.row.inactive)
+                    "
                   >
                   </q-btn>
                   <q-btn
@@ -130,7 +147,7 @@
                     outline
                     color="green-10"
                     v-if="editingRowIndex === props.rowIndex"
-                    @click="() => saveEdited()"
+                    @click="saveEdited"
                   >
                     <q-tooltip>Save</q-tooltip>
                   </q-btn>
@@ -149,32 +166,24 @@
               <q-td key="reason" :props="props">
                 <q-input
                   v-if="editingRowIndex === props.rowIndex"
-                  v-model="newSouce.reason"
+                  v-model="editReason"
                   placeholder="Name required"
                   dense
                   outlined
-                  :color="newSouce.reason ? 'green' : 'red'"
+                  :color="editReason ? 'green' : 'red'"
                   autofocus
                 />
-                <span v-else>{{
-                  props.row.reason.charAt(0).toUpperCase() +
-                  props.row.reason.slice(1)
-                }}</span>
+                <span v-else>
+                  {{ firstLetterCpitalze(props.row.reason) }}
+                </span>
               </q-td>
-              <q-td key="createdOn" :props="props">
-                {{
-                  props.row.createdOn.toLocaleString('en-US', DateTimeOptions)
-                }}
-              </q-td>
-              <q-td key="updatedOn" :props="props">
-                {{
-                  props.row.updatedOn.toLocaleString('en-US', DateTimeOptions)
-                }}
-              </q-td>
-              <q-td key="inactiveOn" :props="props">
-                {{
-                  props.row.inactiveOn.toLocaleString('en-US', DateTimeOptions)
-                }}
+
+              <q-td
+                :props="props"
+                v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
+                :key="key"
+              >
+                {{ formatDate(props.row[key], format) }}
               </q-td>
             </q-tr>
           </template>
@@ -189,59 +198,34 @@
                     <div class="col-12">
                       <q-input
                         v-if="editingRowIndex === props.rowIndex"
-                        v-model="newSouce.reason"
+                        v-model="editReason"
                         placeholder="Name required"
                         dense
                         outlined
-                        :color="newSouce.reason ? 'green' : 'red'"
+                        :color="editReason ? 'green' : 'red'"
                         autofocus
                       />
-                      <span v-else>{{
-                        props.row.reason.charAt(0).toUpperCase() +
-                        props.row.reason.slice(1)
-                      }}</span>
+                      <span v-else>
+                        {{ firstLetterCpitalze(props.row.reason) }}
+                      </span>
                     </div>
                   </div>
                 </q-card-section>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Created :</div>
-                    <div class="col-12">
-                      {{
-                        props.row.createdOn.toLocaleString(
-                          'en-US',
-                          DateTimeOptions
-                        )
-                      }}
+                <template
+                  v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
+                  :key="key"
+                >
+                  <q-card-section v-if="props.row[key]">
+                    <div class="row q-gutter-y-xs">
+                      <div class="col-12 text-weight-medium">
+                        {{ capitalCase(key.split('On').join(' on')) }} :
+                      </div>
+                      <div class="col-12">
+                        {{ formatDate(props.row[key], format) }}
+                      </div>
                     </div>
-                  </div>
-                </q-card-section>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Updated :</div>
-                    <div class="col-12">
-                      {{
-                        props.row.updatedOn.toLocaleString(
-                          'en-US',
-                          DateTimeOptions
-                        )
-                      }}
-                    </div>
-                  </div>
-                </q-card-section>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Inactive :</div>
-                    <div class="col-12">
-                      {{
-                        props.row.inactiveOn.toLocaleString(
-                          'en-US',
-                          DateTimeOptions
-                        )
-                      }}
-                    </div>
-                  </div>
-                </q-card-section>
+                  </q-card-section>
+                </template>
 
                 <q-card-actions align="center" class="q-py-md bg-grey-2">
                   <q-btn
@@ -260,7 +244,9 @@
                     :label="props.row.inactive ? 'activate' : 'deactivate'"
                     size="sm"
                     color="red"
-                    @click="changeActive(props.row.id, props.row.inactive)"
+                    @click="
+                      () => changeActive(props.row.id, props.row.inactive)
+                    "
                   >
                   </q-btn>
                   <q-btn
@@ -269,7 +255,7 @@
                     size="sm"
                     color="teal"
                     v-if="editingRowIndex === props.rowIndex"
-                    @click="() => saveEdited()"
+                    @click="saveEdited"
                   >
                     <q-tooltip>Save</q-tooltip>
                   </q-btn>
@@ -296,9 +282,11 @@
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { ref, onMounted, computed, watch, reactive } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
-
+import { formatDate } from 'src/utils/date';
+import { useQuasar } from 'quasar';
+import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
 interface StageReason {
   reason: string;
   stageCode: number | null;
@@ -351,67 +339,63 @@ const columns: {
     required: true,
     align: 'left',
     field: 'createdOn',
-    label: 'Created',
+    label: 'Created On',
   },
   {
     name: 'updatedOn',
     required: true,
     align: 'left',
     field: 'updatedOn',
-    label: 'Updated',
+    label: 'Updated On',
   },
   {
     name: 'inactiveOn',
     required: true,
     align: 'left',
     field: 'inactiveOn',
-    label: 'In-Active',
+    label: 'In-Active On',
   },
 ];
 
-const DateTimeOptions = {
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-  hour: 'numeric',
-  minute: 'numeric',
-  hour12: true, // Use 12-hour format
-};
-
+const $q = useQuasar();
 const fetchingData = ref(false);
-const name = ref('');
-const nameSearchQuery = ref('');
-const stages = ref<Stage[]>([]);
+const reason = ref('');
 const selectedSatge = ref('');
+const stages = ref<Stage[]>([]);
+const nameSearchQuery = ref('');
 const stageReason = ref<StageReason[]>([]);
-const stageReasonTemp = ref<StageReason[]>([]);
 const checkBox = ref(false);
 const isEditing = ref(false);
 const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
-const error = ref(false);
-const msg = ref('');
+const editReason = ref('');
+const format = 'DD/MM/YYYY @hh:mmA';
 const selectedError = ref(false);
 
-const newSouce = reactive<StageReason>({
-  reason: '',
-  stageCode: null,
-  id: null,
-  createdOn: '',
-  inactive: false,
-  inactiveOn: '',
-  updatedOn: '',
-});
-
 const filteredData = computed(() =>
-  stageReason.value.filter((item) => item.inactive === checkBox.value)
+  stageReason.value.filter(
+    (item) =>
+      item.reason.toLowerCase().includes(nameSearchQuery.value.toLowerCase()) &&
+      item.inactive === checkBox.value
+  )
+);
+
+const isDuplicate = computed(
+  () =>
+    !!stageReason.value.find(
+      (item) => item.reason.toLocaleLowerCase() === reason.value
+    )
 );
 
 const setFormData = () => {
-  const index = stageReason.value.findIndex(
-    (obj) => obj.id === editingRowId.value
-  );
-  newSouce.reason = index >= 0 ? stageReason.value[index].reason : '';
+  let temp;
+  if (editingRowId.value !== null) {
+    let index = stageReason.value.findIndex(
+      (obj) => obj.id === editingRowId.value
+    );
+    temp = stageReason.value[index];
+  }
+  editReason.value = temp ? temp.reason : '';
 };
 
 const editEntryConfirmed = (id: number, index: number) => {
@@ -423,7 +407,7 @@ const editEntryConfirmed = (id: number, index: number) => {
 const editEntry = (id: number, rowIndex: number) => {
   if (isEditing.value) {
     confirmDialog(() => editEntryConfirmed(id, rowIndex), {
-      msg: 'Are you sure you want to cancel editing the current Code?',
+      msg: 'Are you sure you want to cancel editing the current row?',
     });
   } else {
     isEditing.value = true;
@@ -431,88 +415,79 @@ const editEntry = (id: number, rowIndex: number) => {
     editEntryConfirmed(id, rowIndex);
   }
 };
-const saveNewEntry = async () => {
-  let payLoad = {
-    reason: name.value,
-    inactive: false,
-    createdOn: new Date(),
-    stageCode: selectedSatge.value,
-  };
-  const rsp = await api.post('/stageReason', payLoad);
-  if (rsp.data) {
-    onSuccess({
-      msg: rsp.data.displayMessage,
-      icon: 'sync_alt',
-    });
-    name.value = '';
-    loadSource();
-  }
-};
 const saveEdited = async () => {
-  const temp = stageReasonTemp.value.filter(
+  const temp = stageReason.value.filter(
     (item) => item.id !== editingRowId.value
   );
 
   const isDuplicate = temp.find(
-    (item) => item.reason.toLowerCase() === newSouce.reason.toLowerCase()
+    (item) => item.reason.toLowerCase() === editReason.value.toLowerCase()
   );
   if (isDuplicate) {
     onFailure({
-      msg: 'Duplicate Account Found',
+      msg: 'Item already exist',
       icon: 'warning',
     });
     return;
   }
 
   let payLoad = {
-    reason: newSouce.reason,
+    reason: editReason.value,
     id: editingRowId.value,
     updatedOn: new Date(),
     stageCode: selectedSatge.value,
   };
   const rsp = await api.put('/stageReason/update', payLoad);
-  if (rsp.data) {
+  if (rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
       icon: 'sync_alt',
     });
-    isEditing.value = false;
-    editingRowIndex.value = null;
     loadSource();
   }
 };
 
 const saveEntry = () => {
-  if (name.value) {
-    selectedSatge.value ? saveNewEntry() : (selectedError.value = true);
-  } else {
-    error.value = true;
+  selectedSatge.value ? saveNewEntry() : (selectedError.value = true);
+};
+
+const saveNewEntry = async () => {
+  let payLoad = {
+    reason: reason.value,
+    inactive: false,
+    createdOn: new Date(),
+    stageCode: selectedSatge.value,
+  };
+  const rsp = await api.post('/stageReason', payLoad);
+  if (rsp.data.displayMessage) {
+    onSuccess({
+      msg: rsp.data.displayMessage,
+      icon: 'sync_alt',
+    });
+    reason.value = '';
+    loadSource();
   }
 };
 
-const changeActive = async (id: number, state: boolean) => {
+const changeActive = (id: number, state: boolean) => {
   if (editingRowIndex.value === null) {
     confirmDialog(() => changeActiveConfirm(id, state), {
       msg: state
         ? 'Are you sure you want to activate ?'
         : 'Are you sure you want to deactivate ?',
     });
-  } else {
-    return;
   }
 };
 
 const changeActiveConfirm = async (id: number, state: boolean) => {
-  const payLoad = {
-    id: id,
-  };
-
   const str = state ? 'active' : 'inactive';
-  const rsp = await api.put('/stageReason/' + str, payLoad);
-  if (rsp.data) {
+  const rsp = await api.put('/stageReason/' + str, {
+    id,
+  });
+  if (rsp.data && rsp.data.displayMessage) {
     onSuccess({ msg: rsp.data.displayMessage });
+    loadSource();
   }
-  loadSource();
 };
 
 const loadSource = async () => {
@@ -520,21 +495,7 @@ const loadSource = async () => {
   const rsp = await api.get('stageReason/stageCode/' + selectedSatge.value);
 
   if (rsp.data) {
-    stageReason.value = rsp.data.map(
-      (item: {
-        createdOn: string | number | Date;
-        updatedOn: string | number | Date;
-        inactiveOn: string | number | Date;
-      }) => {
-        return {
-          ...item,
-          createdOn: item.createdOn !== null ? new Date(item.createdOn) : '',
-          updatedOn: item.updatedOn !== null ? new Date(item.updatedOn) : '',
-          inactiveOn: item.inactiveOn !== null ? new Date(item.inactiveOn) : '',
-        };
-      }
-    );
-    stageReasonTemp.value = stageReason.value;
+    stageReason.value = rsp.data;
   }
   fetchingData.value = false;
 };
@@ -554,35 +515,16 @@ const loadStages = async () => {
   fetchingData.value = false;
 };
 
-watch(name, () => {
-  error.value = false;
-  msg.value = '';
-
-  if (!name.value) {
-    return;
-  }
-
-  const temp = stageReasonTemp.value.find(
-    (item) => item.reason.toLowerCase() === name.value.toLocaleLowerCase()
-  );
-
-  if (temp) {
-    error.value = true;
-    msg.value = 'Item already exists!';
-  }
-});
-
-watch(nameSearchQuery, () => {
-  stageReason.value = stageReasonTemp.value.filter((item) => {
-    return item.reason
-      .toLowerCase()
-      .includes(nameSearchQuery.value.toLowerCase());
-  });
+watch(filteredData, () => {
+  editingRowIndex.value = null;
+  isEditing.value = false;
 });
 
 watch(selectedSatge, () => {
   selectedError.value = false;
-  loadSource();
+  if (selectedSatge.value) {
+    loadSource();
+  }
 });
 
 onMounted(() => {
