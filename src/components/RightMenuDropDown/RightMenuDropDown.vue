@@ -80,7 +80,7 @@
           <q-item-section>Helpdesk</q-item-section>
         </q-item>
         <q-separator />
-        <q-item clickable>
+        <q-item clickable @click="logout">
           <q-item-section avatar>
             <q-icon size="xs" name="fa-solid fa-right-from-bracket" />
           </q-item-section>
@@ -96,7 +96,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import EligibilityCalculator from 'src/components/RightMenuDropDown/RightMenuDropDownOptions/EligibilityCalculator/EligibilityCalculator.vue';
+import { useRouter } from 'vue-router';
 const showEligibilityCalculator = ref(false);
+
+const router = useRouter();
 
 const toggleFullscreen = () => {
   const doc = window.document;
@@ -114,6 +117,10 @@ const toggleFullscreen = () => {
       exitFullscreen.call(doc);
     }
   }
+};
+const logout = () => {
+  router.push({ name: 'login' });
+  localStorage.clear();
 };
 </script>
 <style scoped>

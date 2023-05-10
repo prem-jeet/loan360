@@ -26,16 +26,20 @@
     <q-drawer v-model="drawerLeft" overlay elevated>
       <LeftMenu :key="menuStore.currentModule" />
     </q-drawer>
+    <CompanyAndBranchSelectorModal
+      v-if="isCompanyAndBranchSelectorModalActive"
+    />
   </q-layout>
 </template>
 <script setup lang="ts">
 import NavBar from 'src/components/NavBar.vue';
 import LeftMenu from 'src/components/LeftMenu.vue';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useMenuStore } from 'src/stores/menu/menuStore';
 import { useRouter } from 'vue-router';
 
 import { useUserStore } from 'src/stores/user/userStore';
+import CompanyAndBranchSelectorModal from 'src/components/modals/CompanyAndBranchSelectorModal.vue';
 
 const router = useRouter();
 
@@ -50,10 +54,48 @@ const openMenu = () => {
   drawerLeft.value = !drawerLeft.value;
 };
 
+const getLocalStorage = (item: string) => {
+  return JSON.parse(item);
+};
+
+const isCompanyAndBranchSelectorModalActive = computed(
+  () => userStore.companyModal
+);
+
 onMounted(() => {
   // Header Set and Authentication
   const authToken = localStorage.getItem('authToken') || '';
   const expires_in = localStorage.getItem('expires_in') || 0;
+  const companyData = localStorage.getItem('selectedCompany');
+  const branchData = localStorage.getItem('selectedBranch');
+  const financialYearData = localStorage.getItem('selectedFinancialYear');
+  const company = companyData
+    ? getLocalStorage(companyData)
+    : { code: '', name: '' };
+  console.log(company, 'company');
+
+  const branch = branchData
+    ? getLocalStorage(branchData)
+    : {
+        code: '',
+        name: ' ',
+        inactive: false,
+        inactiveOn: null,
+        headOffice: null,
+      };
+  const financialYear = financialYearData
+    ? getLocalStorage(financialYearData)
+    : {
+        id: 0,
+        companyCode: '',
+        name: '',
+        fromDate: '',
+        toDate: '',
+        createdOn: null,
+        updatedOn: '',
+        inactive: null,
+        inactiveOn: null,
+      };
 
   if (userStore.token && userStore.token.id_token) {
     userStore.setAuthHeader(userStore.token.id_token);
@@ -63,6 +105,7 @@ onMounted(() => {
       id_token: authToken,
       expires_in: Number(expires_in),
     });
+    userStore.saveCompanyDetails(company, branch, financialYear);
   } else {
     userStore.setAuthHeader('');
     router.push({ name: 'login' });

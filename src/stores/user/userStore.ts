@@ -4,6 +4,7 @@ import {
   State,
   Token,
   Branch,
+  FinancialYear,
 } from './userStoreTypes';
 import { defineStore } from 'pinia';
 import jwt_decode from 'jwt-decode';
@@ -37,6 +38,7 @@ export const useUserStore = defineStore('userStore', {
       inactive: null,
       inactiveOn: null,
     },
+    companyModal: false,
   }),
   getters: {
     idToken: (state): string => state.token.id_token,
@@ -129,9 +131,42 @@ export const useUserStore = defineStore('userStore', {
     },
     fetchUser() {
       const authToken = localStorage.getItem('authToken') || ''; // local storage
+      const company =
+        this.selectedCompany &&
+        this.selectedCompany.code &&
+        this.selectedBranch &&
+        this.selectedBranch.code &&
+        this.selectedFinancialYear &&
+        this.selectedFinancialYear.companyCode
+          ? true
+          : false;
+      console.log(company, 'company', this.selectedCompany.code);
 
       return (this.isAuthenticated =
-        authToken || (this.token && this.token.id_token) ? true : false);
+        (authToken || (this.token && this.token.id_token)) && company
+          ? true
+          : false);
+    },
+
+    saveCompanyDetails(
+      selectedCompany: Company,
+      selectedBranch: Branch,
+      selectedFinancialYear: FinancialYear
+    ) {
+      this.selectedCompany = selectedCompany;
+      this.selectedBranch = selectedBranch;
+      this.selectedFinancialYear = selectedFinancialYear;
+      localStorage.setItem('selectedCompany', JSON.stringify(selectedCompany));
+      localStorage.setItem('selectedBranch', JSON.stringify(selectedBranch));
+      localStorage.setItem(
+        'selectedFinancialYear',
+        JSON.stringify(selectedFinancialYear)
+      );
+      console.log('selected Company', this.selectedCompany);
+    },
+
+    openCompanySelectModal(value: boolean) {
+      return (this.companyModal = value);
     },
   },
 });

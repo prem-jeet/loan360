@@ -39,19 +39,18 @@ export default route(function (/* store , ssrContext } */) {
 
   Router.beforeEach((to, from, next) => {
     const isAuthenticated = userStore.fetchUser();
-    console.log(isAuthenticated, 'authernticated', to);
-
+    console.log('Router Called');
     if (to.matched.some((record) => record.meta.requiresAuth)) {
-      // authGuard(to, from, next);
+      console.log('second 1 LoggedIN', isAuthenticated);
       if (isAuthenticated) {
         next();
       } else {
         next('/login');
       }
     } else if (to.matched.some((record) => !record.meta.requiresAuth)) {
-      console.log('second ');
-
+      console.log('second 2 LOGGED OUT', isAuthenticated);
       if (isAuthenticated) {
+        console.log('Not Auth 2 isAuthenticated', isAuthenticated);
         next({ path: '/moduleselector' });
       } else {
         next();
