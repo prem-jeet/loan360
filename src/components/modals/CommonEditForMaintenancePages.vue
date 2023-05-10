@@ -5,9 +5,8 @@
     </q-card-section>
 
     <q-card-section class="q-pt-none">
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum repellendus
-      sit voluptate voluptas eveniet porro. Rerum blanditiis perferendis totam,
-      ea at omnis vel numquam exercitationem aut, natus minima, porro labore.
+      <h1>hi</h1>
+      {{ editObject }}
     </q-card-section>
 
     <q-card-actions align="right">
@@ -16,6 +15,18 @@
   </q-card>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+interface EditObject {
+  name: string;
+  inactive: boolean;
+}
+
+const props = defineProps({
+  editObject: {
+    type: Object as () => EditObject,
+    required: true,
+  },
+});
+</script>
 
 <style scoped></style>

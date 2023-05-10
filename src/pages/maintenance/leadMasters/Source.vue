@@ -251,14 +251,16 @@
   </div>
 
   <q-dialog v-model="isEditModalActive">
-    <CommonEditForMaintenancePages></CommonEditForMaintenancePages>
+    <CommonEditForMaintenancePages
+      :editObject="editObject"
+    ></CommonEditForMaintenancePages>
   </q-dialog>
 </template>
 
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed, watch, reactive } from 'vue';
 import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
 import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
@@ -272,6 +274,11 @@ interface Source {
   inactiveOn: string;
   updatedOn: string;
 }
+
+const editObject = reactive<{ name: string; inactive: boolean }>({
+  name: '',
+  inactive: false,
+});
 
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
@@ -356,6 +363,8 @@ const setFormData = () => {
     temp = source.value[index];
   }
   editName.value = temp ? temp.name : '';
+  editObject.name = temp ? temp.name : '';
+  editObject.inactive = temp ? temp.inactive : false;
 };
 
 const editEntryConfirmed = (id: number, index: number) => {
