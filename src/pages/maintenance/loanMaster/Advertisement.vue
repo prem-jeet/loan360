@@ -114,7 +114,7 @@
                     size="xs"
                     outline
                     color="accent"
-                    @click="editEntry(props.rowIndex)"
+                    @click="editEntry(props.row.id)"
                   >
                     <q-tooltip>Edit</q-tooltip>
                   </q-btn>
@@ -138,23 +138,17 @@
                 }}</span>
               </q-td>
               <q-td key="name" :props="props">
-                <span>{{
-                  props.row.name.charAt(0).toUpperCase() +
-                  props.row.name.slice(1)
-                }}</span>
+                <span>{{ firstLetterCpitalze(props.row.name) }}</span>
               </q-td>
 
               <q-td key="description" :props="props">
-                <span>{{
-                  props.row.description.charAt(0).toUpperCase() +
-                  props.row.description.slice(1)
-                }}</span>
+                <span>{{ firstLetterCpitalze(props.row.description) }}</span>
               </q-td>
               <q-td key="date" :props="props">
-                {{ date.formatDate(props.row.date, 'DD/MM/YYYY@hh:mmA') }}
+                {{ formatDate(props.row.date, format) }}
               </q-td>
               <q-td key="inactiveOn" :props="props">
-                {{ date.formatDate(props.row.inactiveOn, 'DD/MM/YYYY@hh:mmA') }}
+                {{ formatDate(props.row.inactiveOn, format) }}
               </q-td>
             </q-tr>
           </template>
@@ -180,10 +174,7 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">Name :</div>
                     <div class="col-12">
-                      {{
-                        props.row.name.charAt(0).toUpperCase() +
-                        props.row.name.slice(1)
-                      }}
+                      {{ firstLetterCpitalze(props.row.name) }}
                     </div>
                   </div>
                 </q-card-section>
@@ -191,10 +182,7 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">Description :</div>
                     <div class="col-12">
-                      {{
-                        props.row.description.charAt(0).toUpperCase() +
-                        props.row.description.slice(1)
-                      }}
+                      {{ firstLetterCpitalze(props.row.description) }}
                     </div>
                   </div>
                 </q-card-section>
@@ -202,7 +190,7 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">Date :</div>
                     <div class="col-12">
-                      {{ date.formatDate(props.row.date, 'DD/MM/YYYY@hh:mmA') }}
+                      {{ formatDate(props.row.date, format) }}
                     </div>
                   </div>
                 </q-card-section>
@@ -211,12 +199,7 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">InactiveOn :</div>
                     <div class="col-12">
-                      {{
-                        date.formatDate(
-                          props.row.inactiveOn,
-                          'DD/MM/YYYY@hh:mmA'
-                        )
-                      }}
+                      {{ formatDate(props.row.inactiveOn, format) }}
                     </div>
                   </div>
                 </q-card-section>
@@ -227,7 +210,7 @@
                     icon="edit"
                     size="sm"
                     color="teal"
-                    @click="editEntry(props.rowIndex)"
+                    @click="editEntry(props.row.id)"
                   >
                   </q-btn>
 
@@ -274,8 +257,9 @@
                 :options="AdvertisementMedia"
                 map-options
                 emit-value
-                :error="selectError"
+                no-error-icon
                 label="Select media"
+                :rules="[(val) => !!val || '']"
               >
                 <template v-slot:append>
                   <q-icon
@@ -297,6 +281,7 @@
                   :error="error"
                   :error-message="msg"
                   placeholder="name"
+                  :rules="[(val) => !!val || '']"
                 >
                 </q-input>
               </div>
@@ -320,8 +305,8 @@
         <q-separator class="q-mt-md" />
         <q-card-actions align="center" class="q-py-md bg-grey-2 q-mt-auto">
           <q-btn
-            :label="editingRowIndex === null ? 'Add' : 'Save '"
-            :icon="editingRowIndex === null ? 'add' : 'save '"
+            :label="editingRowId === null ? 'Add' : 'Save '"
+            :icon="editingRowId === null ? 'add' : 'save '"
             color="teal"
             type="submit"
             :disable="error"
@@ -338,7 +323,9 @@ import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch, reactive } from 'vue';
 import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
-import { date } from 'quasar';
+import { firstLetterCpitalze } from 'src/utils/string';
+import { formatDate } from 'src/utils/date';
+import { useQuasar } from 'quasar';
 
 interface Advertisement {
   name: string;
@@ -414,10 +401,11 @@ const columns: {
     required: true,
     align: 'left',
     field: 'inactiveOn',
-    label: 'In-Active',
+    label: 'In-Active On',
   },
 ];
 
+const $q = useQuasar();
 const fetchingData = ref(false);
 const nameSearchQuery = ref('');
 const descriptionSearchQuery = ref('');
@@ -425,13 +413,13 @@ const advertisement = ref<Advertisement[]>([]);
 const advertisementTemp = ref<Advertisement[]>([]);
 const AdvertisementMedia = ref<AdvertisementMedia[]>([]);
 const checkBox = ref(false);
-const editingRowIndex = ref<number | null>(null);
+const editingRowId = ref<number | null>(null);
 const error = ref(false);
-const selectError = ref(false);
 const msg = ref('');
 const media = ref<number | null>(null);
 let mode: 'new' | 'edit' = 'new';
 const isEntryModalActive = ref(false);
+const format = 'DD/MM/YYYY @hh:mmA';
 
 const newSouce = reactive<Advertisement>({
   name: '',
@@ -443,42 +431,28 @@ const newSouce = reactive<Advertisement>({
   advertisementMediaId: null,
 });
 
-const filteredData = computed(() => {
-  const _nameSearchQuery = nameSearchQuery.value?.toLocaleLowerCase() || '';
-  const _descriptionSearchQuery =
-    descriptionSearchQuery.value?.toLocaleLowerCase() || '';
-
-  return advertisement.value.filter((item) => {
-    const namePresent = item.name
-      .toLocaleLowerCase()
-      .includes(_nameSearchQuery);
-    const descriptionPresent = item.description
-      .toLocaleLowerCase()
-      .includes(_descriptionSearchQuery);
-
-    if (_nameSearchQuery && _descriptionSearchQuery) {
-      return namePresent && descriptionPresent;
-    }
-
-    if (_nameSearchQuery) {
-      return namePresent;
-    }
-
-    if (_descriptionSearchQuery) {
-      return descriptionPresent;
-    }
-
-    return true;
-  });
-});
+const filteredData = computed(() =>
+  advertisement.value.filter(
+    (item) =>
+      item.inactive === checkBox.value &&
+      item.name.toLowerCase().includes(nameSearchQuery.value.toLowerCase()) &&
+      item.description
+        .toLowerCase()
+        .includes(descriptionSearchQuery.value.toLowerCase())
+  )
+);
 
 const setFormData = () => {
   let temp;
   let dateTemp;
-  if (editingRowIndex.value !== null) {
-    temp = advertisement.value[editingRowIndex.value];
+  if (editingRowId.value !== null) {
+    let index = advertisement.value.findIndex(
+      (obj) => obj.id === editingRowId.value
+    );
+    temp = advertisement.value[index];
     if (temp.date) {
-      dateTemp = date.formatDate(temp.date, 'YYYY-MM-DD');
+      const arr = temp.date.split(' ');
+      dateTemp = formatDate(arr[0], 'YYYY-MM-DD');
     }
   }
 
@@ -493,16 +467,16 @@ const setFormData = () => {
 
 const newEntry = () => {
   mode = 'new';
-  editingRowIndex.value = null;
+  editingRowId.value = null;
   setFormData();
   error.value = false;
   msg.value = '';
   isEntryModalActive.value = true;
 };
 
-const editEntry = (index: number) => {
+const editEntry = (id: number) => {
   mode = 'edit';
-  editingRowIndex.value = index;
+  editingRowId.value = id;
   setFormData();
   isEntryModalActive.value = true;
 };
@@ -522,21 +496,19 @@ const saveNewEntry = async () => {
       icon: 'sync_alt',
     });
     loadadvertisementMedia();
-    editingRowIndex.value = null;
+    editingRowId.value = null;
     isEntryModalActive.value = false;
   }
 };
 const saveEdited = async () => {
-  const temp = advertisementTemp.value.filter(
-    (item) => item.id !== newSouce.id
-  );
+  const temp = advertisement.value.filter((item) => item.id !== newSouce.id);
 
   const isDuplicate = temp.find(
     (item) => item.name.toLowerCase() === newSouce.name.toLowerCase()
   );
   if (isDuplicate) {
     onFailure({
-      msg: 'Duplicate Account Found',
+      msg: 'Item alredy exits',
       icon: 'warning',
     });
     return;
@@ -555,28 +527,18 @@ const saveEdited = async () => {
       msg: rsp.data.displayMessage,
       icon: 'sync_alt',
     });
-    editingRowIndex.value = null;
+    editingRowId.value = null;
     loadadvertisementMedia();
     isEntryModalActive.value = false;
   }
 };
 
-const saveEntryConfirm = () => {
-  if (newSouce.name && newSouce.advertisementMediaId) {
-    saveNewEntry();
-  } else if (!newSouce.advertisementMediaId) {
-    selectError.value = true;
-  } else {
-    error.value = true;
-  }
-};
-
 const saveEntry = () => {
-  mode === 'new' ? saveEntryConfirm() : saveEdited();
+  mode === 'new' ? saveNewEntry() : saveEdited();
 };
 
 const changeActive = async (id: number, state: boolean) => {
-  if (editingRowIndex.value === null) {
+  if (editingRowId.value === null) {
     confirmDialog(() => changeActiveConfirm(id, state), {
       msg: state
         ? 'Are you sure you want to activate ?'
@@ -606,23 +568,15 @@ const loadSource = async () => {
 
   if (rsp.data) {
     const transformedData = rsp.data.map(
-      (item: {
-        date: string | number | Date;
-        inactiveOn: string | number | Date;
-        description: string | null;
-      }) => {
+      (item: { description: string | null }) => {
         return {
           ...item,
-          date: item.date !== null ? new Date(item.date) : '',
-          inactiveOn: item.inactiveOn !== null ? new Date(item.inactiveOn) : '',
           description: item.description ? item.description : '',
         };
       }
     );
     advertisementTemp.value = transformedData;
-    advertisement.value = transformedData.filter(
-      (item: { inactive: boolean }) => item.inactive === checkBox.value
-    );
+    advertisement.value = transformedData;
     if (media.value) {
       advertisement.value = advertisement.value.filter(
         (item) => item.advertisementMediaId === media.value
@@ -655,11 +609,7 @@ watch(newSouce, () => {
     error.value = false;
     msg.value = '';
 
-    if (!newSouce.name) {
-      return;
-    }
-
-    const temp = advertisementTemp.value.find(
+    const temp = advertisement.value.find(
       (item) => item.name.toLowerCase() === newSouce.name.toLocaleLowerCase()
     );
 
@@ -675,30 +625,8 @@ watch(media, () => {
     advertisement.value = advertisementTemp.value.filter(
       (temp) => temp.advertisementMediaId === media.value
     );
-    advertisement.value = advertisement.value.filter((item) => {
-      return item.inactive === checkBox.value;
-    });
   } else {
     advertisement.value = advertisementTemp.value;
-    advertisement.value = advertisement.value.filter((item) => {
-      return item.inactive === checkBox.value;
-    });
-  }
-});
-watch(checkBox, () => {
-  advertisement.value = advertisementTemp.value.filter((item) => {
-    return item.inactive === checkBox.value;
-  });
-  if (media.value) {
-    advertisement.value = advertisement.value.filter(
-      (item) => item.advertisementMediaId === media.value
-    );
-  }
-});
-
-watch(newSouce, () => {
-  if (newSouce.advertisementMediaId) {
-    selectError.value = false;
   }
 });
 
