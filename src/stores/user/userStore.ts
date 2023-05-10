@@ -63,9 +63,6 @@ export const useUserStore = defineStore('userStore', {
   actions: {
     setToken(token: Token) {
       this.token = token;
-      // this.isAuthenticated = true;
-      // const authToken = LocalStorage.getItem('authToken');
-      // console.log(authToken, 'Auth');
     },
     setAccessToken(token: string) {
       this.accessToken = token;
@@ -140,8 +137,6 @@ export const useUserStore = defineStore('userStore', {
         this.selectedFinancialYear.companyCode
           ? true
           : false;
-      console.log(company, 'company', this.selectedCompany.code);
-
       return (this.isAuthenticated =
         (authToken || (this.token && this.token.id_token)) && company
           ? true
@@ -162,7 +157,6 @@ export const useUserStore = defineStore('userStore', {
         'selectedFinancialYear',
         JSON.stringify(selectedFinancialYear)
       );
-      console.log('selected Company', this.selectedCompany);
     },
 
     openCompanySelectModal(value: boolean) {

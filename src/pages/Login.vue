@@ -97,9 +97,7 @@ const getDataOnRefresh = () => {
 };
 
 onMounted(async () => {
-  console.log('called route.query.code 1');
   if (route.query.code) {
-    console.log('called route.query.code 2');
     const rsp = await getAuthTokenFromAws(route.query.code);
     if (rsp.access_token) {
       userStore.setToken({

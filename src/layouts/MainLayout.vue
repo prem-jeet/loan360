@@ -72,7 +72,6 @@ onMounted(() => {
   const company = companyData
     ? getLocalStorage(companyData)
     : { code: '', name: '' };
-  console.log(company, 'company');
 
   const branch = branchData
     ? getLocalStorage(branchData)
