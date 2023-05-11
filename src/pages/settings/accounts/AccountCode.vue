@@ -452,11 +452,10 @@ interface AccountCode {
 }
 
 const breadcrumbs = [
-  { path: '/module/settings', label: 'Settings', disable: false },
+  { path: '/module/settings', label: 'Settings' },
   {
     path: '/module/settings/accountcode',
     label: 'Account Code',
-    disable: false,
   },
 ];
 

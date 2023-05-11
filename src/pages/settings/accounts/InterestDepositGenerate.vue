@@ -62,11 +62,10 @@ import { onSuccess } from 'src/utils/notification';
 import { ref, computed } from 'vue';
 
 const breadcrumbs = [
-  { path: '/module/settings', label: 'Settings', disable: false },
+  { path: '/module/settings', label: 'Settings' },
   {
     path: '/module/settings/interestDepositGenerate',
     label: 'Deposite Interest Generate',
-    disable: false,
   },
 ];
 

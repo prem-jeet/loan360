@@ -25,7 +25,7 @@
         :key="label"
         :to="path"
         :label="label"
-        :disable="disable"
+        :disable="disable || false"
       />
     </q-breadcrumbs>
   </q-chip>
@@ -34,7 +34,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 const props = defineProps<{
-  orderedPaths: { path: string; label: string; disable: boolean }[];
+  orderedPaths: { path: string; label: string; disable?: boolean }[];
   styleCss?: string;
 }>();
 

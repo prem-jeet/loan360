@@ -309,11 +309,10 @@ interface NatureEntry {
 }
 
 const breadcrumbs = [
-  { path: '/module/settings', label: 'Settings', disable: false },
+  { path: '/module/settings', label: 'Settings' },
   {
     path: '/module/settings/natureEntry',
     label: 'Loan master',
-    disable: false,
   },
 ];
 

@@ -265,16 +265,14 @@ interface Source {
 }
 
 const breadcrumbs = [
-  { path: '/module/maintenance', label: 'Maintenance', disable: false },
+  { path: '/module/maintenance', label: 'Maintenance' },
   {
     path: '/module/maintenance/leadMaster/source',
     label: 'LeadMaster',
-    disable: false,
   },
   {
     path: '/module/maintenance/leadMaster/source',
     label: 'Source',
-    disable: false,
   },
 ];
 
