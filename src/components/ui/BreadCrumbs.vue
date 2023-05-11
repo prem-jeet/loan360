@@ -2,7 +2,7 @@
   <q-chip
     color="white"
     class="shadow-3 q-py-md-md py-xs-medium q-mx-xs-none"
-    v-bind:class="customCss ? customCss : 'q-mx-md-lg mx-sm-zero'"
+    v-bind:class="customCss ? customCss : 'q-mx-md-lg mx-sm-none'"
   >
     <q-breadcrumbs gutter="xs" active-color="indigo" class="q-py-md-xs">
       <template v-slot:separator>
@@ -12,7 +12,7 @@
       <q-breadcrumbs-el
         outline
         rounded
-        class="q-px-xs-sm q-py-xs-xs breadcrumbs"
+        class="q-px-xs-sm q-py-xs-xs text-subtitle1"
         to="/moduleSelector"
         icon="house"
         color="gray"
@@ -41,9 +41,4 @@ const props = defineProps<{
 const customCss = ref(props.styleCss);
 </script>
 
-<style scoped lang="scss">
-// added the size for breadCrumb font-sizing
-.breadcrumbs {
-  font-size: 16px;
-}
-</style>
+<style scoped lang="scss"></style>
