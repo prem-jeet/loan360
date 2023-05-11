@@ -2,7 +2,7 @@
   <q-chip
     color="white"
     class="shadow-3 q-py-md-md py-xs-medium q-mx-xs-none"
-    v-bind:class="customCss ? customCss : 'q-mx-md-lg mx-sm-none'"
+    v-bind:class="customCss ? customCss : 'q-mx-md-lg ma-sm-none'"
   >
     <q-breadcrumbs gutter="xs" active-color="indigo" class="q-py-md-xs">
       <template v-slot:separator>
