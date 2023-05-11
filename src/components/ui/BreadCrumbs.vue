@@ -16,7 +16,7 @@
         icon="house"
       />
       <q-breadcrumbs-el
-        class="q-px-xs-xs q-px-md-sm text-weight-medium q-px-xs-sm q-py-xs-xs"
+        class="q-px-md-sm text-weight-medium q-px-xs-sm q-py-xs-xs"
         v-for="{ path, label, disable } in orderedPaths"
         :key="label"
         :to="path"
