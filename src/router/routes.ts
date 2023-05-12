@@ -72,6 +72,12 @@ const routes: RouteRecordRaw[] = [
               import('pages/settings/accounts/InterestDepositGenerate.vue'),
           },
           {
+            path: 'leadMaster/status',
+            name: 'status',
+            component: () => import('pages/maintenance/leadMasters/Status.vue'),
+          },
+
+          {
             path: 'leadMaster/asset',
             name: 'asset',
             component: () => import('pages/maintenance/leadMasters/Asset.vue'),
