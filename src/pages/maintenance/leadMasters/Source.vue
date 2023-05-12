@@ -148,7 +148,6 @@
                     v-if="editingRowIndex !== props.rowIndex"
                     @click="() => editEntry(props.row.id)"
                   >
-                    <q-tooltip>Edit</q-tooltip>
                   </q-btn>
                 </q-card-actions>
               </q-card>

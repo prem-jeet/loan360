@@ -26,24 +26,16 @@
           </div>
         </div>
 
-        <div class="row justify-between q-mx-sm">
+        <div class="row items-center">
           <div class="col-6">
             <q-checkbox
               v-model="modalObj.inactive"
               :label="modalObj.inactive ? 'Activate' : 'Deactivate'"
               @click="active = !active"
             />
-            <!-- <q-btn
-              :label="modalObj.inactive ? 'activate' : 'deactivate'"
-              size="xs"
-              color="red"
-              @click="active = true"
-            ></q-btn> -->
           </div>
           <div class="col-6 text-right text-warning">
-            {{
-              modalObj.inactive ? 'Currently Deactive' : 'Currently Activate'
-            }}
+            {{ activeCondition ? 'Currently Deactive' : 'Currently Activate' }}
           </div>
         </div>
         <div v-if="active">
@@ -53,8 +45,8 @@
               <span class="text-red-10 q-pl-sm">
                 {{
                   modalObj.inactive
-                    ? 'Deactivated , Are you sure ?'
-                    : 'Activate, Are you sure ?'
+                    ? 'It will be deactivated, Click save to confirm'
+                    : 'It will be activated, Click save to confirm'
                 }}
               </span>
             </div>
@@ -85,6 +77,8 @@ const props = defineProps({
 });
 const emit = defineEmits(['close', 'saveEdit']);
 let modalObj = reactive<EditObject>({ ...props.editObject });
+
+const activeCondition = modalObj.inactive;
 
 const active = ref(false);
 
