@@ -35,7 +35,9 @@
             />
           </div>
           <div class="col-6 text-right text-warning">
-            {{ activeCondition ? 'Currently Deactive' : 'Currently Activate' }}
+            {{
+              editObject.inactive ? 'Currently Deactive' : 'Currently Activate'
+            }}
           </div>
         </div>
         <div v-if="active">
@@ -77,8 +79,6 @@ const props = defineProps({
 });
 const emit = defineEmits(['close', 'saveEdit']);
 let modalObj = reactive<EditObject>({ ...props.editObject });
-
-const activeCondition = modalObj.inactive;
 
 const active = ref(false);
 
