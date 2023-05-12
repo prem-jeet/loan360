@@ -28,12 +28,17 @@
 
         <div class="row justify-between q-mx-sm">
           <div class="col-6">
-            <q-btn
+            <q-checkbox
+              v-model="modalObj.inactive"
+              :label="modalObj.inactive ? 'Activate' : 'Deactivate'"
+              @click="active = !active"
+            />
+            <!-- <q-btn
               :label="modalObj.inactive ? 'activate' : 'deactivate'"
               size="xs"
               color="red"
               @click="active = true"
-            ></q-btn>
+            ></q-btn> -->
           </div>
           <div class="col-6 text-right text-warning">
             {{
@@ -48,31 +53,10 @@
               <span class="text-red-10 q-pl-sm">
                 {{
                   modalObj.inactive
-                    ? 'Are you sure you want to activate ?'
-                    : 'Are you sure you want to deactivate ?'
+                    ? 'Deactivated , Are you sure ?'
+                    : 'Activate, Are you sure ?'
                 }}
               </span>
-            </div>
-          </div>
-
-          <div class="row q-mt-md justify-center text-center">
-            <div class="col-3">
-              <q-btn
-                size="sm"
-                label="ok"
-                color="teal"
-                @click="
-                  (modalObj.inactive = !modalObj.inactive), (active = false)
-                "
-              ></q-btn>
-            </div>
-            <div class="col-3">
-              <q-btn
-                size="sm"
-                label="no"
-                color="red-5"
-                @click="active = false"
-              ></q-btn>
             </div>
           </div>
         </div>
