@@ -85,6 +85,9 @@ export const useUserStore = defineStore('userStore', {
   actions: {
     setToken(token: Token) {
       this.token = token;
+      // this.setAuthHeader(token.id_token);
+      localStorage.setItem('authToken', token.id_token);
+      localStorage.setItem('expires_in', JSON.stringify(token.expires_in));
     },
     setAccessToken(token: string) {
       this.accessToken = token;
@@ -150,11 +153,8 @@ export const useUserStore = defineStore('userStore', {
     },
     fetchUser() {
       const company =
-        this.selectedCompany &&
         this.selectedCompany.code &&
-        this.selectedBranch &&
         this.selectedBranch.code &&
-        this.selectedFinancialYear &&
         this.selectedFinancialYear.companyCode
           ? true
           : false;

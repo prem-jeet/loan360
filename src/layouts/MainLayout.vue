@@ -34,7 +34,7 @@
 <script setup lang="ts">
 import NavBar from 'src/components/NavBar.vue';
 import LeftMenu from 'src/components/LeftMenu.vue';
-import { ref, onMounted, computed } from 'vue';
+import { ref, onBeforeMount, computed } from 'vue';
 import { useMenuStore } from 'src/stores/menu/menuStore';
 import { useRouter } from 'vue-router';
 
@@ -58,14 +58,16 @@ const isCompanyAndBranchSelectorModalActive = computed(
   () => userStore.companyModal
 );
 
-onMounted(() => {
-  // Header Set and Authentication
-
+const getDataOnRefresh = () => {
+  // Header Set for loggedIn user
   if (userStore.token && userStore.token.id_token) {
     userStore.setAuthHeader(userStore.token.id_token);
   } else {
     userStore.setAuthHeader('');
-    router.push({ name: 'login' });
   }
+};
+
+onBeforeMount(() => {
+  getDataOnRefresh();
 });
 </script>

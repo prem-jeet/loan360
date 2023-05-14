@@ -30,7 +30,7 @@ import logo from 'src/assets/img/JaguarCloud.png';
 import CompanyAndBranchSelectorModal from 'src/components/modals/CompanyAndBranchSelectorModal.vue';
 import { useUserStore } from 'src/stores/user/userStore';
 import { getAuthTokenFromAws, login } from 'src/utils/auth/login';
-import { computed, onMounted, watch } from 'vue';
+import { computed, onMounted, watch, onBeforeMount } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 
@@ -59,15 +59,16 @@ watch([selectedBranch, selectedCompany, selectedFinancialYear], () => {
 });
 
 const getDataOnRefresh = () => {
-  // Header Set and Authentication
-
+  // Header Set for loggedIn user
   if (userStore.token && userStore.token.id_token) {
     userStore.setAuthHeader(userStore.token.id_token);
   } else {
     userStore.setAuthHeader('');
-    router.push({ name: 'login' });
   }
 };
+onBeforeMount(() => {
+  getDataOnRefresh();
+});
 
 onMounted(async () => {
   if (route.query.code) {
@@ -78,17 +79,11 @@ onMounted(async () => {
         expires_in: rsp.expires_in,
       });
       userStore.setAccessToken(rsp.access_token);
-      localStorage.setItem('authToken', rsp.id_token);
-      localStorage.setItem('expires_in', rsp.expires_in);
       router.push({ name: 'authenticated' });
     } else {
       router.push({ name: 'noFound' });
     }
   }
-  if (userStore.isAuthenticated) {
-    router.push({ name: 'authenticated' });
-  }
-  getDataOnRefresh();
 });
 </script>
 

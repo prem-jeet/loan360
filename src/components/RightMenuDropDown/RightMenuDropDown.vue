@@ -119,7 +119,6 @@ const toggleFullscreen = () => {
   }
 };
 const logout = () => {
-  router.push({ name: 'login' });
   localStorage.clear();
 };
 </script>
