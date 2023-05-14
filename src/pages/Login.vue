@@ -60,36 +60,9 @@ watch([selectedBranch, selectedCompany, selectedFinancialYear], () => {
 
 const getDataOnRefresh = () => {
   // Header Set and Authentication
-  const authToken = localStorage.getItem('authToken') || '';
-  const expires_in = localStorage.getItem('expires_in') || 0;
-  const companyData = localStorage.getItem('selectedCompany');
-  const branchData = localStorage.getItem('selectedBranch');
-  const financialYearData = localStorage.getItem('selectedFinancialYear');
-  const company = companyData
-    ? JSON.parse(companyData)
-    : { code: '', name: '' };
-  const branch = branchData
-    ? JSON.parse(branchData)
-    : {
-        code: '',
-        name: ' ',
-        inactive: false,
-        inactiveOn: null,
-        headOffice: null,
-      };
-  const financialYear = financialYearData
-    ? JSON.parse(financialYearData)
-    : selectedFinancialYear.value;
 
   if (userStore.token && userStore.token.id_token) {
     userStore.setAuthHeader(userStore.token.id_token);
-  } else if (authToken) {
-    userStore.setAuthHeader(authToken);
-    userStore.setToken({
-      id_token: authToken,
-      expires_in: Number(expires_in),
-    });
-    userStore.saveCompanyDetails(company, branch, financialYear);
   } else {
     userStore.setAuthHeader('');
     router.push({ name: 'login' });

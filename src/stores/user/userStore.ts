@@ -9,35 +9,57 @@ import {
 import { defineStore } from 'pinia';
 import jwt_decode from 'jwt-decode';
 import { api } from 'src/boot/axios';
+import { LocalStorage } from 'quasar';
+type CreateMutable<T> = { -readonly [P in keyof T]: CreateMutable<T[P]> };
+import { jsonParse } from 'src/utils/string';
+
+const companyData = localStorage.getItem('selectedCompany');
+const branchData = localStorage.getItem('selectedBranch');
+const financialYearData = localStorage.getItem('selectedFinancialYear');
 
 export const useUserStore = defineStore('userStore', {
   state: (): State => ({
-    token: { id_token: '', expires_in: 0 },
+    token: ({
+      id_token: LocalStorage.getItem('authToken'),
+      expires_in: LocalStorage.getItem('expires_in'),
+    } || {
+      id_token: '',
+      expires_in: 0,
+    }) as CreateMutable<Token>,
     appRole: [],
     accessToken: '',
     isAuthenticated: false,
     allowedCompany: [],
     allowedBranch: [],
     allowedFinancialYear: [],
-    selectedCompany: { code: '', name: '' },
-    selectedBranch: {
-      code: '',
-      name: '',
-      inactive: null,
-      headOffice: null,
-      inactiveOn: null,
-    },
-    selectedFinancialYear: {
-      id: 0,
-      companyCode: '',
-      name: '',
-      fromDate: '',
-      toDate: '',
-      createdOn: null,
-      updatedOn: null,
-      inactive: null,
-      inactiveOn: null,
-    },
+    selectedCompany: (companyData
+      ? jsonParse(companyData)
+      : {
+          code: '',
+          name: '',
+        }) as CreateMutable<Company>,
+    selectedBranch: (branchData
+      ? jsonParse(branchData)
+      : {
+          code: '',
+          name: '',
+          inactive: null,
+          headOffice: null,
+          inactiveOn: null,
+        }) as CreateMutable<Branch>,
+    selectedFinancialYear: (financialYearData
+      ? jsonParse(financialYearData)
+      : {
+          id: 0,
+          companyCode: '',
+          name: '',
+          fromDate: '',
+          toDate: '',
+          createdOn: null,
+          updatedOn: null,
+          inactive: null,
+          inactiveOn: null,
+        }) as CreateMutable<FinancialYear>,
     companyModal: false,
   }),
   getters: {
@@ -127,7 +149,6 @@ export const useUserStore = defineStore('userStore', {
         : delete api.defaults.headers.common['Authorization'];
     },
     fetchUser() {
-      const authToken = localStorage.getItem('authToken') || ''; // local storage
       const company =
         this.selectedCompany &&
         this.selectedCompany.code &&
@@ -138,9 +159,7 @@ export const useUserStore = defineStore('userStore', {
           ? true
           : false;
       return (this.isAuthenticated =
-        (authToken || (this.token && this.token.id_token)) && company
-          ? true
-          : false);
+        this.token && this.token.id_token && company ? true : false);
     },
 
     saveCompanyDetails(

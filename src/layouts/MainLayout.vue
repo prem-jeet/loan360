@@ -54,57 +54,15 @@ const openMenu = () => {
   drawerLeft.value = !drawerLeft.value;
 };
 
-const getLocalStorage = (item: string) => {
-  return JSON.parse(item);
-};
-
 const isCompanyAndBranchSelectorModalActive = computed(
   () => userStore.companyModal
 );
 
 onMounted(() => {
   // Header Set and Authentication
-  const authToken = localStorage.getItem('authToken') || '';
-  const expires_in = localStorage.getItem('expires_in') || 0;
-  const companyData = localStorage.getItem('selectedCompany');
-  const branchData = localStorage.getItem('selectedBranch');
-  const financialYearData = localStorage.getItem('selectedFinancialYear');
-  const company = companyData
-    ? getLocalStorage(companyData)
-    : { code: '', name: '' };
-
-  const branch = branchData
-    ? getLocalStorage(branchData)
-    : {
-        code: '',
-        name: ' ',
-        inactive: false,
-        inactiveOn: null,
-        headOffice: null,
-      };
-  const financialYear = financialYearData
-    ? getLocalStorage(financialYearData)
-    : {
-        id: 0,
-        companyCode: '',
-        name: '',
-        fromDate: '',
-        toDate: '',
-        createdOn: null,
-        updatedOn: '',
-        inactive: null,
-        inactiveOn: null,
-      };
 
   if (userStore.token && userStore.token.id_token) {
     userStore.setAuthHeader(userStore.token.id_token);
-  } else if (authToken) {
-    userStore.setAuthHeader(authToken);
-    userStore.setToken({
-      id_token: authToken,
-      expires_in: Number(expires_in),
-    });
-    userStore.saveCompanyDetails(company, branch, financialYear);
   } else {
     userStore.setAuthHeader('');
     router.push({ name: 'login' });
