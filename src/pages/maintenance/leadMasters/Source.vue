@@ -163,6 +163,7 @@
       :editObject="editObject"
       @close="isEditModalActive = false"
       @saveEdit="saveEdit"
+      editMsg="Edit Source"
     ></CommonEditForMaintenancePages>
   </q-dialog>
 </template>

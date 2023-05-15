@@ -3,7 +3,7 @@
     <q-form @submit.prevent="saveEdit" @reset="resetForm">
       <q-card-section class="bg-grey-2">
         <div class="flex items-center">
-          <span class="text-subtitle2 q-mr-xl"> Edit Source </span>
+          <span class="text-subtitle2 q-mr-xl"> {{ editMsg }} </span>
           <q-space />
           <q-btn
             class="q-ml-xs-md q-ml-sm-xl"
@@ -75,6 +75,10 @@ const props = defineProps({
   editObject: {
     type: Object as () => EditObject,
     required: true,
+  },
+  editMsg: {
+    type: String,
+    requred: true,
   },
 });
 const emit = defineEmits(['close', 'saveEdit']);
