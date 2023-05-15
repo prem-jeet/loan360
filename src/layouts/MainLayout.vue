@@ -36,12 +36,8 @@ import NavBar from 'src/components/NavBar.vue';
 import LeftMenu from 'src/components/LeftMenu.vue';
 import { ref, onBeforeMount, computed } from 'vue';
 import { useMenuStore } from 'src/stores/menu/menuStore';
-import { useRouter } from 'vue-router';
-
 import { useUserStore } from 'src/stores/user/userStore';
 import CompanyAndBranchSelectorModal from 'src/components/modals/CompanyAndBranchSelectorModal.vue';
-
-const router = useRouter();
 
 const userStore = useUserStore();
 

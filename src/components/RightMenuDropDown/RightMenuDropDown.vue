@@ -96,10 +96,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import EligibilityCalculator from 'src/components/RightMenuDropDown/RightMenuDropDownOptions/EligibilityCalculator/EligibilityCalculator.vue';
-import { useRouter } from 'vue-router';
 const showEligibilityCalculator = ref(false);
-
-const router = useRouter();
 
 const toggleFullscreen = () => {
   const doc = window.document;
