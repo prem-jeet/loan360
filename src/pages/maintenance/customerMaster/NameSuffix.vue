@@ -268,7 +268,8 @@ const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
   {
     path: '/module/maintenance/customerMaster/nameSuffix',
-    label: 'Customer Masterr',
+    label: 'Customer Master',
+    disable: true,
   },
   {
     path: '/module/maintenance/customerMaster/nameSuffix',
