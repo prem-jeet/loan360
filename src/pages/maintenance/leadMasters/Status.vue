@@ -85,9 +85,10 @@
             <q-tr :props="props">
               <q-td key="actions" auto-width>
                 <q-btn
+                  outline
+                  rounded
                   icon="edit"
                   size="xs"
-                  outline
                   color="accent"
                   v-if="editingRowIndex !== props.rowIndex"
                   @click="() => editEntry(props.row.id)"

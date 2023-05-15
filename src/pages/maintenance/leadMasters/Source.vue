@@ -88,6 +88,7 @@
                   icon="edit"
                   size="xs"
                   outline
+                  rounded
                   color="accent"
                   v-if="editingRowIndex !== props.rowIndex"
                   @click="() => editEntry(props.row.id)"
