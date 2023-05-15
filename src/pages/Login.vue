@@ -58,18 +58,6 @@ watch([selectedBranch, selectedCompany, selectedFinancialYear], () => {
   }
 });
 
-const getDataOnRefresh = () => {
-  // Header Set for loggedIn user
-  if (userStore.token && userStore.token.id_token) {
-    userStore.setAuthHeader(userStore.token.id_token);
-  } else {
-    userStore.setAuthHeader('');
-  }
-};
-onBeforeMount(() => {
-  getDataOnRefresh();
-});
-
 onMounted(async () => {
   if (route.query.code) {
     const rsp = await getAuthTokenFromAws(route.query.code);

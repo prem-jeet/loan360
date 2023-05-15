@@ -58,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted, onBeforeMount } from 'vue';
 import { useRoute } from 'vue-router';
 
 import { useUserStore } from 'src/stores/user/userStore';
@@ -104,6 +104,17 @@ watch(
   [selectedCompany, selectedBranch, selectedFinancialYear],
   () => (error.value = false)
 );
+const getDataOnRefresh = () => {
+  // Header Set for loggedIn user
+  if (userStore.token && userStore.token.id_token) {
+    userStore.setAuthHeader(userStore.token.id_token);
+  } else {
+    userStore.setAuthHeader('');
+  }
+};
+onBeforeMount(() => {
+  getDataOnRefresh();
+});
 
 onMounted(async () => {
   if (!(userStore.allowedCompany.length && userStore.allowedBranch.length)) {
