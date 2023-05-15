@@ -191,6 +191,7 @@ const breadcrumbs = [
   {
     path: '/module/maintenance/leadMaster/source',
     label: 'LeadMaster',
+    disable: true,
   },
   {
     path: '/module/maintenance/leadMaster/source',
