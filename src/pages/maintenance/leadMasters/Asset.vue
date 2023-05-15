@@ -266,7 +266,11 @@ interface Source {
 
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
-  { path: '/module/maintenance/leadMaster/asset', label: 'LeadMaster' },
+  {
+    path: '/module/maintenance/leadMaster/asset',
+    label: 'LeadMaster',
+    disable: true,
+  },
   { path: '/module/maintenance/leadMaster/asset', label: 'Asset' },
 ];
 
