@@ -44,7 +44,7 @@
               </div>
 
               <div class="row items-center q-gutter-x-md">
-                <div class="col-12 q-mb-sm">
+                <div class="col-12">
                   <span class="text-h6">Filter</span>
                   <span v-if="accountCodeDeposits.length" class="q-ml-md">
                     <q-btn
