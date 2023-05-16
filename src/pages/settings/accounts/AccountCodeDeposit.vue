@@ -231,7 +231,6 @@
                     color="teal"
                     @click="editEntry(props.row.id)"
                   >
-                    <q-tooltip>Edit</q-tooltip>
                   </q-btn>
                   <q-btn
                     label="Delete"
@@ -240,7 +239,6 @@
                     color="red"
                     @click="() => deleteEntry(props.row.id)"
                   >
-                    <q-tooltip>Delete</q-tooltip>
                   </q-btn>
                 </q-card-actions>
               </q-card>
