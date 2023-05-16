@@ -81,6 +81,18 @@ const routes: RouteRecordRaw[] = [
           },
 
           {
+            path: 'customerMaster/nameSuffix',
+            name: 'nameSuffix',
+            component: () =>
+              import('pages/maintenance/customerMaster/NameSuffix.vue'),
+          },
+
+          {
+            path: 'leadMaster/source',
+            name: 'source',
+            component: () => import('pages/maintenance/leadMasters/Source.vue'),
+          },
+          {
             path: 'leadMaster/asset',
             name: 'asset',
             component: () => import('pages/maintenance/leadMasters/Asset.vue'),
