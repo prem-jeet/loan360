@@ -80,7 +80,7 @@
           <q-item-section>Helpdesk</q-item-section>
         </q-item>
         <q-separator />
-        <q-item clickable>
+        <q-item clickable @click="logout">
           <q-item-section avatar>
             <q-icon size="xs" name="fa-solid fa-right-from-bracket" />
           </q-item-section>
@@ -114,6 +114,9 @@ const toggleFullscreen = () => {
       exitFullscreen.call(doc);
     }
   }
+};
+const logout = () => {
+  localStorage.clear();
 };
 </script>
 <style scoped>

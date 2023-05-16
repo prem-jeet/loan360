@@ -8,7 +8,6 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'login',
-
     component: () => import('pages/Login.vue'),
     children: [
       {
@@ -21,11 +20,13 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/moduleselector',
     component: () => import('layouts/MainLayout.vue'),
+    meta: { requiresAuth: true },
     children: [
       {
         path: '',
         name: 'moduleSelector',
         component: () => import('pages/ModuleSelector.vue'),
+        meta: { requiresAuth: true },
       },
     ],
   },
@@ -33,12 +34,14 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/module',
     component: () => import('layouts/MainLayout.vue'),
+    meta: { requiresAuth: true },
     children: [
       {
         path: ':module',
         name: 'module',
         component: () => import('pages/Module.vue'),
         props: ({ params }) => ({ module: params.module }),
+        meta: { requiresAuth: true },
         beforeEnter: (to) => {
           const module = to.params.module as string;
           const availableModules = [
@@ -82,6 +85,25 @@ const routes: RouteRecordRaw[] = [
             component: () => import('pages/maintenance/leadMasters/Status.vue'),
           },
 
+          {
+            path: 'customerMaster/namePrefix',
+            name: 'namePrefix',
+            component: () =>
+              import('pages/maintenance/customerMaster/NamePrefix.vue'),
+          },
+
+          {
+            path: 'customerMaster/nameSuffix',
+            name: 'nameSuffix',
+            component: () =>
+              import('pages/maintenance/customerMaster/NameSuffix.vue'),
+          },
+
+          {
+            path: 'leadMaster/source',
+            name: 'source',
+            component: () => import('pages/maintenance/leadMasters/Source.vue'),
+          },
           {
             path: 'leadMaster/asset',
             name: 'asset',
