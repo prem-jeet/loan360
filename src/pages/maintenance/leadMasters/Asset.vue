@@ -266,7 +266,8 @@ const filteredData = computed(() =>
 const isDuplicate = computed(
   () =>
     !!asset.value.find(
-      (item) => item.name.toLocaleLowerCase() === leadName.value
+      (item) =>
+        item.name.toLocaleLowerCase() === leadName.value.toLocaleLowerCase()
     )
 );
 
