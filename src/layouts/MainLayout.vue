@@ -54,12 +54,16 @@ const isCompanyAndBranchSelectorModalActive = computed(
   () => userStore.companyModal
 );
 
-const getDataOnRefresh = () => {
+const getDataOnRefresh = async () => {
   // Header Set for loggedIn user
   if (userStore.token && userStore.token.id_token) {
     userStore.setAuthHeader(userStore.token.id_token);
   } else {
     userStore.setAuthHeader('');
+  }
+  if (userStore.fetchUser()) {
+    await userStore.fetchAppRole();
+    await menuStore.fetchMenu();
   }
 };
 

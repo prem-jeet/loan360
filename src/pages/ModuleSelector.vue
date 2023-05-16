@@ -117,11 +117,6 @@ const moduleCardData = [
 useModuleSelectorKeyboardListener(router.push);
 
 onMounted(async () => {
-  if (!userStore.appRole.length) {
-    await userStore.fetchAppRole();
-    await menuStore.fetchMenu();
-  }
-
   menuStore.currentModule = '';
 });
 </script>

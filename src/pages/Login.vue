@@ -30,7 +30,7 @@ import logo from 'src/assets/img/JaguarCloud.png';
 import CompanyAndBranchSelectorModal from 'src/components/modals/CompanyAndBranchSelectorModal.vue';
 import { useUserStore } from 'src/stores/user/userStore';
 import { getAuthTokenFromAws, login } from 'src/utils/auth/login';
-import { computed, onMounted, watch, onBeforeMount } from 'vue';
+import { computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 
