@@ -28,24 +28,23 @@
           card-container-class="q-gutter-y-md q-mt-xs"
         >
           <template v-slot:top>
-            <div class="row q-gutter-y-sm q-pb-xs-md">
-              <div class="col-12">
-                <div class="row items-center q-gutter-md">
-                  <div class="col-auto text-h6">Account Code Deposit</div>
-                  <div class="col-auto">
-                    <q-btn
-                      v-if="showAddNew"
-                      color="blue-7"
-                      icon="add"
-                      label="Add new"
-                      size="md"
-                      @click="newEntry()"
-                    />
-                  </div>
+            <div class="q-gutter-y-md q-pb-xs-md">
+              <div class="row items-center q-gutter-md">
+                <div class="col-auto text-h4">Account Code Deposit</div>
+                <div class="col-auto">
+                  <q-btn
+                    v-if="showAddNew"
+                    color="blue-7"
+                    icon="add"
+                    label="Add new"
+                    size="md"
+                    @click="newEntry()"
+                  />
                 </div>
               </div>
+
               <div class="row items-center q-gutter-x-md">
-                <div class="col-12">
+                <div class="col-12 q-mb-sm">
                   <span class="text-h6">Filter</span>
                   <span v-if="accountCodeDeposits.length" class="q-ml-md">
                     <q-btn
