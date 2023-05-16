@@ -1,8 +1,8 @@
 <template>
-  <div class="absolute q-pa-md full-width full-height bg-gre-4">
-    <q-chip outline square size="md" class="shadow-4" :ripple="false">
-      <BreadCrumbs :ordered-paths="breadcrumbs" />
-    </q-chip>
+  <div
+    class="absolute q-px-md q-pt-md-sm q-pt-xs-md q-pb-md full-width full-height bg-gre-4"
+  >
+    <BreadCrumbs :ordered-paths="breadcrumbs" :style-css="'q-mx-xs'" />
 
     <div class="row q-mt-lg q-pb-xl">
       <div class="col">
@@ -20,7 +20,7 @@
               ? 'No result found'
               : noDataLabel
               ? 'No result found'
-              : 'Select a filter product and category'
+              : 'Select product and category'
           "
           :rows-per-page-options="[0]"
           :hide-bottom="!!filteredData.length"
@@ -45,7 +45,9 @@
 
               <div class="row items-center q-gutter-x-md">
                 <div class="col-12">
-                  <span class="text-h6">Filter</span>
+                  <span class="text-subtitle1"
+                    >Select Product and Category</span
+                  >
                   <span v-if="accountCodeDeposits.length" class="q-ml-md">
                     <q-btn
                       label="Clear"
