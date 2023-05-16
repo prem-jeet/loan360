@@ -343,7 +343,7 @@ const filteredData = computed(() =>
 const isDuplicate = computed(
   () =>
     !!namePrefix.value.find(
-      (item) => item.name.toLocaleLowerCase() === name.value
+      (item) => item.name.toLocaleLowerCase() === name.value.toLocaleLowerCase()
     )
 );
 
