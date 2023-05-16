@@ -46,7 +46,7 @@
                 class="q-ml-lg"
                 label="Close"
                 type="button"
-                color="grey-13"
+                color="grey-6"
                 @click="close"
               />
             </div>
@@ -97,6 +97,7 @@ const submit = () => {
 };
 
 const close = () => {
+  userStore.openCompanySelectModal(false);
   emit('close');
 };
 

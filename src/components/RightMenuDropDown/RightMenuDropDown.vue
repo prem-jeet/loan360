@@ -1,7 +1,51 @@
 <template>
-  <q-btn flat :ripple="false" class="bg-purple-6">
-    Jaguar software india
+  <div class="q-ml-sm">
+    <q-btn round :ripple="true" color="secondary">
+      <q-avatar size="32px">
+        {{ userAvatar }}
+      </q-avatar>
+    </q-btn>
     <q-menu fit auto-close>
+      <div class="row no-wrap q-pa-md">
+        <div class="column items-center">
+          <div class="q-mb-none">
+            <h6 class="text-subtitle1 q-my-none text-weight-bolder">
+              {{ userStore.decodedIdToken.given_name }}
+              {{ userStore.decodedIdToken.middle_name }}
+              {{ userStore.decodedIdToken.family_name }}
+            </h6>
+            <p class="inline text-weight-bold">
+              Email Verified
+              <q-icon
+                v-if="userStore.decodedIdToken.email_verified"
+                name="verified"
+                color="green"
+                size="sm"
+                class="q-ml-xs"
+              />
+              <q-icon
+                name="cancel"
+                class="q-ml-xs"
+                color="red"
+                size="sm"
+                v-else
+              />
+            </p>
+          </div>
+
+          <q-btn
+            color="secondary"
+            clickable
+            @click="logout"
+            label="Logout"
+            icon="logout"
+            push
+            size="sm"
+            v-close-popup
+          />
+        </div>
+      </div>
+      <q-separator />
       <q-list style="min-width: 100px">
         <q-item @click="toggleFullscreen" clickable>
           <q-item-section avatar>
@@ -80,23 +124,26 @@
           <q-item-section>Helpdesk</q-item-section>
         </q-item>
         <q-separator />
-        <q-item clickable @click="logout">
-          <q-item-section avatar>
-            <q-icon size="xs" name="fa-solid fa-right-from-bracket" />
-          </q-item-section>
-          <q-item-section>Log Out</q-item-section>
-        </q-item>
       </q-list>
     </q-menu>
-  </q-btn>
-  <q-dialog v-model="showEligibilityCalculator">
-    <EligibilityCalculator />
-  </q-dialog>
+    <q-dialog v-model="showEligibilityCalculator">
+      <EligibilityCalculator />
+    </q-dialog>
+  </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import EligibilityCalculator from 'src/components/RightMenuDropDown/RightMenuDropDownOptions/EligibilityCalculator/EligibilityCalculator.vue';
+import { useUserStore } from 'src/stores/user/userStore';
+const userStore = useUserStore();
+
 const showEligibilityCalculator = ref(false);
+
+const userAvatar = computed(() =>
+  userStore.decodedIdToken.given_name
+    ? userStore.decodedIdToken.given_name.charAt(0)
+    : null
+);
 
 const toggleFullscreen = () => {
   const doc = window.document;
@@ -122,5 +169,12 @@ const logout = () => {
 <style scoped>
 .q-item {
   min-height: 20px;
+}
+q.menu {
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
+}
+q.menu::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
 }
 </style>
