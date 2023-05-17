@@ -62,14 +62,18 @@
                 </q-input>
               </div>
 
-              <div class="col-xs-12 col-sm-3 col-md-3">
+              <div class="col-xs-12 col-sm-3 col-md-2">
                 <q-checkbox
                   v-model="checkBox"
                   label=" In-Active"
                   @click="(editingRowIndex = null), (isEditing = false)"
                 />
               </div>
-              <div class="col-xs-12 col-sm-2 col-md-2 q-pr-sm">
+
+              <div
+                v-if="$q.screen.width > 600"
+                class="col-xs-12 col-sm-2 col-md-3 q-pr-sm"
+              >
                 <q-input
                   v-model="forward"
                   outlined
@@ -83,7 +87,10 @@
                 </q-input>
               </div>
 
-              <div class="col-xs-12 col-sm-2 col-md-2 q-pr-sm">
+              <div
+                v-if="$q.screen.width > 600"
+                class="col-xs-12 col-sm-3 col-md-3 q-pr-sm"
+              >
                 <q-input
                   v-model="backward"
                   clearable
@@ -94,19 +101,60 @@
                   placeholder="backward"
                   @clear="backward = ''"
                 >
+                  <template v-slot:after>
+                    <q-btn
+                      icon="add"
+                      color="teal"
+                      size="md"
+                      :disable="forward === '' || backward === ''"
+                      @click="saveEntry"
+                    />
+                  </template>
                 </q-input>
               </div>
-              <div class="col-xs-12 col-sm-1 col-md-1 text-center">
-                <q-btn
-                  icon="add"
-                  color="teal"
-                  size="md"
-                  padding="7px 25px"
-                  :disable="forward === '' || backward === ''"
-                  @click="saveEntry"
-                />
-              </div>
             </div>
+
+            <q-card v-if="$q.screen.width < 600" class="q-pa-lg">
+              <div class="row full-width q-col-gutter-y-md">
+                <div class="col-xs-12">
+                  <q-input
+                    v-model="forward"
+                    outlined
+                    dense
+                    clearable
+                    no-error-icon
+                    error-message="Item alredy exits"
+                    placeholder="forward"
+                    @clear="forward = ''"
+                  >
+                  </q-input>
+                </div>
+
+                <div class="col-xs-12">
+                  <q-input
+                    v-model="backward"
+                    clearable
+                    outlined
+                    dense
+                    hide-bottom-space
+                    no-error-icon
+                    placeholder="backward"
+                    @clear="backward = ''"
+                  >
+                  </q-input>
+                </div>
+                <div class="col-xs-12 text-center">
+                  <q-btn
+                    icon="add"
+                    color="teal"
+                    size="md"
+                    padding="7px 25px"
+                    :disable="forward === '' || backward === ''"
+                    @click="saveEntry"
+                  />
+                </div>
+              </div>
+            </q-card>
           </template>
 
           <template v-slot:header-cell="props">
