@@ -164,7 +164,7 @@
       :editObject="editObject"
       @close="isEditModalActive = false"
       @saveEdit="saveEdit"
-      editMsg="Edit Source"
+      editMsg="Edit Name Suffix"
     ></CommonEditForMaintenancePages>
   </q-dialog>
 </template>
