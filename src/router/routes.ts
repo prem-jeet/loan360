@@ -76,7 +76,7 @@ const routes: RouteRecordRaw[] = [
             path: 'customerMaster/relation',
             name: 'relation',
             component: () =>
-              import('pages/maintenance/customerMaster/relations.vue'),
+              import('pages/maintenance/customerMaster/Relations.vue'),
           },
 
           {
