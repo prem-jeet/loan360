@@ -7,7 +7,7 @@
       <div
         class="row q-gutter-x-lg q-gutter-y-md justify-xs-center justify-sm-evenly"
       >
-        <div class="col-xs-10 col-sm-5 col-lg-3 q-gutter-y-md">
+        <div class="col-xs-10 col-sm-5 col-lg-5 q-gutter-y-md">
           <div class="row">
             <div class="col">
               <q-input v-model="address.name" label="Name" outlined dense />
@@ -91,7 +91,7 @@
             </div>
           </div>
         </div>
-        <div class="col-xs-10 col-sm-5 col-lg-3 q-gutter-y-md">
+        <div class="col-xs-10 col-sm-5 col-lg-5 q-gutter-y-md">
           <div class="row">
             <div class="col">
               <q-input
