@@ -1,8 +1,8 @@
 <template>
-  <div class="absolute q-pa-md full-width full-height bg-gre-4">
-    <q-chip outline square size="md" class="shadow-4" :ripple="false">
-      <BreadCrumbs :ordered-paths="breadcrumbs" />
-    </q-chip>
+  <div
+    class="absolute q-px-md q-pt-md-sm q-pt-xs-md q-pb-md full-width full-height bg-gre-4"
+  >
+    <BreadCrumbs :ordered-paths="breadcrumbs" :style-css="'q-mx-xs'" />
 
     <div class="row q-mt-lg q-pb-xl">
       <div class="col">
@@ -62,14 +62,14 @@
                 </q-input>
               </div>
 
-              <div class="col-xs-12 col-sm-3 col-md-2">
+              <div class="col-xs-12 col-sm-3 col-md-3">
                 <q-checkbox
                   v-model="checkBox"
                   label=" In-Active"
                   @click="(editingRowIndex = null), (isEditing = false)"
                 />
               </div>
-              <div class="col-xs-12 col-sm-2 col-md-3 q-pr-sm">
+              <div class="col-xs-12 col-sm-2 col-md-2 q-pr-sm">
                 <q-input
                   v-model="forward"
                   outlined
@@ -83,7 +83,7 @@
                 </q-input>
               </div>
 
-              <div class="col-xs-12 col-sm-3 col-md-3">
+              <div class="col-xs-12 col-sm-2 col-md-2 q-pr-sm">
                 <q-input
                   v-model="backward"
                   clearable
@@ -94,16 +94,17 @@
                   placeholder="backward"
                   @clear="backward = ''"
                 >
-                  <template v-slot:after>
-                    <q-btn
-                      icon="add"
-                      color="teal"
-                      size="md"
-                      :disable="forward === '' || backward === ''"
-                      @click="saveEntry"
-                    />
-                  </template>
                 </q-input>
+              </div>
+              <div class="col-xs-12 col-sm-1 col-md-1 text-center">
+                <q-btn
+                  icon="add"
+                  color="teal"
+                  size="md"
+                  padding="7px 25px"
+                  :disable="forward === '' || backward === ''"
+                  @click="saveEntry"
+                />
               </div>
             </div>
           </template>
