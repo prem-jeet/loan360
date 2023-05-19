@@ -387,6 +387,7 @@ const breadcrumbs = [
   {
     path: '/module/maintenance/customerMaster/relation',
     label: 'Customer Master',
+    disable: true,
   },
   {
     path: '/module/maintenance/customerMaster/relation',
