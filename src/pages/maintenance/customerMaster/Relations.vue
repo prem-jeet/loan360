@@ -80,7 +80,6 @@
                   dense
                   clearable
                   no-error-icon
-                  error-message="Item alredy exits"
                   placeholder="forward"
                   @clear="forward = ''"
                 >
@@ -114,8 +113,8 @@
               </div>
             </div>
 
-            <q-card v-if="$q.screen.width < 600" class="q-pa-lg">
-              <div class="row full-width q-col-gutter-y-md">
+            <q-card v-if="$q.screen.width < 600" class="q-mb-lg">
+              <div class="row full-width q-gutter-y-md q-pa-lg">
                 <div class="col-xs-12">
                   <q-input
                     v-model="forward"
@@ -123,7 +122,6 @@
                     dense
                     clearable
                     no-error-icon
-                    error-message="Item alredy exits"
                     placeholder="forward"
                     @clear="forward = ''"
                   >
