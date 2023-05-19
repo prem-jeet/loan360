@@ -390,7 +390,7 @@ const filteredData = computed(() =>
 const isDuplicate = computed(
   () =>
     !!customerCategory.value.find(
-      (item) => item.code.toLocaleLowerCase() === code.value
+      (item) => item.code.toLocaleLowerCase() === code.value.toLocaleLowerCase()
     )
 );
 const setFormData = () => {
