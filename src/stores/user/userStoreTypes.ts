@@ -2,6 +2,7 @@ export interface State {
   token: Token;
   accessToken: string;
   isAuthenticated: boolean;
+  companyModal: boolean;
   allowedCompany: Company[] | [];
   allowedBranch: Branch[] | [];
   allowedFinancialYear: FinancialYear[] | [];

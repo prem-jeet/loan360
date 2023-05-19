@@ -24,7 +24,7 @@
             <div class="row q-gutter-y-lg q-pb-xs-md">
               <div class="col-12">
                 <div class="row items-center q-gutter-md">
-                  <div class="col-auto text-h6">Source Lead</div>
+                  <div class="col-auto text-h6">Status Lead</div>
                 </div>
               </div>
             </div>
@@ -267,12 +267,13 @@ interface Source {
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
   {
-    path: '/module/maintenance/leadMaster/source',
+    path: '/module/maintenance/leadMaster/status',
     label: 'LeadMaster',
+    disable: true,
   },
   {
-    path: '/module/maintenance/leadMaster/source',
-    label: 'Source',
+    path: '/module/maintenance/leadMaster/status',
+    label: 'Status',
   },
 ];
 
@@ -294,7 +295,7 @@ const columns: {
     required: true,
     align: 'left',
     field: 'name',
-    label: 'Source Lead',
+    label: 'Status Lead',
   },
   {
     name: 'createdOn',
@@ -323,7 +324,7 @@ const $q = useQuasar();
 const fetchingData = ref(false);
 const leadName = ref('');
 const nameSearchQuery = ref('');
-const source = ref<Source[]>([]);
+const status = ref<Source[]>([]);
 const checkBox = ref(false);
 const isEditing = ref(false);
 const editingRowIndex = ref<number | null>(null);
@@ -332,7 +333,7 @@ const editName = ref('');
 const format = 'DD/MM/YYYY @hh:mmA';
 
 const filteredData = computed(() =>
-  source.value.filter(
+  status.value.filter(
     (item) =>
       item.name.toLowerCase().includes(nameSearchQuery.value.toLowerCase()) &&
       item.inactive === checkBox.value
@@ -341,7 +342,7 @@ const filteredData = computed(() =>
 
 const isDuplicate = computed(
   () =>
-    !!source.value.find(
+    !!status.value.find(
       (item) => item.name.toLocaleLowerCase() === leadName.value
     )
 );
@@ -349,8 +350,8 @@ const isDuplicate = computed(
 const setFormData = () => {
   let temp;
   if (editingRowId.value !== null) {
-    let index = source.value.findIndex((obj) => obj.id === editingRowId.value);
-    temp = source.value[index];
+    let index = status.value.findIndex((obj) => obj.id === editingRowId.value);
+    temp = status.value[index];
   }
   editName.value = temp ? temp.name : '';
 };
@@ -373,7 +374,7 @@ const editEntry = (id: number, rowIndex: number) => {
   }
 };
 const saveEdited = async () => {
-  const temp = source.value.filter((item) => item.id !== editingRowId.value);
+  const temp = status.value.filter((item) => item.id !== editingRowId.value);
 
   const isDuplicate = temp.find(
     (item) => item.name.toLowerCase() === editName.value.toLowerCase()
@@ -391,7 +392,7 @@ const saveEdited = async () => {
     id: editingRowId.value,
     updatedOn: new Date(),
   };
-  const rsp = await api.put('/sourceLead/update', payLoad);
+  const rsp = await api.put('/statusLead/update', payLoad);
   if (rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
@@ -407,7 +408,7 @@ const saveEntry = async () => {
     inactive: false,
     createdOn: new Date(),
   };
-  const rsp = await api.post('/sourceLead', payLoad);
+  const rsp = await api.post('/statusLead', payLoad);
   if (rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
@@ -430,7 +431,7 @@ const changeActive = (id: number, state: boolean) => {
 
 const changeActiveConfirm = async (id: number, state: boolean) => {
   const str = state ? 'active' : 'inactive';
-  const rsp = await api.put('/sourceLead/' + str, {
+  const rsp = await api.put('/statusLead/' + str, {
     id,
   });
   if (rsp.data && rsp.data.displayMessage) {
@@ -441,10 +442,10 @@ const changeActiveConfirm = async (id: number, state: boolean) => {
 
 const loadSource = async () => {
   fetchingData.value = true;
-  const rsp = await api.get('sourceLead');
+  const rsp = await api.get('statusLead');
 
   if (rsp.data) {
-    source.value = rsp.data;
+    status.value = rsp.data;
   }
   fetchingData.value = false;
 };
