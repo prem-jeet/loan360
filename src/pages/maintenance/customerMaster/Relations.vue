@@ -30,7 +30,7 @@
             </div>
 
             <div class="row full-width q-col-gutter-y-md q-pb-md">
-              <div class="col-xs-12 col-sm-2 col-md-2 q-pr-xs">
+              <div class="col-xs-12 col-sm-2 col-md-2 q-pr-sm">
                 <q-input
                   v-model="forwardSearchQuery"
                   outlined
