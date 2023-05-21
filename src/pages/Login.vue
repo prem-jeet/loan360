@@ -1,22 +1,34 @@
 <template>
   <div>
-    <div id="main" class="fullscreen child-take-fullheight bg-grey-1">
-      <div id="main-content" class="column flex-center q-pa-md-md">
-        <div id="logo-container">
-          <q-img :src="logo" spinner-color="white" fir="cover" />
+    <div class="row">
+      <div class="col">
+        <div class="justify-center q-pa-sm q-pt-lg q-mr-md">
+          <q-img :src="loginImage" spinner-color="white" />
         </div>
-        <q-btn
-          push
-          color="dark"
-          label="login"
-          size="xl"
-          padding="sm xl"
-          @click="login"
-          class="q-mt-lg"
-        />
-        <h1 class="text-weight-medium text-purple-6" id="app-name">
-          Loan360 Cloud
-        </h1>
+      </div>
+      <div class="col justify-center column" align="center">
+        <div class="q-pa-md-md">
+          <div class="col flex justify-center">
+            <div
+              id="logo-container"
+              class="justify-center q-pa-sm q-pt-lg q-mr-md"
+            >
+              <q-img :src="logo" spinner-color="white" />
+            </div>
+            <h3 class="text-weight-medium text-purple-6 text-h2">
+              Loan 360° Cloud
+            </h3>
+          </div>
+          <q-btn
+            push
+            color="dark"
+            label="login"
+            size="xl"
+            padding="sm xl"
+            @click="login"
+            class="q-mt-lg justify-center"
+          />
+        </div>
       </div>
     </div>
     <CompanyAndBranchSelectorModal
@@ -27,6 +39,7 @@
 
 <script setup>
 import logo from 'src/assets/img/JaguarCloud.png';
+import loginImage from 'src/assets/img/loginImage.jpg';
 import CompanyAndBranchSelectorModal from 'src/components/modals/CompanyAndBranchSelectorModal.vue';
 import { useUserStore } from 'src/stores/user/userStore';
 import { getAuthTokenFromAws, login } from 'src/utils/auth/login';
@@ -76,14 +89,10 @@ onMounted(async () => {
 </script>
 
 <style lang="scss" scoped>
-#main {
-  overflow: hidden;
-}
+// #main {
+//   overflow: hidden;
+// }
 #logo-container {
-  width: clamp(100px, 50vw, 300px);
-}
-
-#app-name {
-  font-size: calc(7vw + 1rem) !important;
+  width: clamp(100px, 50vw, 200px);
 }
 </style>

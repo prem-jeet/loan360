@@ -18,6 +18,11 @@
   -moz-appearance: textfield;
 }
 
+/* Fixed minimum value below the minimum breakpoint */
+.fluid {
+  font-size: 14px;
+}
+
 /* Custom Padding */
 @media screen and (max-width: 560px) {
   .py-xs-medium {
@@ -26,5 +31,12 @@
   }
   .ma-sm-none {
     margin: 0 auto;
+  }
+}
+
+/* Fluid value from 568px to 768px viewport width */
+@media screen and (max-width: 600px) {
+  .fluid {
+    font-size: 11px;
   }
 }

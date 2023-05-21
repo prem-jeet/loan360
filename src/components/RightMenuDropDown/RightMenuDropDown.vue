@@ -1,6 +1,6 @@
 <template>
   <div class="q-ml-sm">
-    <q-btn round :ripple="true" color="secondary">
+    <q-btn round :ripple="true" glossy color="cyan-7">
       <q-avatar size="32px">
         {{ userAvatar }}
       </q-avatar>
