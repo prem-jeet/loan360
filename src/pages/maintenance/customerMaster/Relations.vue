@@ -30,7 +30,7 @@
             </div>
 
             <div class="row full-width q-col-gutter-y-md q-pb-md">
-              <div class="col-xs-12 col-sm-2 col-md-2 q-pr-sm">
+              <div class="col-xs-12 col-sm-2 col-md-2 q-pr-md">
                 <q-input
                   v-model="forwardSearchQuery"
                   outlined
@@ -46,7 +46,7 @@
                 </q-input>
               </div>
 
-              <div class="col-xs-12 col-sm-2 col-md-2 q-pl-xs">
+              <div class="col-xs-12 col-sm-2 col-md-2 q-pr-md">
                 <q-input
                   v-model="backwardSearchQuery"
                   outlined
@@ -70,10 +70,7 @@
                 />
               </div>
 
-              <div
-                v-if="$q.screen.width > 600"
-                class="col-xs-12 col-sm-2 col-md-3 q-pr-sm"
-              >
+              <div class="col-xs-12 col-sm-2 col-md-3 q-pr-sm">
                 <q-input
                   v-model="forward"
                   outlined
@@ -86,10 +83,7 @@
                 </q-input>
               </div>
 
-              <div
-                v-if="$q.screen.width > 600"
-                class="col-xs-12 col-sm-3 col-md-3 q-pr-sm"
-              >
+              <div class="col-xs-12 col-sm-3 col-md-3 q-pr-sm">
                 <q-input
                   v-model="backward"
                   clearable
@@ -100,7 +94,7 @@
                   placeholder="backward"
                   @clear="backward = ''"
                 >
-                  <template v-slot:after>
+                  <template v-if="$q.screen.width >= 600" v-slot:after>
                     <q-btn
                       icon="add"
                       color="teal"
@@ -111,48 +105,17 @@
                   </template>
                 </q-input>
               </div>
-            </div>
 
-            <q-card v-if="$q.screen.width < 600" class="q-mb-lg">
-              <div class="row full-width q-gutter-y-md q-pa-lg">
-                <div class="col-xs-12">
-                  <q-input
-                    v-model="forward"
-                    outlined
-                    dense
-                    clearable
-                    no-error-icon
-                    placeholder="forward"
-                    @clear="forward = ''"
-                  >
-                  </q-input>
-                </div>
-
-                <div class="col-xs-12">
-                  <q-input
-                    v-model="backward"
-                    clearable
-                    outlined
-                    dense
-                    hide-bottom-space
-                    no-error-icon
-                    placeholder="backward"
-                    @clear="backward = ''"
-                  >
-                  </q-input>
-                </div>
-                <div class="col-xs-12 text-center">
-                  <q-btn
-                    icon="add"
-                    color="teal"
-                    size="md"
-                    padding="7px 25px"
-                    :disable="forward === '' || backward === ''"
-                    @click="saveEntry"
-                  />
-                </div>
+              <div v-if="$q.screen.width < 600" class="col-xs-12 text-center">
+                <q-btn
+                  icon="add"
+                  color="teal"
+                  size="md"
+                  :disable="forward === '' || backward === ''"
+                  @click="saveEntry"
+                />
               </div>
-            </q-card>
+            </div>
           </template>
 
           <template v-slot:header-cell="props">
