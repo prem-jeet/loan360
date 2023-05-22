@@ -1,11 +1,11 @@
 <template>
   <div
-    class="justify-between q-px-md lt-sm row no-wrap bg-white q-pt-sm q-pb-xs"
+    class="justify-between q-px-md lt-sm row no-wrap q-pt-sm q-pb-xs brand-footer"
   >
     <div v-for="(item, index) in buttonOptions" :key="index">
       <q-btn
         :icon="item.icon"
-        class="q-mx-sm"
+        class="q-mx-xs"
         flat
         :text-color="item.textColor"
         size="md"
@@ -29,22 +29,22 @@
 <script setup>
 const buttonOptions = [
   {
-    textColor: 'blue-grey-5',
+    textColor: 'blue-grey-10',
     icon: 'email',
     label: 'Mails',
   },
   {
-    textColor: 'blue-grey-5',
+    textColor: 'blue-grey-10',
     icon: 'notifications',
     label: 'Notifications',
   },
   {
-    textColor: 'blue-grey-5',
+    textColor: 'blue-grey-10',
     icon: 'chat',
     label: 'Chat Room',
   },
   {
-    textColor: 'blue-grey-5',
+    textColor: 'blue-grey-10',
     icon: 'newspaper',
     label: 'newspaper News',
   },

@@ -1,5 +1,5 @@
 <template>
-  <q-toolbar class="bg-purple-6 inline row">
+  <q-toolbar class="brand-header inline row glossy">
     <q-btn
       flat
       @click="openMenu"
@@ -9,36 +9,45 @@
       class=""
       v-if="route.name !== 'moduleSelector'"
     />
-    <q-avatar>
-      <img :src="logo" />
-    </q-avatar>
-    <q-toolbar-title>
+    <q-separator
+      v-if="route.name !== 'moduleSelector'"
+      class="q-mr-sm q-ml-xs"
+      color="grey"
+      inset
+      vertical
+    />
+    <q-img :src="logo" style="height: 37px; width: 50px" class="q-ml-xs" />
+    <q-toolbar-title class="q-mt-sm">
       <router-link
         :to="{ name: 'moduleSelector' }"
         :style="{ textDecoration: 'none' }"
       >
-        <p class="text-subtitle1 q-pt-md text-white">Jaguar 360°</p>
+        <p
+          class="text-h6 text-h6-xs q-mt-sm-sm q-mt-xs-md row text-white text-weight-medium"
+        >
+          <span class="col col-shrink"> Jaguar 360° </span>
+          <span class="col col-shrink"> &nbsp;Cloud </span>
+        </p>
       </router-link>
     </q-toolbar-title>
     <div
-      class="q-mr-md gt-xs"
+      class="row inline q-mr-sm gt-xs transparent"
       v-for="(item, index) in buttonOptions"
       :key="index"
     >
       <q-btn
-        color="teal-2"
-        rounded
+        text-color="white"
         :icon="item.icon"
         class="q-mx-xs"
-        :text-color="item.textColor"
-        padding="10px"
-        size="md"
+        padding="4px"
+        size="10px"
+        flat
       >
         <q-badge
           v-if="false"
           color="red-2"
           rounded
-          size="sm"
+          size="xs"
           class="text-weight-bold"
           text-color="red-10"
           style="font-size: 8px"
@@ -47,14 +56,21 @@
         </q-badge>
       </q-btn>
     </div>
+    <q-separator
+      v-if="$q.screen.width > 600"
+      inset
+      vertical
+      class="q-mr-sm q-ml-xs"
+      color="grey"
+    />
     <RightMenuDropDown />
   </q-toolbar>
   <div class="example-row-variable-width bg-white shadow-0">
     <div
       class="row"
-      :class="$q.screen.width > 640 ? 'justify-end' : 'justify-center'"
+      :class="$q.screen.width > 600 ? 'justify-end' : 'justify-center'"
     >
-      <div class="bg-cyan-7 flex rounded-borders">
+      <div class="brand-button flex rounded-borders">
         <q-separator dark vertical />
         <q-btn-dropdown
           push
@@ -65,7 +81,7 @@
           @click="openCompanyModal()"
           class="fluid q-px-xs-xs q-px-sm-sm"
           :label="
-            $q.screen.width > 640
+            $q.screen.width > 600
               ? userStore.selectedCompany.name
               : userStore.selectedCompany.name.slice(0, 7)
           "
@@ -82,7 +98,7 @@
           flat
           icon="burst_mode"
           :label="
-            $q.screen.width > 640
+            $q.screen.width > 600
               ? userStore.selectedBranch.name
               : userStore.selectedBranch.code
           "
@@ -97,7 +113,7 @@
           class="fluid q-px-xs-xs q-px-sm-sm"
           icon="edit_calendar"
           :label="
-            $q.screen.width > 640
+            $q.screen.width > 600
               ? userStore.selectedFinancialYear.name
               : `${fromDate} - ${toDate}`
           "
@@ -125,22 +141,18 @@ const fromDate = formatDate(userStore.selectedFinancialYear.fromDate, 'YY');
 const toDate = formatDate(userStore.selectedFinancialYear.toDate, 'YY');
 const buttonOptions = [
   {
-    textColor: 'cyan-10',
     icon: 'email',
     label: 'Mails',
   },
   {
-    textColor: 'red-8',
     icon: 'notifications',
     label: 'Notifications',
   },
   {
-    textColor: 'blue-8',
     icon: 'chat',
     label: 'Chat Room',
   },
   {
-    textColor: 'blue-grey-10',
     icon: 'newspaper',
     label: 'newspaper News',
   },

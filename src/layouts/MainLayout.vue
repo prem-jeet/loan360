@@ -77,6 +77,6 @@ onBeforeMount(() => {
 </script>
 <style>
 .q-drawer {
-  top: 60px !important;
+  top: 64px !important;
 }
 </style>
