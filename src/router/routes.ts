@@ -118,7 +118,8 @@ const routes: RouteRecordRaw[] = [
               {
                 path: 'accountHead',
                 name: 'accountHead',
-                component: () => import('pages/AccountHead.vue'),
+                component: () =>
+                  import('pages/maintenance/accountMasters/AccountHead.vue'),
               },
             ],
           },
