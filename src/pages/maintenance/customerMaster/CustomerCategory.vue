@@ -29,7 +29,7 @@
               </div>
             </div>
 
-            <div class="row full-width q-mt-sm q-col-gutter-y-md">
+            <div class="row full-width items-center q-mt-sm q-col-gutter-y-md">
               <div class="col-xs-12 col-sm-3 col-md-3 q-pr-sm">
                 <q-input
                   v-model="codeSearchQuery"
@@ -37,6 +37,7 @@
                   clearable
                   dense
                   rounded
+                  hide-bottom-space
                   placeholder="search code"
                   @clear="codeSearchQuery = ''"
                 >
@@ -64,6 +65,7 @@
                   no-error-icon
                   placeholder="code"
                   @clear="code = ''"
+                  hide-bottom-space
                 >
                 </q-input>
               </div>
