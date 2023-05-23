@@ -29,7 +29,9 @@
               </div>
             </div>
 
-            <div class="row full-width items-center q-mt-sm q-col-gutter-y-md">
+            <div
+              class="row full-width items-center q-mt-sm q-col-gutter-y-md q-pb-md"
+            >
               <div class="col-xs-12 col-sm-3 col-md-3 q-pr-sm">
                 <q-input
                   v-model="codeSearchQuery"
