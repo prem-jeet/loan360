@@ -21,16 +21,16 @@
           card-container-class="q-gutter-y-md q-mt-xs"
         >
           <template v-slot:top>
-            <div class="row q-gutter-y-lg q-pb-xs-md">
+            <div class="row">
               <div class="col-12">
-                <div class="row items-center q-gutter-md">
+                <div class="row items-center">
                   <div class="col-auto text-h6">Customer Category</div>
                 </div>
               </div>
             </div>
 
-            <div class="row full-width q-mt-sm">
-              <div class="col-xs-12 col-sm-3 col-md-3">
+            <div class="row full-width q-mt-sm q-col-gutter-y-md">
+              <div class="col-xs-12 col-sm-3 col-md-3 q-pr-sm">
                 <q-input
                   v-model="codeSearchQuery"
                   outlined
@@ -46,17 +46,14 @@
                 </q-input>
               </div>
 
-              <div class="col-xs-12 col-sm-2 col-md-3">
+              <div class="col-xs-12 col-sm-3 col-md-3">
                 <q-checkbox
                   v-model="checkBox"
                   label=" In-Active"
                   @click="(editingRowIndex = null), (isEditing = false)"
                 />
               </div>
-              <div
-                v-if="$q.screen.width > 600"
-                class="col-xs-12 col-sm-3 col-md-3 q-pr-sm"
-              >
+              <div class="col-xs-12 col-sm-3 col-md-3 q-pr-sm">
                 <q-input
                   v-model="code"
                   outlined
@@ -68,14 +65,10 @@
                   placeholder="code"
                   @clear="code = ''"
                 >
-                  <template v-slot:prepend> Category </template>
                 </q-input>
               </div>
 
-              <div
-                v-if="$q.screen.width > 600"
-                class="col-xs-12 col-sm-4 col-md-3"
-              >
+              <div class="col-xs-12 col-sm-3 col-md-3 q-pr-sm">
                 <q-input
                   v-model="name"
                   clearable
@@ -86,7 +79,7 @@
                   placeholder="name"
                   @clear="name = ''"
                 >
-                  <template v-slot:after>
+                  <template v-if="$q.screen.width >= 600" v-slot:after>
                     <q-btn
                       icon="add"
                       color="teal"
@@ -97,50 +90,16 @@
                   </template>
                 </q-input>
               </div>
-            </div>
-
-            <q-card v-if="$q.screen.width < 600" class="q-my-lg">
-              <div class="row full-width q-pa-lg q-gutter-y-md">
-                <div class="col-xs-12">
-                  <q-input
-                    v-model="code"
-                    outlined
-                    dense
-                    clearable
-                    hide-bottom-space
-                    :error="isDuplicate"
-                    error-message="Item alredy exits"
-                    no-error-icon
-                    placeholder="code"
-                    @clear="code = ''"
-                  >
-                  </q-input>
-                </div>
-
-                <div class="col-xs-12">
-                  <q-input
-                    v-model="name"
-                    clearable
-                    outlined
-                    dense
-                    hide-bottom-space
-                    no-error-icon
-                    placeholder="name"
-                    @clear="name = ''"
-                  >
-                  </q-input>
-                </div>
-                <div class="col-xs-12 text-center">
-                  <q-btn
-                    icon="add"
-                    color="teal"
-                    size="md"
-                    :disable="code === '' || name === '' || isDuplicate"
-                    @click="saveEntry"
-                  />
-                </div>
+              <div v-if="$q.screen.width < 600" class="col-xs-12 text-center">
+                <q-btn
+                  icon="add"
+                  color="teal"
+                  size="md"
+                  :disable="code === '' || name === '' || isDuplicate"
+                  @click="saveEntry"
+                />
               </div>
-            </q-card>
+            </div>
           </template>
 
           <template v-slot:header-cell="props">
