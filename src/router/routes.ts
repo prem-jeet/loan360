@@ -100,6 +100,12 @@ const routes: RouteRecordRaw[] = [
             component: () =>
               import('pages/maintenance/customerMaster/CustomerCategory.vue'),
           },
+          {
+            path: 'customerMaster/relation',
+            name: 'relation',
+            component: () =>
+              import('pages/maintenance/customerMaster/Relations.vue'),
+          },
 
           {
             path: 'leadMaster/source',
