@@ -2,20 +2,23 @@
   <div>
     <div class="row">
       <div class="col">
-        <div class="justify-center q-pa-sm q-pt-lg q-mr-md">
+        <div class="justify-center q-px-sm q-mr-md">
           <q-img :src="loginImage" spinner-color="white" />
         </div>
       </div>
-      <div class="col justify-center column" align="center">
-        <div class="q-pa-md-md">
-          <div class="col flex justify-center">
+      <div class="col-sm justify-center column" align="center">
+        <q-card
+          class="q-pa-sm-md q-ma-xs-xs q-mr-sm-xl q-pl-sm-xs q-pb-xs-xs"
+          bordered
+        >
+          <div class="row inline justify-center">
             <div
               id="logo-container"
               class="justify-center q-pa-sm q-pt-lg q-mr-md"
             >
               <q-img :src="logo" spinner-color="white" />
             </div>
-            <h3 class="text-weight-medium text-purple-6 text-h2">
+            <h3 class="text-weight-medium text-purple-6 text-h3 q-pt-sm-sm">
               Loan 360° Cloud
             </h3>
           </div>
@@ -26,9 +29,9 @@
             size="xl"
             padding="sm xl"
             @click="login"
-            class="q-mt-lg justify-center"
+            class="q-mt-md justify-center"
           />
-        </div>
+        </q-card>
       </div>
     </div>
     <CompanyAndBranchSelectorModal
