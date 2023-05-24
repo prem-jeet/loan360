@@ -95,6 +95,13 @@ const routes: RouteRecordRaw[] = [
           },
 
           {
+            path: 'customerMaster/relation',
+            name: 'relation',
+            component: () =>
+              import('pages/maintenance/customerMaster/Relations.vue'),
+          },
+
+          {
             path: 'leadMaster/source',
             name: 'source',
             component: () => import('pages/maintenance/leadMasters/Source.vue'),
