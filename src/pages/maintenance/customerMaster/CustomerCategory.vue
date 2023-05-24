@@ -21,7 +21,7 @@
           card-container-class="q-gutter-y-md q-mt-xs"
         >
           <template v-slot:top>
-            <div class="row">
+            <div class="row q-mb-xs-lg q-mb-sm-none q-mb-md-none q-pb-sm">
               <div class="col-12">
                 <div class="row items-center">
                   <div class="col-auto text-h6">Customer Category</div>
@@ -30,60 +30,65 @@
             </div>
 
             <div
-              class="row full-width items-center q-mt-sm q-col-gutter-y-md q-pb-md"
+              class="row full-width items-center q-col-gutter-y-md q-pb-xs-md q-pb-sm-none q-pb-md-none"
             >
-              <div class="col-xs-12 col-sm-3 col-md-3 q-pr-sm">
-                <q-input
-                  v-model="codeSearchQuery"
-                  outlined
-                  clearable
-                  dense
-                  rounded
-                  hide-bottom-space
-                  placeholder="search code"
-                  @clear="codeSearchQuery = ''"
-                >
-                  <template v-slot:prepend>
-                    <q-icon name="search" />
-                  </template>
-                </q-input>
+              <div class="col-xs-12 col-sm-6 col-md-6 q-pa-none q-pb-sm">
+                <div class="row">
+                  <div class="col-xs-12 col-sm-5 col-md-5">
+                    <q-input
+                      v-model="codeSearchQuery"
+                      outlined
+                      clearable
+                      dense
+                      rounded
+                      placeholder="search code"
+                      @clear="codeSearchQuery = ''"
+                    >
+                      <template v-slot:prepend>
+                        <q-icon name="search" />
+                      </template>
+                    </q-input>
+                  </div>
+                  <div class="col-xs-12 col-sm-5 col-md-5">
+                    <q-checkbox
+                      v-model="checkBox"
+                      label=" In-Active"
+                      @click="(editingRowIndex = null), (isEditing = false)"
+                    />
+                  </div>
+                </div>
               </div>
-
-              <div class="col-xs-12 col-sm-3 col-md-3">
-                <q-checkbox
-                  v-model="checkBox"
-                  label=" In-Active"
-                  @click="(editingRowIndex = null), (isEditing = false)"
-                />
-              </div>
-              <div class="col-xs-12 col-sm-3 col-md-3 q-pr-sm">
-                <q-input
-                  v-model="code"
-                  outlined
-                  dense
-                  clearable
-                  :error="isDuplicate"
-                  error-message="Item alredy exits"
-                  no-error-icon
-                  placeholder="code"
-                  @clear="code = ''"
-                  hide-bottom-space
-                >
-                </q-input>
-              </div>
-
-              <div class="col-xs-12 col-sm-3 col-md-3 q-pr-sm">
-                <q-input
-                  v-model="name"
-                  clearable
-                  outlined
-                  dense
-                  hide-bottom-space
-                  no-error-icon
-                  placeholder="name"
-                  @clear="name = ''"
-                >
-                  <template v-if="$q.screen.width >= 600" v-slot:after>
+              <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="row mobile-border q-pa-md q-col-gutter-y-sm">
+                  <div class="col-xs-12 col-sm-5 col-md-6 q-pa-xs">
+                    <q-input
+                      v-model="code"
+                      outlined
+                      dense
+                      clearable
+                      :error="isDuplicate"
+                      error-message="Item alredy exits"
+                      no-error-icon
+                      placeholder="code"
+                      @clear="code = ''"
+                    >
+                    </q-input>
+                  </div>
+                  <div class="col-xs-12 col-sm-5 col-md-5 q-pa-xs">
+                    <q-input
+                      v-model="name"
+                      clearable
+                      outlined
+                      dense
+                      no-error-icon
+                      placeholder="name"
+                      @clear="name = ''"
+                    >
+                    </q-input>
+                  </div>
+                  <div
+                    class="col-xs-12 col-sm-1 col-md-1 text-center q-pa-xs q-mt-xs-md q-mt-sm-none q-mt-md-none"
+                  >
                     <q-btn
                       icon="add"
                       color="teal"
@@ -91,17 +96,8 @@
                       :disable="code === '' || name === '' || isDuplicate"
                       @click="saveEntry"
                     />
-                  </template>
-                </q-input>
-              </div>
-              <div v-if="$q.screen.width < 600" class="col-xs-12 text-center">
-                <q-btn
-                  icon="add"
-                  color="teal"
-                  size="md"
-                  :disable="code === '' || name === '' || isDuplicate"
-                  @click="saveEntry"
-                />
+                  </div>
+                </div>
               </div>
             </div>
           </template>
@@ -510,4 +506,11 @@ onMounted(() => {
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+@media (max-width: 600px) {
+  /* Media query for mobile devices */
+  .mobile-border {
+    border: 2px solid rgb(176, 174, 174);
+  }
+}
+</style>
