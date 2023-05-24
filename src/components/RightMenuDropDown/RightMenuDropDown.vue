@@ -5,7 +5,7 @@
         {{ userAvatar }}
       </q-avatar>
     </q-btn>
-    <q-menu fit auto-close>
+    <q-menu auto-close fit>
       <div class="row no-wrap q-pa-md">
         <div class="column items-center">
           <div class="q-mb-none">
@@ -46,69 +46,71 @@
         </div>
       </div>
       <q-separator />
-      <q-list style="min-width: 100px">
-        <q-item @click="toggleFullscreen" clickable>
-          <q-item-section avatar>
-            <q-icon size="xs" name="fa-solid fa-expand" />
+      <q-list>
+        <q-item @click="toggleFullscreen" clickable class="q-px-lg">
+          <q-item-section thumbnail>
+            <q-icon size="xs" color="black" name="open_in_full" />
           </q-item-section>
+
           <q-item-section>Full Screen</q-item-section>
         </q-item>
         <q-separator />
-        <q-item to="/moduleselector" class="text-black">
-          <q-item-section avatar>
-            <q-icon size="xs" name="fa-solid fa-home" />
+        <q-item to="/moduleselector" class="text-black q-px-lg">
+          <q-item-section thumbnail>
+            <q-icon size="xs" color="black" name="view_module" />
           </q-item-section>
-          <q-item-section avatar> Modules</q-item-section>
+          <q-item-section thumbnail> Modules</q-item-section>
         </q-item>
         <q-separator />
-        <q-item clickable>
-          <q-item-section avatar>
-            <q-icon size="xs" name="fa-solid fa-calendar" />
+        <q-item clickable class="q-px-lg">
+          <q-item-section thumbnail>
+            <q-icon size="xs" color="black" name="fa-solid fa-calendar" />
           </q-item-section>
           <q-item-section>Calender</q-item-section>
         </q-item>
         <q-separator />
-        <q-item clickable>
-          <q-item-section avatar>
-            <q-icon size="xs" name="fa-solid fa-address-card" />
+        <q-item clickable class="q-px-lg">
+          <q-item-section thumbnail>
+            <q-icon size="xs" color="black" name="contacts" />
           </q-item-section>
           <q-item-section>Contacts</q-item-section>
         </q-item>
         <q-separator />
-        <q-item clickable>
-          <q-item-section avatar>
-            <q-icon size="xs" name="fa-solid fa-calculator" />
+        <q-item clickable class="q-px-lg">
+          <q-item-section thumbnail>
+            <q-icon size="xs" color="black" name="calculate" />
           </q-item-section>
           <q-item-section>IRR Calculator</q-item-section>
         </q-item>
         <q-separator />
         <q-item
           clickable
+          class="q-px-lg"
           @click="showEligibilityCalculator = !showEligibilityCalculator"
         >
-          <q-item-section avatar>
-            <q-icon size="xs" name="fa-solid fa-calculator" />
+          <q-item-section thumbnail>
+            <q-icon size="xs" color="black" name="rule" />
           </q-item-section>
           <q-item-section>Eligibility Calculator</q-item-section>
         </q-item>
         <q-separator />
-        <q-item clickable>
-          <q-item-section avatar>
-            <q-icon size="xs" name="fa-solid fa-calculator" />
+        <q-item clickable class="q-px-lg">
+          <q-item-section thumbnail>
+            <q-icon size="xs" color="black" name="fa-solid fa-calculator" />
           </q-item-section>
           <q-item-section>Calculator</q-item-section>
         </q-item>
         <q-separator />
-        <q-item clickable>
-          <q-item-section avatar>
-            <q-icon size="xs" name="fa-solid fa-users" />
+        <q-item clickable class="q-px-lg">
+          <q-item-section thumbnail>
+            <q-icon size="xs" color="black" name="people" />
           </q-item-section>
           <q-item-section>Users</q-item-section>
         </q-item>
         <q-separator />
-        <q-item clickable>
-          <q-item-section avatar>
-            <q-icon size="xs" name="fa-solid fa-gears" />
+        <q-item clickable class="q-px-lg">
+          <q-item-section thumbnail>
+            <q-icon size="xs" color="black" name="account_tree" />
           </q-item-section>
           <q-item-section>Menu Rights</q-item-section>
         </q-item>
@@ -117,11 +119,12 @@
           href="https://jaguarsoftwareindia.freshdesk.com/support/login"
           target="_blank"
           clickable
+          class="q-px-lg"
         >
-          <q-item-section avatar>
-            <q-icon size="xs" name="fa-solid fa-circle-question" />
+          <q-item-section thumbnail>
+            <q-icon size="xs" color="black" name="help" />
           </q-item-section>
-          <q-item-section>Helpdesk</q-item-section>
+          <q-item-section>Help Desk</q-item-section>
         </q-item>
         <q-separator />
       </q-list>
@@ -169,12 +172,5 @@ const logout = () => {
 <style scoped>
 .q-item {
   min-height: 20px;
-}
-q.menu {
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
-  scrollbar-width: none; /* Firefox */
-}
-q.menu::-webkit-scrollbar {
-  display: none; /* Safari and Chrome */
 }
 </style>
