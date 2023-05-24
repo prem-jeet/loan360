@@ -76,26 +76,6 @@ const routes: RouteRecordRaw[] = [
           },
 
           {
-            path: 'customerMaster/namePrefix',
-            name: 'namePrefix',
-            component: () =>
-              import('pages/maintenance/customerMaster/NamePrefix.vue'),
-          },
-
-          {
-            path: 'customerMaster/nameSuffix',
-            name: 'nameSuffix',
-            component: () =>
-              import('pages/maintenance/customerMaster/NameSuffix.vue'),
-          },
-
-          {
-            path: 'customerMaster/relation',
-            name: 'relation',
-            component: () =>
-              import('pages/maintenance/customerMaster/Relations.vue'),
-          },
-          {
             path: 'leadMaster',
             children: [
               {
@@ -116,6 +96,29 @@ const routes: RouteRecordRaw[] = [
                 name: 'asset',
                 component: () =>
                   import('pages/maintenance/leadMasters/Asset.vue'),
+              },
+            ],
+          },
+          {
+            path: 'customerMaster',
+            children: [
+              {
+                path: 'namePrefix',
+                name: 'namePrefix',
+                component: () =>
+                  import('pages/maintenance/customerMaster/NamePrefix.vue'),
+              },
+              {
+                path: 'nameSuffix',
+                name: 'nameSuffix',
+                component: () =>
+                  import('pages/maintenance/customerMaster/NameSuffix.vue'),
+              },
+              {
+                path: 'relation',
+                name: 'relation',
+                component: () =>
+                  import('pages/maintenance/customerMaster/Relations.vue'),
               },
             ],
           },
