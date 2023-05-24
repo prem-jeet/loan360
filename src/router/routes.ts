@@ -74,11 +74,6 @@ const routes: RouteRecordRaw[] = [
             component: () =>
               import('pages/settings/accounts/InterestDepositGenerate.vue'),
           },
-          {
-            path: 'leadMaster/status',
-            name: 'status',
-            component: () => import('pages/maintenance/leadMasters/Status.vue'),
-          },
 
           {
             path: 'customerMaster/namePrefix',
@@ -100,16 +95,29 @@ const routes: RouteRecordRaw[] = [
             component: () =>
               import('pages/maintenance/customerMaster/Relations.vue'),
           },
+          {
+            path: 'leadMaster',
+            children: [
+              {
+                path: 'source',
+                name: 'source',
 
-          {
-            path: 'leadMaster/source',
-            name: 'source',
-            component: () => import('pages/maintenance/leadMasters/Source.vue'),
-          },
-          {
-            path: 'leadMaster/asset',
-            name: 'asset',
-            component: () => import('pages/maintenance/leadMasters/Asset.vue'),
+                component: () =>
+                  import('pages/maintenance/leadMasters/Source.vue'),
+              },
+              {
+                path: 'status',
+                name: 'status',
+                component: () =>
+                  import('pages/maintenance/leadMasters/Status.vue'),
+              },
+              {
+                path: 'asset',
+                name: 'asset',
+                component: () =>
+                  import('pages/maintenance/leadMasters/Asset.vue'),
+              },
+            ],
           },
         ],
       },
