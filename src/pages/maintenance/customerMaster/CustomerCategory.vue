@@ -511,6 +511,8 @@ onMounted(() => {
   /* Media query for mobile devices */
   .mobile-border {
     border: 2px solid rgb(176, 174, 174);
+    border-radius: 8px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
   }
 }
 </style>
