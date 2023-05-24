@@ -1,12 +1,34 @@
 // Brand Color
 .brand-header {
-  background-color: $brandHeader;
+  background-color: $brand-header;
 }
-.brand-button {
-  background-color: $brandButton;
+.brand-sub-header {
+  background-color: $brand-sub-header;
+}
+// Primary Submit color for Buttons
+// Secondary Primary color class name can be => brand-btn-secondary
+.brand-btn {
+  background-color: $brand-button;
 }
 .brand-footer {
-  background-color: $brandFooter;
+  background-color: $brand-footer;
+}
+.brand-btn-close,
+.brand-btn-disabled {
+  background-color: $brand-disabled;
+  color: grey;
+}
+// Disabled Button will not be Glossy(Gradient) unless specified in some condition
+.brand-btn-disabled {
+  pointer-events: none;
+}
+.brand-btn-reset {
+  background-color: $brand-reset;
+}
+.brand-btn,
+.brand-header {
+  color: whitesmoke;
+  letter-spacing: 0.1rem;
 }
 
 // app global css in SCSS form

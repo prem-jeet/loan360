@@ -70,7 +70,7 @@
       class="row"
       :class="$q.screen.width > 600 ? 'justify-end' : 'justify-center'"
     >
-      <div class="brand-button flex rounded-borders">
+      <div class="brand-sub-header flex rounded-borders">
         <q-separator dark vertical />
         <q-btn-dropdown
           push
@@ -79,11 +79,11 @@
           stretch
           flat
           @click="openCompanyModal()"
-          class="fluid q-px-xs-xs q-px-sm-sm"
+          class="fluid q-px-xs-xs q-px-sm-sm q-ml-sm"
           :label="
             $q.screen.width > 600
               ? userStore.selectedCompany.name
-              : userStore.selectedCompany.name.slice(0, 7)
+              : userStore.selectedCompany.name.slice(0, 12)
           "
           icon="business"
         />
@@ -100,7 +100,7 @@
           :label="
             $q.screen.width > 600
               ? userStore.selectedBranch.name
-              : userStore.selectedBranch.code
+              : userStore.selectedBranch.name.slice(0, 5)
           "
         />
         <q-separator dark vertical />
@@ -110,7 +110,7 @@
           no-caps
           flat
           @click="openCompanyModal()"
-          class="fluid q-px-xs-xs q-px-sm-sm"
+          class="fluid q-px-xs-xs q-px-sm-sm q-mr-sm"
           icon="edit_calendar"
           :label="
             $q.screen.width > 600
