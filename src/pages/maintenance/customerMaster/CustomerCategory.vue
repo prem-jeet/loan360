@@ -62,27 +62,27 @@
                 <div class="row mobile-border q-pa-md q-col-gutter-y-sm">
                   <div class="col-xs-12 col-sm-5 col-md-6 q-pa-xs">
                     <q-input
-                      v-model="code"
+                      v-model="newCategory.code"
                       outlined
                       dense
                       clearable
                       :error="isDuplicate"
-                      error-message="Item alredy exits"
+                      error-message="Item already exits"
                       no-error-icon
                       placeholder="code"
-                      @clear="code = ''"
+                      @clear="newCategory.code = ''"
                     >
                     </q-input>
                   </div>
                   <div class="col-xs-12 col-sm-5 col-md-5 q-pa-xs">
                     <q-input
-                      v-model="name"
+                      v-model="newCategory.name"
                       clearable
                       outlined
                       dense
                       no-error-icon
                       placeholder="name"
-                      @clear="name = ''"
+                      @clear="newCategory.name = ''"
                     >
                     </q-input>
                   </div>
@@ -93,7 +93,11 @@
                       icon="add"
                       color="teal"
                       size="md"
-                      :disable="code === '' || name === '' || isDuplicate"
+                      :disable="
+                        newCategory.code === '' ||
+                        newCategory.name === '' ||
+                        isDuplicate
+                      "
                       @click="saveEntry"
                     />
                   </div>
@@ -293,7 +297,7 @@
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed, watch, reactive } from 'vue';
 import { onSuccess, confirmDialog } from 'src/utils/notification';
 import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
@@ -374,8 +378,6 @@ const columns: {
 
 const $q = useQuasar();
 const fetchingData = ref(false);
-const code = ref('');
-const name = ref('');
 const codeSearchQuery = ref('');
 
 const customerCategory = ref<CustomerCategory[]>([]);
@@ -386,6 +388,11 @@ const editingRowCode = ref('');
 const editCode = ref('');
 const editName = ref('');
 const format = 'DD/MM/YYYY @hh:mmA';
+
+const newCategory = reactive<{ name: string; code: string }>({
+  name: '',
+  code: '',
+});
 
 const filteredData = computed(() =>
   customerCategory.value.filter(
@@ -398,7 +405,8 @@ const filteredData = computed(() =>
 const isDuplicate = computed(
   () =>
     !!customerCategory.value.find(
-      (item) => item.code.toLocaleLowerCase() === code.value.toLocaleLowerCase()
+      (item) =>
+        item.code.toLocaleLowerCase() === newCategory.code.toLocaleLowerCase()
     )
 );
 const setFormData = () => {
@@ -448,8 +456,8 @@ const saveEdited = async () => {
 
 const saveEntry = async () => {
   let payLoad = {
-    code: code.value,
-    name: name.value,
+    code: newCategory.code,
+    name: newCategory.name,
     inactive: false,
     createdOn: new Date(),
   };
@@ -459,8 +467,8 @@ const saveEntry = async () => {
       msg: rsp.data.displayMessage,
       icon: 'sync_alt',
     });
-    code.value = '';
-    name.value = '';
+    newCategory.code = '';
+    newCategory.name = '';
     loadSource();
   }
 };
