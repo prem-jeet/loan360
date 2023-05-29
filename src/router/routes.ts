@@ -100,6 +100,17 @@ const routes: RouteRecordRaw[] = [
             ],
           },
           {
+            path: 'loanMaster',
+            children: [
+              {
+                path: 'goldItem',
+                name: 'goldItem',
+                component: () =>
+                  import('pages/maintenance/loanMaster/goldLaon/GoldItems.vue'),
+              },
+            ],
+          },
+          {
             path: 'customerMaster',
             children: [
               {
