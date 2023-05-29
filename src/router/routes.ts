@@ -131,6 +131,14 @@ const routes: RouteRecordRaw[] = [
                 component: () =>
                   import('pages/maintenance/customerMaster/Relations.vue'),
               },
+              {
+                path: 'customerCategory',
+                name: 'customerCategory',
+                component: () =>
+                  import(
+                    'pages/maintenance/customerMaster/CustomerCategory.vue'
+                  ),
+              },
             ],
           },
         ],
