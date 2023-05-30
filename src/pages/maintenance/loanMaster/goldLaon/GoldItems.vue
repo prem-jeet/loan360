@@ -24,7 +24,7 @@
             <div class="row q-gutter-y-lg q-pb-xs-md">
               <div class="col-12">
                 <div class="row items-center q-gutter-md">
-                  <div class="col-auto text-h6">Loan Group</div>
+                  <div class="col-auto text-h6">Gold Items</div>
                 </div>
               </div>
             </div>
@@ -63,7 +63,7 @@
                   error-message="Item already exits"
                   placeholder="name"
                 >
-                  <template v-slot:prepend> Loan </template>
+                  <template v-slot:prepend> Gold </template>
                   <template v-slot:after>
                     <q-btn
                       icon="add"
@@ -255,7 +255,7 @@ import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
 import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
-interface LoanGroup {
+interface GoldItems {
   name: string;
   id: number | null;
   createdOn: string;
@@ -267,13 +267,13 @@ interface LoanGroup {
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
   {
-    path: '/module/maintenance/loanMaster/loanGroup',
+    path: '/module/maintenance/loanMaster/goldItem',
     label: 'Loan Master',
     disable: true,
   },
   {
-    path: '/module/maintenance/loanMaster/loanGroup',
-    label: 'Loan Group',
+    path: '/module/maintenance/loanMaster/goldItem',
+    label: 'Gold Items',
   },
 ];
 
@@ -295,7 +295,7 @@ const columns: {
     required: true,
     align: 'left',
     field: 'name',
-    label: 'Loan Group',
+    label: 'Gold Items',
   },
   {
     name: 'createdOn',
@@ -324,7 +324,7 @@ const $q = useQuasar();
 const fetchingData = ref(false);
 const name = ref('');
 const nameSearchQuery = ref('');
-const loanGroup = ref<LoanGroup[]>([]);
+const goldItems = ref<GoldItems[]>([]);
 const checkBox = ref(false);
 const isEditing = ref(false);
 const editingRowIndex = ref<number | null>(null);
@@ -333,7 +333,7 @@ const editName = ref('');
 const format = 'DD/MM/YYYY @hh:mmA';
 
 const filteredData = computed(() =>
-  loanGroup.value.filter(
+  goldItems.value.filter(
     (item) =>
       item.name.toLowerCase().includes(nameSearchQuery.value.toLowerCase()) &&
       item.inactive === checkBox.value
@@ -342,7 +342,7 @@ const filteredData = computed(() =>
 
 const isDuplicate = computed(
   () =>
-    !!loanGroup.value.find(
+    !!goldItems.value.find(
       (item) => item.name.toLocaleLowerCase() === name.value.toLocaleLowerCase()
     )
 );
@@ -350,10 +350,10 @@ const isDuplicate = computed(
 const setFormData = () => {
   let temp;
   if (editingRowId.value !== null) {
-    let index = loanGroup.value.findIndex(
+    let index = goldItems.value.findIndex(
       (obj) => obj.id === editingRowId.value
     );
-    temp = loanGroup.value[index];
+    temp = goldItems.value[index];
   }
   editName.value = temp ? temp.name : '';
 };
@@ -376,7 +376,7 @@ const editEntry = (id: number, rowIndex: number) => {
   }
 };
 const saveEdited = async () => {
-  const temp = loanGroup.value.filter((item) => item.id !== editingRowId.value);
+  const temp = goldItems.value.filter((item) => item.id !== editingRowId.value);
 
   const isDuplicate = temp.find(
     (item) => item.name.toLowerCase() === editName.value.toLowerCase()
@@ -394,7 +394,7 @@ const saveEdited = async () => {
     id: editingRowId.value,
     updatedOn: new Date(),
   };
-  const rsp = await api.put('/loanGroup/update', payLoad);
+  const rsp = await api.put('/goldItem/update', payLoad);
   if (rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
@@ -410,7 +410,7 @@ const saveEntry = async () => {
     inactive: false,
     createdOn: new Date(),
   };
-  const rsp = await api.post('/loanGroup', payLoad);
+  const rsp = await api.post('/goldItem', payLoad);
   if (rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
@@ -433,7 +433,7 @@ const changeActive = (id: number, state: boolean) => {
 
 const changeActiveConfirm = async (id: number, state: boolean) => {
   const str = state ? 'active' : 'inactive';
-  const rsp = await api.put('/loanGroup/' + str, {
+  const rsp = await api.put('/goldItem/' + str, {
     id,
   });
   if (rsp.data && rsp.data.displayMessage) {
@@ -444,10 +444,10 @@ const changeActiveConfirm = async (id: number, state: boolean) => {
 
 const loadSource = async () => {
   fetchingData.value = true;
-  const rsp = await api.get('loanGroup');
+  const rsp = await api.get('goldItem');
 
   if (rsp.data) {
-    loanGroup.value = rsp.data;
+    goldItems.value = rsp.data;
   }
   fetchingData.value = false;
 };
