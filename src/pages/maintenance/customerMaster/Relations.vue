@@ -21,7 +21,7 @@
           card-container-class="q-gutter-y-md q-mt-xs"
         >
           <template v-slot:top>
-            <div class="row q-mb-xs-lg q-mb-sm-none q-mb-md-none q-pb-sm">
+            <div class="row q-mb-xs-lg q-my-sm">
               <div class="col-12">
                 <div class="row items-center">
                   <div class="col-auto text-h6">Relations</div>
