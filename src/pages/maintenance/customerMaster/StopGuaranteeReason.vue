@@ -60,7 +60,7 @@
                   dense
                   no-error-icon
                   :error="isDuplicate"
-                  error-message="Item alredy exits"
+                  error-message="Item already exits"
                   placeholder="name"
                 >
                   <template v-slot:prepend> Reason </template>
