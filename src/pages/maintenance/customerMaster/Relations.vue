@@ -21,99 +21,100 @@
           card-container-class="q-gutter-y-md q-mt-xs"
         >
           <template v-slot:top>
-            <div class="row q-gutter-y-lg q-pb-xs-md">
+            <div class="row q-mb-xs-lg q-mb-sm-none q-mb-md-none q-pb-sm">
               <div class="col-12">
-                <div class="row items-center q-gutter-md">
+                <div class="row items-center">
                   <div class="col-auto text-h6">Relations</div>
                 </div>
               </div>
             </div>
 
-            <div class="row full-width q-col-gutter-y-md q-pb-md">
-              <div class="col-xs-12 col-sm-2 col-md-2 q-pr-md">
-                <q-input
-                  v-model="forwardSearchQuery"
-                  outlined
-                  clearable
-                  dense
-                  rounded
-                  placeholder="search forward"
-                  @clear="forwardSearchQuery = ''"
-                >
-                  <template v-slot:prepend>
-                    <q-icon name="search" />
-                  </template>
-                </q-input>
+            <div
+              class="row full-width items-center q-col-gutter-y-md q-pb-xs-md q-pb-sm-none q-pb-md-none"
+            >
+              <div class="col-xs-12 col-sm-6 col-md-6 q-pa-none q-pb-sm">
+                <div class="row q-col-gutter-y-sm">
+                  <div class="col-xs-12 col-sm-4 col-md-4 q-pr-sm">
+                    <q-input
+                      v-model="forwardSearchQuery"
+                      outlined
+                      clearable
+                      dense
+                      rounded
+                      placeholder="search code"
+                      @clear="forwardSearchQuery = ''"
+                    >
+                      <template v-slot:prepend>
+                        <q-icon name="search" />
+                      </template>
+                    </q-input>
+                  </div>
+                  <div class="col-xs-12 col-sm-4 col-md-4 q-pr-sm">
+                    <q-input
+                      v-model="backwardSearchQuery"
+                      outlined
+                      clearable
+                      dense
+                      rounded
+                      placeholder="search backward"
+                      @clear="backwardSearchQuery = ''"
+                    >
+                      <template v-slot:prepend>
+                        <q-icon name="search" />
+                      </template>
+                    </q-input>
+                  </div>
+                  <div class="col-xs-12 col-sm-4 col-md-4">
+                    <q-checkbox
+                      v-model="checkBox"
+                      label=" In-Active"
+                      @click="(editingRowIndex = null), (isEditing = false)"
+                    />
+                  </div>
+                </div>
               </div>
-
-              <div class="col-xs-12 col-sm-2 col-md-2 q-pr-md">
-                <q-input
-                  v-model="backwardSearchQuery"
-                  outlined
-                  clearable
-                  dense
-                  rounded
-                  placeholder="search backward"
-                  @clear="backwardSearchQuery = ''"
-                >
-                  <template v-slot:prepend>
-                    <q-icon name="search" />
-                  </template>
-                </q-input>
-              </div>
-
-              <div class="col-xs-12 col-sm-3 col-md-2">
-                <q-checkbox
-                  v-model="checkBox"
-                  label=" In-Active"
-                  @click="(editingRowIndex = null), (isEditing = false)"
-                />
-              </div>
-
-              <div class="col-xs-12 col-sm-2 col-md-3 q-pr-sm">
-                <q-input
-                  v-model="forward"
-                  outlined
-                  dense
-                  clearable
-                  no-error-icon
-                  placeholder="forward"
-                  @clear="forward = ''"
-                >
-                </q-input>
-              </div>
-
-              <div class="col-xs-12 col-sm-3 col-md-3 q-pr-sm">
-                <q-input
-                  v-model="backward"
-                  clearable
-                  outlined
-                  dense
-                  hide-bottom-space
-                  no-error-icon
-                  placeholder="backward"
-                  @clear="backward = ''"
-                >
-                  <template v-if="$q.screen.width >= 600" v-slot:after>
+              <div class="col-xs-12 col-sm-6 col-md-6 q-pt-none">
+                <div class="row mobile-border q-pa-md q-col-gutter-y-sm">
+                  <div class="col-xs-12 col-sm-5 col-md-6 q-pa-xs">
+                    <q-input
+                      v-model="newRelation.forward"
+                      outlined
+                      dense
+                      clearable
+                      no-error-icon
+                      placeholder="forward"
+                      @clear="newRelation.forward = ''"
+                    >
+                    </q-input>
+                  </div>
+                  <div class="col-xs-12 col-sm-5 col-md-5 q-pa-xs">
+                    <q-input
+                      v-model="newRelation.backward"
+                      clearable
+                      outlined
+                      dense
+                      hide-bottom-space
+                      no-error-icon
+                      placeholder="backward"
+                      @clear="newRelation.backward = ''"
+                    >
+                    </q-input>
+                  </div>
+                  <div
+                    class="col-xs-12 col-sm-1 col-md-1 text-center q-pa-xs q-mt-xs-md q-mt-sm-none q-mt-md-none"
+                  >
                     <q-btn
                       icon="add"
                       color="teal"
                       size="md"
-                      :disable="forward === '' || backward === ''"
+                      :disable="
+                        newRelation.forward === '' ||
+                        newRelation.backward === ''
+                      "
                       @click="saveEntry"
                     />
-                  </template>
-                </q-input>
-              </div>
-
-              <div v-if="$q.screen.width < 600" class="col-xs-12 text-center">
-                <q-btn
-                  icon="add"
-                  color="teal"
-                  size="md"
-                  :disable="forward === '' || backward === ''"
-                  @click="saveEntry"
-                />
+                  </div>
+                </div>
               </div>
             </div>
           </template>
@@ -327,7 +328,7 @@
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed, watch, reactive } from 'vue';
 import { onSuccess, confirmDialog } from 'src/utils/notification';
 import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
@@ -408,8 +409,6 @@ const columns: {
 
 const $q = useQuasar();
 const fetchingData = ref(false);
-const forward = ref('');
-const backward = ref('');
 const forwardSearchQuery = ref('');
 const backwardSearchQuery = ref('');
 const relations = ref<Relations[]>([]);
@@ -420,6 +419,11 @@ const editingRowId = ref<number | null>(null);
 const editForward = ref('');
 const editBackward = ref('');
 const format = 'DD/MM/YYYY @hh:mmA';
+
+const newRelation = reactive<{ forward: string; backward: string }>({
+  forward: '',
+  backward: '',
+});
 
 const filteredData = computed(() =>
   relations.value.filter(
@@ -482,8 +486,8 @@ const saveEdited = async () => {
 
 const saveEntry = async () => {
   let payLoad = {
-    forward: forward.value,
-    backward: backward.value,
+    forward: newRelation.forward,
+    backward: newRelation.backward,
     inactive: false,
     createdOn: new Date(),
   };
@@ -493,8 +497,8 @@ const saveEntry = async () => {
       msg: rsp.data.displayMessage,
       icon: 'sync_alt',
     });
-    forward.value = '';
-    backward.value = '';
+    newRelation.forward = '';
+    newRelation.backward = '';
     loadSource();
   }
 };
@@ -540,4 +544,13 @@ onMounted(() => {
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+@media (max-width: 600px) {
+  /* Media query for mobile devices */
+  .mobile-border {
+    border: 2px solid rgb(176, 174, 174);
+    border-radius: 8px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  }
+}
+</style>
