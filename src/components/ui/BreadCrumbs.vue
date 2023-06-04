@@ -12,7 +12,7 @@
       </template>
 
       <q-breadcrumbs-el
-        class="q-px-xs-sm q-py-xs-xs text-subtitle1"
+        class="q-pr-xs-sm q-pr-xs-xs q-py-xs-xs text-subtitle1"
         to="/moduleSelector"
         icon="house"
       />
