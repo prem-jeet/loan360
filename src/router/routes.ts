@@ -108,6 +108,18 @@ const routes: RouteRecordRaw[] = [
                 component: () =>
                   import('pages/maintenance/loanMaster/goldLaon/GoldItems.vue'),
               },
+              {
+                path: 'goldItem',
+                name: 'goldItem',
+                component: () =>
+                  import('pages/maintenance/loanMaster/goldLaon/GoldItems.vue'),
+              },
+              {
+                path: 'loanGroup',
+                name: 'loanGroup',
+                component: () =>
+                  import('pages/maintenance/loanMaster/LoanGroup.vue'),
+              },
             ],
           },
           {
