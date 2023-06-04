@@ -24,7 +24,7 @@
             <div class="row q-gutter-y-lg q-pb-xs-md">
               <div class="col-12">
                 <div class="row items-center q-gutter-md">
-                  <div class="col-auto text-h6">Source Lead</div>
+                  <div class="col-auto text-h6">Asset Lead</div>
                 </div>
               </div>
             </div>
@@ -266,14 +266,8 @@ interface Source {
 
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
-  {
-    path: '/module/maintenance/leadMaster/source',
-    label: 'LeadMaster',
-  },
-  {
-    path: '/module/maintenance/leadMaster/source',
-    label: 'Source',
-  },
+  { path: '/module/maintenance/leadMaster/asset', label: 'LeadMaster' },
+  { path: '/module/maintenance/leadMaster/asset', label: 'Asset' },
 ];
 
 const columns: {
@@ -294,7 +288,7 @@ const columns: {
     required: true,
     align: 'left',
     field: 'name',
-    label: 'Source Lead',
+    label: 'Asset Lead',
   },
   {
     name: 'createdOn',
@@ -391,7 +385,7 @@ const saveEdited = async () => {
     id: editingRowId.value,
     updatedOn: new Date(),
   };
-  const rsp = await api.put('/sourceLead/update', payLoad);
+  const rsp = await api.put('/assetLead/update', payLoad);
   if (rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
@@ -407,7 +401,7 @@ const saveEntry = async () => {
     inactive: false,
     createdOn: new Date(),
   };
-  const rsp = await api.post('/sourceLead', payLoad);
+  const rsp = await api.post('/assetLead', payLoad);
   if (rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
@@ -430,7 +424,7 @@ const changeActive = (id: number, state: boolean) => {
 
 const changeActiveConfirm = async (id: number, state: boolean) => {
   const str = state ? 'active' : 'inactive';
-  const rsp = await api.put('/sourceLead/' + str, {
+  const rsp = await api.put('/assetLead/' + str, {
     id,
   });
   if (rsp.data && rsp.data.displayMessage) {
@@ -441,7 +435,7 @@ const changeActiveConfirm = async (id: number, state: boolean) => {
 
 const loadSource = async () => {
   fetchingData.value = true;
-  const rsp = await api.get('sourceLead');
+  const rsp = await api.get('assetLead');
 
   if (rsp.data) {
     source.value = rsp.data;

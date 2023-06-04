@@ -1,8 +1,8 @@
 <template>
-  <div class="absolute q-pa-md full-width full-height bg-gre-4">
-    <q-chip outline square size="md" class="shadow-4" :ripple="false">
-      <BreadCrumbs :ordered-paths="breadcrumbs" />
-    </q-chip>
+  <div
+    class="absolute q-px-md q-pt-md-sm q-pt-xs-md q-pb-md full-width full-height bg-gre-4"
+  >
+    <BreadCrumbs :ordered-paths="breadcrumbs" :style-css="'q-mx-xs'" />
 
     <div class="row q-mt-lg q-pb-xl">
       <div class="col">
@@ -24,7 +24,7 @@
             <div class="row q-gutter-y-lg q-pb-xs-md">
               <div class="col-12">
                 <div class="row items-center q-gutter-md">
-                  <div class="col-auto text-h6">Gold Deduction</div>
+                  <div class="col-auto text-h6">Gold Items</div>
                 </div>
               </div>
             </div>
@@ -60,8 +60,8 @@
                   dense
                   no-error-icon
                   :error="isDuplicate"
-                  error-message="Item alredy exits"
-                  placeholder="Deduction"
+                  error-message="Item already exits"
+                  placeholder="name"
                 >
                   <template v-slot:prepend> Gold </template>
                   <template v-slot:after>
@@ -255,7 +255,7 @@ import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
 import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
-interface GoldDeduction {
+interface GoldItems {
   name: string;
   id: number | null;
   createdOn: string;
@@ -267,12 +267,13 @@ interface GoldDeduction {
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
   {
-    path: '/module/maintenance/loanMaster/goldDeduction',
+    path: '/module/maintenance/loanMaster/goldItem',
     label: 'Loan Master',
+    disable: true,
   },
   {
-    path: '/module/maintenance/loanMaster/goldDeduction',
-    label: 'Gold Deduction',
+    path: '/module/maintenance/loanMaster/goldItem',
+    label: 'Gold Items',
   },
 ];
 
@@ -294,7 +295,7 @@ const columns: {
     required: true,
     align: 'left',
     field: 'name',
-    label: 'Gold Deduction',
+    label: 'Gold Items',
   },
   {
     name: 'createdOn',
@@ -323,7 +324,7 @@ const $q = useQuasar();
 const fetchingData = ref(false);
 const name = ref('');
 const nameSearchQuery = ref('');
-const goldDeduction = ref<GoldDeduction[]>([]);
+const goldItems = ref<GoldItems[]>([]);
 const checkBox = ref(false);
 const isEditing = ref(false);
 const editingRowIndex = ref<number | null>(null);
@@ -332,7 +333,7 @@ const editName = ref('');
 const format = 'DD/MM/YYYY @hh:mmA';
 
 const filteredData = computed(() =>
-  goldDeduction.value.filter(
+  goldItems.value.filter(
     (item) =>
       item.name.toLowerCase().includes(nameSearchQuery.value.toLowerCase()) &&
       item.inactive === checkBox.value
@@ -341,18 +342,18 @@ const filteredData = computed(() =>
 
 const isDuplicate = computed(
   () =>
-    !!goldDeduction.value.find(
-      (item) => item.name.toLocaleLowerCase() === name.value
+    !!goldItems.value.find(
+      (item) => item.name.toLocaleLowerCase() === name.value.toLocaleLowerCase()
     )
 );
 
 const setFormData = () => {
   let temp;
   if (editingRowId.value !== null) {
-    let index = goldDeduction.value.findIndex(
+    let index = goldItems.value.findIndex(
       (obj) => obj.id === editingRowId.value
     );
-    temp = goldDeduction.value[index];
+    temp = goldItems.value[index];
   }
   editName.value = temp ? temp.name : '';
 };
@@ -375,9 +376,7 @@ const editEntry = (id: number, rowIndex: number) => {
   }
 };
 const saveEdited = async () => {
-  const temp = goldDeduction.value.filter(
-    (item) => item.id !== editingRowId.value
-  );
+  const temp = goldItems.value.filter((item) => item.id !== editingRowId.value);
 
   const isDuplicate = temp.find(
     (item) => item.name.toLowerCase() === editName.value.toLowerCase()
@@ -395,7 +394,7 @@ const saveEdited = async () => {
     id: editingRowId.value,
     updatedOn: new Date(),
   };
-  const rsp = await api.put('/goldDeduction/update', payLoad);
+  const rsp = await api.put('/goldItem/update', payLoad);
   if (rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
@@ -411,7 +410,7 @@ const saveEntry = async () => {
     inactive: false,
     createdOn: new Date(),
   };
-  const rsp = await api.post('/goldDeduction', payLoad);
+  const rsp = await api.post('/goldItem', payLoad);
   if (rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
@@ -434,7 +433,7 @@ const changeActive = (id: number, state: boolean) => {
 
 const changeActiveConfirm = async (id: number, state: boolean) => {
   const str = state ? 'active' : 'inactive';
-  const rsp = await api.put('/goldDeduction/' + str, {
+  const rsp = await api.put('/goldItem/' + str, {
     id,
   });
   if (rsp.data && rsp.data.displayMessage) {
@@ -445,10 +444,10 @@ const changeActiveConfirm = async (id: number, state: boolean) => {
 
 const loadSource = async () => {
   fetchingData.value = true;
-  const rsp = await api.get('goldDeduction');
+  const rsp = await api.get('goldItem');
 
   if (rsp.data) {
-    goldDeduction.value = rsp.data;
+    goldItems.value = rsp.data;
   }
   fetchingData.value = false;
 };
