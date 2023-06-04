@@ -1,8 +1,8 @@
 <template>
-  <div class="absolute q-pa-md full-width full-height bg-gre-4">
-    <q-chip outline square size="md" class="shadow-4" :ripple="false">
-      <BreadCrumbs :ordered-paths="breadcrumbs" />
-    </q-chip>
+  <div
+    class="absolute q-px-md q-pt-md-sm q-pt-xs-md q-pb-md full-width full-height bg-gre-4"
+  >
+    <BreadCrumbs :ordered-paths="breadcrumbs" :style-css="'q-mx-xs'" />
 
     <div class="row q-mt-lg q-pb-xl">
       <div class="col">
@@ -230,7 +230,8 @@ const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
   {
     path: '/module/maintenance/loanMaster/goldRate',
-    label: 'Loan Masterr',
+    label: 'Loan Master',
+    disable: true,
   },
   {
     path: '/module/maintenance/loanMaster/goldRate',
