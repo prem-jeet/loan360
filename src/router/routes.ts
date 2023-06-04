@@ -108,7 +108,18 @@ const routes: RouteRecordRaw[] = [
                 component: () =>
                   import('pages/maintenance/loanMaster/goldLaon/GoldItems.vue'),
               },
-
+              {
+                path: 'goldItem',
+                name: 'goldItem',
+                component: () =>
+                  import('pages/maintenance/loanMaster/goldLaon/GoldItems.vue'),
+              },
+              {
+                path: 'loanGroup',
+                name: 'loanGroup',
+                component: () =>
+                  import('pages/maintenance/loanMaster/LoanGroup.vue'),
+              },
               {
                 path: 'advertisementMedia',
                 name: 'advertisementMedia',
@@ -144,6 +155,14 @@ const routes: RouteRecordRaw[] = [
                 component: () =>
                   import(
                     'pages/maintenance/customerMaster/CustomerCategory.vue'
+                  ),
+              },
+              {
+                path: 'stopGuaranteeReason',
+                name: 'stopGuaranteeReason',
+                component: () =>
+                  import(
+                    'pages/maintenance/customerMaster/StopGuaranteeReason.vue'
                   ),
               },
             ],
