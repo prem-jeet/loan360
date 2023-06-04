@@ -4,6 +4,7 @@
     class="shadow-3 q-py-md-md py-xs-medium q-mx-xs-none"
     :class="customCss || 'q-mx-md-lg ma-sm-none'"
     :ripple="false"
+    dense
   >
     <q-breadcrumbs gutter="xs" active-color="indigo" class="q-py-md-xs">
       <template v-slot:separator>
