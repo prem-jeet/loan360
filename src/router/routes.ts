@@ -151,6 +151,14 @@ const routes: RouteRecordRaw[] = [
                     'pages/maintenance/customerMaster/CustomerCategory.vue'
                   ),
               },
+              {
+                path: 'stopGuaranteeReason',
+                name: 'stopGuaranteeReason',
+                component: () =>
+                  import(
+                    'pages/maintenance/customerMaster/StopGuaranteeReason.vue'
+                  ),
+              },
             ],
           },
         ],
