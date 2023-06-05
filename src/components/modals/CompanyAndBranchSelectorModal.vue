@@ -40,13 +40,12 @@
               error-message="select a financial year"
             />
             <div class="q-mt-lg">
-              <q-btn label="Submit" type="submit" color="primary" />
+              <q-btn label="Submit" type="submit" class="brand-btn" glossy />
               <q-btn
                 v-if="route.name !== 'authenticated'"
-                class="q-ml-lg"
+                class="q-ml-lg brand-btn-close"
                 label="Close"
                 type="button"
-                color="grey-13"
                 @click="close"
               />
             </div>
@@ -97,6 +96,7 @@ const submit = () => {
 };
 
 const close = () => {
+  userStore.openCompanySelectModal(false);
   emit('close');
 };
 
