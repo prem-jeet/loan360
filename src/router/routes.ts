@@ -106,13 +106,13 @@ const routes: RouteRecordRaw[] = [
                 path: 'goldItem',
                 name: 'goldItem',
                 component: () =>
-                  import('pages/maintenance/loanMaster/goldLaon/GoldItems.vue'),
+                  import('pages/maintenance/loanMaster/goldLoan/GoldItems.vue'),
               },
               {
                 path: 'goldItem',
                 name: 'goldItem',
                 component: () =>
-                  import('pages/maintenance/loanMaster/goldLaon/GoldItems.vue'),
+                  import('pages/maintenance/loanMaster/goldLoan/GoldItems.vue'),
               },
               {
                 path: 'loanGroup',
@@ -121,10 +121,18 @@ const routes: RouteRecordRaw[] = [
                   import('pages/maintenance/loanMaster/LoanGroup.vue'),
               },
               {
+                path: 'goldDeduction',
+                name: 'goldDeduction',
+                component: () =>
+                  import(
+                    'pages/maintenance/loanMaster/goldLoan/GoldDeductions.vue'
+                  ),
+              },
+              {
                 path: 'goldRate',
                 name: 'goldRate',
                 component: () =>
-                  import('pages/maintenance/loanMaster/goldLaon/GoldRate.vue'),
+                  import('pages/maintenance/loanMaster/goldLoan/GoldRate.vue'),
               },
             ],
           },
