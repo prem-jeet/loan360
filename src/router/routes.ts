@@ -106,7 +106,33 @@ const routes: RouteRecordRaw[] = [
                 path: 'goldItem',
                 name: 'goldItem',
                 component: () =>
-                  import('pages/maintenance/loanMaster/goldLaon/GoldItems.vue'),
+                  import('pages/maintenance/loanMaster/goldLoan/GoldItems.vue'),
+              },
+              {
+                path: 'goldItem',
+                name: 'goldItem',
+                component: () =>
+                  import('pages/maintenance/loanMaster/goldLoan/GoldItems.vue'),
+              },
+              {
+                path: 'loanGroup',
+                name: 'loanGroup',
+                component: () =>
+                  import('pages/maintenance/loanMaster/LoanGroup.vue'),
+              },
+              {
+                path: 'goldDeduction',
+                name: 'goldDeduction',
+                component: () =>
+                  import(
+                    'pages/maintenance/loanMaster/goldLoan/GoldDeductions.vue'
+                  ),
+              },
+              {
+                path: 'source',
+                name: 'source',
+                component: () =>
+                  import('pages/maintenance/leadMasters/Source.vue'),
               },
             ],
           },
@@ -137,6 +163,14 @@ const routes: RouteRecordRaw[] = [
                 component: () =>
                   import(
                     'pages/maintenance/customerMaster/CustomerCategory.vue'
+                  ),
+              },
+              {
+                path: 'stopGuaranteeReason',
+                name: 'stopGuaranteeReason',
+                component: () =>
+                  import(
+                    'pages/maintenance/customerMaster/StopGuaranteeReason.vue'
                   ),
               },
             ],
