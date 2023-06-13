@@ -8,7 +8,7 @@
       <div class="col">
         <q-table
           :rows="filteredData"
-          :columns="columns"
+          :columns="GoldColumns"
           row-key="code"
           :loading="fetchingData"
           table-header-class="bg-deep-purple-10 text-white"
@@ -88,50 +88,17 @@
           <template v-slot:body="props">
             <q-tr :props="props">
               <q-td key="actions" auto-width>
-                <q-btn-group push unelevated>
-                  <q-btn
-                    icon="edit"
-                    size="xs"
-                    outline
-                    color="accent"
-                    v-if="editingRowIndex !== props.rowIndex"
-                    @click="() => editEntry(props.row.id, props.rowIndex)"
-                  >
-                    <q-tooltip>Edit</q-tooltip>
-                  </q-btn>
-
-                  <q-btn
-                    v-if="editingRowIndex !== props.rowIndex"
-                    :label="props.row.inactive ? 'activate' : 'deactivate'"
-                    size="xs"
-                    outline
-                    color="red"
-                    @click="
-                      () => changeActive(props.row.id, props.row.inactive)
-                    "
-                  >
-                  </q-btn>
-                  <q-btn
-                    icon="check"
-                    size="xs"
-                    outline
-                    color="green-10"
-                    v-if="editingRowIndex === props.rowIndex"
-                    @click="saveEdited"
-                  >
-                    <q-tooltip>Save</q-tooltip>
-                  </q-btn>
-                  <q-btn
-                    icon="close"
-                    size="xs"
-                    outline
-                    color="red"
-                    v-if="editingRowIndex === props.rowIndex"
-                    @click="(isEditing = false), (editingRowIndex = null)"
-                  >
-                    <q-tooltip>Cancel</q-tooltip>
-                  </q-btn>
-                </q-btn-group>
+                <q-btn
+                  icon="edit"
+                  size="xs"
+                  outline
+                  rounded
+                  color="accent"
+                  v-if="editingRowIndex !== props.rowIndex"
+                  @click="() => editEntry(props.row.id)"
+                >
+                  <q-tooltip>Edit</q-tooltip>
+                </q-btn>
               </q-td>
               <q-td key="name" :props="props">
                 <q-input
@@ -194,50 +161,6 @@
                     </div>
                   </q-card-section>
                 </template>
-
-                <q-card-actions align="center" class="q-py-md bg-grey-2">
-                  <q-btn
-                    label="edit"
-                    icon="edit"
-                    size="sm"
-                    color="teal"
-                    v-if="editingRowIndex !== props.rowIndex"
-                    @click="() => editEntry(props.row.id, props.rowIndex)"
-                  >
-                    <q-tooltip>Edit</q-tooltip>
-                  </q-btn>
-
-                  <q-btn
-                    v-if="editingRowIndex !== props.rowIndex"
-                    :label="props.row.inactive ? 'activate' : 'deactivate'"
-                    size="sm"
-                    color="red"
-                    @click="
-                      () => changeActive(props.row.id, props.row.inactive)
-                    "
-                  >
-                  </q-btn>
-                  <q-btn
-                    label="save"
-                    icon="save"
-                    size="sm"
-                    color="teal"
-                    v-if="editingRowIndex === props.rowIndex"
-                    @click="saveEdited"
-                  >
-                    <q-tooltip>Save</q-tooltip>
-                  </q-btn>
-                  <q-btn
-                    label="close"
-                    icon="close"
-                    size="sm"
-                    color="red"
-                    v-if="editingRowIndex === props.rowIndex"
-                    @click="(isEditing = false), (editingRowIndex = null)"
-                  >
-                    <q-tooltip>Cancel</q-tooltip>
-                  </q-btn>
-                </q-card-actions>
               </q-card>
             </div>
           </template>
@@ -245,16 +168,29 @@
       </div>
     </div>
   </div>
+
+  <q-dialog v-model="isEditModalActive">
+    <CommonEditForMaintenancePages
+      :editObject="editObject"
+      @close="isEditModalActive = false"
+      @saveEdit="saveEdit"
+      editMsg="Edit Gold Deductions"
+    ></CommonEditForMaintenancePages>
+  </q-dialog>
 </template>
 
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { ref, onMounted, computed, watch } from 'vue';
-import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
+import { ref, onMounted, computed, watch, reactive } from 'vue';
+import { onSuccess, onFailure } from 'src/utils/notification';
+import { columns } from 'src/utils/types';
 import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
+
+type CreateMutable<T> = { -readonly [P in keyof T]: CreateMutable<T[P]> };
+
 interface GoldDeduction {
   name: string;
   id: number | null;
@@ -277,48 +213,7 @@ const breadcrumbs = [
   },
 ];
 
-const columns: {
-  name: string;
-  required?: boolean;
-  label: string;
-  field: string;
-  align: 'left';
-}[] = [
-  {
-    name: 'actions',
-    label: 'Actions',
-    align: 'left',
-    field: '',
-  },
-  {
-    name: 'name',
-    required: true,
-    align: 'left',
-    field: 'name',
-    label: 'Gold Deduction',
-  },
-  {
-    name: 'createdOn',
-    required: true,
-    align: 'left',
-    field: 'createdOn',
-    label: 'Created On',
-  },
-  {
-    name: 'updatedOn',
-    required: true,
-    align: 'left',
-    field: 'updatedOn',
-    label: 'Updated On',
-  },
-  {
-    name: 'inactiveOn',
-    required: true,
-    align: 'left',
-    field: 'inactiveOn',
-    label: 'In-Active On',
-  },
-];
+const GoldColumns = columns;
 
 const $q = useQuasar();
 const fetchingData = ref(false);
@@ -331,6 +226,16 @@ const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
 const editName = ref('');
 const format = 'DD/MM/YYYY @hh:mmA';
+const isEditModalActive = ref(false);
+let editObject = reactive<{
+  firstInputValue: string;
+  inactive: boolean;
+  firstInputLabel: string;
+}>({
+  firstInputValue: '',
+  inactive: false,
+  firstInputLabel: 'Gold Deductions',
+});
 
 const filteredData = computed(() =>
   goldDeduction.value.filter(
@@ -355,44 +260,54 @@ const setFormData = () => {
     );
     temp = goldDeduction.value[index];
   }
-  editName.value = temp ? temp.name : '';
+  editObject.firstInputValue = temp ? temp.name : '';
+  editObject.inactive = temp ? temp.inactive : false;
 };
 
-const editEntryConfirmed = (id: number, index: number) => {
-  editingRowIndex.value = index;
+const editEntry = (id: number) => {
   editingRowId.value = id;
   setFormData();
+  isEditModalActive.value = true;
+};
+const saveEdit = (editSaveObject: {
+  firstInputValue: string;
+  inactive: boolean;
+  firstInputLabel: string;
+}) => {
+  const { firstInputValue, inactive } = editSaveObject;
+  const tempInactive = editObject.inactive;
+
+  if (firstInputValue !== editObject.firstInputValue) {
+    const temp = goldDeduction.value.filter(
+      (item) => item.id !== editingRowId.value
+    );
+
+    const isDuplicate = temp.find(
+      (item) =>
+        item.name.toLowerCase() === editSaveObject.firstInputValue.toLowerCase()
+    );
+    if (isDuplicate) {
+      onFailure({
+        msg: 'Item already exist',
+        icon: 'warning',
+      });
+      return;
+    }
+    editObject = { ...editSaveObject };
+    saveEditedConfirm();
+  }
+
+  if (inactive !== tempInactive) {
+    changeActiveConfirm(editingRowId.value!, editSaveObject.inactive);
+  }
+
+  editingRowId.value = null;
+  isEditModalActive.value = false;
 };
 
-const editEntry = (id: number, rowIndex: number) => {
-  if (isEditing.value) {
-    confirmDialog(() => editEntryConfirmed(id, rowIndex), {
-      msg: 'Are you sure you want to cancel editing the current row?',
-    });
-  } else {
-    isEditing.value = true;
-    editingRowIndex.value = rowIndex;
-    editEntryConfirmed(id, rowIndex);
-  }
-};
-const saveEdited = async () => {
-  const temp = goldDeduction.value.filter(
-    (item) => item.id !== editingRowId.value
-  );
-
-  const isDuplicate = temp.find(
-    (item) => item.name.toLowerCase() === editName.value.toLowerCase()
-  );
-  if (isDuplicate) {
-    onFailure({
-      msg: 'Item already exist',
-      icon: 'warning',
-    });
-    return;
-  }
-
+const saveEditedConfirm = async () => {
   let payLoad = {
-    name: editName.value,
+    name: editObject.firstInputValue,
     id: editingRowId.value,
     updatedOn: new Date(),
   };
@@ -420,16 +335,6 @@ const saveEntry = async () => {
     });
     name.value = '';
     loadSource();
-  }
-};
-
-const changeActive = (id: number, state: boolean) => {
-  if (editingRowIndex.value === null) {
-    confirmDialog(() => changeActiveConfirm(id, state), {
-      msg: state
-        ? 'Are you sure you want to activate ?'
-        : 'Are you sure you want to deactivate ?',
-    });
   }
 };
 

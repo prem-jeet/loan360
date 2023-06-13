@@ -18,10 +18,20 @@
           <div class="col-12 q-mt-sm">
             <q-input
               outlined
-              v-model="modalObj.name"
-              label="name"
+              v-model="modalObj.firstInputValue"
+              :label="modalObj.firstInputLabel"
               dense
-              :rules="[(val:string) => val!=='']"
+              :rules="[(val: string) => val !== '']"
+            />
+          </div>
+        </div>
+        <div class="row q-mb-md" v-show="modalObj.secondInputLabel">
+          <div class="col-12 q-mt-sm">
+            <q-input
+              outlined
+              v-model="modalObj.secondInputValue"
+              :label="modalObj.secondInputLabel"
+              dense
             />
           </div>
         </div>
@@ -36,7 +46,9 @@
           </div>
           <div class="col-6 text-right text-warning">
             {{
-              editObject.inactive ? 'Currently Deactive' : 'Currently Activate'
+              editObject.inactive
+                ? 'Currently Deactivate'
+                : 'Currently Activate'
             }}
           </div>
         </div>
@@ -67,7 +79,10 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue';
 interface EditObject {
-  name: string;
+  firstInputValue: string;
+  firstInputLabel: string;
+  secondInputValue?: string;
+  secondInputLabel?: string;
   inactive: boolean;
 }
 
@@ -78,9 +93,10 @@ const props = defineProps({
   },
   editMsg: {
     type: String,
-    requred: true,
+    required: true,
   },
 });
+
 const emit = defineEmits(['close', 'saveEdit']);
 let modalObj = reactive<EditObject>({ ...props.editObject });
 
@@ -91,12 +107,14 @@ const close = () => {
 };
 
 const resetForm = () => {
-  modalObj.name = props.editObject.name;
+  modalObj.firstInputValue = props.editObject.firstInputValue;
+  modalObj.secondInputValue = props.editObject.secondInputValue;
   modalObj.inactive = props.editObject.inactive;
 };
 
 const saveEdit = () => {
   emit('saveEdit', modalObj);
+  resetForm();
 };
 </script>
 

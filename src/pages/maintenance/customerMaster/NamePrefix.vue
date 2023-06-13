@@ -56,7 +56,7 @@
                   dense
                   no-error-icon
                   :error="isDuplicate"
-                  error-message="Item alredy exits"
+                  error-message="Item already exits"
                   placeholder="name"
                 >
                   <template v-slot:prepend> Prefix </template>
@@ -253,9 +253,14 @@ const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
 const format = 'DD/MM/YYYY @hh:mmA';
 const isEditModalActive = ref(false);
-let editObject = reactive<{ name: string; inactive: boolean }>({
-  name: '',
+let editObject = reactive<{
+  firstInputValue: string;
+  inactive: boolean;
+  firstInputLabel: string;
+}>({
+  firstInputValue: '',
   inactive: false,
+  firstInputLabel: 'Name',
 });
 
 const filteredData = computed(() =>
@@ -281,7 +286,7 @@ const setFormData = () => {
     );
     temp = namePrefix.value[index];
   }
-  editObject.name = temp ? temp.name : '';
+  editObject.firstInputValue = temp ? temp.name : '';
   editObject.inactive = temp ? temp.inactive : false;
 };
 
@@ -290,17 +295,23 @@ const editEntry = (id: number) => {
   setFormData();
   isEditModalActive.value = true;
 };
-const saveEdit = (editSaveObject: { name: string; inactive: boolean }) => {
-  const { name, inactive } = editSaveObject;
+
+const saveEdit = (editSaveObject: {
+  firstInputValue: string;
+  inactive: boolean;
+  firstInputLabel: string;
+}) => {
+  const { firstInputValue, inactive } = editSaveObject;
   const tempInactive = editObject.inactive;
 
-  if (name !== editObject.name) {
+  if (firstInputValue !== editObject.firstInputValue) {
     const temp = namePrefix.value.filter(
       (item) => item.id !== editingRowId.value
     );
 
     const isDuplicate = temp.find(
-      (item) => item.name.toLowerCase() === editSaveObject.name.toLowerCase()
+      (item) =>
+        item.name.toLowerCase() === editSaveObject.firstInputValue.toLowerCase()
     );
     if (isDuplicate) {
       onFailure({
@@ -323,7 +334,7 @@ const saveEdit = (editSaveObject: { name: string; inactive: boolean }) => {
 
 const saveEditedConfirm = async () => {
   let payLoad = {
-    name: editObject.name,
+    name: editObject.firstInputValue,
     id: editingRowId.value,
     updatedOn: new Date(),
   };
