@@ -1,8 +1,11 @@
 <template>
   <q-layout view="hHh Lpr lFf">
-    <q-header elevated>
+    <q-header>
       <NavBar @openMenu="openMenu" />
     </q-header>
+    <q-footer elevated>
+      <footerMenu />
+    </q-footer>
     <q-page-container>
       <q-page>
         <RouterView @openMenu="openMenu"></RouterView>
@@ -32,7 +35,8 @@
   </q-layout>
 </template>
 <script setup lang="ts">
-import NavBar from 'src/components/NavBar.vue';
+import NavBar from 'src/components/ui/header/NavBar.vue';
+import footerMenu from 'src/components/ui/footer/footerMenu.vue';
 import LeftMenu from 'src/components/LeftMenu.vue';
 import { ref, onBeforeMount, computed } from 'vue';
 import { useMenuStore } from 'src/stores/menu/menuStore';
@@ -54,12 +58,16 @@ const isCompanyAndBranchSelectorModalActive = computed(
   () => userStore.companyModal
 );
 
-const getDataOnRefresh = () => {
+const getDataOnRefresh = async () => {
   // Header Set for loggedIn user
   if (userStore.token && userStore.token.id_token) {
     userStore.setAuthHeader(userStore.token.id_token);
   } else {
     userStore.setAuthHeader('');
+  }
+  if (userStore.fetchUser()) {
+    await userStore.fetchAppRole();
+    await menuStore.fetchMenu();
   }
 };
 
@@ -67,3 +75,8 @@ onBeforeMount(() => {
   getDataOnRefresh();
 });
 </script>
+<style>
+.q-drawer {
+  top: 64px !important;
+}
+</style>
