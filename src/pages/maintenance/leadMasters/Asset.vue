@@ -56,7 +56,7 @@
                   dense
                   no-error-icon
                   :error="isDuplicate"
-                  error-message="Item alredy exits"
+                  error-message="Item already exits"
                   placeholder="name"
                 >
                   <template v-slot:prepend> Lead </template>
@@ -139,18 +139,6 @@
                     </div>
                   </q-card-section>
                 </template>
-
-                <q-card-actions align="center" class="q-py-md bg-grey-2">
-                  <q-btn
-                    label="edit"
-                    icon="edit"
-                    size="sm"
-                    color="teal"
-                    v-if="editingRowIndex !== props.rowIndex"
-                    @click="() => editEntry(props.row.id)"
-                  >
-                  </q-btn>
-                </q-card-actions>
               </q-card>
             </div>
           </template>
@@ -178,6 +166,7 @@ import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
 import CommonEditForMaintenancePages from 'src/components/modals/CommonEditForMaintenancePages.vue';
+
 interface Asset {
   name: string;
   id: number | null;
@@ -250,9 +239,15 @@ const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
 const format = 'DD/MM/YYYY @hh:mmA';
 const isEditModalActive = ref(false);
-let editObject = reactive<{ name: string; inactive: boolean }>({
-  name: '',
+
+let editObject = reactive<{
+  firstInputValue: string;
+  inactive: boolean;
+  firstInputLabel: string;
+}>({
+  firstInputValue: '',
   inactive: false,
+  firstInputLabel: 'Asset',
 });
 
 const filteredData = computed(() =>
@@ -266,8 +261,7 @@ const filteredData = computed(() =>
 const isDuplicate = computed(
   () =>
     !!asset.value.find(
-      (item) =>
-        item.name.toLocaleLowerCase() === leadName.value.toLocaleLowerCase()
+      (item) => item.name.toLocaleLowerCase() === leadName.value
     )
 );
 
@@ -277,7 +271,7 @@ const setFormData = () => {
     let index = asset.value.findIndex((obj) => obj.id === editingRowId.value);
     temp = asset.value[index];
   }
-  editObject.name = temp ? temp.name : '';
+  editObject.firstInputValue = temp ? temp.name : '';
   editObject.inactive = temp ? temp.inactive : false;
 };
 
@@ -286,16 +280,22 @@ const editEntry = (id: number) => {
   setFormData();
   isEditModalActive.value = true;
 };
-const saveEdit = (editSaveObject: { name: string; inactive: boolean }) => {
-  const { name, inactive } = editSaveObject;
+const saveEdit = (editSaveObject: {
+  firstInputValue: string;
+  inactive: boolean;
+  firstInputLabel: string;
+}) => {
+  const { firstInputValue, inactive } = editSaveObject;
   const tempInactive = editObject.inactive;
 
-  if (name !== editObject.name) {
+  if (firstInputValue !== editObject.firstInputValue) {
     const temp = asset.value.filter((item) => item.id !== editingRowId.value);
 
     const isDuplicate = temp.find(
-      (item) => item.name.toLowerCase() === editSaveObject.name.toLowerCase()
+      (item) =>
+        item.name.toLowerCase() === editSaveObject.firstInputValue.toLowerCase()
     );
+
     if (isDuplicate) {
       onFailure({
         msg: 'Item already exist',
@@ -317,7 +317,7 @@ const saveEdit = (editSaveObject: { name: string; inactive: boolean }) => {
 
 const saveEditedConfirm = async () => {
   let payLoad = {
-    name: editObject.name,
+    name: editObject.firstInputValue,
     id: editingRowId.value,
     updatedOn: new Date(),
   };

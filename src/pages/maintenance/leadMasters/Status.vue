@@ -51,7 +51,7 @@
               </div>
               <div class="col-xs-12 col-sm-5 col-md-3 q-pb-sm">
                 <q-input
-                  v-model="leadName"
+                  v-model="name"
                   outlined
                   dense
                   no-error-icon
@@ -65,7 +65,7 @@
                       icon="add"
                       color="teal"
                       size="md"
-                      :disable="isDuplicate || leadName === ''"
+                      :disable="isDuplicate || name === ''"
                       @click="saveEntry"
                     />
                   </template>
@@ -139,18 +139,6 @@
                     </div>
                   </q-card-section>
                 </template>
-
-                <q-card-actions align="center" class="q-py-md bg-grey-2">
-                  <q-btn
-                    label="edit"
-                    icon="edit"
-                    size="sm"
-                    color="teal"
-                    v-if="editingRowIndex !== props.rowIndex"
-                    @click="() => editEntry(props.row.id)"
-                  >
-                  </q-btn>
-                </q-card-actions>
               </q-card>
             </div>
           </template>
@@ -245,7 +233,7 @@ const columns: {
 
 const $q = useQuasar();
 const fetchingData = ref(false);
-const leadName = ref('');
+const name = ref('');
 const nameSearchQuery = ref('');
 const status = ref<Status[]>([]);
 const checkBox = ref(false);
@@ -253,9 +241,14 @@ const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
 const format = 'DD/MM/YYYY @hh:mmA';
 const isEditModalActive = ref(false);
-let editObject = reactive<{ name: string; inactive: boolean }>({
-  name: '',
+let editObject = reactive<{
+  firstInputValue: string;
+  inactive: boolean;
+  firstInputLabel: string;
+}>({
+  firstInputValue: '',
   inactive: false,
+  firstInputLabel: 'Status',
 });
 
 const filteredData = computed(() =>
@@ -268,10 +261,7 @@ const filteredData = computed(() =>
 
 const isDuplicate = computed(
   () =>
-    !!status.value.find(
-      (item) =>
-        item.name.toLocaleLowerCase() === leadName.value.toLocaleLowerCase()
-    )
+    !!status.value.find((item) => item.name.toLocaleLowerCase() === name.value)
 );
 
 const setFormData = () => {
@@ -280,7 +270,7 @@ const setFormData = () => {
     let index = status.value.findIndex((obj) => obj.id === editingRowId.value);
     temp = status.value[index];
   }
-  editObject.name = temp ? temp.name : '';
+  editObject.firstInputValue = temp ? temp.name : '';
   editObject.inactive = temp ? temp.inactive : false;
 };
 
@@ -289,16 +279,22 @@ const editEntry = (id: number) => {
   setFormData();
   isEditModalActive.value = true;
 };
-const saveEdit = (editSaveObject: { name: string; inactive: boolean }) => {
-  const { name, inactive } = editSaveObject;
+const saveEdit = (editSaveObject: {
+  firstInputValue: string;
+  inactive: boolean;
+  firstInputLabel: string;
+}) => {
+  const { firstInputValue, inactive } = editSaveObject;
   const tempInactive = editObject.inactive;
 
-  if (name !== editObject.name) {
+  if (firstInputValue !== editObject.firstInputValue) {
     const temp = status.value.filter((item) => item.id !== editingRowId.value);
 
     const isDuplicate = temp.find(
-      (item) => item.name.toLowerCase() === editSaveObject.name.toLowerCase()
+      (item) =>
+        item.name.toLowerCase() === editSaveObject.firstInputValue.toLowerCase()
     );
+
     if (isDuplicate) {
       onFailure({
         msg: 'Item already exist',
@@ -320,7 +316,7 @@ const saveEdit = (editSaveObject: { name: string; inactive: boolean }) => {
 
 const saveEditedConfirm = async () => {
   let payLoad = {
-    name: editObject.name,
+    name: editObject.firstInputValue,
     id: editingRowId.value,
     updatedOn: new Date(),
   };
@@ -336,7 +332,7 @@ const saveEditedConfirm = async () => {
 
 const saveEntry = async () => {
   let payLoad = {
-    name: leadName.value,
+    name: name.value,
     inactive: false,
     createdOn: new Date(),
   };
@@ -346,7 +342,7 @@ const saveEntry = async () => {
       msg: rsp.data.displayMessage,
       icon: 'sync_alt',
     });
-    leadName.value = '';
+    name.value = '';
     loadSource();
   }
 };
