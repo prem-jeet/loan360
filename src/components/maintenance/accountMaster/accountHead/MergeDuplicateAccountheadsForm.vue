@@ -54,7 +54,7 @@ import { ref, watch } from 'vue';
 
 const emits = defineEmits(['close', 'merge']);
 const props = defineProps<{
-  duplicateList: { id: number; name: string }[];
+  duplicateList: { id: number | undefined; name: string | null }[];
 }>();
 
 const isActive = ref(true);
