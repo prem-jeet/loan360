@@ -54,9 +54,13 @@
                 <div class="col-auto">
                   <q-btn
                     size="md"
-                    label="Add Account heads"
+                    label="Add Account head"
                     icon="add"
                     color="blue-7"
+                    @click="
+                      (editingAccountHeadIndex = null),
+                        (isAddAccountHeadFormActive = true)
+                    "
                   />
                 </div>
               </div>
@@ -247,6 +251,10 @@
                     size="sm"
                     color="teal-2"
                     text-color="black"
+                    @click="
+                      (editingAccountHeadIndex = props.rowIndex),
+                        (isAddAccountHeadFormActive = true)
+                    "
                   />
                   <q-btn
                     padding="sm"
@@ -344,9 +352,9 @@
                             color="yellow"
                             size="sm"
                           >
-                            <q-avatar color="teal" text-color="white"
-                              >BY</q-avatar
-                            >
+                            <q-avatar color="teal" text-color="white">
+                              BY
+                            </q-avatar>
                             <span class="text-weight-medium">
                               {{ props.row[`${key}By`] }}
                             </span>
@@ -367,6 +375,10 @@
                       icon="edit"
                       color="teal-2"
                       text-color="black"
+                      @click="
+                        (editingAccountHeadIndex = props.rowIndex),
+                          (isAddAccountHeadFormActive = true)
+                      "
                     />
                     <q-btn
                       label="attachment"
@@ -408,18 +420,28 @@
       :duplicateList="duplicateAccountHeads"
       @merge="mergeAccountHeads"
     />
+    <AddAccountHeadForm
+      v-if="isAddAccountHeadFormActive"
+      :account-head="
+        editingAccountHeadIndex === null
+          ? null
+          : accountHeads[editingAccountHeadIndex]
+      "
+      @close="isAddAccountHeadFormActive = false"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+import { date } from 'quasar';
 import { storeToRefs } from 'pinia';
 import { api } from 'src/boot/axios';
 import { useUserStore } from 'src/stores/user/userStore';
-import dayjs from 'dayjs';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { confirmDialog, onSuccess } from 'src/utils/notification';
 import { alertDialog } from 'src/utils/notification';
 import MergeDuplicateAccoutheadsForm from 'src/components/maintenance/accountMaster/accountHead/MergeDuplicateAccountheadsForm.vue';
+import AddAccountHeadForm from 'src/components/maintenance/accountMaster/accountHead/AddAccountHeadForm.vue';
 
 interface SearchObject {
   companyCode: string | null;
@@ -431,23 +453,23 @@ interface SearchObject {
 }
 
 interface AccountHead {
-  id: number;
+  id?: number;
   branchCode: string | null;
-  accountGroupCode: string;
-  accountType: string;
+  accountGroupCode: string | null;
+  accountType: string | null;
   companyCode: string | null;
   addressId: string | null;
   subLedgerCode: string | null;
-  automatic: boolean | null;
-  name: string;
+  automatic: boolean;
+  name: string | null;
   alias: string | null;
   creditDays: number | null;
   rateInt: number | null;
   sharePercent: number | null;
   lockedOn: string | null;
   panNo: string | null;
-  costCenter: string | null;
-  refrenceAdjust: string | null;
+  costCenter: boolean | null;
+  refrenceAdjust: boolean | null;
   createdOn: string | null;
   updatedOn: string | null;
   inactive: boolean;
@@ -466,7 +488,7 @@ interface AccountHead {
   bankFormatCode: string | null;
   showInAllBranches: boolean;
   taxClassId: number | null;
-  stateId: number;
+  stateId: number | null;
   taxNo: string | null;
   hsnCode: string | null;
   attachments: string | null;
@@ -475,11 +497,11 @@ interface AccountHead {
   lockedUpdatedOn: string | null;
   tdsClassId: number | null;
   tdsType: string | null;
-  tdsEditable: boolean;
-  tds: boolean;
+  tdsEditable: boolean | null;
+  tds: boolean | null;
   ndsi500ItemCode: string | null;
   nbs7ItemCode: string | null;
-  tax: boolean;
+  tax: boolean | null;
   roleCode: string;
   drFromAmount: number | null;
   drToAmount: number | null;
@@ -509,6 +531,8 @@ const tableColumns: {
   { name: 'actions', field: '', align: 'left', label: 'Actions' },
 ];
 
+const isAddAccountHeadFormActive = ref(false);
+const editingAccountHeadIndex = ref<number | null>(null);
 const isPerformingAction = ref(false);
 const { allowedCompany, allowedBranch } = storeToRefs(useUserStore());
 const accountGroupOptions = ref<{ code: string; name: string }[]>([]);
@@ -530,13 +554,13 @@ const duplicateAccountHeads = computed(() => {
     return [];
   }
   return selectedAccountHeads.value.map((accountHead) => ({
-    id: accountHead.id,
-    name: accountHead.name,
+    id: accountHead.id!,
+    name: accountHead.name!,
   }));
 });
 
-const getDate = (date: Date) => {
-  return dayjs(date).format('DD/MM/YY @h:mma');
+const getDate = (_date: Date) => {
+  return date.formatDate(_date, 'DD/MM/YY @h:mma');
 };
 
 const buildQuery = () => {
@@ -613,7 +637,7 @@ const varifySelectedAccountHead = (currentSelectedAccount: AccountHead[]) => {
         'Error'
       );
       setTimeout(
-        () => removeSelectedAccountHead(currentSelectedAccount[0].id),
+        () => removeSelectedAccountHead(currentSelectedAccount[0].id!),
         0
       );
     }
@@ -623,7 +647,7 @@ const varifySelectedAccountHead = (currentSelectedAccount: AccountHead[]) => {
         'Error'
       );
       setTimeout(
-        () => removeSelectedAccountHead(currentSelectedAccount[0].id),
+        () => removeSelectedAccountHead(currentSelectedAccount[0].id!),
         0
       );
     }
@@ -657,11 +681,12 @@ const mergeAccountHeads = async (payload: { id: number; ids: number[] }) => {
   }
 
   accountHeads.value = accountHeads.value.filter(
-    ({ id }) => !payload.ids.includes(id)
+    ({ id }) => !payload.ids.includes(id!)
   );
 };
 
 watch(accountHeads, () => (selectedAccountHeads.value = []));
+
 onMounted(async () => {
   isPerformingAction.value = true;
   const accountGroup = await api.get('accountGroup');

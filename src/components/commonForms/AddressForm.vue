@@ -63,7 +63,7 @@
             <div class="col-12">
               <q-select
                 v-model="address.stateId"
-                label="Country"
+                label="State"
                 outlined
                 dense
                 :error="address.stateId === null"
@@ -187,7 +187,7 @@ interface Address {
   address2: string | null;
   address3: string | null;
   city: string | null;
-  countryId: string | null;
+  countryId: number | null;
   fax: string | null;
   mobile: string | null;
   name: string | null;
@@ -202,6 +202,7 @@ interface Address {
 
 interface Props {
   modelValue: Address;
+  countryId?: number;
 }
 
 const props = defineProps<Props>();
@@ -245,6 +246,13 @@ onMounted(async () => {
   const rsp = await api.get('country');
   if (rsp.data) {
     countries.value = rsp.data;
+
+    // if (
+    //   props.countryId !== undefined &&
+    //   rsp.data.some((item: { id: number }) => item.id === props.countryId)
+    // ) {
+    //   address.countryId = props.countryId
+    // }
   }
 });
 </script>
