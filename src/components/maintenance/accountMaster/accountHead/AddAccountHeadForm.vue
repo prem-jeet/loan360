@@ -841,27 +841,41 @@ const isAddressFormValid = computed(
       !(address.city && address.countryId !== null && address.stateId !== null)
     )
 );
+const isKycFormValid = computed(() =>
+  kycRequired.value ? !!kycData.value.length : true
+);
+const computedKycIdList = computed(() => {
+  const list: number[] = [];
+
+  kycData.value.forEach((val) => {
+    if (val.id !== undefined) {
+      list.push(val.id);
+    }
+  });
+
+  return list;
+});
 const saveAccountHead = () => {
   if (!isAddressFormValid.value) {
     alertDialog('Please fill the address form');
   }
+  if (!isKycFormValid.value) {
+    alertDialog('KYC required');
+  }
+
   const now = new Date();
   const isEditing = !!props.accountHead;
-  if (isEditing) {
-    localAccountHead.updatedOn = now;
-  } else {
-    localAccountHead.createdOn = now;
-    if (kycRequired.value && kycData.value.length) {
-      kycData.value = kycData.value.map((item, index) => ({
-        // @ts-expect-error intentional override
-        id: index,
-        ...item,
-      }));
-    }
+
+  localAccountHead[isEditing ? 'updatedOn' : 'createdOn'] = now;
+
+  if (kycData.value.length) {
+    updateKycIds();
   }
 
   if (isEditing) {
+    // call editing api
   } else {
+    // call create new api
   }
 };
 
@@ -913,16 +927,34 @@ const resetLockedOnDate = () => {
     props.accountHead?.lockedOn || date.formatDate(Date.now(), 'DD/MM/YYYY');
 };
 
-const setKyc = () => {
+const setKycData = () => {
   if (props.accountHead && props.accountHead.kyc) {
-    kycRequired.value = true;
+    const kyc = props.accountHead.kyc;
+    if (JSON.parse(kyc).length) kycRequired.value = true;
     kycData.value = [...JSON.parse(props.accountHead.kyc)];
   }
 };
+const updateKycIds = () => {
+  if (props.accountHead) {
+    let maxId = Math.max(...computedKycIdList.value);
+    kycData.value = kycData.value.map((val) => {
+      if (val.id !== undefined) {
+        return val;
+      }
+      return { ...val, id: ++maxId };
+    });
+  } else {
+    kycData.value = kycData.value.map((val, index) => ({
+      ...val,
+      id: index + 1,
+    }));
+  }
+};
+
 onMounted(async () => {
   if (props.accountHead) {
     setBooleanVariables();
-    setKyc();
+    setKycData();
   }
   const accountGroupsRsp = await api.get('accountGroup');
 
