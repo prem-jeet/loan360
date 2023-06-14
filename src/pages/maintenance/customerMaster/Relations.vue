@@ -477,7 +477,7 @@ const saveEntry = async () => {
 };
 
 const changeActiveConfirm = async (id: number, state: boolean) => {
-  const str = state ? 'active' : 'inactive';
+  const str = state ? 'inactive' : 'active';
   const rsp = await api.put('/relation/' + str, {
     id,
   });

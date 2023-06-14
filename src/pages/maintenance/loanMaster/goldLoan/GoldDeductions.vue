@@ -8,7 +8,7 @@
       <div class="col">
         <q-table
           :rows="filteredData"
-          :columns="GoldColumns"
+          :columns="columns"
           row-key="code"
           :loading="fetchingData"
           table-header-class="bg-deep-purple-10 text-white"
@@ -47,11 +47,7 @@
               </div>
 
               <div class="col-xs-12 col-sm-3 col-md-6 q-pb-sm">
-                <q-checkbox
-                  v-model="checkBox"
-                  label=" In-Active"
-                  @click="(editingRowIndex = null), (isEditing = false)"
-                />
+                <q-checkbox v-model="checkBox" label=" In-Active" />
               </div>
               <div class="col-xs-12 col-sm-5 col-md-3 q-pb-sm">
                 <q-input
@@ -101,16 +97,7 @@
                 </q-btn>
               </q-td>
               <q-td key="name" :props="props">
-                <q-input
-                  v-if="editingRowIndex === props.rowIndex"
-                  v-model="editName"
-                  placeholder="Name required"
-                  dense
-                  outlined
-                  :color="editName ? 'green' : 'red'"
-                  autofocus
-                />
-                <span v-else> {{ firstLetterCpitalze(props.row.name) }} </span>
+                <span> {{ firstLetterCpitalze(props.row.name) }} </span>
               </q-td>
 
               <q-td
@@ -131,16 +118,7 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">Name :</div>
                     <div class="col-12">
-                      <q-input
-                        v-if="editingRowIndex === props.rowIndex"
-                        v-model="editName"
-                        placeholder="Name required"
-                        dense
-                        outlined
-                        :color="editName ? 'green' : 'red'"
-                        autofocus
-                      />
-                      <span v-else>
+                      <span>
                         {{ firstLetterCpitalze(props.row.name) }}
                       </span>
                     </div>
@@ -182,14 +160,12 @@
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { ref, onMounted, computed, watch, reactive } from 'vue';
+import { ref, onMounted, computed, reactive } from 'vue';
 import { onSuccess, onFailure } from 'src/utils/notification';
-import { columns } from 'src/utils/types';
 import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
-
-type CreateMutable<T> = { -readonly [P in keyof T]: CreateMutable<T[P]> };
+import CommonEditForMaintenancePages from 'src/components/modals/CommonEditForMaintenancePages.vue';
 
 interface GoldDeduction {
   name: string;
@@ -213,7 +189,48 @@ const breadcrumbs = [
   },
 ];
 
-const GoldColumns = columns;
+const columns: {
+  name: string;
+  required?: boolean;
+  label: string;
+  field: string;
+  align: 'left';
+}[] = [
+  {
+    name: 'actions',
+    label: 'Actions',
+    align: 'left',
+    field: '',
+  },
+  {
+    name: 'name',
+    required: true,
+    align: 'left',
+    field: 'name',
+    label: 'Gold Deduction',
+  },
+  {
+    name: 'createdOn',
+    required: true,
+    align: 'left',
+    field: 'createdOn',
+    label: 'Created On',
+  },
+  {
+    name: 'updatedOn',
+    required: true,
+    align: 'left',
+    field: 'updatedOn',
+    label: 'Updated On',
+  },
+  {
+    name: 'inactiveOn',
+    required: true,
+    align: 'left',
+    field: 'inactiveOn',
+    label: 'In-Active On',
+  },
+];
 
 const $q = useQuasar();
 const fetchingData = ref(false);
@@ -221,10 +238,8 @@ const name = ref('');
 const nameSearchQuery = ref('');
 const goldDeduction = ref<GoldDeduction[]>([]);
 const checkBox = ref(false);
-const isEditing = ref(false);
 const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
-const editName = ref('');
 const format = 'DD/MM/YYYY @hh:mmA';
 const isEditModalActive = ref(false);
 let editObject = reactive<{
@@ -275,6 +290,7 @@ const saveEdit = (editSaveObject: {
   firstInputLabel: string;
 }) => {
   const { firstInputValue, inactive } = editSaveObject;
+
   const tempInactive = editObject.inactive;
 
   if (firstInputValue !== editObject.firstInputValue) {
@@ -339,7 +355,7 @@ const saveEntry = async () => {
 };
 
 const changeActiveConfirm = async (id: number, state: boolean) => {
-  const str = state ? 'active' : 'inactive';
+  const str = state ? 'inactive' : 'active';
   const rsp = await api.put('/goldDeduction/' + str, {
     id,
   });
@@ -358,11 +374,6 @@ const loadSource = async () => {
   }
   fetchingData.value = false;
 };
-
-watch(filteredData, () => {
-  editingRowIndex.value = null;
-  isEditing.value = false;
-});
 
 onMounted(() => {
   loadSource();
