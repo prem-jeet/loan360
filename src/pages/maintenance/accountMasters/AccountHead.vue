@@ -476,6 +476,7 @@ interface AccountHead {
   inactiveOn: string | null;
   code: string | null;
   chequeFormatFile: string | null;
+  chequeFileName: string | null;
   accountNo: string | null;
   createdOnBy: string | null;
   updatedOnBy: string;

@@ -40,7 +40,7 @@
             </div>
             <div class="col-auto">
               <q-input
-                label="Account name"
+                label="Account Name"
                 v-model="localAccountHead.name"
                 outlined
                 dense
@@ -110,6 +110,9 @@
                 option-value="code"
                 behavior="menu"
                 :options="subLedgerOptions"
+                clear-icon="backspace"
+                clearable
+                dropdown-icon="expand_more"
               />
             </div>
           </div>
@@ -117,12 +120,19 @@
             <div class="row q-gutter-md">
               <div class="col-2">
                 <q-input
-                  :mask="'#'.repeat(20)"
-                  v-model.nuber="localAccountHead.accountNo"
+                  :mask="'X'.repeat(20)"
+                  v-model="localAccountHead.accountNo"
                   dense
                   outlined
                   label="Bank A/c number"
-                  @vnode-unmounted="clerBankData"
+                  @vue:unmounted="clerBankData"
+                  @update:model-value="
+                    (val) => {
+                      if (val === '') {
+                        localAccountHead.accountNo = null;
+                      }
+                    }
+                  "
                 />
               </div>
               <div class="col-3">
@@ -138,6 +148,9 @@
                   label="Bank format"
                   behavior="menu"
                   options-dense
+                  clearable
+                  clear-icon="backspace"
+                  dropdown-icon="expand_more"
                 />
               </div>
             </div>
@@ -149,6 +162,13 @@
                   dense
                   outlined
                   :mask="'N'.repeat(20)"
+                  @update:model-value="
+                    (val) => {
+                      if (val === '') {
+                        localAccountHead.nachUniqueId = null;
+                      }
+                    }
+                  "
                 />
               </div>
               <div class="col-3">
@@ -158,9 +178,15 @@
                   dense
                   outlined
                   :mask="'N'.repeat(11)"
+                  @update:model-value="
+                    (val) => {
+                      if (val === '') {
+                        localAccountHead.nachBankCode = null;
+                      }
+                    }
+                  "
                 />
               </div>
-              <div class="col-3"></div>
             </div>
             <div class="row q-gutter-md">
               <div class="col-3">
@@ -170,6 +196,13 @@
                   dense
                   outlined
                   :mask="'N'.repeat(7)"
+                  @update:model-value="
+                    (val) => {
+                      if (val === '') {
+                        localAccountHead.ecsUserCode = null;
+                      }
+                    }
+                  "
                 />
               </div>
               <div class="col-3">
@@ -179,6 +212,13 @@
                   dense
                   outlined
                   :mask="'N'.repeat(9)"
+                  @update:model-value="
+                    (val) => {
+                      if (val === '') {
+                        localAccountHead.micrCode = null;
+                      }
+                    }
+                  "
                 />
               </div>
               <div class="col-3"></div>
@@ -196,6 +236,9 @@
                 option-label="name"
                 dense
                 outlined
+                clear-icon="backspace"
+                dropdown-icon="expand_more"
+                clearable
               />
             </div>
             <div class="col-3">
@@ -209,6 +252,9 @@
                 option-label="name"
                 dense
                 outlined
+                clear-icon="backspace"
+                dropdown-icon="expand_more"
+                clearable
               />
             </div>
             <div class="col-4 q-gutter-x-md">
@@ -226,11 +272,10 @@
             <div class="col-auto">
               <q-input
                 label="Credit Days"
-                v-model="localAccountHead.creditDays"
+                v-model.number="localAccountHead.creditDays"
                 outlined
-                type="number"
                 dense
-                max="99999"
+                :mask="'#'.repeat(5)"
                 @update:model-value="
                   (val) => {
                     if (val === '') {
@@ -243,15 +288,14 @@
             <div class="col-auto">
               <q-input
                 label="Interest Rate"
-                v-model="localAccountHead.rateInt"
+                v-model.number="localAccountHead.rateInt"
                 outlined
-                type="number"
                 dense
-                max="999999"
+                mask="######"
                 @update:model-value="
                   (val) => {
                     if (val === '') {
-                      localAccountHead.creditDays = null;
+                      localAccountHead.rateInt = null;
                     }
                   }
                 "
@@ -260,15 +304,14 @@
             <div class="col-auto">
               <q-input
                 label="Share Percent"
-                v-model="localAccountHead.sharePercent"
+                v-model.number="localAccountHead.sharePercent"
                 outlined
-                type="number"
                 dense
-                max="999999"
+                :mask="'#'.repeat(6)"
                 @update:model-value="
                   (val) => {
                     if (val === '') {
-                      localAccountHead.creditDays = null;
+                      localAccountHead.sharePercent = null;
                     }
                   }
                 "
@@ -280,14 +323,6 @@
                 v-model="localAccountHead.lockedOn"
                 dense
                 label="Locked Upto"
-                @click="
-                  if (localAccountHead.lockedOn === null) {
-                    localAccountHead.lockedOn = date.formatDate(
-                      new Date(),
-                      'DD/MM/YYYY'
-                    );
-                  }
-                "
               >
                 <q-popup-proxy
                   @before-show="
@@ -321,33 +356,41 @@
                   </q-date>
                 </q-popup-proxy>
                 <template v-slot:append>
-                  <q-icon name="calendar_month" />
+                  <q-icon name="calendar_month" class="cursor-pointer" />
                 </template>
               </q-input>
+            </div>
+            <div class="col-3" v-if="localAccountHead.accountType === 'B'">
+              <q-input
+                v-model="localAccountHead.chequeFileName"
+                @update:model-value="
+                  (val) => {
+                    if (val === '') {
+                      localAccountHead.chequeFileName = null;
+                    }
+                  }
+                "
+                label="Cheque File Name"
+                dense
+                outlined
+              />
             </div>
           </div>
           <div class="row q-gutter-md">
             <div class="col-auto">
               <q-input
-                label="Pan number"
+                label="Pan Number"
                 v-model="localAccountHead.panNo"
                 dense
                 outlined
+                mask="AAAAA####A"
                 @update:model-value="
                   (val) => {
-                    if (typeof val === 'string') {
-                      localAccountHead.panNo = val.toUpperCase();
+                    if (val === '') {
+                      localAccountHead.panNo = null;
                     }
                   }
                 "
-                :rules="[
-                  (val:string) => {
-                    if(!val) {return true}
-                    return new RegExp(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/).test(val)
-                  },
-                ]"
-                maxlength="10"
-                placeholder="XXXXX9999X"
               />
             </div>
             <div class="col-auto q-gutter-x-md">
@@ -368,9 +411,19 @@
                 v-model="localAccountHead.chequeFormatFile"
                 dense
                 outlined
+                @update:model-value="
+                  (val) => {
+                    if (val === '') {
+                      localAccountHead.chequeFormatFile = null;
+                    }
+                  }
+                "
               />
             </div>
-            <div class="col-3" v-if="reverseAcGroupCodeOptions.length">
+            <div
+              class="col-3"
+              v-if="['A', 'B', 'L'].includes(localAccountHead.accountType!)"
+            >
               <q-select
                 label="Reverse A/c Group Code"
                 v-model="localAccountHead.reverseAccountGroupCode"
@@ -381,6 +434,9 @@
                 :options="reverseAcGroupCodeOptions"
                 option-label="name"
                 option-value="code"
+                clearable
+                clear-icon="backspace"
+                dropdown-icon="expand_more"
               />
             </div>
           </div>
@@ -395,7 +451,10 @@
                 map-options
                 option-value="id"
                 option-label="name"
-                :options="taxClassOptions.filter((item) => !item.inactive)"
+                :options="(inactiveFilter(taxClassOptions) as typeof taxClassOptions)"
+                clearable
+                clear-icon="backspace"
+                dropdown-icon="expand_more"
               />
             </div>
             <div class="col-3">
@@ -403,20 +462,15 @@
                 dense
                 outlined
                 label="Tax No"
-                :rules="[
-                  (val:string) => {
-                    if(!val) {return true}
-                    return new RegExp(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/).test(val)},
-                ]"
                 v-model="localAccountHead.taxNo"
                 @update:model-value="
                   (val) => {
-                    if (typeof val === 'string') {
-                      localAccountHead.taxNo = val.toUpperCase();
+                    if (val === '') {
+                      localAccountHead.taxNo = null;
                     }
                   }
                 "
-                placeholder="99XXXXX9999X9Z9"
+                mask="##AAAAA####AXAX"
               />
             </div>
             <div class="col-2">
@@ -425,14 +479,17 @@
                 outlined
                 emit-value
                 map-options
-                label="Tax category"
+                label="Tax Category"
                 v-model="localAccountHead.taxCategory"
                 :options="getOptionsFromObject(taxCategories)"
+                clearable
+                clear-icon="backspace"
+                dropdown-icon="expand_more"
               />
             </div>
           </div>
           <div class="row q-gutter-md items-center">
-            <div class="col-2">
+            <div class="col-4">
               <q-select
                 options-dense
                 dense
@@ -444,6 +501,9 @@
                 :options="statesOptions"
                 option-label="name"
                 option-value="id"
+                clearable
+                clear-icon="backspace"
+                dropdown-icon="expand_more"
               />
             </div>
             <div class="col-auto">
@@ -456,12 +516,15 @@
                 v-model="localAccountHead.tdsClassId"
                 outlined
                 dense
-                label="TDS class"
+                label="TDS Class"
                 emit-value
                 map-options
                 option-label="name"
                 option-value="id"
-                :options="tdsClassOptions"
+                :options="(inactiveFilter(tdsClassOptions) as typeof tdsClassOptions)"
+                clearable
+                clear-icon="backspace"
+                dropdown-icon="expand_more"
               />
             </div>
             <div class="col-2">
@@ -469,100 +532,138 @@
                 v-model="localAccountHead.tdsType"
                 outlined
                 dense
-                label="TDS type"
+                label="TDS Type"
                 emit-value
                 map-options
                 :options="getOptionsFromObject(tdsType)"
+                clearable
+                clear-icon="backspace"
+                dropdown-icon="expand_more"
               />
             </div>
             <div class="col-auto q-gutter-x-md">
               <q-checkbox v-model="localAccountHead.tds" label="TDS" />
               <q-checkbox
                 v-model="localAccountHead.tdsEditable"
-                label="TDS editable"
+                label="TDS Editable"
               />
             </div>
           </div>
           <div class="row q-gutter-md">
             <div class="col-2">
               <q-input
-                type="number"
-                v-model="localAccountHead.hsnCode"
-                max="9999999999"
-                min="1"
+                v-model.number="localAccountHead.hsnCode"
+                mask="##########"
+                @update:model-value="
+                  (val) => {
+                    if (val === '') {
+                      localAccountHead.hsnCode = null;
+                    }
+                  }
+                "
                 dense
                 outlined
-                label="HSN code"
+                label="HSN Code"
               />
             </div>
             <div class="col-2">
               <q-input
-                type="number"
                 v-model="localAccountHead.ndsi500ItemCode"
-                max="9999999999"
-                min="1"
+                mask="NNNNNNNNNN"
                 dense
                 outlined
-                label="NDSI500 item code"
+                label="NDSI500 Item Code"
+                @update:model-value="
+                  (val) => {
+                    if (val === '') {
+                      localAccountHead.ndsi500ItemCode = null;
+                    }
+                  }
+                "
               />
             </div>
             <div class="col-2">
               <q-input
-                type="number"
                 v-model="localAccountHead.nbs7ItemCode"
-                max="9999999999"
-                min="1"
+                mask="NNNNNNNNNN"
                 dense
                 outlined
-                label="NBS7 item code"
+                label="NBS7 Item Code"
+                @update:model-value="
+                  (val) => {
+                    if (val === '') {
+                      localAccountHead.nbs7ItemCode = null;
+                    }
+                  }
+                "
               />
             </div>
           </div>
           <div class="row q-gutter-md">
             <div class="col-4">
               <q-input
-                type="number"
-                v-model="localAccountHead.drFromAmount"
-                max="999999999999999"
-                min="0"
+                v-model.number="localAccountHead.drFromAmount"
+                :mask="'#'.repeat(15)"
                 dense
                 outlined
                 label="Dr From Amount"
+                @update:model-value="
+                  (val) => {
+                    if (val === '') {
+                      localAccountHead.drFromAmount = null;
+                    }
+                  }
+                "
               />
             </div>
             <div class="col-4">
               <q-input
-                type="number"
-                v-model="localAccountHead.drToAmount"
-                max="999999999999999"
-                min="0"
+                v-model.number="localAccountHead.drToAmount"
+                :mask="'#'.repeat(15)"
                 dense
                 outlined
                 label="Dr To Amount"
+                @update:model-value="
+                  (val) => {
+                    if (val === '') {
+                      localAccountHead.drToAmount = null;
+                    }
+                  }
+                "
               />
             </div>
           </div>
           <div class="row q-gutter-md">
             <div class="col-4">
               <q-input
-                type="number"
-                v-model="localAccountHead.crFromAmount"
-                max="999999999999999"
-                min="0"
+                v-model.number="localAccountHead.crFromAmount"
+                :mask="'#'.repeat(15)"
                 dense
                 outlined
                 label="Cr From Amount"
+                @update:model-value="
+                  (val) => {
+                    if (val === '') {
+                      localAccountHead.crFromAmount = null;
+                    }
+                  }
+                "
               />
             </div>
             <div class="col-4">
               <q-input
-                type="number"
-                v-model="localAccountHead.crToAmount"
-                max="999999999999999"
-                min="0"
+                v-model.number="localAccountHead.crToAmount"
+                :mask="'#'.repeat(15)"
                 dense
                 outlined
                 label="Cr To Amount"
+                @update:model-value="
+                  (val) => {
+                    if (val === '') {
+                      localAccountHead.crToAmount = null;
+                    }
+                  }
+                "
               />
             </div>
           </div>
@@ -631,6 +732,7 @@ interface AccountHead {
   bankFormatCode: string | null;
   branchCode: string | null;
   chequeFormatFile: string | null;
+  chequeFileName: string | null;
   code: string | null;
   companyCode: string | null;
   costCenter: boolean | null;
@@ -716,6 +818,7 @@ const initialAccountHead: AccountHead = {
   bankFormatCode: null,
   branchCode: null,
   chequeFormatFile: null,
+  chequeFileName: null,
   code: null,
   companyCode: null,
   costCenter: false,
@@ -744,7 +847,7 @@ const initialAccountHead: AccountHead = {
   rateInt: null,
   refrenceAdjust: false,
   reverseAccountGroupCode: null,
-  roleCode: '',
+  roleCode: null,
   sharePercent: null,
   showInAllBranches: false,
   stateId: null,
@@ -808,7 +911,9 @@ const taxClassOptions = ref<
   { id: number; taxType: string; name: string; inactive: boolean }[]
 >([]);
 
-const tdsClassOptions = ref<{ id: number; name: string }[]>([]);
+const tdsClassOptions = ref<{ id: number; name: string; inactive: boolean }[]>(
+  []
+);
 const statesOptions = ref<{ id: number; name: string }[]>([]);
 
 const isActive = ref(true);
@@ -881,6 +986,7 @@ const saveAccountHead = () => {
   } else {
     // call create new api
   }
+  console.log({ ...localAccountHead });
 };
 
 const close = () => emits('close');
@@ -1013,6 +1119,11 @@ watch(
     }
   }
 );
+
+watchEffect(() => {
+  // const { panNo } = localAccountHead;
+  console.log(reverseAcGroupCodeOptions.value);
+});
 </script>
 
 <style lang="scss"></style>
