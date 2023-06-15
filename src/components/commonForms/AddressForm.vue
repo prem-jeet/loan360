@@ -202,7 +202,6 @@ interface Address {
 
 interface Props {
   modelValue: Address;
-  countryId?: number;
 }
 
 const props = defineProps<Props>();
@@ -246,13 +245,6 @@ onMounted(async () => {
   const rsp = await api.get('country');
   if (rsp.data) {
     countries.value = rsp.data;
-
-    // if (
-    //   props.countryId !== undefined &&
-    //   rsp.data.some((item: { id: number }) => item.id === props.countryId)
-    // ) {
-    //   address.countryId = props.countryId
-    // }
   }
 });
 </script>

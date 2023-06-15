@@ -577,7 +577,7 @@
                   />
                 </template>
                 <div class="q-px-lg q-py-md">
-                  <AddressForm v-model="address" :country-id="1" />
+                  <AddressForm v-model="address" />
                 </div>
               </q-expansion-item>
             </div>
