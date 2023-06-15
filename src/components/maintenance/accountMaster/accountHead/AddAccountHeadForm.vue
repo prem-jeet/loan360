@@ -855,12 +855,15 @@ const computedKycIdList = computed(() => {
 
   return list;
 });
+
 const saveAccountHead = () => {
   if (!isAddressFormValid.value) {
     alertDialog('Please fill the address form');
+    return;
   }
   if (!isKycFormValid.value) {
     alertDialog('KYC required');
+    return;
   }
 
   const now = new Date();
@@ -870,6 +873,7 @@ const saveAccountHead = () => {
 
   if (kycData.value.length) {
     updateKycIds();
+    localAccountHead.kyc = JSON.stringify(kycData.value);
   }
 
   if (isEditing) {
