@@ -1,5 +1,5 @@
 <template>
-  <q-dialog v-model="isActive" maximized>
+  <q-dialog v-model="isActive" maximized @before-hide="close">
     <q-card>
       <q-card-section class="row items-center bg-grey-2">
         <div class="text-h6">
@@ -1026,11 +1026,14 @@ const resetFormData = () => {
     kycData.value = [];
     let addressKey: keyof Address;
     for (addressKey in address) {
-      address[addressKey] = null;
+      if (!['countryId', 'stateId'].includes(addressKey)) {
+        address[addressKey] = null;
+      }
     }
     address.countryId = initailAddress.countryId;
   }
 };
+
 const setBooleanVariables = () => {
   const booleanKeys = [
     'automatic',
