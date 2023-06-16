@@ -793,6 +793,9 @@ interface Address {
   pincode: string | null;
   stateId: number | null;
   std: string | null;
+  id: null;
+  cityId: null;
+  geoLocation: null;
 }
 type KycDataItem = {
   kycCode: 'string';
@@ -936,6 +939,9 @@ const address = reactive<Address>({
   pincode: null,
   stateId: null,
   std: null,
+  id: null,
+  cityId: null,
+  geoLocation: null,
 });
 const kycData = ref<KycDataItem[]>([]);
 
@@ -1037,13 +1043,6 @@ const resetLockedOnDate = () => {
     props.accountHead?.lockedOn || date.formatDate(Date.now(), 'DD/MM/YYYY');
 };
 
-const setKycData = () => {
-  if (props.accountHead && props.accountHead.kyc) {
-    const kyc = props.accountHead.kyc;
-    if (JSON.parse(kyc).length) kycRequired.value = true;
-    kycData.value = [...JSON.parse(props.accountHead.kyc)];
-  }
-};
 const updateKycIds = () => {
   if (props.accountHead) {
     let maxId = Math.max(...computedKycIdList.value);
@@ -1061,10 +1060,33 @@ const updateKycIds = () => {
   }
 };
 
+const setKycData = () => {
+  const kyc = props.accountHead!.kyc as string;
+  if (JSON.parse(kyc).length) {
+    kycRequired.value = true;
+    kycData.value = [...JSON.parse(kyc)];
+  }
+};
+const setAddress = async () => {
+  const rsp = await api.get(`address/${props.accountHead?.addressId}`);
+  if (rsp.data) {
+    let key: keyof Address;
+    for (key in address) {
+      address[key] = rsp.data[key];
+    }
+  }
+};
+
 onMounted(async () => {
   if (props.accountHead) {
     setBooleanVariables();
-    setKycData();
+    if (props.accountHead && props.accountHead.kyc) {
+      setKycData();
+    }
+    if (props.accountHead.addressId !== null) {
+      addressRequired.value = true;
+      setAddress();
+    }
   }
   const accountGroupsRsp = await api.get('accountGroup');
 
@@ -1119,11 +1141,6 @@ watch(
     }
   }
 );
-
-watchEffect(() => {
-  // const { panNo } = localAccountHead;
-  console.log(reverseAcGroupCodeOptions.value);
-});
 </script>
 
 <style lang="scss"></style>
