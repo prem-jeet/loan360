@@ -793,9 +793,9 @@ interface Address {
   pincode: string | null;
   stateId: number | null;
   std: string | null;
-  id: null;
-  cityId: null;
-  geoLocation: null;
+  id: string | null;
+  cityId: string | null;
+  geoLocation: string | null;
 }
 type KycDataItem = {
   kycCode: 'string';
@@ -866,7 +866,26 @@ const initialAccountHead: AccountHead = {
   updatedOn: null,
   updatedOnBy: null,
 };
-
+const initailAddress: Address = {
+  address1: null,
+  address2: null,
+  address3: null,
+  city: null,
+  countryId: 1,
+  fax: null,
+  mobile: null,
+  name: null,
+  phone1: null,
+  phone1Extn: null,
+  phone2: null,
+  phone2Extn: null,
+  pincode: null,
+  stateId: null,
+  std: null,
+  id: null,
+  cityId: null,
+  geoLocation: null,
+};
 const accountTypes = {
   A: 'Assets',
   L: 'Liabilities',
@@ -923,26 +942,7 @@ const isActive = ref(true);
 const addressRequired = ref(false);
 const kycRequired = ref(false);
 
-const address = reactive<Address>({
-  address1: null,
-  address2: null,
-  address3: null,
-  city: null,
-  countryId: 1,
-  fax: null,
-  mobile: null,
-  name: null,
-  phone1: null,
-  phone1Extn: null,
-  phone2: null,
-  phone2Extn: null,
-  pincode: null,
-  stateId: null,
-  std: null,
-  id: null,
-  cityId: null,
-  geoLocation: null,
-});
+const address = reactive<Address>({ ...initailAddress });
 const kycData = ref<KycDataItem[]>([]);
 
 const isAddressFormValid = computed(
@@ -1014,8 +1014,22 @@ const clerBankData = () => {
 };
 
 const resetFormData = () => {
-  const temp = props.accountHead || initialAccountHead;
-  console.table(temp);
+  const isEditing = !!props.accountHead;
+  if (isEditing) {
+    if (props.accountHead.kyc) {
+      setKycData();
+    }
+    if (props.accountHead.addressId) {
+      setAddress();
+    }
+  } else {
+    kycData.value = [];
+    let addressKey: keyof Address;
+    for (addressKey in address) {
+      address[addressKey] = null;
+    }
+    address.countryId = initailAddress.countryId;
+  }
 };
 const setBooleanVariables = () => {
   const booleanKeys = [

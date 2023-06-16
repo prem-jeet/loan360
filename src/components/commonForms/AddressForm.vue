@@ -198,9 +198,9 @@ interface Address {
   pincode: string | null;
   stateId: number | null;
   std: string | null;
-  id: null;
-  cityId: null;
-  geoLocation: null;
+  id: string | null;
+  cityId: string | null;
+  geoLocation: string | null;
 }
 
 interface Props {
