@@ -33,7 +33,7 @@
                   no-error-icon
                   :error="isDuplicate"
                   type="number"
-                  error-message="Item alredy exits"
+                  error-message="Item already exits"
                   placeholder="Rate"
                 >
                   <template v-slot:prepend> Gold </template>

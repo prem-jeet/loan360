@@ -21,6 +21,7 @@
               v-model="modalObj.firstInputValue"
               :label="modalObj.firstInputLabel"
               dense
+              :disable="modalObj.editable"
               :rules="[(val: string) => val !== '']"
             />
           </div>
@@ -84,6 +85,7 @@ interface EditObject {
   secondInputValue?: string;
   secondInputLabel?: string;
   inactive: boolean;
+  editable?: boolean;
 }
 
 const props = defineProps({
