@@ -48,6 +48,7 @@ import { ref, watch } from 'vue';
 import { MenuItem } from 'src/stores/menu/menuStoreTypes';
 import { debounce } from 'quasar';
 import { useRoute, useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
 
 interface TreeNode {
   name: string;
@@ -67,6 +68,7 @@ const iconSet = {
 
 const scrollbarVisible = ref(false);
 const menuStore = useMenuStore();
+const { topLevelMenu } = storeToRefs(menuStore);
 
 const resetFilter = () => {
   filter.value = '';
@@ -111,7 +113,7 @@ const menuItemClickHandler = (menuItem: MenuItem) => {
   }
 };
 
-const treeStructure = createTreeStructure();
+let treeStructure = createTreeStructure();
 const filter = ref('');
 const treeFilter = ref('');
 const treeRef = ref(null);
@@ -122,6 +124,13 @@ watch(
   filter,
   debounce(() => (treeFilter.value = filter.value), 200)
 );
+
+watch(topLevelMenu, () => {
+  if (topLevelMenu.value.length > 0) {
+    // console.log('called', topLevelMenu.value);
+    treeStructure = createTreeStructure();
+  }
+});
 
 watch(treeFilter, () => {
   if (treeFilter.value) {
