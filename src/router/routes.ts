@@ -129,10 +129,16 @@ const routes: RouteRecordRaw[] = [
                   ),
               },
               {
-                path: 'source',
-                name: 'source',
+                path: 'goldRate',
+                name: 'goldRate',
                 component: () =>
-                  import('pages/maintenance/leadMasters/Source.vue'),
+                  import('pages/maintenance/loanMaster/goldLoan/GoldRate.vue'),
+              },
+              {
+                path: 'advertisementMedia',
+                name: 'advertisementMedia',
+                component: () =>
+                  import('pages/maintenance/loanMaster/AdvertisementMedia.vue'),
               },
             ],
           },

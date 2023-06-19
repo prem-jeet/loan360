@@ -24,7 +24,7 @@
             <div class="row q-gutter-y-lg q-pb-xs-md">
               <div class="col-12">
                 <div class="row items-center q-gutter-md">
-                  <div class="col-auto text-h6">Name Prefix</div>
+                  <div class="col-auto text-h6">Advertisement Media</div>
                 </div>
               </div>
             </div>
@@ -59,7 +59,7 @@
                   error-message="Item already exits"
                   placeholder="name"
                 >
-                  <template v-slot:prepend> Prefix </template>
+                  <template v-slot:prepend> Media </template>
                   <template v-slot:after>
                     <q-btn
                       icon="add"
@@ -139,18 +139,6 @@
                     </div>
                   </q-card-section>
                 </template>
-
-                <q-card-actions align="center" class="q-py-md bg-grey-2">
-                  <q-btn
-                    label="edit"
-                    icon="edit"
-                    size="sm"
-                    color="teal"
-                    v-if="editingRowIndex !== props.rowIndex"
-                    @click="() => editEntry(props.row.id)"
-                  >
-                  </q-btn>
-                </q-card-actions>
               </q-card>
             </div>
           </template>
@@ -158,13 +146,12 @@
       </div>
     </div>
   </div>
-
   <q-dialog v-model="isEditModalActive">
     <CommonEditForMaintenancePages
       :editObject="editObject"
       @close="isEditModalActive = false"
       @saveEdit="saveEdit"
-      editMsg="Edit Name Prefix"
+      editMsg="Edit Advertisement Media"
     ></CommonEditForMaintenancePages>
   </q-dialog>
 </template>
@@ -179,7 +166,8 @@ import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
 import CommonEditForMaintenancePages from 'src/components/modals/CommonEditForMaintenancePages.vue';
-// interface NamePrefix {
+
+// interface AdvertisementMedia {
 //   name: string;
 //   id: number | null;
 //   createdOn: string;
@@ -191,13 +179,13 @@ import CommonEditForMaintenancePages from 'src/components/modals/CommonEditForMa
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
   {
-    path: '/module/maintenance/customerMaster/namePrefix',
-    label: 'Customer Master',
+    path: '/module/maintenance/loanMaster/advertisementMedia',
+    label: 'Loan Master',
     disable: true,
   },
   {
-    path: '/module/maintenance/customerMaster/namePrefix',
-    label: 'Name Prefix',
+    path: '/module/maintenance/loanMaster/advertisementMedia',
+    label: 'Advertisement Media',
   },
 ];
 
@@ -219,7 +207,7 @@ const columns: {
     required: true,
     align: 'left',
     field: 'name',
-    label: 'Prefix',
+    label: 'Media',
   },
   {
     name: 'createdOn',
@@ -248,12 +236,13 @@ const $q = useQuasar();
 const fetchingData = ref(false);
 const name = ref('');
 const nameSearchQuery = ref('');
-const namePrefix = ref<tableTypeOne[]>([]);
+const advertisementMedia = ref<tableTypeOne[]>([]);
 const checkBox = ref(false);
 const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
 const format = 'DD/MM/YYYY @hh:mmA';
 const isEditModalActive = ref(false);
+
 let editObject = reactive<{
   firstInputValue: string;
   inactive: boolean;
@@ -261,11 +250,11 @@ let editObject = reactive<{
 }>({
   firstInputValue: '',
   inactive: false,
-  firstInputLabel: 'Name',
+  firstInputLabel: 'Advertisement Media',
 });
 
 const filteredData = computed(() =>
-  namePrefix.value.filter(
+  advertisementMedia.value.filter(
     (item) =>
       item.name.toLowerCase().includes(nameSearchQuery.value.toLowerCase()) &&
       item.inactive === checkBox.value
@@ -274,18 +263,18 @@ const filteredData = computed(() =>
 
 const isDuplicate = computed(
   () =>
-    !!namePrefix.value.find(
-      (item) => item.name.toLocaleLowerCase() === name.value.toLocaleLowerCase()
+    !!advertisementMedia.value.find(
+      (item) => item.name.toLocaleLowerCase() === name.value
     )
 );
 
 const setFormData = () => {
   let temp;
   if (editingRowId.value !== null) {
-    let index = namePrefix.value.findIndex(
+    let index = advertisementMedia.value.findIndex(
       (obj) => obj.id === editingRowId.value
     );
-    temp = namePrefix.value[index];
+    temp = advertisementMedia.value[index];
   }
   editObject.firstInputValue = temp ? temp.name : '';
   editObject.inactive = temp ? temp.inactive : false;
@@ -296,7 +285,6 @@ const editEntry = (id: number) => {
   setFormData();
   isEditModalActive.value = true;
 };
-
 const saveEdit = (editSaveObject: {
   firstInputValue: string;
   inactive: boolean;
@@ -306,7 +294,7 @@ const saveEdit = (editSaveObject: {
   const tempInactive = editObject.inactive;
 
   if (firstInputValue !== editObject.firstInputValue) {
-    const temp = namePrefix.value.filter(
+    const temp = advertisementMedia.value.filter(
       (item) => item.id !== editingRowId.value
     );
 
@@ -314,6 +302,7 @@ const saveEdit = (editSaveObject: {
       (item) =>
         item.name.toLowerCase() === editSaveObject.firstInputValue.toLowerCase()
     );
+
     if (isDuplicate) {
       onFailure({
         msg: 'Item already exist',
@@ -339,7 +328,7 @@ const saveEditedConfirm = async () => {
     id: editingRowId.value,
     updatedOn: new Date(),
   };
-  const rsp = await api.put('/namePrefix/update', payLoad);
+  const rsp = await api.put('/advertisementMedia/update', payLoad);
   if (rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
@@ -355,7 +344,7 @@ const saveEntry = async () => {
     inactive: false,
     createdOn: new Date(),
   };
-  const rsp = await api.post('/namePrefix', payLoad);
+  const rsp = await api.post('/advertisementMedia', payLoad);
   if (rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
@@ -368,7 +357,7 @@ const saveEntry = async () => {
 
 const changeActiveConfirm = async (id: number, state: boolean) => {
   const str = state ? 'inactive' : 'active';
-  const rsp = await api.put('/namePrefix/' + str, {
+  const rsp = await api.put('/advertisementMedia/' + str, {
     id,
   });
   if (rsp.data && rsp.data.displayMessage) {
@@ -379,10 +368,10 @@ const changeActiveConfirm = async (id: number, state: boolean) => {
 
 const loadSource = async () => {
   fetchingData.value = true;
-  const rsp = await api.get('namePrefix');
+  const rsp = await api.get('advertisementMedia');
 
   if (rsp.data) {
-    namePrefix.value = rsp.data;
+    advertisementMedia.value = rsp.data;
   }
   fetchingData.value = false;
 };
