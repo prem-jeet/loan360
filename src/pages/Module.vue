@@ -15,7 +15,8 @@
 
     <div class="q-mt-lg" v-else>
       <q-btn
-        color="dark"
+        class="brand-btn"
+        glossy
         label="Open Menu"
         size="md"
         rounded
@@ -24,8 +25,8 @@
         @click="openMenu"
       />
       <q-btn
-        class="q-ml-lg"
-        color="dark"
+        class="q-ml-lg brand-btn"
+        glossy
         icon="home"
         size="md"
         rounded

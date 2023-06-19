@@ -67,6 +67,7 @@ export const useMenuStore = defineStore('menuStore', {
       }
 
       this.fetchUserRightsMenu();
+      this.topLevelMenu; // Calling To update the Menu Data From API
 
       this.menu = rsp.data;
       return rsp.data;

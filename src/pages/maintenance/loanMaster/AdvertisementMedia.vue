@@ -24,7 +24,7 @@
             <div class="row q-gutter-y-lg q-pb-xs-md">
               <div class="col-12">
                 <div class="row items-center q-gutter-md">
-                  <div class="col-auto text-h6">Source Lead</div>
+                  <div class="col-auto text-h6">Advertisement Media</div>
                 </div>
               </div>
             </div>
@@ -51,7 +51,7 @@
               </div>
               <div class="col-xs-12 col-sm-5 col-md-3 q-pb-sm">
                 <q-input
-                  v-model="leadName"
+                  v-model="name"
                   outlined
                   dense
                   no-error-icon
@@ -59,13 +59,13 @@
                   error-message="Item already exits"
                   placeholder="name"
                 >
-                  <template v-slot:prepend> Lead </template>
+                  <template v-slot:prepend> Media </template>
                   <template v-slot:after>
                     <q-btn
                       icon="add"
                       color="teal"
                       size="md"
-                      :disable="isDuplicate || leadName === ''"
+                      :disable="isDuplicate || name === ''"
                       @click="saveEntry"
                     />
                   </template>
@@ -157,13 +157,12 @@
       </div>
     </div>
   </div>
-
   <q-dialog v-model="isEditModalActive">
     <CommonEditForMaintenancePages
       :editObject="editObject"
       @close="isEditModalActive = false"
       @saveEdit="saveEdit"
-      editMsg="Edit Source"
+      editMsg="Edit Advertisement Media"
     ></CommonEditForMaintenancePages>
   </q-dialog>
 </template>
@@ -178,7 +177,8 @@ import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
 import CommonEditForMaintenancePages from 'src/components/modals/CommonEditForMaintenancePages.vue';
-// interface Source {
+
+// interface AdvertisementMedia {
 //   name: string;
 //   id: number | null;
 //   createdOn: string;
@@ -190,13 +190,13 @@ import CommonEditForMaintenancePages from 'src/components/modals/CommonEditForMa
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
   {
-    path: '/module/maintenance/leadMaster/source',
-    label: 'LeadMaster',
+    path: '/module/maintenance/loanMaster/advertisementMedia',
+    label: 'Loan Master',
     disable: true,
   },
   {
-    path: '/module/maintenance/leadMaster/source',
-    label: 'Source',
+    path: '/module/maintenance/loanMaster/advertisementMedia',
+    label: 'Advertisement Media',
   },
 ];
 
@@ -218,7 +218,7 @@ const columns: {
     required: true,
     align: 'left',
     field: 'name',
-    label: 'Source Lead',
+    label: 'Media',
   },
   {
     name: 'createdOn',
@@ -245,9 +245,9 @@ const columns: {
 
 const $q = useQuasar();
 const fetchingData = ref(false);
-const leadName = ref('');
+const name = ref('');
 const nameSearchQuery = ref('');
-const source = ref<tableTypeOne[]>([]);
+const advertisementMedia = ref<tableTypeOne[]>([]);
 const checkBox = ref(false);
 const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
@@ -261,11 +261,11 @@ let editObject = reactive<{
 }>({
   firstInputValue: '',
   inactive: false,
-  firstInputLabel: 'Source',
+  firstInputLabel: 'Advertisement Media',
 });
 
 const filteredData = computed(() =>
-  source.value.filter(
+  advertisementMedia.value.filter(
     (item) =>
       item.name.toLowerCase().includes(nameSearchQuery.value.toLowerCase()) &&
       item.inactive === checkBox.value
@@ -274,17 +274,18 @@ const filteredData = computed(() =>
 
 const isDuplicate = computed(
   () =>
-    !!source.value.find(
-      (item) =>
-        item.name.toLocaleLowerCase() === leadName.value.toLocaleLowerCase()
+    !!advertisementMedia.value.find(
+      (item) => item.name.toLocaleLowerCase() === name.value
     )
 );
 
 const setFormData = () => {
   let temp;
   if (editingRowId.value !== null) {
-    let index = source.value.findIndex((obj) => obj.id === editingRowId.value);
-    temp = source.value[index];
+    let index = advertisementMedia.value.findIndex(
+      (obj) => obj.id === editingRowId.value
+    );
+    temp = advertisementMedia.value[index];
   }
   editObject.firstInputValue = temp ? temp.name : '';
   editObject.inactive = temp ? temp.inactive : false;
@@ -304,7 +305,9 @@ const saveEdit = (editSaveObject: {
   const tempInactive = editObject.inactive;
 
   if (firstInputValue !== editObject.firstInputValue) {
-    const temp = source.value.filter((item) => item.id !== editingRowId.value);
+    const temp = advertisementMedia.value.filter(
+      (item) => item.id !== editingRowId.value
+    );
 
     const isDuplicate = temp.find(
       (item) =>
@@ -336,7 +339,7 @@ const saveEditedConfirm = async () => {
     id: editingRowId.value,
     updatedOn: new Date(),
   };
-  const rsp = await api.put('/sourceLead/update', payLoad);
+  const rsp = await api.put('/advertisementMedia/update', payLoad);
   if (rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
@@ -348,24 +351,24 @@ const saveEditedConfirm = async () => {
 
 const saveEntry = async () => {
   let payLoad = {
-    name: leadName.value,
+    name: name.value,
     inactive: false,
     createdOn: new Date(),
   };
-  const rsp = await api.post('/sourceLead', payLoad);
+  const rsp = await api.post('/advertisementMedia', payLoad);
   if (rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
       icon: 'sync_alt',
     });
-    leadName.value = '';
+    name.value = '';
     loadSource();
   }
 };
 
 const changeActiveConfirm = async (id: number, state: boolean) => {
   const str = state ? 'inactive' : 'active';
-  const rsp = await api.put('/sourceLead/' + str, {
+  const rsp = await api.put('/advertisementMedia/' + str, {
     id,
   });
   if (rsp.data && rsp.data.displayMessage) {
@@ -376,10 +379,10 @@ const changeActiveConfirm = async (id: number, state: boolean) => {
 
 const loadSource = async () => {
   fetchingData.value = true;
-  const rsp = await api.get('sourceLead');
+  const rsp = await api.get('advertisementMedia');
 
   if (rsp.data) {
-    source.value = rsp.data;
+    advertisementMedia.value = rsp.data;
   }
   fetchingData.value = false;
 };

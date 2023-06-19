@@ -24,7 +24,7 @@
             <div class="row q-gutter-y-lg q-pb-xs-md">
               <div class="col-12">
                 <div class="row items-center q-gutter-md">
-                  <div class="col-auto text-h6">Source Lead</div>
+                  <div class="col-auto text-h6">Loan Group</div>
                 </div>
               </div>
             </div>
@@ -51,7 +51,7 @@
               </div>
               <div class="col-xs-12 col-sm-5 col-md-3 q-pb-sm">
                 <q-input
-                  v-model="leadName"
+                  v-model="name"
                   outlined
                   dense
                   no-error-icon
@@ -59,13 +59,13 @@
                   error-message="Item already exits"
                   placeholder="name"
                 >
-                  <template v-slot:prepend> Lead </template>
+                  <template v-slot:prepend> Loan </template>
                   <template v-slot:after>
                     <q-btn
                       icon="add"
                       color="teal"
                       size="md"
-                      :disable="isDuplicate || leadName === ''"
+                      :disable="isDuplicate || name === ''"
                       @click="saveEntry"
                     />
                   </template>
@@ -84,17 +84,18 @@
           <template v-slot:body="props">
             <q-tr :props="props">
               <q-td key="actions" auto-width>
-                <q-btn
-                  icon="edit"
-                  size="xs"
-                  outline
-                  rounded
-                  color="accent"
-                  v-if="editingRowIndex !== props.rowIndex"
-                  @click="() => editEntry(props.row.id)"
-                >
-                  <q-tooltip>Edit</q-tooltip>
-                </q-btn>
+                <q-btn-group push unelevated>
+                  <q-btn
+                    icon="edit"
+                    size="xs"
+                    outline
+                    color="accent"
+                    v-if="editingRowIndex !== props.rowIndex"
+                    @click="() => editEntry(props.row.id)"
+                  >
+                    <q-tooltip>Edit</q-tooltip>
+                  </q-btn>
+                </q-btn-group>
               </q-td>
               <q-td key="name" :props="props">
                 <span> {{ firstLetterCpitalze(props.row.name) }} </span>
@@ -163,7 +164,7 @@
       :editObject="editObject"
       @close="isEditModalActive = false"
       @saveEdit="saveEdit"
-      editMsg="Edit Source"
+      editMsg="Edit Asset"
     ></CommonEditForMaintenancePages>
   </q-dialog>
 </template>
@@ -178,7 +179,8 @@ import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
 import CommonEditForMaintenancePages from 'src/components/modals/CommonEditForMaintenancePages.vue';
-// interface Source {
+
+// interface LoanGroup {
 //   name: string;
 //   id: number | null;
 //   createdOn: string;
@@ -190,13 +192,13 @@ import CommonEditForMaintenancePages from 'src/components/modals/CommonEditForMa
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
   {
-    path: '/module/maintenance/leadMaster/source',
-    label: 'LeadMaster',
+    path: '/module/maintenance/loanMaster/loanGroup',
+    label: 'Loan Master',
     disable: true,
   },
   {
-    path: '/module/maintenance/leadMaster/source',
-    label: 'Source',
+    path: '/module/maintenance/loanMaster/loanGroup',
+    label: 'Loan Group',
   },
 ];
 
@@ -218,7 +220,7 @@ const columns: {
     required: true,
     align: 'left',
     field: 'name',
-    label: 'Source Lead',
+    label: 'Loan Group',
   },
   {
     name: 'createdOn',
@@ -245,9 +247,9 @@ const columns: {
 
 const $q = useQuasar();
 const fetchingData = ref(false);
-const leadName = ref('');
+const name = ref('');
 const nameSearchQuery = ref('');
-const source = ref<tableTypeOne[]>([]);
+const loanGroup = ref<tableTypeOne[]>([]);
 const checkBox = ref(false);
 const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
@@ -261,11 +263,11 @@ let editObject = reactive<{
 }>({
   firstInputValue: '',
   inactive: false,
-  firstInputLabel: 'Source',
+  firstInputLabel: 'Loan Group',
 });
 
 const filteredData = computed(() =>
-  source.value.filter(
+  loanGroup.value.filter(
     (item) =>
       item.name.toLowerCase().includes(nameSearchQuery.value.toLowerCase()) &&
       item.inactive === checkBox.value
@@ -274,17 +276,18 @@ const filteredData = computed(() =>
 
 const isDuplicate = computed(
   () =>
-    !!source.value.find(
-      (item) =>
-        item.name.toLocaleLowerCase() === leadName.value.toLocaleLowerCase()
+    !!loanGroup.value.find(
+      (item) => item.name.toLocaleLowerCase() === name.value.toLocaleLowerCase()
     )
 );
 
 const setFormData = () => {
   let temp;
   if (editingRowId.value !== null) {
-    let index = source.value.findIndex((obj) => obj.id === editingRowId.value);
-    temp = source.value[index];
+    let index = loanGroup.value.findIndex(
+      (obj) => obj.id === editingRowId.value
+    );
+    temp = loanGroup.value[index];
   }
   editObject.firstInputValue = temp ? temp.name : '';
   editObject.inactive = temp ? temp.inactive : false;
@@ -295,6 +298,7 @@ const editEntry = (id: number) => {
   setFormData();
   isEditModalActive.value = true;
 };
+
 const saveEdit = (editSaveObject: {
   firstInputValue: string;
   inactive: boolean;
@@ -304,13 +308,14 @@ const saveEdit = (editSaveObject: {
   const tempInactive = editObject.inactive;
 
   if (firstInputValue !== editObject.firstInputValue) {
-    const temp = source.value.filter((item) => item.id !== editingRowId.value);
+    const temp = loanGroup.value.filter(
+      (item) => item.id !== editingRowId.value
+    );
 
     const isDuplicate = temp.find(
       (item) =>
         item.name.toLowerCase() === editSaveObject.firstInputValue.toLowerCase()
     );
-
     if (isDuplicate) {
       onFailure({
         msg: 'Item already exist',
@@ -321,7 +326,6 @@ const saveEdit = (editSaveObject: {
     editObject = { ...editSaveObject };
     saveEditedConfirm();
   }
-
   if (inactive !== tempInactive) {
     changeActiveConfirm(editingRowId.value!, editSaveObject.inactive);
   }
@@ -329,14 +333,13 @@ const saveEdit = (editSaveObject: {
   editingRowId.value = null;
   isEditModalActive.value = false;
 };
-
 const saveEditedConfirm = async () => {
   let payLoad = {
     name: editObject.firstInputValue,
     id: editingRowId.value,
     updatedOn: new Date(),
   };
-  const rsp = await api.put('/sourceLead/update', payLoad);
+  const rsp = await api.put('/loanGroup/update', payLoad);
   if (rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
@@ -348,24 +351,24 @@ const saveEditedConfirm = async () => {
 
 const saveEntry = async () => {
   let payLoad = {
-    name: leadName.value,
+    name: name.value,
     inactive: false,
     createdOn: new Date(),
   };
-  const rsp = await api.post('/sourceLead', payLoad);
+  const rsp = await api.post('/loanGroup', payLoad);
   if (rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
       icon: 'sync_alt',
     });
-    leadName.value = '';
+    name.value = '';
     loadSource();
   }
 };
 
 const changeActiveConfirm = async (id: number, state: boolean) => {
   const str = state ? 'inactive' : 'active';
-  const rsp = await api.put('/sourceLead/' + str, {
+  const rsp = await api.put('/loanGroup/' + str, {
     id,
   });
   if (rsp.data && rsp.data.displayMessage) {
@@ -376,10 +379,10 @@ const changeActiveConfirm = async (id: number, state: boolean) => {
 
 const loadSource = async () => {
   fetchingData.value = true;
-  const rsp = await api.get('sourceLead');
+  const rsp = await api.get('loanGroup');
 
   if (rsp.data) {
-    source.value = rsp.data;
+    loanGroup.value = rsp.data;
   }
   fetchingData.value = false;
 };
