@@ -4,39 +4,63 @@ import {
   State,
   Token,
   Branch,
+  FinancialYear,
 } from './userStoreTypes';
 import { defineStore } from 'pinia';
 import jwt_decode from 'jwt-decode';
 import { api } from 'src/boot/axios';
+import { LocalStorage } from 'quasar';
+type CreateMutable<T> = { -readonly [P in keyof T]: CreateMutable<T[P]> };
+import { jsonParse } from 'src/utils/string';
+
+const companyData = localStorage.getItem('selectedCompany');
+const branchData = localStorage.getItem('selectedBranch');
+const financialYearData = localStorage.getItem('selectedFinancialYear');
 
 export const useUserStore = defineStore('userStore', {
   state: (): State => ({
-    token: { id_token: '', expires_in: 0 },
+    token: ({
+      id_token: LocalStorage.getItem('authToken'),
+      expires_in: LocalStorage.getItem('expires_in'),
+    } || {
+      id_token: '',
+      expires_in: 0,
+    }) as CreateMutable<Token>,
     appRole: [],
     accessToken: '',
     isAuthenticated: false,
     allowedCompany: [],
     allowedBranch: [],
     allowedFinancialYear: [],
-    selectedCompany: { code: '', name: '' },
-    selectedBranch: {
-      code: '',
-      name: '',
-      inactive: null,
-      headOffice: null,
-      inactiveOn: null,
-    },
-    selectedFinancialYear: {
-      id: 0,
-      companyCode: '',
-      name: '',
-      fromDate: '',
-      toDate: '',
-      createdOn: null,
-      updatedOn: null,
-      inactive: null,
-      inactiveOn: null,
-    },
+    selectedCompany: (companyData
+      ? jsonParse(companyData)
+      : {
+          code: '',
+          name: '',
+        }) as CreateMutable<Company>,
+    selectedBranch: (branchData
+      ? jsonParse(branchData)
+      : {
+          code: '',
+          name: '',
+          inactive: null,
+          headOffice: null,
+          inactiveOn: null,
+        }) as CreateMutable<Branch>,
+    selectedFinancialYear: (financialYearData
+      ? jsonParse(financialYearData)
+      : {
+          id: 0,
+          companyCode: '',
+          name: '',
+          fromDate: '',
+          toDate: '',
+          createdOn: null,
+          updatedOn: null,
+          inactive: null,
+          inactiveOn: null,
+        }) as CreateMutable<FinancialYear>,
+    companyModal: false,
   }),
   getters: {
     idToken: (state): string => state.token.id_token,
@@ -61,11 +85,9 @@ export const useUserStore = defineStore('userStore', {
   actions: {
     setToken(token: Token) {
       this.token = token;
-      this.isAuthenticated = true;
-
-      localStorage.setItem('jaguar', JSON.stringify(token));
-
-      api.defaults.headers.common.Authorization = `Bearer ${token.id_token}`;
+      // this.setAuthHeader(token.id_token);
+      localStorage.setItem('authToken', token.id_token);
+      localStorage.setItem('expires_in', JSON.stringify(token.expires_in));
     },
     setAccessToken(token: string) {
       this.accessToken = token;
@@ -123,6 +145,41 @@ export const useUserStore = defineStore('userStore', {
 
       this.appRole = rsp.data;
       return rsp.data;
+    },
+    setAuthHeader(authToken: string) {
+      authToken !== ''
+        ? (api.defaults.headers.common['Authorization'] = `Bearer ${authToken}`)
+        : delete api.defaults.headers.common['Authorization'];
+    },
+    fetchUser() {
+      const company =
+        this.selectedCompany.code &&
+        this.selectedBranch.code &&
+        this.selectedFinancialYear.companyCode
+          ? true
+          : false;
+      return (this.isAuthenticated =
+        this.token && this.token.id_token && company ? true : false);
+    },
+
+    saveCompanyDetails(
+      selectedCompany: Company,
+      selectedBranch: Branch,
+      selectedFinancialYear: FinancialYear
+    ) {
+      this.selectedCompany = selectedCompany;
+      this.selectedBranch = selectedBranch;
+      this.selectedFinancialYear = selectedFinancialYear;
+      localStorage.setItem('selectedCompany', JSON.stringify(selectedCompany));
+      localStorage.setItem('selectedBranch', JSON.stringify(selectedBranch));
+      localStorage.setItem(
+        'selectedFinancialYear',
+        JSON.stringify(selectedFinancialYear)
+      );
+    },
+
+    openCompanySelectModal(value: boolean) {
+      return (this.companyModal = value);
     },
   },
 });
