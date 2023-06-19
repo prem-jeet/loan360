@@ -21,55 +21,100 @@
           card-container-class="q-gutter-y-md q-mt-xs"
         >
           <template v-slot:top>
-            <div class="row q-gutter-y-lg q-pb-xs-md">
+            <div class="row q-mb-xs-lg q-my-sm">
               <div class="col-12">
-                <div class="row items-center q-gutter-md">
-                  <div class="col-auto text-h6">Source Lead</div>
+                <div class="row items-center">
+                  <div class="col-auto text-h6">Relations</div>
                 </div>
               </div>
             </div>
 
-            <div class="row full-width q-mt-sm">
-              <div class="col-xs-12 col-sm-4 col-md-3 q-pb-sm">
-                <q-input
-                  v-model="nameSearchQuery"
-                  outlined
-                  clearable
-                  dense
-                  rounded
-                  placeholder="search"
-                  @clear="nameSearchQuery = ''"
-                >
-                  <template v-slot:prepend>
-                    <q-icon name="search" />
-                  </template>
-                </q-input>
+            <div
+              class="row full-width items-center q-col-gutter-y-md q-pb-xs-md q-pb-sm-none q-pb-md-none"
+            >
+              <div class="col-xs-12 col-sm-6 col-md-6 q-pa-none q-pb-sm">
+                <div class="row q-col-gutter-y-sm">
+                  <div class="col-xs-12 col-sm-4 col-md-4 q-pr-sm">
+                    <q-input
+                      v-model="forwardSearchQuery"
+                      outlined
+                      clearable
+                      dense
+                      rounded
+                      placeholder="search Forward"
+                      @clear="forwardSearchQuery = ''"
+                    >
+                      <template v-slot:prepend>
+                        <q-icon name="search" />
+                      </template>
+                    </q-input>
+                  </div>
+                  <div class="col-xs-12 col-sm-4 col-md-4 q-pr-sm">
+                    <q-input
+                      v-model="backwardSearchQuery"
+                      outlined
+                      clearable
+                      dense
+                      rounded
+                      placeholder="search backward"
+                      @clear="backwardSearchQuery = ''"
+                    >
+                      <template v-slot:prepend>
+                        <q-icon name="search" />
+                      </template>
+                    </q-input>
+                  </div>
+                  <div class="col-xs-12 col-sm-4 col-md-4">
+                    <q-checkbox
+                      v-model="checkBox"
+                      label=" In-Active"
+                      @click="(editingRowIndex = null), (isEditing = false)"
+                    />
+                  </div>
+                </div>
               </div>
-
-              <div class="col-xs-12 col-sm-3 col-md-6 q-pb-sm">
-                <q-checkbox v-model="checkBox" label=" In-Active" />
-              </div>
-              <div class="col-xs-12 col-sm-5 col-md-3 q-pb-sm">
-                <q-input
-                  v-model="leadName"
-                  outlined
-                  dense
-                  no-error-icon
-                  :error="isDuplicate"
-                  error-message="Item already exits"
-                  placeholder="name"
-                >
-                  <template v-slot:prepend> Lead </template>
-                  <template v-slot:after>
+              <div class="col-xs-12 col-sm-6 col-md-6 q-pt-none">
+                <div class="row mobile-border q-pa-md q-col-gutter-y-sm">
+                  <div class="col-xs-12 col-sm-5 col-md-6 q-pa-xs">
+                    <q-input
+                      v-model="newRelation.forward"
+                      outlined
+                      dense
+                      clearable
+                      no-error-icon
+                      placeholder="forward"
+                      @clear="newRelation.forward = ''"
+                    >
+                    </q-input>
+                  </div>
+                  <div class="col-xs-12 col-sm-5 col-md-5 q-pa-xs">
+                    <q-input
+                      v-model="newRelation.backward"
+                      clearable
+                      outlined
+                      dense
+                      hide-bottom-space
+                      no-error-icon
+                      placeholder="backward"
+                      @clear="newRelation.backward = ''"
+                    >
+                    </q-input>
+                  </div>
+                  <div
+                    class="col-xs-12 col-sm-1 col-md-1 text-center q-pa-xs q-mt-xs-md q-mt-sm-none q-mt-md-none"
+                  >
                     <q-btn
                       icon="add"
                       color="teal"
                       size="md"
-                      :disable="isDuplicate || leadName === ''"
+                      :disable="
+                        newRelation.forward === '' ||
+                        newRelation.backward === ''
+                      "
                       @click="saveEntry"
                     />
-                  </template>
-                </q-input>
+                  </div>
+                </div>
               </div>
             </div>
           </template>
@@ -96,8 +141,16 @@
                   <q-tooltip>Edit</q-tooltip>
                 </q-btn>
               </q-td>
-              <q-td key="name" :props="props">
-                <span> {{ firstLetterCpitalze(props.row.name) }} </span>
+              <q-td key="forward" :props="props">
+                <span>
+                  {{ firstLetterCpitalze(props.row.forward) }}
+                </span>
+              </q-td>
+
+              <q-td key="backward" :props="props">
+                <span>
+                  {{ firstLetterCpitalze(props.row.backward) }}
+                </span>
               </q-td>
 
               <q-td
@@ -116,10 +169,21 @@
               <q-card>
                 <q-card-section>
                   <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Name :</div>
+                    <div class="col-12 text-weight-medium">Forward :</div>
                     <div class="col-12">
                       <span>
-                        {{ firstLetterCpitalze(props.row.name) }}
+                        {{ firstLetterCpitalze(props.row.forward) }}
+                      </span>
+                    </div>
+                  </div>
+                </q-card-section>
+
+                <q-card-section>
+                  <div class="row q-gutter-y-xs">
+                    <div class="col-12 text-weight-medium">Backward :</div>
+                    <div class="col-12">
+                      <span>
+                        {{ firstLetterCpitalze(props.row.backward) }}
                       </span>
                     </div>
                   </div>
@@ -157,13 +221,12 @@
       </div>
     </div>
   </div>
-
   <q-dialog v-model="isEditModalActive">
     <CommonEditForMaintenancePages
       :editObject="editObject"
       @close="isEditModalActive = false"
       @saveEdit="saveEdit"
-      editMsg="Edit Source"
+      editMsg="Edit Name Prefix"
     ></CommonEditForMaintenancePages>
   </q-dialog>
 </template>
@@ -173,30 +236,40 @@ import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, reactive } from 'vue';
 import { onSuccess, onFailure } from 'src/utils/notification';
-import { tableTypeOne } from 'src/utils/types';
+//import { tableTypeOne } from 'src/utils/types';
 import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
 import CommonEditForMaintenancePages from 'src/components/modals/CommonEditForMaintenancePages.vue';
-// interface Source {
-//   name: string;
-//   id: number | null;
-//   createdOn: string;
-//   inactive: boolean;
-//   inactiveOn: string;
-//   updatedOn: string;
-// }
+
+interface Relations {
+  forward: string;
+  id: number | null;
+  createdOn: string;
+  inactive: boolean;
+  inactiveOn: string;
+  updatedOn: string;
+  backward: string;
+}
+
+interface EditObject {
+  firstInputValue: string;
+  firstInputLabel: string;
+  secondInputValue?: string;
+  secondInputLabel?: string;
+  inactive: boolean;
+}
 
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
   {
-    path: '/module/maintenance/leadMaster/source',
-    label: 'LeadMaster',
+    path: '/module/maintenance/customerMaster/relation',
+    label: 'Customer Master',
     disable: true,
   },
   {
-    path: '/module/maintenance/leadMaster/source',
-    label: 'Source',
+    path: '/module/maintenance/customerMaster/relation',
+    label: 'Relations',
   },
 ];
 
@@ -214,11 +287,18 @@ const columns: {
     field: '',
   },
   {
-    name: 'name',
+    name: 'forward',
     required: true,
     align: 'left',
-    field: 'name',
-    label: 'Source Lead',
+    field: 'forward',
+    label: 'Forward',
+  },
+  {
+    name: 'backward',
+    required: true,
+    align: 'left',
+    field: 'backward',
+    label: 'Backward',
   },
   {
     name: 'createdOn',
@@ -245,48 +325,51 @@ const columns: {
 
 const $q = useQuasar();
 const fetchingData = ref(false);
-const leadName = ref('');
-const nameSearchQuery = ref('');
-const source = ref<tableTypeOne[]>([]);
+const forwardSearchQuery = ref('');
+const backwardSearchQuery = ref('');
+const relations = ref<Relations[]>([]);
 const checkBox = ref(false);
+const isEditing = ref(false);
 const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
 const format = 'DD/MM/YYYY @hh:mmA';
 const isEditModalActive = ref(false);
-
-let editObject = reactive<{
-  firstInputValue: string;
-  inactive: boolean;
-  firstInputLabel: string;
-}>({
+let editObject = reactive<EditObject>({
   firstInputValue: '',
   inactive: false,
-  firstInputLabel: 'Source',
+  firstInputLabel: 'Forward',
+  secondInputValue: '',
+  secondInputLabel: 'Backward',
+});
+
+const newRelation = reactive<{ forward: string; backward: string }>({
+  forward: '',
+  backward: '',
 });
 
 const filteredData = computed(() =>
-  source.value.filter(
+  relations.value.filter(
     (item) =>
-      item.name.toLowerCase().includes(nameSearchQuery.value.toLowerCase()) &&
-      item.inactive === checkBox.value
+      item.forward
+        .toLowerCase()
+        .includes(forwardSearchQuery.value.toLowerCase()) &&
+      item.inactive === checkBox.value &&
+      item.backward
+        .toLowerCase()
+        .includes(backwardSearchQuery.value.toLowerCase())
   )
-);
-
-const isDuplicate = computed(
-  () =>
-    !!source.value.find(
-      (item) =>
-        item.name.toLocaleLowerCase() === leadName.value.toLocaleLowerCase()
-    )
 );
 
 const setFormData = () => {
   let temp;
   if (editingRowId.value !== null) {
-    let index = source.value.findIndex((obj) => obj.id === editingRowId.value);
-    temp = source.value[index];
+    let index = relations.value.findIndex(
+      (obj) => obj.id === editingRowId.value
+    );
+    temp = relations.value[index];
   }
-  editObject.firstInputValue = temp ? temp.name : '';
+  editObject.firstInputValue = temp ? temp.forward : '';
+  editObject.secondInputValue = temp ? temp.backward : '';
   editObject.inactive = temp ? temp.inactive : false;
 };
 
@@ -295,22 +378,26 @@ const editEntry = (id: number) => {
   setFormData();
   isEditModalActive.value = true;
 };
-const saveEdit = (editSaveObject: {
-  firstInputValue: string;
-  inactive: boolean;
-  firstInputLabel: string;
-}) => {
+
+const saveEdit = (editSaveObject: EditObject) => {
   const { firstInputValue, inactive } = editSaveObject;
   const tempInactive = editObject.inactive;
 
-  if (firstInputValue !== editObject.firstInputValue) {
-    const temp = source.value.filter((item) => item.id !== editingRowId.value);
+  if (
+    editSaveObject.firstInputValue !== editObject.firstInputValue ||
+    editSaveObject.secondInputValue !== editObject.secondInputValue
+  ) {
+    const temp = relations.value.filter(
+      (item) => item.id !== editingRowId.value
+    );
 
     const isDuplicate = temp.find(
       (item) =>
-        item.name.toLowerCase() === editSaveObject.firstInputValue.toLowerCase()
+        item.forward.toLowerCase() ===
+          editSaveObject.firstInputValue.toLowerCase() &&
+        item.backward.toLowerCase() ===
+          editSaveObject?.secondInputValue?.toLowerCase()
     );
-
     if (isDuplicate) {
       onFailure({
         msg: 'Item already exist',
@@ -332,11 +419,12 @@ const saveEdit = (editSaveObject: {
 
 const saveEditedConfirm = async () => {
   let payLoad = {
-    name: editObject.firstInputValue,
+    forward: editObject.firstInputValue,
+    backward: editObject.secondInputValue,
     id: editingRowId.value,
     updatedOn: new Date(),
   };
-  const rsp = await api.put('/sourceLead/update', payLoad);
+  const rsp = await api.put('/relation/update', payLoad);
   if (rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
@@ -348,24 +436,26 @@ const saveEditedConfirm = async () => {
 
 const saveEntry = async () => {
   let payLoad = {
-    name: leadName.value,
+    forward: newRelation.forward,
+    backward: newRelation.backward,
     inactive: false,
     createdOn: new Date(),
   };
-  const rsp = await api.post('/sourceLead', payLoad);
+  const rsp = await api.post('/relation', payLoad);
   if (rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
       icon: 'sync_alt',
     });
-    leadName.value = '';
+    newRelation.forward = '';
+    newRelation.backward = '';
     loadSource();
   }
 };
 
 const changeActiveConfirm = async (id: number, state: boolean) => {
   const str = state ? 'inactive' : 'active';
-  const rsp = await api.put('/sourceLead/' + str, {
+  const rsp = await api.put('/relation/' + str, {
     id,
   });
   if (rsp.data && rsp.data.displayMessage) {
@@ -376,10 +466,10 @@ const changeActiveConfirm = async (id: number, state: boolean) => {
 
 const loadSource = async () => {
   fetchingData.value = true;
-  const rsp = await api.get('sourceLead');
+  const rsp = await api.get('relation');
 
   if (rsp.data) {
-    source.value = rsp.data;
+    relations.value = rsp.data;
   }
   fetchingData.value = false;
 };
@@ -387,6 +477,19 @@ const loadSource = async () => {
 onMounted(() => {
   loadSource();
 });
+
+// function onFailure(arg0: { msg: string; icon: string }) {
+//   throw new Error('Function not implemented.');
+// }
 </script>
 
-<style scoped></style>
+<style scoped>
+@media (max-width: 600px) {
+  /* Media query for mobile devices */
+  .mobile-border {
+    border: 2px solid rgb(176, 174, 174);
+    border-radius: 8px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  }
+}
+</style>

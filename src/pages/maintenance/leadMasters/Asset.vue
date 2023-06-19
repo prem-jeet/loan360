@@ -24,7 +24,7 @@
             <div class="row q-gutter-y-lg q-pb-xs-md">
               <div class="col-12">
                 <div class="row items-center q-gutter-md">
-                  <div class="col-auto text-h6">Source Lead</div>
+                  <div class="col-auto text-h6">Asset Lead</div>
                 </div>
               </div>
             </div>
@@ -163,7 +163,7 @@
       :editObject="editObject"
       @close="isEditModalActive = false"
       @saveEdit="saveEdit"
-      editMsg="Edit Source"
+      editMsg="Edit Asset"
     ></CommonEditForMaintenancePages>
   </q-dialog>
 </template>
@@ -178,26 +178,15 @@ import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
 import CommonEditForMaintenancePages from 'src/components/modals/CommonEditForMaintenancePages.vue';
-// interface Source {
-//   name: string;
-//   id: number | null;
-//   createdOn: string;
-//   inactive: boolean;
-//   inactiveOn: string;
-//   updatedOn: string;
-// }
 
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
   {
-    path: '/module/maintenance/leadMaster/source',
+    path: '/module/maintenance/leadMaster/asset',
     label: 'LeadMaster',
     disable: true,
   },
-  {
-    path: '/module/maintenance/leadMaster/source',
-    label: 'Source',
-  },
+  { path: '/module/maintenance/leadMaster/asset', label: 'Asset' },
 ];
 
 const columns: {
@@ -218,7 +207,7 @@ const columns: {
     required: true,
     align: 'left',
     field: 'name',
-    label: 'Source Lead',
+    label: 'Asset Lead',
   },
   {
     name: 'createdOn',
@@ -247,7 +236,7 @@ const $q = useQuasar();
 const fetchingData = ref(false);
 const leadName = ref('');
 const nameSearchQuery = ref('');
-const source = ref<tableTypeOne[]>([]);
+const asset = ref<tableTypeOne[]>([]);
 const checkBox = ref(false);
 const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
@@ -261,11 +250,11 @@ let editObject = reactive<{
 }>({
   firstInputValue: '',
   inactive: false,
-  firstInputLabel: 'Source',
+  firstInputLabel: 'Asset',
 });
 
 const filteredData = computed(() =>
-  source.value.filter(
+  asset.value.filter(
     (item) =>
       item.name.toLowerCase().includes(nameSearchQuery.value.toLowerCase()) &&
       item.inactive === checkBox.value
@@ -274,17 +263,16 @@ const filteredData = computed(() =>
 
 const isDuplicate = computed(
   () =>
-    !!source.value.find(
-      (item) =>
-        item.name.toLocaleLowerCase() === leadName.value.toLocaleLowerCase()
+    !!asset.value.find(
+      (item) => item.name.toLocaleLowerCase() === leadName.value
     )
 );
 
 const setFormData = () => {
   let temp;
   if (editingRowId.value !== null) {
-    let index = source.value.findIndex((obj) => obj.id === editingRowId.value);
-    temp = source.value[index];
+    let index = asset.value.findIndex((obj) => obj.id === editingRowId.value);
+    temp = asset.value[index];
   }
   editObject.firstInputValue = temp ? temp.name : '';
   editObject.inactive = temp ? temp.inactive : false;
@@ -304,7 +292,7 @@ const saveEdit = (editSaveObject: {
   const tempInactive = editObject.inactive;
 
   if (firstInputValue !== editObject.firstInputValue) {
-    const temp = source.value.filter((item) => item.id !== editingRowId.value);
+    const temp = asset.value.filter((item) => item.id !== editingRowId.value);
 
     const isDuplicate = temp.find(
       (item) =>
@@ -336,7 +324,9 @@ const saveEditedConfirm = async () => {
     id: editingRowId.value,
     updatedOn: new Date(),
   };
-  const rsp = await api.put('/sourceLead/update', payLoad);
+  console.log(payLoad, 'payLoad');
+
+  const rsp = await api.put('/assetLead/update', payLoad);
   if (rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
@@ -352,7 +342,7 @@ const saveEntry = async () => {
     inactive: false,
     createdOn: new Date(),
   };
-  const rsp = await api.post('/sourceLead', payLoad);
+  const rsp = await api.post('/assetLead', payLoad);
   if (rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
@@ -365,7 +355,7 @@ const saveEntry = async () => {
 
 const changeActiveConfirm = async (id: number, state: boolean) => {
   const str = state ? 'inactive' : 'active';
-  const rsp = await api.put('/sourceLead/' + str, {
+  const rsp = await api.put('/assetLead/' + str, {
     id,
   });
   if (rsp.data && rsp.data.displayMessage) {
@@ -376,10 +366,10 @@ const changeActiveConfirm = async (id: number, state: boolean) => {
 
 const loadSource = async () => {
   fetchingData.value = true;
-  const rsp = await api.get('sourceLead');
+  const rsp = await api.get('assetLead');
 
   if (rsp.data) {
-    source.value = rsp.data;
+    asset.value = rsp.data;
   }
   fetchingData.value = false;
 };

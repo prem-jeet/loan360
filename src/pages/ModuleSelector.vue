@@ -29,7 +29,7 @@
           <q-tooltip
             anchor="top middle"
             self="bottom middle"
-            class="bg-blue-4 text-dark text-weight-medium text-subtitle1 text-center q-px-lg q-py-md"
+            class="bg-blue-4 text-dark text-weight-medium text-subtitle2 text-center q-px-lg q-py-sm"
           >
             <div style="max-width: 40ch">{{ data.tooltip }}</div>
           </q-tooltip>
@@ -117,11 +117,6 @@ const moduleCardData = [
 useModuleSelectorKeyboardListener(router.push);
 
 onMounted(async () => {
-  if (!userStore.appRole.length) {
-    await userStore.fetchAppRole();
-    await menuStore.fetchMenu();
-  }
-
   menuStore.currentModule = '';
 });
 </script>
