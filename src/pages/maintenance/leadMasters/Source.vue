@@ -139,6 +139,17 @@
                     </div>
                   </q-card-section>
                 </template>
+                <q-card-actions align="center" class="q-py-md bg-grey-2">
+                  <q-btn
+                    label="edit"
+                    icon="edit"
+                    size="sm"
+                    color="teal"
+                    v-if="editingRowIndex !== props.rowIndex"
+                    @click="() => editEntry(props.row.id)"
+                  >
+                  </q-btn>
+                </q-card-actions>
               </q-card>
             </div>
           </template>
@@ -263,7 +274,10 @@ const filteredData = computed(() =>
 
 const isDuplicate = computed(
   () =>
-    !!source.value.find((item) => item.name.toLocaleLowerCase() === name.value)
+    !!source.value.find(
+      (item) =>
+        item.name.toLocaleLowerCase() === leadName.value.toLocaleLowerCase()
+    )
 );
 
 const setFormData = () => {

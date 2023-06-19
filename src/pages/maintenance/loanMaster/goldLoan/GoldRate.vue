@@ -34,7 +34,7 @@
                   :error="isDuplicate"
                   type="number"
                   error-message="Item already exits"
-                  placeholder="Rate"
+                  placeholder="Enter a Rate"
                 >
                   <template v-slot:prepend> Gold </template>
                   <template v-slot:after>
