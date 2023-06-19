@@ -15,91 +15,34 @@
           separator="cell"
           bordered
           title="Nature entry"
-          :no-data-label="
-            stageReason.length ? 'No data available' : 'select stage'
-          "
           :rows-per-page-options="[0]"
           :hide-bottom="!!filteredData.length"
           :grid="$q.screen.width < 830"
           card-container-class="q-gutter-y-md q-mt-xs"
         >
           <template v-slot:top>
-            <div class="row q-gutter-y-lg q-pb-xs-md">
-              <div class="col-12">
-                <div class="row items-center q-gutter-md">
-                  <div class="col-auto text-h6">Stage Reason</div>
-                </div>
+            <div class="row full-width justify-between">
+              <div class="col-xs-12 col-sm-4 col-md-3 text-h6 q-pt-md">
+                Gold Rate
               </div>
-            </div>
-
-            <div class="row full-width q-my-sm">
-              <div class="col-xs-12 col-sm-4 col-md-3 q-pb-sm">
-                <q-select
-                  v-model="selectedSatge"
-                  dense
-                  :options="stages"
-                  map-options
-                  emit-value
-                  label="Select stage"
-                  outlined
-                  hide-bottom-space
-                  :error="selectedError"
-                >
-                  <template v-slot:append>
-                    <q-icon
-                      v-if="selectedSatge"
-                      name="close"
-                      @click.stop.prevent="
-                        (selectedSatge = ''), (stageReason = [])
-                      "
-                      class="cursor-pointer"
-                    />
-                  </template>
-                </q-select>
-              </div>
-            </div>
-
-            <div class="row full-width q-mt-sm">
-              <div class="col-xs-12 col-sm-4 col-md-3 q-pb-sm">
+              <div class="col-xs-12 col-sm-5 col-md-3 q-pt-md">
                 <q-input
-                  v-model="nameSearchQuery"
-                  outlined
-                  clearable
-                  dense
-                  rounded
-                  placeholder="search"
-                  @clear="nameSearchQuery = ''"
-                >
-                  <template v-slot:prepend>
-                    <q-icon name="search" />
-                  </template>
-                </q-input>
-              </div>
-
-              <div class="col-xs-12 col-sm-3 col-md-6 q-pb-sm">
-                <q-checkbox
-                  v-model="checkBox"
-                  label=" In-Active"
-                  @click="(editingRowIndex = null), (isEditing = false)"
-                />
-              </div>
-              <div class="col-xs-12 col-sm-5 col-md-3 q-pb-sm">
-                <q-input
-                  v-model="reason"
+                  v-model="rate"
                   outlined
                   dense
                   no-error-icon
                   :error="isDuplicate"
-                  error-message="Item alredy exits"
-                  placeholder="Reason"
+                  type="number"
+                  error-message="Item already exits"
+                  placeholder="Enter a Rate"
                 >
-                  <template v-slot:prepend> Stage </template>
+                  <template v-slot:prepend> Gold </template>
                   <template v-slot:after>
                     <q-btn
                       icon="add"
                       color="teal"
                       size="md"
-                      :disable="isDuplicate || reason === ''"
+                      :disable="isDuplicate || rate === null"
                       @click="saveEntry"
                     />
                   </template>
@@ -132,13 +75,11 @@
 
                   <q-btn
                     v-if="editingRowIndex !== props.rowIndex"
-                    :label="props.row.inactive ? 'activate' : 'deactivate'"
+                    label="delete"
                     size="xs"
                     outline
                     color="red"
-                    @click="
-                      () => changeActive(props.row.id, props.row.inactive)
-                    "
+                    @click="deleteRate(props.row.id)"
                   >
                   </q-btn>
                   <q-btn
@@ -163,27 +104,22 @@
                   </q-btn>
                 </q-btn-group>
               </q-td>
-              <q-td key="reason" :props="props">
+              <q-td key="rate" :props="props">
                 <q-input
                   v-if="editingRowIndex === props.rowIndex"
-                  v-model="editReason"
-                  placeholder="Name required"
+                  v-model="editRate"
+                  placeholder="rate required"
                   dense
                   outlined
-                  :color="editReason ? 'green' : 'red'"
+                  :color="editRate ? 'green' : 'red'"
+                  type="number"
                   autofocus
                 />
-                <span v-else>
-                  {{ firstLetterCpitalze(props.row.reason) }}
-                </span>
+                <span v-else>{{ props.row.rate }} </span>
               </q-td>
 
-              <q-td
-                :props="props"
-                v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
-                :key="key"
-              >
-                {{ formatDate(props.row[key], format) }}
+              <q-td :props="props" key="updatedOn">
+                {{ formatDate(props.row.updatedOn, format) }}
               </q-td>
             </q-tr>
           </template>
@@ -194,27 +130,25 @@
               <q-card>
                 <q-card-section>
                   <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Reason :</div>
+                    <div class="col-12 text-weight-medium">Rate :</div>
                     <div class="col-12">
                       <q-input
                         v-if="editingRowIndex === props.rowIndex"
-                        v-model="editReason"
-                        placeholder="Name required"
+                        v-model="editRate"
+                        placeholder="rate required"
                         dense
                         outlined
-                        :color="editReason ? 'green' : 'red'"
+                        :color="editRate ? 'green' : 'red'"
+                        type="number"
                         autofocus
                       />
                       <span v-else>
-                        {{ firstLetterCpitalze(props.row.reason) }}
+                        {{ props.row.rate }}
                       </span>
                     </div>
                   </div>
                 </q-card-section>
-                <template
-                  v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
-                  :key="key"
-                >
+                <template v-for="key in ['updatedOn']" :key="key">
                   <q-card-section v-if="props.row[key]">
                     <div class="row q-gutter-y-xs">
                       <div class="col-12 text-weight-medium">
@@ -241,12 +175,10 @@
 
                   <q-btn
                     v-if="editingRowIndex !== props.rowIndex"
-                    :label="props.row.inactive ? 'activate' : 'deactivate'"
+                    label="delete"
                     size="sm"
                     color="red"
-                    @click="
-                      () => changeActive(props.row.id, props.row.inactive)
-                    "
+                    @click="deleteRate(props.row.id)"
                   >
                   </q-btn>
                   <q-btn
@@ -286,31 +218,24 @@ import { ref, onMounted, computed, watch } from 'vue';
 import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
 import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
-import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
-interface StageReason {
-  reason: string;
-  stageCode: number | null;
-  id: number | null;
-  createdOn: string;
-  inactive: boolean;
-  inactiveOn: string;
-  updatedOn: string;
-}
+import { capitalCase } from 'src/utils/string';
 
-interface Stage {
-  label: string;
-  value: string;
+interface GoldRates {
+  rate: number | null;
+  id: number | null;
+  updatedOn: string;
 }
 
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
   {
-    path: '/module/maintenance/loanMaster/stageReason',
+    path: '/module/maintenance/loanMaster/goldRate',
     label: 'Loan Master',
+    disable: true,
   },
   {
-    path: '/module/maintenance/loanMaster/stageReason',
-    label: 'Stage Reason',
+    path: '/module/maintenance/loanMaster/goldRate',
+    label: 'Gold Rate',
   },
 ];
 
@@ -328,19 +253,13 @@ const columns: {
     field: '',
   },
   {
-    name: 'reason',
+    name: 'rate',
     required: true,
     align: 'left',
-    field: 'reason',
-    label: 'Reason',
+    field: 'rate',
+    label: 'Rate',
   },
-  {
-    name: 'createdOn',
-    required: true,
-    align: 'left',
-    field: 'createdOn',
-    label: 'Created On',
-  },
+
   {
     name: 'updatedOn',
     required: true,
@@ -348,54 +267,33 @@ const columns: {
     field: 'updatedOn',
     label: 'Updated On',
   },
-  {
-    name: 'inactiveOn',
-    required: true,
-    align: 'left',
-    field: 'inactiveOn',
-    label: 'In-Active On',
-  },
 ];
 
 const $q = useQuasar();
 const fetchingData = ref(false);
-const reason = ref('');
-const selectedSatge = ref('');
-const stages = ref<Stage[]>([]);
-const nameSearchQuery = ref('');
-const stageReason = ref<StageReason[]>([]);
-const checkBox = ref(false);
+const rate = ref<number | null>(null);
+const goldRates = ref<GoldRates[]>([]);
 const isEditing = ref(false);
 const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
-const editReason = ref('');
+const editRate = ref<number | null>(null);
 const format = 'DD/MM/YYYY @hh:mmA';
-const selectedError = ref(false);
 
-const filteredData = computed(() =>
-  stageReason.value.filter(
-    (item) =>
-      item.reason.toLowerCase().includes(nameSearchQuery.value.toLowerCase()) &&
-      item.inactive === checkBox.value
-  )
-);
+const filteredData = computed(() => goldRates.value);
 
 const isDuplicate = computed(
-  () =>
-    !!stageReason.value.find(
-      (item) => item.reason.toLocaleLowerCase() === reason.value
-    )
+  () => !!goldRates.value.find((item) => item.rate == rate.value)
 );
 
 const setFormData = () => {
   let temp;
   if (editingRowId.value !== null) {
-    let index = stageReason.value.findIndex(
+    let index = goldRates.value.findIndex(
       (obj) => obj.id === editingRowId.value
     );
-    temp = stageReason.value[index];
+    temp = goldRates.value[index];
   }
-  editReason.value = temp ? temp.reason : '';
+  editRate.value = temp ? temp.rate : null;
 };
 
 const editEntryConfirmed = (id: number, index: number) => {
@@ -416,13 +314,9 @@ const editEntry = (id: number, rowIndex: number) => {
   }
 };
 const saveEdited = async () => {
-  const temp = stageReason.value.filter(
-    (item) => item.id !== editingRowId.value
-  );
+  const temp = goldRates.value.filter((item) => item.id !== editingRowId.value);
 
-  const isDuplicate = temp.find(
-    (item) => item.reason.toLowerCase() === editReason.value.toLowerCase()
-  );
+  const isDuplicate = temp.find((item) => item.rate == editRate.value);
   if (isDuplicate) {
     onFailure({
       msg: 'Item already exist',
@@ -432,85 +326,57 @@ const saveEdited = async () => {
   }
 
   let payLoad = {
-    reason: editReason.value,
+    rate: editRate.value,
     id: editingRowId.value,
     updatedOn: new Date(),
-    stageCode: selectedSatge.value,
   };
-  const rsp = await api.put('/stageReason/update', payLoad);
+  const rsp = await api.post('/goldRate', payLoad);
   if (rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
       icon: 'sync_alt',
     });
+    editingRowIndex.value = null;
     loadSource();
   }
 };
 
-const saveEntry = () => {
-  selectedSatge.value ? saveNewEntry() : (selectedError.value = true);
-};
-
-const saveNewEntry = async () => {
-  let payLoad = {
-    reason: reason.value,
-    inactive: false,
-    createdOn: new Date(),
-    stageCode: selectedSatge.value,
-  };
-  const rsp = await api.post('/stageReason', payLoad);
+const saveEntry = async () => {
+  const rsp = await api.post('/goldRate', { rate: rate.value });
   if (rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
       icon: 'sync_alt',
     });
-    reason.value = '';
+    rate.value = null;
     loadSource();
   }
 };
 
-const changeActive = (id: number, state: boolean) => {
+const deleteRate = async (id: number) => {
   if (editingRowIndex.value === null) {
-    confirmDialog(() => changeActiveConfirm(id, state), {
-      msg: state
-        ? 'Are you sure you want to activate ?'
-        : 'Are you sure you want to deactivate ?',
+    confirmDialog(() => deleteConfirm(id), {
+      msg: 'Are you sure you want to delete ?',
     });
+  } else {
+    return;
   }
 };
 
-const changeActiveConfirm = async (id: number, state: boolean) => {
-  const str = state ? 'active' : 'inactive';
-  const rsp = await api.put('/stageReason/' + str, {
-    id,
-  });
-  if (rsp.data && rsp.data.displayMessage) {
+const deleteConfirm = async (id: number) => {
+  const rsp = await api.delete(`/goldRate/${id}`);
+  if (rsp.data) {
     onSuccess({ msg: rsp.data.displayMessage });
-    loadSource();
   }
+  loadSource();
 };
 
 const loadSource = async () => {
   fetchingData.value = true;
-  const rsp = await api.get('stageReason/stageCode/' + selectedSatge.value);
+  const rsp = await api.get('goldRate/getTop10Rates');
 
   if (rsp.data) {
-    stageReason.value = rsp.data;
-  }
-  fetchingData.value = false;
-};
-
-const loadStages = async () => {
-  fetchingData.value = true;
-  const rsp = await api.get('stage');
-
-  if (rsp.data) {
-    stages.value = rsp.data.map((item: { code: string; name: string }) => {
-      return {
-        label: item.name,
-        value: item.code,
-      };
-    });
+    goldRates.value = rsp.data;
   }
   fetchingData.value = false;
 };
@@ -520,15 +386,8 @@ watch(filteredData, () => {
   isEditing.value = false;
 });
 
-watch(selectedSatge, () => {
-  selectedError.value = false;
-  if (selectedSatge.value) {
-    loadSource();
-  }
-});
-
 onMounted(() => {
-  loadStages();
+  loadSource();
 });
 </script>
 

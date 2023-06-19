@@ -24,7 +24,7 @@
             <div class="row q-gutter-y-lg q-pb-xs-md">
               <div class="col-12">
                 <div class="row items-center q-gutter-md">
-                  <div class="col-auto text-h6">Source Lead</div>
+                  <div class="col-auto text-h6">Status Lead</div>
                 </div>
               </div>
             </div>
@@ -51,12 +51,12 @@
               </div>
               <div class="col-xs-12 col-sm-5 col-md-3 q-pb-sm">
                 <q-input
-                  v-model="leadName"
+                  v-model="name"
                   outlined
                   dense
                   no-error-icon
                   :error="isDuplicate"
-                  error-message="Item already exits"
+                  error-message="Item alredy exits"
                   placeholder="name"
                 >
                   <template v-slot:prepend> Lead </template>
@@ -65,7 +65,7 @@
                       icon="add"
                       color="teal"
                       size="md"
-                      :disable="isDuplicate || leadName === ''"
+                      :disable="isDuplicate || name === ''"
                       @click="saveEntry"
                     />
                   </template>
@@ -85,10 +85,10 @@
             <q-tr :props="props">
               <q-td key="actions" auto-width>
                 <q-btn
-                  icon="edit"
-                  size="xs"
                   outline
                   rounded
+                  icon="edit"
+                  size="xs"
                   color="accent"
                   v-if="editingRowIndex !== props.rowIndex"
                   @click="() => editEntry(props.row.id)"
@@ -163,7 +163,7 @@
       :editObject="editObject"
       @close="isEditModalActive = false"
       @saveEdit="saveEdit"
-      editMsg="Edit Source"
+      editMsg="Edit Status"
     ></CommonEditForMaintenancePages>
   </q-dialog>
 </template>
@@ -178,7 +178,8 @@ import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
 import CommonEditForMaintenancePages from 'src/components/modals/CommonEditForMaintenancePages.vue';
-// interface Source {
+
+// interface Status {
 //   name: string;
 //   id: number | null;
 //   createdOn: string;
@@ -190,13 +191,13 @@ import CommonEditForMaintenancePages from 'src/components/modals/CommonEditForMa
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
   {
-    path: '/module/maintenance/leadMaster/source',
+    path: '/module/maintenance/leadMaster/status',
     label: 'LeadMaster',
     disable: true,
   },
   {
-    path: '/module/maintenance/leadMaster/source',
-    label: 'Source',
+    path: '/module/maintenance/leadMaster/status',
+    label: 'Status',
   },
 ];
 
@@ -218,7 +219,7 @@ const columns: {
     required: true,
     align: 'left',
     field: 'name',
-    label: 'Source Lead',
+    label: 'Status Lead',
   },
   {
     name: 'createdOn',
@@ -245,15 +246,14 @@ const columns: {
 
 const $q = useQuasar();
 const fetchingData = ref(false);
-const leadName = ref('');
+const name = ref('');
 const nameSearchQuery = ref('');
-const source = ref<tableTypeOne[]>([]);
+const status = ref<tableTypeOne[]>([]);
 const checkBox = ref(false);
 const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
 const format = 'DD/MM/YYYY @hh:mmA';
 const isEditModalActive = ref(false);
-
 let editObject = reactive<{
   firstInputValue: string;
   inactive: boolean;
@@ -261,11 +261,11 @@ let editObject = reactive<{
 }>({
   firstInputValue: '',
   inactive: false,
-  firstInputLabel: 'Source',
+  firstInputLabel: 'Status',
 });
 
 const filteredData = computed(() =>
-  source.value.filter(
+  status.value.filter(
     (item) =>
       item.name.toLowerCase().includes(nameSearchQuery.value.toLowerCase()) &&
       item.inactive === checkBox.value
@@ -274,17 +274,14 @@ const filteredData = computed(() =>
 
 const isDuplicate = computed(
   () =>
-    !!source.value.find(
-      (item) =>
-        item.name.toLocaleLowerCase() === leadName.value.toLocaleLowerCase()
-    )
+    !!status.value.find((item) => item.name.toLocaleLowerCase() === name.value)
 );
 
 const setFormData = () => {
   let temp;
   if (editingRowId.value !== null) {
-    let index = source.value.findIndex((obj) => obj.id === editingRowId.value);
-    temp = source.value[index];
+    let index = status.value.findIndex((obj) => obj.id === editingRowId.value);
+    temp = status.value[index];
   }
   editObject.firstInputValue = temp ? temp.name : '';
   editObject.inactive = temp ? temp.inactive : false;
@@ -304,7 +301,7 @@ const saveEdit = (editSaveObject: {
   const tempInactive = editObject.inactive;
 
   if (firstInputValue !== editObject.firstInputValue) {
-    const temp = source.value.filter((item) => item.id !== editingRowId.value);
+    const temp = status.value.filter((item) => item.id !== editingRowId.value);
 
     const isDuplicate = temp.find(
       (item) =>
@@ -336,7 +333,7 @@ const saveEditedConfirm = async () => {
     id: editingRowId.value,
     updatedOn: new Date(),
   };
-  const rsp = await api.put('/sourceLead/update', payLoad);
+  const rsp = await api.put('/statusLead/update', payLoad);
   if (rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
@@ -348,24 +345,24 @@ const saveEditedConfirm = async () => {
 
 const saveEntry = async () => {
   let payLoad = {
-    name: leadName.value,
+    name: name.value,
     inactive: false,
     createdOn: new Date(),
   };
-  const rsp = await api.post('/sourceLead', payLoad);
+  const rsp = await api.post('/statusLead', payLoad);
   if (rsp.data.displayMessage) {
     onSuccess({
       msg: rsp.data.displayMessage,
       icon: 'sync_alt',
     });
-    leadName.value = '';
+    name.value = '';
     loadSource();
   }
 };
 
 const changeActiveConfirm = async (id: number, state: boolean) => {
   const str = state ? 'inactive' : 'active';
-  const rsp = await api.put('/sourceLead/' + str, {
+  const rsp = await api.put('/statusLead/' + str, {
     id,
   });
   if (rsp.data && rsp.data.displayMessage) {
@@ -376,10 +373,10 @@ const changeActiveConfirm = async (id: number, state: boolean) => {
 
 const loadSource = async () => {
   fetchingData.value = true;
-  const rsp = await api.get('sourceLead');
+  const rsp = await api.get('statusLead');
 
   if (rsp.data) {
-    source.value = rsp.data;
+    status.value = rsp.data;
   }
   fetchingData.value = false;
 };
