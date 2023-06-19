@@ -91,7 +91,7 @@
                   <q-select
                     v-model="category"
                     dense
-                    :options="getMultiSelectOptions_Util(categorys)"
+                    :options="getMultiSelectOptions_Util(categories)"
                     label="Select category"
                     outlined
                     map-options
@@ -298,7 +298,7 @@
                   v-if="mode === 'new'"
                   v-model="newCodeDeposit.categoryCode"
                   dense
-                  :options="getMultiSelectOptions_Util(categorys)"
+                  :options="getMultiSelectOptions_Util(categories)"
                   label="Select category"
                   outlined
                   map-options
@@ -497,7 +497,7 @@ const products = {
   FC: 'Fully Convertible Debentures',
 };
 
-const categorys = {
+const categories = {
   S: 'Share Holders',
   D: 'Directors',
   O: 'Others',
@@ -572,7 +572,6 @@ const saveNewEntry = async () => {
 };
 
 const saveEdited = async () => {
-  console.log('hi');
   const rsp = await api.get('accountHead');
 
   let headObj = rsp.data.filter((item: { id: number }) => {
