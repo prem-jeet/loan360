@@ -69,6 +69,12 @@ const routes: RouteRecordRaw[] = [
             component: () => import('pages/settings/accounts/NatureEntry.vue'),
           },
           {
+            path: 'accountCodeDeposit',
+            name: 'accountCodeDeposit',
+            component: () =>
+              import('pages/settings/accounts//AccountCodeDeposit.vue'),
+          },
+          {
             path: 'interestDepositGenerate',
             name: 'interestDepositGenerate',
             component: () =>
