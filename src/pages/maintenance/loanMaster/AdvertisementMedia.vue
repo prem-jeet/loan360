@@ -161,19 +161,20 @@ import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, reactive } from 'vue';
 import { onSuccess, onFailure } from 'src/utils/notification';
+import { tableTypeOne } from 'src/utils/types';
 import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
 import CommonEditForMaintenancePages from 'src/components/modals/CommonEditForMaintenancePages.vue';
 
-interface AdvertisementMedia {
-  name: string;
-  id: number | null;
-  createdOn: string;
-  inactive: boolean;
-  inactiveOn: string;
-  updatedOn: string;
-}
+// interface AdvertisementMedia {
+//   name: string;
+//   id: number | null;
+//   createdOn: string;
+//   inactive: boolean;
+//   inactiveOn: string;
+//   updatedOn: string;
+// }
 
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
@@ -235,7 +236,7 @@ const $q = useQuasar();
 const fetchingData = ref(false);
 const name = ref('');
 const nameSearchQuery = ref('');
-const advertisementMedia = ref<AdvertisementMedia[]>([]);
+const advertisementMedia = ref<tableTypeOne[]>([]);
 const checkBox = ref(false);
 const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);

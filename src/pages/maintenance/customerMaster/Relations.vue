@@ -142,31 +142,13 @@
                 </q-btn>
               </q-td>
               <q-td key="forward" :props="props">
-                <q-input
-                  v-if="editingRowIndex === props.rowIndex"
-                  v-model="editForward"
-                  placeholder="forward required"
-                  dense
-                  outlined
-                  :color="editForward ? 'green' : 'red'"
-                  autofocus
-                />
-                <span v-else>
+                <span>
                   {{ firstLetterCpitalze(props.row.forward) }}
                 </span>
               </q-td>
 
               <q-td key="backward" :props="props">
-                <q-input
-                  v-if="editingRowIndex === props.rowIndex"
-                  v-model="editBackward"
-                  placeholder="backward required"
-                  dense
-                  outlined
-                  color="green"
-                  autofocus
-                />
-                <span v-else>
+                <span>
                   {{ firstLetterCpitalze(props.row.backward) }}
                 </span>
               </q-td>
@@ -189,16 +171,7 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">Forward :</div>
                     <div class="col-12">
-                      <q-input
-                        v-if="editingRowIndex === props.rowIndex"
-                        v-model="editForward"
-                        placeholder="Forward required"
-                        dense
-                        outlined
-                        :color="editForward ? 'green' : 'red'"
-                        autofocus
-                      />
-                      <span v-else>
+                      <span>
                         {{ firstLetterCpitalze(props.row.forward) }}
                       </span>
                     </div>
@@ -209,16 +182,7 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">Backward :</div>
                     <div class="col-12">
-                      <q-input
-                        v-if="editingRowIndex === props.rowIndex"
-                        v-model="editBackward"
-                        placeholder="Name required"
-                        dense
-                        outlined
-                        color="green"
-                        autofocus
-                      />
-                      <span v-else>
+                      <span>
                         {{ firstLetterCpitalze(props.row.backward) }}
                       </span>
                     </div>
@@ -259,8 +223,9 @@
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { ref, onMounted, computed, watch, reactive } from 'vue';
-import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
+import { ref, onMounted, computed, reactive } from 'vue';
+import { onSuccess, onFailure } from 'src/utils/notification';
+//import { tableTypeOne } from 'src/utils/types';
 import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
@@ -356,8 +321,6 @@ const checkBox = ref(false);
 const isEditing = ref(false);
 const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
-const editForward = ref('');
-const editBackward = ref('');
 const format = 'DD/MM/YYYY @hh:mmA';
 const isEditModalActive = ref(false);
 let editObject = reactive<EditObject>({
@@ -394,8 +357,9 @@ const setFormData = () => {
     );
     temp = relations.value[index];
   }
-  editForward.value = temp ? temp.forward : '';
-  editBackward.value = temp ? temp.backward : '';
+  editObject.firstInputValue = temp ? temp.forward : '';
+  editObject.secondInputValue = temp ? temp.backward : '';
+  editObject.inactive = temp ? temp.inactive : false;
 };
 
 const editEntry = (id: number) => {
@@ -408,7 +372,10 @@ const saveEdit = (editSaveObject: EditObject) => {
   const { firstInputValue, inactive } = editSaveObject;
   const tempInactive = editObject.inactive;
 
-  if (editSaveObject.firstInputValue !== editObject.firstInputValue) {
+  if (
+    editSaveObject.firstInputValue !== editObject.firstInputValue ||
+    editSaveObject.secondInputValue !== editObject.secondInputValue
+  ) {
     const temp = relations.value.filter(
       (item) => item.id !== editingRowId.value
     );
@@ -416,7 +383,7 @@ const saveEdit = (editSaveObject: EditObject) => {
     const isDuplicate = temp.find(
       (item) =>
         item.forward.toLowerCase() ===
-          editSaveObject.firstInputValue.toLowerCase() ||
+          editSaveObject.firstInputValue.toLowerCase() &&
         item.backward.toLowerCase() ===
           editSaveObject?.secondInputValue?.toLowerCase()
     );
@@ -441,7 +408,6 @@ const saveEdit = (editSaveObject: EditObject) => {
 
 const saveEditedConfirm = async () => {
   let payLoad = {
-    name: editObject.firstInputValue,
     forward: editObject.firstInputValue,
     backward: editObject.secondInputValue,
     id: editingRowId.value,
@@ -496,11 +462,6 @@ const loadSource = async () => {
   }
   fetchingData.value = false;
 };
-
-watch(filteredData, () => {
-  editingRowIndex.value = null;
-  isEditing.value = false;
-});
 
 onMounted(() => {
   loadSource();
