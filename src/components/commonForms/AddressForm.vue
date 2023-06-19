@@ -1,7 +1,9 @@
 <template>
   <q-card>
-    <q-card-section class="row items-center bg-indigo-10 text-white">
+    <q-card-section class="row items-center bg-blue-6 text-black">
       <div class="text-h6">Address</div>
+      <q-space />
+      <q-btn icon="restart_alt" text-color="white" round color="indigo-10" />
     </q-card-section>
     <q-card-section>
       <div
