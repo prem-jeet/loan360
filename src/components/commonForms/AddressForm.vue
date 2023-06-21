@@ -188,7 +188,7 @@
 
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
-import { onMounted, reactive, ref, watch, watchEffect } from 'vue';
+import { onMounted, reactive, ref, watch } from 'vue';
 
 interface Address {
   address1: string | null;
