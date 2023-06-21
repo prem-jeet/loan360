@@ -1130,16 +1130,22 @@ watchEffect(() => {
   ) as AccountGroup[];
 });
 
-watchEffect(async () => {
-  const { countryId } = address;
-  if (countryId !== null) {
-    localAccountHead.stateId = null;
-    const rsp = await api.get(`statesByCountry/${countryId}`);
-    if (rsp.data) {
-      statesOptions.value = [...rsp.data];
+watch(
+  () => address.countryId,
+  async (newVal, oldVal) => {
+    if (newVal) {
+      if (oldVal) {
+        localAccountHead.stateId = null;
+      }
+
+      const rsp = await api.get(`statesByCountry/${newVal}`);
+      if (rsp.data) {
+        statesOptions.value = [...rsp.data];
+      }
     }
-  }
-});
+  },
+  { immediate: true }
+);
 
 watch(
   () => localAccountHead.accountType,
