@@ -213,6 +213,7 @@ interface Address {
 
 interface Props {
   modelValue: Address;
+  addressId?: number | null;
 }
 
 const props = defineProps<Props>();
@@ -246,6 +247,17 @@ const reset = () => {
   }
 };
 
+const fetchAddress = async (addressId: number) => {
+  try {
+    const rsp = await api.get(`address/${addressId}`);
+    if (rsp.data) {
+      return rsp.data;
+    }
+  } catch (e) {
+    return {};
+  }
+};
+
 watch(address, () => {
   emits('update:modelValue', address);
 });
@@ -274,6 +286,19 @@ onMounted(async () => {
   if (rsp.data) {
     countries.value = rsp.data;
   }
+
   initialData.value = { ...props.modelValue };
+  if (props.addressId) {
+    const rsp = await fetchAddress(props.addressId);
+    if (rsp.countryId) {
+      initialData.value = { ...rsp };
+
+      let KEY: keyof Address;
+      for (KEY in initialData.value) {
+        // @ts-expect-error intentive overrite
+        address[KEY] = initialData.value[KEY];
+      }
+    }
+  }
 });
 </script>

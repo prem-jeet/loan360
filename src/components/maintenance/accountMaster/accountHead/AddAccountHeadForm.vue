@@ -678,7 +678,10 @@
                   />
                 </template>
                 <div class="q-px-lg q-py-md">
-                  <AddressForm v-model="address" />
+                  <AddressForm
+                    v-model="address"
+                    :address-id="props.accountHead?.addressId"
+                  />
                 </div>
               </q-expansion-item>
             </div>
@@ -1019,9 +1022,6 @@ const resetFormData = () => {
     if (props.accountHead.kyc) {
       setKycData();
     }
-    if (props.accountHead.addressId) {
-      setAddress(props.accountHead.addressId);
-    }
   } else {
     kycData.value = [];
     let addressKey: keyof Address;
@@ -1085,16 +1085,6 @@ const setKycData = () => {
   }
 };
 
-const setAddress = async (addressId: number) => {
-  const rsp = await api.get(`address/${addressId}`);
-  if (rsp.data) {
-    let key: keyof Address;
-    for (key in address) {
-      address[key] = rsp.data[key];
-    }
-  }
-};
-
 onMounted(async () => {
   if (props.accountHead) {
     setBooleanVariables();
@@ -1103,7 +1093,6 @@ onMounted(async () => {
     }
     if (props.accountHead.addressId !== null) {
       addressRequired.value = true;
-      setAddress(props.accountHead.addressId);
     }
   }
   const accountGroupsRsp = await api.get('accountGroup');
