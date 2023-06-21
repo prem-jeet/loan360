@@ -725,7 +725,7 @@ interface AccountHead {
   accountGroupCode: string | null;
   accountNo: string | null;
   accountType: string | null;
-  addressId: string | null;
+  addressId: number | null;
   alias: string | null;
   attachments: string | null;
   automatic: boolean;
@@ -1020,7 +1020,7 @@ const resetFormData = () => {
       setKycData();
     }
     if (props.accountHead.addressId) {
-      setAddress();
+      setAddress(props.accountHead.addressId);
     }
   } else {
     kycData.value = [];
@@ -1084,8 +1084,9 @@ const setKycData = () => {
     kycData.value = [...JSON.parse(kyc)];
   }
 };
-const setAddress = async () => {
-  const rsp = await api.get(`address/${props.accountHead?.addressId}`);
+
+const setAddress = async (addressId: number) => {
+  const rsp = await api.get(`address/${addressId}`);
   if (rsp.data) {
     let key: keyof Address;
     for (key in address) {
@@ -1102,7 +1103,7 @@ onMounted(async () => {
     }
     if (props.accountHead.addressId !== null) {
       addressRequired.value = true;
-      setAddress();
+      setAddress(props.accountHead.addressId);
     }
   }
   const accountGroupsRsp = await api.get('accountGroup');
@@ -1139,6 +1140,7 @@ watchEffect(() => {
     accountGroups.value.filter((group) => accountType === group.groupType)
   ) as AccountGroup[];
 });
+
 watchEffect(async () => {
   const { countryId } = address;
   if (countryId !== null) {
@@ -1149,6 +1151,7 @@ watchEffect(async () => {
     }
   }
 });
+
 watch(
   () => localAccountHead.accountType,
   (newVal, oldVal) => {
