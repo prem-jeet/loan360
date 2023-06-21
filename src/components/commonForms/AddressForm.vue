@@ -188,7 +188,7 @@
 
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
-import { onMounted, reactive, ref, watch } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 
 interface Address {
   address1: string | null;
@@ -214,17 +214,18 @@ interface Address {
 interface Props {
   modelValue: Address;
   addressId?: number | null;
+  resetForm?: boolean;
 }
 
 const props = defineProps<Props>();
-const emits = defineEmits(['update:modelValue']);
+const emits = defineEmits(['update:modelValue', 'onReset']);
 
 const isRessseting = ref(false);
 const initialData = ref<Address>({ ...props.modelValue });
 const address = reactive<Address>(props.modelValue);
 const countries = ref<{ id: number; name: string }[]>([]);
 const states = ref<{ id: number; name: string }[]>([]);
-
+const shouldReset = computed(() => props.resetForm);
 const testStdCode = (value: string) => {
   const regex = /^[-+\d]*$/;
   if (![null, ''].includes(value)) {
@@ -257,6 +258,13 @@ const fetchAddress = async (addressId: number) => {
     return {};
   }
 };
+
+watch(shouldReset, () => {
+  if (shouldReset.value) {
+    reset();
+    emits('onReset');
+  }
+});
 
 watch(address, () => {
   emits('update:modelValue', address);

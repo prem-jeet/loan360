@@ -681,6 +681,8 @@
                   <AddressForm
                     v-model="address"
                     :address-id="props.accountHead?.addressId"
+                    :reset-form="resetAddressForm"
+                    @on-reset="resetAddressForm = false"
                   />
                 </div>
               </q-expansion-item>
@@ -941,6 +943,7 @@ const tdsClassOptions = ref<{ id: number; name: string; inactive: boolean }[]>(
 );
 const statesOptions = ref<{ id: number; name: string }[]>([]);
 
+const resetAddressForm = ref(false);
 const isActive = ref(true);
 const addressRequired = ref(false);
 const kycRequired = ref(false);
@@ -1024,14 +1027,8 @@ const resetFormData = () => {
     }
   } else {
     kycData.value = [];
-    let addressKey: keyof Address;
-    for (addressKey in address) {
-      if (!['countryId', 'stateId'].includes(addressKey)) {
-        address[addressKey] = null;
-      }
-    }
-    address.countryId = initailAddress.countryId;
   }
+  resetAddressForm.value = true;
 };
 
 const setBooleanVariables = () => {
@@ -1124,7 +1121,6 @@ onMounted(async () => {
 
 watchEffect(() => {
   const { accountType } = localAccountHead;
-
   accountGroupsOptions.value = inactiveFilter(
     accountGroups.value.filter((group) => accountType === group.groupType)
   ) as AccountGroup[];
