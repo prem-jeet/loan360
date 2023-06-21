@@ -3,7 +3,13 @@
     <q-card-section class="row items-center bg-blue-6 text-black">
       <div class="text-h6">Address</div>
       <q-space />
-      <q-btn icon="restart_alt" text-color="white" round color="indigo-10" />
+      <q-btn
+        icon="restart_alt"
+        text-color="white"
+        round
+        color="indigo-10"
+        @click="reset"
+      />
     </q-card-section>
     <q-card-section>
       <div
@@ -212,6 +218,8 @@ interface Props {
 const props = defineProps<Props>();
 const emits = defineEmits(['update:modelValue']);
 
+const isRessseting = ref(false);
+const initialData = ref<Address>({ ...props.modelValue });
 const address = reactive<Address>(props.modelValue);
 const countries = ref<{ id: number; name: string }[]>([]);
 const states = ref<{ id: number; name: string }[]>([]);
@@ -229,27 +237,43 @@ const testStdCode = (value: string) => {
   }
   return true;
 };
+const reset = () => {
+  isRessseting.value = address.countryId !== initialData.value.countryId;
+  let key: keyof Address;
+  for (key in initialData.value) {
+    // @ts-expect-error intended iteration
+    address[key] = initialData.value[key];
+  }
+};
 
 watch(address, () => {
   emits('update:modelValue', address);
 });
 
-watchEffect(async () => {
-  const { countryId } = address;
+watch(
+  () => address.countryId,
+  async () => {
+    const { countryId } = address;
 
-  if (countryId !== null) {
-    address.stateId = null;
-    const rsp = await api.get(`statesByCountry/${countryId}`);
-    if (rsp.data) {
-      states.value = [...rsp.data];
+    if (countryId !== null) {
+      if (!isRessseting.value) {
+        address.stateId = null;
+      }
+      const rsp = await api.get(`statesByCountry/${countryId}`);
+      if (rsp.data) {
+        states.value = [...rsp.data];
+      }
+      isRessseting.value = false;
     }
-  }
-});
+  },
+  { immediate: true }
+);
 
 onMounted(async () => {
   const rsp = await api.get('country');
   if (rsp.data) {
     countries.value = rsp.data;
   }
+  initialData.value = { ...props.modelValue };
 });
 </script>
