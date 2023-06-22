@@ -972,7 +972,12 @@ const computedKycIdList = computed(() => {
 
   return list;
 });
-
+const shouldSetKyc = computed(() => {
+  if (!(props.accountHead && props.accountHead.kyc)) {
+    return false;
+  }
+  return !!JSON.parse(props.accountHead.kyc).length;
+});
 const saveAccountHead = () => {
   if (!isAddressFormValid.value) {
     alertDialog('Please fill the address form');
@@ -1020,15 +1025,9 @@ const clerBankData = () => {
 };
 
 const resetFormData = () => {
-  const isEditing = !!props.accountHead;
-  if (isEditing) {
-    if (props.accountHead.kyc) {
-      setKycData();
-    }
-  } else {
-    kycData.value = [];
-  }
   resetAddressForm.value = true;
+  kycRequired.value = shouldSetKyc.value;
+  setKycData(shouldSetKyc.value ? JSON.parse(props.accountHead!.kyc!) : []);
 };
 
 const setBooleanVariables = () => {
@@ -1074,24 +1073,22 @@ const updateKycIds = () => {
   }
 };
 
-const setKycData = () => {
-  const kyc = props.accountHead!.kyc as string;
-  if (JSON.parse(kyc).length) {
-    kycRequired.value = true;
-    kycData.value = [...JSON.parse(kyc)];
-  }
+const setKycData = (kycDataArray: KycDataItem[]) => {
+  kycData.value = [...kycDataArray];
 };
 
 onMounted(async () => {
   if (props.accountHead) {
     setBooleanVariables();
-    if (props.accountHead && props.accountHead.kyc) {
-      setKycData();
+    if (shouldSetKyc.value) {
+      kycRequired.value = true;
+      setKycData(JSON.parse(props.accountHead.kyc!));
     }
     if (props.accountHead.addressId !== null) {
       addressRequired.value = true;
     }
   }
+
   const accountGroupsRsp = await api.get('accountGroup');
 
   if (accountGroupsRsp.data) {
