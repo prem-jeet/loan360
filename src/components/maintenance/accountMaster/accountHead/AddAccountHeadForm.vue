@@ -1030,7 +1030,7 @@ const resetFormData = () => {
   setKycData(shouldSetKyc.value ? JSON.parse(props.accountHead!.kyc!) : []);
 };
 
-const setBooleanVariables = () => {
+const fixNullBooleanValues = () => {
   const booleanKeys = [
     'automatic',
     'costCenter',
@@ -1041,10 +1041,7 @@ const setBooleanVariables = () => {
     'tax',
   ];
   booleanKeys.forEach((key) => {
-    if (
-      props.accountHead &&
-      props.accountHead[key as keyof AccountHead] === null
-    ) {
+    if (props.accountHead![key as keyof AccountHead] === null) {
       // @ts-expect-error not assigning to id
       localAccountHead[key as keyof AccountHead] = false;
     }
@@ -1079,7 +1076,7 @@ const setKycData = (kycDataArray: KycDataItem[]) => {
 
 onMounted(async () => {
   if (props.accountHead) {
-    setBooleanVariables();
+    fixNullBooleanValues();
     if (shouldSetKyc.value) {
       kycRequired.value = true;
       setKycData(JSON.parse(props.accountHead.kyc!));
