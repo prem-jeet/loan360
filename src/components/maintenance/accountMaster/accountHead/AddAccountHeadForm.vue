@@ -1028,6 +1028,17 @@ const resetFormData = () => {
   resetAddressForm.value = true;
   kycRequired.value = shouldSetKyc.value;
   setKycData(shouldSetKyc.value ? JSON.parse(props.accountHead!.kyc!) : []);
+
+  let key: keyof AccountHead;
+  for (key in initialAccountHead) {
+    // @ts-expect-error intended overrite
+    localAccountHead[key] = props.accountHead
+      ? props.accountHead[key]
+      : initialAccountHead[key];
+  }
+  if (props.accountHead) {
+    fixNullBooleanValues();
+  }
 };
 
 const fixNullBooleanValues = () => {
