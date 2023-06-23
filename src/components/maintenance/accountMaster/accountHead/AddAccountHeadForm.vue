@@ -1086,6 +1086,40 @@ const setKycData = (kycDataArray: KycDataItem[]) => {
 };
 
 onMounted(async () => {
+  const [
+    accountGroupsRsp,
+    subLedgerRsp,
+    taxClassRsp,
+    tdsClassRsp,
+    bankFormatRsp,
+  ] = await Promise.all([
+    api.get('accountGroup'),
+    api.get('subLedger'),
+    api.get('taxClass'),
+    api.get('tdsClass'),
+    api.get('bankFormat'),
+  ]);
+
+  if (accountGroupsRsp.data) {
+    accountGroups.value = [...accountGroupsRsp.data];
+  }
+
+  if (subLedgerRsp.data) {
+    subLedgerOptions.value = [...subLedgerRsp.data];
+  }
+
+  if (taxClassRsp.data) {
+    taxClassOptions.value = taxClassRsp.data;
+  }
+
+  if (tdsClassRsp.data) {
+    tdsClassOptions.value = tdsClassRsp.data;
+  }
+
+  if (bankFormatRsp.data) {
+    bankFormatOptions.value = bankFormatRsp.data;
+  }
+
   if (props.accountHead) {
     fixNullBooleanValues();
     if (shouldSetKyc.value) {
@@ -1095,32 +1129,6 @@ onMounted(async () => {
     if (props.accountHead.addressId !== null) {
       addressRequired.value = true;
     }
-  }
-
-  const accountGroupsRsp = await api.get('accountGroup');
-
-  if (accountGroupsRsp.data) {
-    accountGroups.value = [...accountGroupsRsp.data];
-  }
-
-  const subLedgerRsp = await api.get('subLedger');
-  if (subLedgerRsp.data) {
-    subLedgerOptions.value = [...subLedgerRsp.data];
-  }
-
-  const taxClassRsp = await api.get('taxClass');
-  if (taxClassRsp.data) {
-    taxClassOptions.value = taxClassRsp.data;
-  }
-
-  const tdsClassRsp = await api.get('tdsClass');
-  if (tdsClassRsp.data) {
-    tdsClassOptions.value = tdsClassRsp.data;
-  }
-
-  const bankFormatRsp = await api.get('bankFormat');
-  if (bankFormatRsp.data) {
-    bankFormatOptions.value = bankFormatRsp.data;
   }
 });
 
