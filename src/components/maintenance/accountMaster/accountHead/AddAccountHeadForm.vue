@@ -1032,12 +1032,7 @@ const resetFormData = () => {
   let key: keyof AccountHead;
   for (key in initialAccountHead) {
     // @ts-expect-error intended overrite
-    localAccountHead[key] = props.accountHead
-      ? props.accountHead[key]
-      : initialAccountHead[key];
-  }
-  if (props.accountHead) {
-    fixNullBooleanValues();
+    localAccountHead[key] = initialAccountHead[key];
   }
 };
 
@@ -1051,10 +1046,11 @@ const fixNullBooleanValues = () => {
     'tdsEditable',
     'tax',
   ];
+
   booleanKeys.forEach((key) => {
-    if (props.accountHead![key as keyof AccountHead] === null) {
+    if (initialAccountHead[key as keyof AccountHead] === null) {
       // @ts-expect-error not assigning to id
-      localAccountHead[key as keyof AccountHead] = false;
+      initialAccountHead[key as keyof AccountHead] = false;
     }
   });
 };
@@ -1128,6 +1124,17 @@ onMounted(async () => {
     }
     if (props.accountHead.addressId !== null) {
       addressRequired.value = true;
+    }
+
+    let key: keyof AccountHead;
+    for (key in props.accountHead) {
+      // @ts-expect-error intended overrite
+      initialAccountHead[key] = props.accountHead[key];
+    }
+    fixNullBooleanValues();
+    for (key in initialAccountHead) {
+      // @ts-expect-error intended overrite
+      localAccountHead[key] = initialAccountHead[key];
     }
   }
 });
