@@ -1026,6 +1026,9 @@ const clerBankData = () => {
 
 const resetFormData = () => {
   resetAddressForm.value = true;
+  if (initialAccountHead.addressId) {
+    addressRequired.value = true;
+  }
   kycRequired.value = shouldSetKyc.value;
   setKycData(shouldSetKyc.value ? JSON.parse(props.accountHead!.kyc!) : []);
 
