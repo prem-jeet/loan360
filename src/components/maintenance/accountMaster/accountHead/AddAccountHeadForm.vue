@@ -947,7 +947,7 @@ const resetAddressForm = ref(false);
 const isActive = ref(true);
 const addressRequired = ref(false);
 const kycRequired = ref(false);
-
+const isResettingAccountHeadForm = ref(false);
 const address = reactive<Address>({ ...initailAddress });
 const kycData = ref<KycDataItem[]>([]);
 
@@ -978,6 +978,7 @@ const shouldSetKyc = computed(() => {
   }
   return !!JSON.parse(props.accountHead.kyc).length;
 });
+
 const saveAccountHead = () => {
   if (!isAddressFormValid.value) {
     alertDialog('Please fill the address form');
@@ -1025,6 +1026,7 @@ const clerBankData = () => {
 };
 
 const resetFormData = () => {
+  isResettingAccountHeadForm.value = true;
   resetAddressForm.value = true;
   if (initialAccountHead.addressId) {
     addressRequired.value = true;
@@ -1037,6 +1039,7 @@ const resetFormData = () => {
     // @ts-expect-error intended overrite
     localAccountHead[key] = initialAccountHead[key];
   }
+  setTimeout(() => (isResettingAccountHeadForm.value = false), 0);
 };
 
 const fixNullBooleanValues = () => {
@@ -1169,7 +1172,7 @@ watch(
 watch(
   () => localAccountHead.accountType,
   (newVal, oldVal) => {
-    if (newVal !== oldVal) {
+    if (newVal !== oldVal && !isResettingAccountHeadForm.value) {
       localAccountHead.reverseAccountGroupCode = null;
       localAccountHead.accountGroupCode = null;
     }
