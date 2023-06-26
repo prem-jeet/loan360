@@ -891,6 +891,7 @@ const initailAddress: Address = {
   cityId: null,
   geoLocation: null,
 };
+
 const accountTypes = {
   A: 'Assets',
   L: 'Liabilities',
@@ -979,7 +980,7 @@ const shouldSetKyc = computed(() => {
   return !!JSON.parse(props.accountHead.kyc).length;
 });
 
-const saveAccountHead = () => {
+const saveAccountHead = async () => {
   if (!isAddressFormValid.value) {
     alertDialog('Please fill the address form');
     return;
@@ -998,13 +999,20 @@ const saveAccountHead = () => {
     updateKycIds();
     localAccountHead.kyc = JSON.stringify(kycData.value);
   }
+  console.log({
+    accountHead: { ...localAccountHead },
+    address: { ...address },
+  });
 
-  if (isEditing) {
-    // call editing api
-  } else {
-    // call create new api
+  try {
+    const rsp = await api.post('accountHead', {
+      accountHead: { ...localAccountHead },
+      address: { ...address },
+    });
+  } catch (e) {
+    // @ts-expect-error intended
+    alertDialog(e.response.data.displayMessage);
   }
-  console.log({ ...localAccountHead });
 };
 
 const close = () => emits('close');
