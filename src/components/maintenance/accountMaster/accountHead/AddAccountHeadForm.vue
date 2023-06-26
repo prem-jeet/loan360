@@ -1123,7 +1123,6 @@ onMounted(async () => {
   }
 
   if (props.accountHead) {
-    fixNullBooleanValues();
     if (shouldSetKyc.value) {
       kycRequired.value = true;
       setKycData(JSON.parse(props.accountHead.kyc!));
