@@ -723,7 +723,7 @@ import { watch, computed, onMounted, reactive, ref, watchEffect } from 'vue';
 import AddressForm from 'components/commonForms/AddressForm.vue';
 import KycDataList from './KycDataList.vue';
 import { inactiveFilter } from 'src/utils/filters';
-import { alertDialog } from 'src/utils/notification';
+import { alertDialog, onSuccess } from 'src/utils/notification';
 
 interface AccountHead {
   id?: number;
@@ -1009,6 +1009,10 @@ const saveAccountHead = async () => {
       accountHead: { ...localAccountHead },
       address: { ...address },
     });
+
+    if (rsp.data) {
+      onSuccess({ msg: rsp.data.displayMessage });
+    }
   } catch (e) {
     // @ts-expect-error intended
     alertDialog(e.response.data.displayMessage);
