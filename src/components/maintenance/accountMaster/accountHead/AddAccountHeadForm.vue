@@ -1009,25 +1009,36 @@ const saveAccountHead = async () => {
   });
 
   if (localAccountHead.addressId && !addressRequired.value) {
-    if (await asyncConfirmDialog()) {
+    if (address.stateId && (await asyncConfirmDialog())) {
       await deleteAddress(localAccountHead.addressId);
     }
+    localAccountHead.addressId = null;
   }
 
-  /*  try {
-    const rsp = await api.post('accountHead', {
-      accountHead: { ...localAccountHead },
-      address: { ...address },
-    });
+  const payload = {
+    accountHead: { ...localAccountHead },
+    address: addressRequired.value ? { ...address } : {},
+  };
+
+  try {
+    const rsp = await api.post('accountHead', payload);
 
     if (rsp.data) {
-      emits('close');
       onSuccess({ msg: rsp.data.displayMessage });
+
+      localAccountHead[isEditing ? 'updatedOnBy' : 'createdOnBy'] =
+        rsp.data[isEditing ? 'updatedOnBy' : 'createdOnBy'];
+
+      emits('close');
+      // also emit the new data
     }
   } catch (e) {
-    // @ts-expect-error intended
-    alertDialog(e.response.data.displayMessage);
-  } */
+    // @ts-expect-error response data contains message if error occurs
+    const msg = e.response.data.displayMessage;
+    if (msg) {
+      alertDialog(msg);
+    }
+  }
 };
 
 const deleteAddress = async (id: number) => {
@@ -1035,14 +1046,11 @@ const deleteAddress = async (id: number) => {
     const rsp = await api.delete('address' + '/' + id);
     if (rsp.data) {
       onSuccess({ msg: 'Address ' + rsp.data.displayMessage });
-      localAccountHead.addressId = null;
     }
   } catch (e) {
     // @ts-expect-error response data contains message if error occurs
     const msg = e.response.data.displayMessage;
     if (msg) {
-      console.log(msg);
-
       alertDialog(msg);
     }
   }
