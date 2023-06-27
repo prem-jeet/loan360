@@ -723,7 +723,11 @@ import { watch, computed, onMounted, reactive, ref, watchEffect } from 'vue';
 import AddressForm from 'components/commonForms/AddressForm.vue';
 import KycDataList from './KycDataList.vue';
 import { inactiveFilter } from 'src/utils/filters';
-import { alertDialog, asyncConfirmDialog } from 'src/utils/notification';
+import {
+  alertDialog,
+  asyncConfirmDialog,
+  onSuccess,
+} from 'src/utils/notification';
 
 interface AccountHead {
   id?: number;
@@ -1004,13 +1008,11 @@ const saveAccountHead = async () => {
     address: { ...address },
   });
 
-  if (initialAccountHead.addressId && !addressRequired.value) {
+  if (localAccountHead.addressId && !addressRequired.value) {
     if (await asyncConfirmDialog()) {
-      // call the delete address function
-      // remove address id from accoun account head
+      await deleteAddress(localAccountHead.addressId);
     }
   }
-  console.log('now Save');
 
   /*  try {
     const rsp = await api.post('accountHead', {
@@ -1027,13 +1029,23 @@ const saveAccountHead = async () => {
     alertDialog(e.response.data.displayMessage);
   } */
 };
-const test = () => new Promise((resolve) => setTimeout(() => resolve(2), 2000));
-const deleteAddress = async () => {
-  const rsp = await test();
-  console.log(
-    '🚀 ~ file: AddAccountHeadForm.vue:1029 ~ deleteAddress ~ rsp:',
-    rsp
-  );
+
+const deleteAddress = async (id: number) => {
+  try {
+    const rsp = await api.delete('address' + '/' + id);
+    if (rsp.data) {
+      onSuccess({ msg: 'Address ' + rsp.data.displayMessage });
+      localAccountHead.addressId = null;
+    }
+  } catch (e) {
+    // @ts-expect-error response data contains message if error occurs
+    const msg = e.response.data.displayMessage;
+    if (msg) {
+      console.log(msg);
+
+      alertDialog(msg);
+    }
+  }
 };
 const close = () => emits('close');
 
