@@ -723,7 +723,7 @@ import { watch, computed, onMounted, reactive, ref, watchEffect } from 'vue';
 import AddressForm from 'components/commonForms/AddressForm.vue';
 import KycDataList from './KycDataList.vue';
 import { inactiveFilter } from 'src/utils/filters';
-import { alertDialog, onSuccess } from 'src/utils/notification';
+import { alertDialog, asyncConfirmDialog } from 'src/utils/notification';
 
 interface AccountHead {
   id?: number;
@@ -1004,7 +1004,15 @@ const saveAccountHead = async () => {
     address: { ...address },
   });
 
-  try {
+  if (initialAccountHead.addressId && !addressRequired.value) {
+    if (await asyncConfirmDialog()) {
+      // call the delete address function
+      // remove address id from accoun account head
+    }
+  }
+  console.log('now Save');
+
+  /*  try {
     const rsp = await api.post('accountHead', {
       accountHead: { ...localAccountHead },
       address: { ...address },
@@ -1017,9 +1025,16 @@ const saveAccountHead = async () => {
   } catch (e) {
     // @ts-expect-error intended
     alertDialog(e.response.data.displayMessage);
-  }
+  } */
 };
-
+const test = () => new Promise((resolve) => setTimeout(() => resolve(2), 2000));
+const deleteAddress = async () => {
+  const rsp = await test();
+  console.log(
+    '🚀 ~ file: AddAccountHeadForm.vue:1029 ~ deleteAddress ~ rsp:',
+    rsp
+  );
+};
 const close = () => emits('close');
 
 const getOptionsFromObject = (obj: { [key: string]: string }) => {

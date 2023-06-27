@@ -86,6 +86,38 @@ export const confirmDialog = (
     .onCancel(cancelHandler)
     .onDismiss(dismissHandler);
 };
+
+export const asyncConfirmDialog = (options?: {
+  title?: string;
+  msg?: string;
+  position?: DialogPositions;
+  cardClasses?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  okButton?: boolean | string | { [key: string]: any };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  cancelButton?: boolean | string | { [key: string]: any };
+}): Promise<boolean> =>
+  new Promise((resolve) => {
+    Dialog.create({
+      title: options?.title || 'Confirm',
+      message: options?.msg || 'Are you sure?',
+      position: options?.position || 'top',
+      class: options?.cardClasses || '',
+      focus: 'none',
+      ok:
+        options !== undefined && options.okButton !== undefined
+          ? options.okButton
+          : true,
+      cancel:
+        options !== undefined && options.cancelButton !== undefined
+          ? options.cancelButton
+          : true,
+    })
+      .onOk(() => resolve(true))
+      .onCancel(() => resolve(false))
+      .onDismiss(() => resolve(false));
+  });
+
 export const alertDialog = (
   msg: string,
   title = 'Alert',
