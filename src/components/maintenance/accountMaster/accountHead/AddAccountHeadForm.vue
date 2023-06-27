@@ -1011,6 +1011,7 @@ const saveAccountHead = async () => {
     });
 
     if (rsp.data) {
+      emits('close');
       onSuccess({ msg: rsp.data.displayMessage });
     }
   } catch (e) {
