@@ -1037,6 +1037,9 @@ const saveAccountHead = async () => {
     localAccountHead.addressId = null;
   }
 
+  if (roleCodes.value.length) {
+    localAccountHead.roleCode = roleCodes.value.join(',');
+  }
   const payload = {
     accountHead: { ...localAccountHead },
     address: addressRequired.value ? { ...address } : {},
@@ -1211,7 +1214,9 @@ onMounted(async () => {
     if (props.accountHead.addressId !== null) {
       addressRequired.value = true;
     }
-
+    if (props.accountHead.roleCode) {
+      roleCodes.value = props.accountHead.roleCode.split(',');
+    }
     let key: keyof AccountHead;
     for (key in props.accountHead) {
       // @ts-expect-error intended overrite
