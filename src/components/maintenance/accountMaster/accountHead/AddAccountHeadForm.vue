@@ -1107,6 +1107,9 @@ const resetFormData = () => {
   kycRequired.value = shouldSetKyc.value;
   setKycData(shouldSetKyc.value ? JSON.parse(props.accountHead!.kyc!) : []);
 
+  if (initialAccountHead.roleCode) {
+    roleCodes.value = initialAccountHead.roleCode.split(',');
+  }
   let key: keyof AccountHead;
   for (key in initialAccountHead) {
     // @ts-expect-error intended overrite
