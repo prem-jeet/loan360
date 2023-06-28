@@ -8,13 +8,11 @@
         <q-space />
         <q-btn icon="close" flat round dense v-close-popup @click="close" />
       </q-card-section>
-      <q-form
-        @submit="saveAccountHead"
-        @reset="resetFormData"
-        :style="{ maxHeight: 'calc(100vh - 65.5863px)' }"
-        class="scroll overflow-auto"
-      >
-        <q-card-section class="q-col-gutter-y-sm">
+      <q-form @submit="saveAccountHead" @reset="resetFormData">
+        <q-card-section
+          class="q-col-gutter-y-sm scroll overflow-auto"
+          :style="{ height: 'calc(100vh - 128px)' }"
+        >
           <div class="row q-gutter-md">
             <div class="col-auto">
               <q-input
