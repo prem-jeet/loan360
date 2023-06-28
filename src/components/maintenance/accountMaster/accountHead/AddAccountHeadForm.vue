@@ -468,6 +468,9 @@
                     if (val === '') {
                       localAccountHead.taxNo = null;
                     }
+                    if (typeof val === 'string' && val.length > 0) {
+                      addressRequired = true;
+                    }
                   }
                 "
                 mask="##AAAAA####AXAX"
@@ -977,6 +980,7 @@ const computedKycIdList = computed(() => {
 
   return list;
 });
+
 const shouldSetKyc = computed(() => {
   if (!(props.accountHead && props.accountHead.kyc)) {
     return false;
@@ -985,8 +989,14 @@ const shouldSetKyc = computed(() => {
 });
 
 const saveAccountHead = async () => {
-  if (!isAddressFormValid.value) {
+  if (
+    (localAccountHead.taxNo && !addressRequired.value) ||
+    !isAddressFormValid.value
+  ) {
     alertDialog('Please fill the address form');
+    if (!addressRequired.value) {
+      addressRequired.value = true;
+    }
     return;
   }
   if (!isKycFormValid.value) {
@@ -1003,10 +1013,6 @@ const saveAccountHead = async () => {
     updateKycIds();
     localAccountHead.kyc = JSON.stringify(kycData.value);
   }
-  console.log({
-    accountHead: { ...localAccountHead },
-    address: { ...address },
-  });
 
   if (localAccountHead.addressId && !addressRequired.value) {
     if (address.stateId && (await asyncConfirmDialog())) {
