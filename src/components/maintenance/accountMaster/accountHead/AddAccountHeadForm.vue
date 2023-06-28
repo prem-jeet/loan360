@@ -604,6 +604,17 @@
           </div>
           <div class="row q-gutter-md">
             <div class="col-4">
+              <SearchableMultiselect
+                label="Role Code"
+                v-model="roleCodes"
+                :options="roleCodeOptions"
+                :max-chips="2"
+                chip-key="value"
+              />
+            </div>
+          </div>
+          <div class="row q-gutter-md">
+            <div class="col-4">
               <q-input
                 v-model.number="localAccountHead.drFromAmount"
                 :mask="'#'.repeat(15)"
@@ -724,6 +735,7 @@ import { api } from 'src/boot/axios';
 import { useUserStore } from 'src/stores/user/userStore';
 import { watch, computed, onMounted, reactive, ref, watchEffect } from 'vue';
 import AddressForm from 'components/commonForms/AddressForm.vue';
+import SearchableMultiselect from 'components/SearchableMultiselect.vue';
 import KycDataList from './KycDataList.vue';
 import { inactiveFilter } from 'src/utils/filters';
 import {
@@ -958,6 +970,9 @@ const kycRequired = ref(false);
 const isResettingAccountHeadForm = ref(false);
 const address = reactive<Address>({ ...initailAddress });
 const kycData = ref<KycDataItem[]>([]);
+
+const roleCodeOptions = ref<{ label: string; value: string }[]>([]);
+const roleCodes = ref<string[]>([]);
 
 const isAddressFormValid = computed(
   () =>

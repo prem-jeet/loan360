@@ -103,7 +103,7 @@ import { ref, watch, computed } from 'vue';
 type Option = { label: string; value: string };
 interface Props {
   options: Option[];
-  modelValue: Option[];
+  modelValue: string[] | Option[];
   label: string;
   maxChips: number;
   chipKey: string;
