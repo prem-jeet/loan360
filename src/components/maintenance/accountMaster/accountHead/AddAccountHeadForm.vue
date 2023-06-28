@@ -608,8 +608,9 @@
                 label="Role Code"
                 v-model="roleCodes"
                 :options="roleCodeOptions"
-                :max-chips="2"
+                :max-chips="4"
                 chip-key="value"
+                :return-value="true"
               />
             </div>
           </div>
@@ -1163,12 +1164,14 @@ onMounted(async () => {
     taxClassRsp,
     tdsClassRsp,
     bankFormatRsp,
+    appRoles,
   ] = await Promise.all([
     api.get('accountGroup'),
     api.get('subLedger'),
     api.get('taxClass'),
     api.get('tdsClass'),
     api.get('bankFormat'),
+    api.get('appRole'),
   ]);
 
   if (accountGroupsRsp.data) {
@@ -1189,6 +1192,15 @@ onMounted(async () => {
 
   if (bankFormatRsp.data) {
     bankFormatOptions.value = bankFormatRsp.data;
+  }
+
+  if (appRoles.data) {
+    roleCodeOptions.value = appRoles.data.map(
+      (val: { code: string; name: string }) => ({
+        label: val.name,
+        value: val.code,
+      })
+    );
   }
 
   if (props.accountHead) {
