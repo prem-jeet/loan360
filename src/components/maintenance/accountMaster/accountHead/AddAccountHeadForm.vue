@@ -1223,7 +1223,8 @@ onMounted(async () => {
     let key: keyof AccountHead;
     for (key in props.accountHead) {
       // @ts-expect-error intended overrite
-      initialAccountHead[key] = props.accountHead[key];
+      initialAccountHead[key] =
+        props.accountHead[key] === '' ? null : props.accountHead[key];
     }
     fixNullBooleanValues();
     for (key in initialAccountHead) {
