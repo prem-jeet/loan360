@@ -8,13 +8,18 @@
         <q-space />
         <q-btn icon="close" flat round dense v-close-popup @click="close" />
       </q-card-section>
-      <q-form @submit="saveAccountHead" @reset="resetFormData">
+      <q-form
+        @submit="saveAccountHead"
+        @reset="resetFormData"
+        class="scroll overflow-auto"
+        :style="{ height: 'calc(100vh - 66px)' }"
+      >
         <q-card-section
-          class="q-col-gutter-y-sm scroll overflow-auto"
-          :style="{ height: 'calc(100vh - 128px)' }"
+          class="q-pt-lg scroll overflow-auto"
+          :style="{ height: 'calc(100% - 70px)' }"
         >
-          <div class="row q-gutter-md">
-            <div class="col-auto">
+          <div class="row justify-center">
+            <div class="col-5 col-sm-3">
               <q-input
                 label="Code"
                 v-model="localAccountHead.code"
@@ -36,7 +41,7 @@
                 "
               />
             </div>
-            <div class="col-auto">
+            <div class="col-5 col-sm-3">
               <q-input
                 label="Account Name"
                 v-model="localAccountHead.name"
@@ -47,7 +52,7 @@
                 no-error-icon
               />
             </div>
-            <div class="col-auto">
+            <div class="col-5 col-sm-3">
               <q-input
                 label="Alias"
                 v-model="localAccountHead.alias"
@@ -63,8 +68,8 @@
               />
             </div>
           </div>
-          <div class="row q-gutter-md">
-            <div class="col-2">
+          <div class="row justify-center">
+            <div class="col-10 col-sm-4 col-md-2">
               <q-select
                 label="A/c Type"
                 v-model="localAccountHead.accountType"
@@ -77,9 +82,14 @@
                 dense
                 :options="getOptionsFromObject(accountTypes)"
                 behavior="menu"
+                hide-bottom-space
+                dropdown-icon="expand_more"
               />
             </div>
-            <div class="col-4" v-if="localAccountHead.accountType">
+            <div
+              class="col-10 col-sm-7 col-md-5"
+              v-if="localAccountHead.accountType"
+            >
               <q-select
                 label="A/c Group"
                 v-model="localAccountHead.accountGroupCode"
@@ -94,9 +104,11 @@
                 option-value="code"
                 behavior="menu"
                 :options="accountGroupsOptions"
+                hide-bottom-space
+                dropdown-icon="expand_more"
               />
             </div>
-            <div class="col-3">
+            <div class="col-10 col-sm-6 col-md-3">
               <q-select
                 label="Sub Ledger"
                 v-model="localAccountHead.subLedgerCode"
@@ -111,12 +123,13 @@
                 clear-icon="backspace"
                 clearable
                 dropdown-icon="expand_more"
+                hide-bottom-space
               />
             </div>
           </div>
           <template v-if="localAccountHead.accountType === 'B'">
-            <div class="row q-gutter-md">
-              <div class="col-2">
+            <div class="row justify-center">
+              <div class="col-5 col-sm-4 col-md-3">
                 <q-input
                   :mask="'X'.repeat(20)"
                   v-model="localAccountHead.accountNo"
@@ -131,9 +144,10 @@
                       }
                     }
                   "
+                  hide-bottom-space
                 />
               </div>
-              <div class="col-3">
+              <div class="col-6 col-sm-4 col-md-2">
                 <q-select
                   v-model="localAccountHead.bankFormatCode"
                   :options="bankFormatOptions"
@@ -149,11 +163,12 @@
                   clearable
                   clear-icon="backspace"
                   dropdown-icon="expand_more"
+                  hide-bottom-space
                 />
               </div>
             </div>
-            <div class="row q-gutter-md">
-              <div class="col-3">
+            <div class="row justify-center">
+              <div class="col-5 col-md-3">
                 <q-input
                   label="NACH Unique Id"
                   v-model="localAccountHead.nachUniqueId"
@@ -167,9 +182,10 @@
                       }
                     }
                   "
+                  hide-bottom-space
                 />
               </div>
-              <div class="col-3">
+              <div class="col-5 col-md-3">
                 <q-input
                   label="NACH Bank Code"
                   v-model="localAccountHead.nachBankCode"
@@ -183,11 +199,12 @@
                       }
                     }
                   "
+                  hide-bottom-space
                 />
               </div>
             </div>
-            <div class="row q-gutter-md">
-              <div class="col-3">
+            <div class="row justify-center">
+              <div class="col-5 col-md-3">
                 <q-input
                   label="ECS User Code"
                   v-model="localAccountHead.ecsUserCode"
@@ -201,9 +218,10 @@
                       }
                     }
                   "
+                  hide-bottom-space
                 />
               </div>
-              <div class="col-3">
+              <div class="col-5 col-md-3">
                 <q-input
                   label="MICR Code"
                   v-model="localAccountHead.micrCode"
@@ -217,13 +235,13 @@
                       }
                     }
                   "
+                  hide-bottom-space
                 />
               </div>
-              <div class="col-3"></div>
             </div>
           </template>
-          <div class="row q-gutter-md items-center">
-            <div class="col-3">
+          <div class="row items-center justify-center">
+            <div class="col-5 col-md-3">
               <q-select
                 label="Company"
                 v-model="localAccountHead.companyCode"
@@ -237,9 +255,11 @@
                 clear-icon="backspace"
                 dropdown-icon="expand_more"
                 clearable
+                behavior="menu"
+                hide-bottom-space
               />
             </div>
-            <div class="col-3">
+            <div class="col-5 col-md-3">
               <q-select
                 label="Branch"
                 v-model="localAccountHead.branchCode"
@@ -253,20 +273,27 @@
                 clear-icon="backspace"
                 dropdown-icon="expand_more"
                 clearable
+                behavior="menu"
+                options-dense
+                hide-bottom-space
               />
             </div>
-            <div class="col-4 q-gutter-x-md">
-              <q-checkbox
-                v-model="localAccountHead.showInAllBranches"
-                label="Show In All Branchs"
-              />
-              <q-checkbox
-                v-model="localAccountHead.automatic"
-                label="Automatic"
-              />
+            <div class="col-12 col-md-4">
+              <div
+                class="row items-center justify-evenly justify-sm-center justify-md-start"
+              >
+                <q-checkbox
+                  v-model="localAccountHead.showInAllBranches"
+                  label="Show In All Branchs"
+                />
+                <q-checkbox
+                  v-model="localAccountHead.automatic"
+                  label="Automatic"
+                />
+              </div>
             </div>
           </div>
-          <div class="row q-gutter-md">
+          <div class="row justify-center">
             <div class="col-auto">
               <q-input
                 label="Credit Days"
@@ -281,6 +308,7 @@
                     }
                   }
                 "
+                hide-bottom-space
               />
             </div>
             <div class="col-auto">
@@ -297,6 +325,7 @@
                     }
                   }
                 "
+                hide-bottom-space
               />
             </div>
             <div class="col-auto">
@@ -313,6 +342,7 @@
                     }
                   }
                 "
+                hide-bottom-space
               />
             </div>
             <div class="col-auto">
@@ -321,6 +351,7 @@
                 v-model="localAccountHead.lockedOn"
                 dense
                 label="Locked Upto"
+                hide-bottom-space
               >
                 <q-popup-proxy
                   @before-show="
@@ -358,7 +389,10 @@
                 </template>
               </q-input>
             </div>
-            <div class="col-3" v-if="localAccountHead.accountType === 'B'">
+            <div
+              class="col-8 col-sm-6 col-md-3"
+              v-if="localAccountHead.accountType === 'B'"
+            >
               <q-input
                 v-model="localAccountHead.chequeFileName"
                 @update:model-value="
@@ -371,10 +405,11 @@
                 label="Cheque File Name"
                 dense
                 outlined
+                hide-bottom-space
               />
             </div>
           </div>
-          <div class="row q-gutter-md">
+          <div class="row justify-center">
             <div class="col-auto">
               <q-input
                 label="Pan Number"
@@ -389,9 +424,10 @@
                     }
                   }
                 "
+                hide-bottom-space
               />
             </div>
-            <div class="col-auto q-gutter-x-md">
+            <div class="col-auto">
               <q-checkbox
                 v-model="localAccountHead.costCenter"
                 label="Cost center"
@@ -402,8 +438,8 @@
               />
             </div>
           </div>
-          <div class="row q-gutter-md">
-            <div class="col-4">
+          <div class="row justify-center">
+            <div class="col-10 col-sm-5 col-md-4">
               <q-input
                 label="Cheque Format File"
                 v-model="localAccountHead.chequeFormatFile"
@@ -416,10 +452,11 @@
                     }
                   }
                 "
+                hide-bottom-space
               />
             </div>
             <div
-              class="col-3"
+              class="col-10 col-sm-5 col-md-4"
               v-if="['A', 'B', 'L'].includes(localAccountHead.accountType!)"
             >
               <q-select
@@ -435,11 +472,14 @@
                 clearable
                 clear-icon="backspace"
                 dropdown-icon="expand_more"
+                hide-bottom-space
+                behavior="menu"
+                options-dense
               />
             </div>
           </div>
-          <div class="row q-gutter-md">
-            <div class="col-2">
+          <div class="row justify-center">
+            <div class="col-10 col-sm-5 col-md-2">
               <q-select
                 outlined
                 dense
@@ -453,9 +493,12 @@
                 clearable
                 clear-icon="backspace"
                 dropdown-icon="expand_more"
+                hide-bottom-space
+                behavior="menu"
+                options-dense
               />
             </div>
-            <div class="col-3">
+            <div class="col-10 col-sm-5 col-md-2">
               <q-input
                 dense
                 outlined
@@ -472,9 +515,10 @@
                   }
                 "
                 mask="##AAAAA####AXAX"
+                hide-bottom-space
               />
             </div>
-            <div class="col-2">
+            <div class="col-10 col-sm-5 col-md-2">
               <q-select
                 dense
                 outlined
@@ -486,11 +530,14 @@
                 clearable
                 clear-icon="backspace"
                 dropdown-icon="expand_more"
+                behavior="menu"
+                hide-bottom-space
+                options-dense
               />
             </div>
           </div>
-          <div class="row q-gutter-md items-center">
-            <div class="col-4">
+          <div class="row justify-center items-center">
+            <div class="col-9 col-sm-7 col-md-4">
               <q-select
                 options-dense
                 dense
@@ -505,14 +552,16 @@
                 clearable
                 clear-icon="backspace"
                 dropdown-icon="expand_more"
+                hide-bottom-space
+                behavior="menu"
               />
             </div>
-            <div class="col-auto">
+            <div class="col-2">
               <q-checkbox v-model="localAccountHead.tax" label="TAX" />
             </div>
           </div>
-          <div class="row q-gutter-md items-center">
-            <div class="col-2">
+          <div class="row items-center justify-center">
+            <div class="col-5 col-sm-4 col-md-3">
               <q-select
                 v-model="localAccountHead.tdsClassId"
                 outlined
@@ -526,9 +575,11 @@
                 clearable
                 clear-icon="backspace"
                 dropdown-icon="expand_more"
+                hide-bottom-space
+                behavior="menu"
               />
             </div>
-            <div class="col-2">
+            <div class="col-5 col-sm-4 col-md-3">
               <q-select
                 v-model="localAccountHead.tdsType"
                 outlined
@@ -540,6 +591,8 @@
                 clearable
                 clear-icon="backspace"
                 dropdown-icon="expand_more"
+                behavior="menu"
+                hide-bottom-space
               />
             </div>
             <div class="col-auto q-gutter-x-md">
@@ -550,8 +603,8 @@
               />
             </div>
           </div>
-          <div class="row q-gutter-md">
-            <div class="col-2">
+          <div class="row justify-center">
+            <div class="col-5 col-sm-auto col-md-2">
               <q-input
                 v-model.number="localAccountHead.hsnCode"
                 mask="##########"
@@ -564,11 +617,13 @@
                 "
                 dense
                 outlined
+                hide-bottom-space
                 label="HSN Code"
               />
             </div>
-            <div class="col-2">
+            <div class="col-5 col-sm-auto col-md-2">
               <q-input
+                hide-bottom-space
                 v-model="localAccountHead.ndsi500ItemCode"
                 mask="NNNNNNNNNN"
                 dense
@@ -583,8 +638,9 @@
                 "
               />
             </div>
-            <div class="col-2">
+            <div class="col-6 col-sm-auto col-md-2">
               <q-input
+                hide-bottom-space
                 v-model="localAccountHead.nbs7ItemCode"
                 mask="NNNNNNNNNN"
                 dense
@@ -600,8 +656,8 @@
               />
             </div>
           </div>
-          <div class="row q-gutter-md">
-            <div class="col-4">
+          <div class="row justify-center">
+            <div class="col-10 col-sm-7 col-md-5">
               <SearchableMultiselect
                 label="Role Code"
                 v-model="roleCodes"
@@ -612,8 +668,8 @@
               />
             </div>
           </div>
-          <div class="row q-gutter-md">
-            <div class="col-4">
+          <div class="row justify-center">
+            <div class="col-5 col-sm-3 col-md-2">
               <q-input
                 v-model.number="localAccountHead.drFromAmount"
                 :mask="'#'.repeat(15)"
@@ -627,10 +683,12 @@
                     }
                   }
                 "
+                hide-bottom-space
               />
             </div>
-            <div class="col-4">
+            <div class="col-5 col-sm-3 col-md-2">
               <q-input
+                hide-bottom-space
                 v-model.number="localAccountHead.drToAmount"
                 :mask="'#'.repeat(15)"
                 dense
@@ -646,8 +704,8 @@
               />
             </div>
           </div>
-          <div class="row q-gutter-md">
-            <div class="col-4">
+          <div class="row justify-center">
+            <div class="col-5 col-sm-3 col-md-2">
               <q-input
                 v-model.number="localAccountHead.crFromAmount"
                 :mask="'#'.repeat(15)"
@@ -663,7 +721,7 @@
                 "
               />
             </div>
-            <div class="col-4">
+            <div class="col-5 col-sm-3 col-md-2">
               <q-input
                 v-model.number="localAccountHead.crToAmount"
                 :mask="'#'.repeat(15)"
@@ -681,8 +739,8 @@
             </div>
           </div>
 
-          <div class="row">
-            <div class="col-12 col-md-6">
+          <div class="row justify-center">
+            <div class="col-11 col-md-6">
               <q-expansion-item hide-expand-icon v-model="addressRequired">
                 <template v-slot:header>
                   <q-checkbox
@@ -700,7 +758,7 @@
                 </div>
               </q-expansion-item>
             </div>
-            <div class="col-12 col-md-6">
+            <div class="col-11 col-md-6">
               <q-expansion-item hide-expand-icon v-model="kycRequired">
                 <template v-slot:header>
                   <q-checkbox v-model="kycRequired" label="Kyc" />
