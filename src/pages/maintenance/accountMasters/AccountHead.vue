@@ -76,6 +76,10 @@
                         option-value="code"
                         emit-value
                         map-options
+                        behaviour="menu"
+                        clearable
+                        clear-icon="backspace"
+                        dropdown-icon="expand_more"
                       />
                     </div>
                     <div class="col-4">
@@ -87,6 +91,11 @@
                         option-value="code"
                         emit-value
                         map-options
+                        behaviour="menu"
+                        clearable
+                        clear-icon="backspace"
+                        dropdown-icon="expand_more"
+                        options-dense
                       />
                     </div>
                   </div>
@@ -102,6 +111,10 @@
                         option-value="code"
                         emit-value
                         map-options
+                        behaviour="menu"
+                        clearable
+                        clear-icon="backspace"
+                        dropdown-icon="expand_more"
                       />
                     </div>
                     <div class="col-4">
@@ -113,6 +126,10 @@
                         option-value="code"
                         emit-value
                         map-options
+                        behaviour="menu"
+                        clearable
+                        clear-icon="backspace"
+                        dropdown-icon="expand_more"
                       />
                     </div>
                   </div>
