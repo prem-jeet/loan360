@@ -741,7 +741,7 @@
             </div>
           </div>
 
-          <div class="row justify-center q-col-gutter-sm q-mt-sm">
+          <div class="row justify-center q-px-md q-col-gutter-md q-mt-sm">
             <div class="col-12 col-md-6">
               <q-expansion-item hide-expand-icon v-model="addressRequired">
                 <template v-slot:header>
@@ -752,7 +752,7 @@
                     />
                   </div>
                 </template>
-                <div class="q-px-sm">
+                <div>
                   <AddressForm
                     v-model="address"
                     :address-id="props.accountHead?.addressId"
@@ -767,7 +767,7 @@
                 <template v-slot:header>
                   <q-checkbox v-model="kycRequired" label="Kyc" />
                 </template>
-                <div class="q-px-sm">
+                <div>
                   <KycDataList v-model:kycDataList="kycData" />
                 </div>
               </q-expansion-item>
