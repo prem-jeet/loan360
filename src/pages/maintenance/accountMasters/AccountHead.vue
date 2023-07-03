@@ -48,10 +48,10 @@
           </template>
 
           <template v-slot:top>
-            <div class="q-gutter-y-md q-pb-xs-md">
-              <div class="row items-center q-gutter-md">
-                <div class="col-auto text-h4">Account Heads</div>
-                <div class="col-auto">
+            <div class="q-pb-xs-md">
+              <div class="row items-center">
+                <div class="col-12 col-sm-auto text-h4">Account Heads</div>
+                <div class="col-12 col-sm-auto q-mt-md q-mt-sm-none q-ml-sm-md">
                   <q-btn
                     size="md"
                     label="Add Account head"
