@@ -48,7 +48,7 @@
           </template>
 
           <template v-slot:top>
-            <div class="q-pb-xs-md">
+            <div class="q-pb-xs-md col-grow">
               <div class="row items-center">
                 <div class="col-12 col-sm-auto text-h4">Account Heads</div>
                 <div class="col-12 col-sm-auto q-mt-md q-mt-sm-none q-ml-sm-md">
@@ -62,144 +62,168 @@
                         (isAddAccountHeadFormActive = true)
                     "
                   />
+                  <q-btn
+                    class="q-ml-md q-px-sm"
+                    icon="filter_alt"
+                    color="blue-grey"
+                    @click="
+                      searchExpansionItemExpanded = !searchExpansionItemExpanded
+                    "
+                  />
                 </div>
               </div>
-              <div class="row q-gutter-md">
-                <div class="col-12">
-                  <div class="row q-gutter-md">
-                    <div class="col-4">
-                      <q-select
-                        :options="allowedCompany"
-                        label="Company"
-                        v-model="searchObject.companyCode"
-                        option-label="name"
-                        option-value="code"
-                        emit-value
-                        map-options
-                        behaviour="menu"
-                        clearable
-                        clear-icon="backspace"
-                        dropdown-icon="expand_more"
-                      />
+              <div class="q-mt-md">
+                <q-expansion-item
+                  hide-expand-icon
+                  v-model="searchExpansionItemExpanded"
+                  header-class="q-pa-none"
+                  header-style="display:none"
+                  default-opened
+                >
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="row q-col-gutter-sm-x-md">
+                        <div class="col-12 col-sm-6 col-md-4">
+                          <q-select
+                            :options="allowedCompany"
+                            label="Company"
+                            v-model="searchObject.companyCode"
+                            option-label="name"
+                            option-value="code"
+                            emit-value
+                            map-options
+                            behaviour="menu"
+                            clearable
+                            clear-icon="backspace"
+                            dropdown-icon="expand_more"
+                          />
+                        </div>
+                        <div
+                          class="col-12 col-sm-6 col-md-4 q-mt-md q-mt-sm-none"
+                        >
+                          <q-select
+                            :options="allowedBranch"
+                            label="Branch"
+                            v-model="searchObject.branchCode"
+                            option-label="name"
+                            option-value="code"
+                            emit-value
+                            map-options
+                            behaviour="menu"
+                            clearable
+                            clear-icon="backspace"
+                            dropdown-icon="expand_more"
+                            options-dense
+                          />
+                        </div>
+                      </div>
                     </div>
-                    <div class="col-4">
-                      <q-select
-                        :options="allowedBranch"
-                        label="Branch"
-                        v-model="searchObject.branchCode"
-                        option-label="name"
-                        option-value="code"
-                        emit-value
-                        map-options
-                        behaviour="menu"
-                        clearable
-                        clear-icon="backspace"
-                        dropdown-icon="expand_more"
-                        options-dense
-                      />
+                    <div class="col-12 q-mt-md">
+                      <div class="row q-col-gutter-sm-x-md">
+                        <div class="col-12 col-sm-6 col-md-4">
+                          <q-select
+                            :options="accountGroupOptions"
+                            label="A/c Group"
+                            v-model="searchObject.accountGroupCode"
+                            option-label="name"
+                            option-value="code"
+                            emit-value
+                            map-options
+                            behaviour="menu"
+                            clearable
+                            clear-icon="backspace"
+                            dropdown-icon="expand_more"
+                          />
+                        </div>
+                        <div
+                          class="col-12 col-sm-6 col-md-4 q-mt-md q-mt-sm-none"
+                        >
+                          <q-select
+                            :options="subLedgerCodeOptions"
+                            label="Sub-Ledger Code"
+                            v-model="searchObject.subLedgerCode"
+                            option-label="name"
+                            option-value="code"
+                            emit-value
+                            map-options
+                            behaviour="menu"
+                            clearable
+                            clear-icon="backspace"
+                            dropdown-icon="expand_more"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12 q-mt-md">
+                      <div class="row items-center">
+                        <div
+                          class="col-12 col-sm-4 col-md-2 q-mb-md q-mb-sm-none"
+                        >
+                          <q-select
+                            v-model="nameSearchcriteria"
+                            :options="[
+                              {
+                                label: 'Name starts with',
+                                value: 'sw',
+                              },
+                              { label: 'Name Contains', value: 'c' },
+                            ]"
+                            emit-value
+                            map-options
+                            outlined
+                            dense
+                          />
+                        </div>
+                        <div class="col-7 col-sm-5 col-md-3 q-ml-sm-md">
+                          <q-input
+                            v-model="searchObject.accountName"
+                            placeholder="Account name (min 3 char)"
+                            outlined
+                            dense
+                          />
+                        </div>
+                        <div class="col-4 col-sm-2 q-ml-md">
+                          <q-checkbox
+                            dense
+                            v-model="searchObject.inActive"
+                            label="In-Active"
+                          />
+                        </div>
+                        <div class="col-12 q-mt-md">
+                          <div class="flex justify-center justify-md-start">
+                            <q-btn
+                              color="grey-4"
+                              text-color="black"
+                              label="Search"
+                              icon="search"
+                              @click="search"
+                            />
+                            <q-btn
+                              class="q-ml-md"
+                              color="red-5"
+                              text-color="black"
+                              label="reset"
+                              icon="restart_alt"
+                              @click="resetSearchParameters"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12 q-mt-md" v-if="$q.screen.width < 830">
+                      <div class="flex flex-center">
+                        <q-btn
+                          label="remove duplicate"
+                          @click="removeDuplicate"
+                          color="orange"
+                          icon="dynamic_feed"
+                          padding="sm"
+                          text-color="black"
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div class="col-12">
-                  <div class="row q-gutter-md">
-                    <div class="col-4">
-                      <q-select
-                        :options="accountGroupOptions"
-                        label="A/c Group"
-                        v-model="searchObject.accountGroupCode"
-                        option-label="name"
-                        option-value="code"
-                        emit-value
-                        map-options
-                        behaviour="menu"
-                        clearable
-                        clear-icon="backspace"
-                        dropdown-icon="expand_more"
-                      />
-                    </div>
-                    <div class="col-4">
-                      <q-select
-                        :options="subLedgerCodeOptions"
-                        label="Sub-Ledger Code"
-                        v-model="searchObject.subLedgerCode"
-                        option-label="name"
-                        option-value="code"
-                        emit-value
-                        map-options
-                        behaviour="menu"
-                        clearable
-                        clear-icon="backspace"
-                        dropdown-icon="expand_more"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div class="col-12">
-                  <div class="row q-gutter-md items-center">
-                    <div class="col-auto">Name:</div>
-                    <div class="col-2">
-                      <q-select
-                        v-model="nameSearchcriteria"
-                        :options="[
-                          {
-                            label: 'Starts with',
-                            value: 'sw',
-                          },
-                          { label: 'Contains', value: 'c' },
-                        ]"
-                        emit-value
-                        map-options
-                        outlined
-                        dense
-                      />
-                    </div>
-                    <div class="col-3">
-                      <q-input
-                        v-model="searchObject.accountName"
-                        placeholder="Account name (min 3 char)"
-                        outlined
-                        dense
-                      />
-                    </div>
-                    <div class="col-auto">
-                      <q-checkbox
-                        dense
-                        v-model="searchObject.inActive"
-                        label="In-Active"
-                      />
-                    </div>
-                    <div class="col-auto">
-                      <q-btn
-                        color="grey-4"
-                        text-color="black"
-                        label="Search"
-                        icon="search"
-                        @click="search"
-                      />
-                    </div>
-                    <div class="col-auto">
-                      <q-btn
-                        color="red-5"
-                        text-color="black"
-                        label="reset"
-                        icon="restart_alt"
-                        @click="resetSearchParameters"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div class="col-12" v-if="$q.screen.width < 830">
-                  <div class="row justify-end">
-                    <q-btn
-                      label="remove duplicate"
-                      @click="removeDuplicate"
-                      color="orange"
-                      icon="dynamic_feed"
-                      padding="sm"
-                      text-color="black"
-                    />
-                  </div>
-                </div>
+                </q-expansion-item>
               </div>
             </div>
           </template>
@@ -549,6 +573,7 @@ const tableColumns: {
   { name: 'actions', field: '', align: 'left', label: 'Actions' },
 ];
 
+const searchExpansionItemExpanded = ref(true);
 const isAddAccountHeadFormActive = ref(false);
 const editingAccountHeadIndex = ref<number | null>(null);
 const isPerformingAction = ref(false);
