@@ -790,6 +790,8 @@
 </template>
 
 <script setup lang="ts">
+import type { AccountHead } from 'src/types/AccountHead';
+import type { Address } from 'src/types/Address';
 import { date } from 'quasar';
 import { storeToRefs } from 'pinia';
 import { api } from 'src/boot/axios';
@@ -805,83 +807,6 @@ import {
   onSuccess,
 } from 'src/utils/notification';
 
-interface AccountHead {
-  id?: number;
-  accountGroupCode: string | null;
-  accountNo: string | null;
-  accountType: string | null;
-  addressId: number | null;
-  alias: string | null;
-  attachments: string | null;
-  automatic: boolean;
-  bankFormatCode: string | null;
-  branchCode: string | null;
-  chequeFormatFile: string | null;
-  chequeFileName: string | null;
-  code: string | null;
-  companyCode: string | null;
-  costCenter: boolean | null;
-  createdOn: Date | string | null;
-  createdOnBy: string | null;
-  crFromAmount: number | null;
-  crToAmount: number | null;
-  creditDays: number | null;
-  drFromAmount: number | null;
-  drToAmount: number | null;
-  ecsUserCode: string | null;
-  hsnCode: string | null;
-  inactive: boolean;
-  inactiveOn: string | null;
-  inactiveOnBy: string | null;
-  kyc: string | null;
-  lockedOn: string | null;
-  lockedUpdatedOn: string | null;
-  micrCode: string | null;
-  name: string | null;
-  nachBankCode: string | null;
-  nachUniqueId: string | null;
-  nbs7ItemCode: string | null;
-  ndsi500ItemCode: string | null;
-  panNo: string | null;
-  rateInt: number | null;
-  refrenceAdjust: boolean | null;
-  reverseAccountGroupCode: string | null;
-  roleCode: string | null;
-  sharePercent: number | null;
-  showInAllBranches: boolean;
-  stateId: number | null;
-  subLedgerCode: string | null;
-  tds: boolean | null;
-  tdsClassId: number | null;
-  tdsEditable: boolean | null;
-  tdsType: string | null;
-  tax: boolean | null;
-  taxCategory: string | null;
-  taxClassId: number | null;
-  taxNo: string | null;
-  updatedOn: Date | string | null;
-  updatedOnBy: string | null;
-}
-interface Address {
-  address1: string | null;
-  address2: string | null;
-  address3: string | null;
-  city: string | null;
-  countryId: number | null;
-  fax: string | null;
-  mobile: string | null;
-  name: string | null;
-  phone1: string | null;
-  phone1Extn: string | null;
-  phone2: string | null;
-  phone2Extn: string | null;
-  pincode: string | null;
-  stateId: number | null;
-  std: string | null;
-  id: string | null;
-  cityId: string | null;
-  geoLocation: string | null;
-}
 type KycDataItem = {
   kycCode: 'string';
   pattern: 'string';

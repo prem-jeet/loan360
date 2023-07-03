@@ -474,6 +474,7 @@
 </template>
 
 <script setup lang="ts">
+import type { AccountHead } from 'src/types/AccountHead';
 import { date } from 'quasar';
 import { storeToRefs } from 'pinia';
 import { api } from 'src/boot/axios';
@@ -493,63 +494,6 @@ interface SearchObject {
   inActive: boolean;
 }
 
-interface AccountHead {
-  id?: number;
-  branchCode: string | null;
-  accountGroupCode: string | null;
-  accountType: string | null;
-  companyCode: string | null;
-  addressId: string | null;
-  subLedgerCode: string | null;
-  automatic: boolean;
-  name: string | null;
-  alias: string | null;
-  creditDays: number | null;
-  rateInt: number | null;
-  sharePercent: number | null;
-  lockedOn: string | null;
-  panNo: string | null;
-  costCenter: boolean | null;
-  refrenceAdjust: boolean | null;
-  createdOn: string | null;
-  updatedOn: string | null;
-  inactive: boolean;
-  inactiveOn: string | null;
-  code: string | null;
-  chequeFormatFile: string | null;
-  chequeFileName: string | null;
-  accountNo: string | null;
-  createdOnBy: string | null;
-  updatedOnBy: string;
-  inactiveOnBy: string | null;
-  nachUniqueId: string | null;
-  nachBankCode: string | null;
-  reverseAccountGroupCode: string | null;
-  ecsUserCode: string | null;
-  micrCode: string | null;
-  bankFormatCode: string | null;
-  showInAllBranches: boolean;
-  taxClassId: number | null;
-  stateId: number | null;
-  taxNo: string | null;
-  hsnCode: string | null;
-  attachments: string | null;
-  kyc: string | null;
-  taxCategory: string | null;
-  lockedUpdatedOn: string | null;
-  tdsClassId: number | null;
-  tdsType: string | null;
-  tdsEditable: boolean | null;
-  tds: boolean | null;
-  ndsi500ItemCode: string | null;
-  nbs7ItemCode: string | null;
-  tax: boolean | null;
-  roleCode: string;
-  drFromAmount: number | null;
-  drToAmount: number | null;
-  crFromAmount: number | null;
-  crToAmount: number | null;
-}
 const tableColumns: {
   name: string;
   required?: boolean;
