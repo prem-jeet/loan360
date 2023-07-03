@@ -18,8 +18,8 @@
           class="q-pt-lg scroll overflow-auto"
           :style="{ height: 'calc(100% - 70px)' }"
         >
-          <div class="row justify-center">
-            <div class="col-5 col-sm-3">
+          <div class="row justify-center gap-2 q-col-gutter-x-sm">
+            <div class="col-6 col-sm-3">
               <q-input
                 label="Code"
                 v-model="localAccountHead.code"
@@ -41,7 +41,7 @@
                 "
               />
             </div>
-            <div class="col-5 col-sm-3">
+            <div class="col-6 col-sm-3">
               <q-input
                 label="Account Name"
                 v-model="localAccountHead.name"
@@ -52,7 +52,7 @@
                 no-error-icon
               />
             </div>
-            <div class="col-5 col-sm-3">
+            <div class="col-6 col-sm-3">
               <q-input
                 label="Alias"
                 v-model="localAccountHead.alias"
@@ -68,7 +68,7 @@
               />
             </div>
           </div>
-          <div class="row justify-center">
+          <div class="row justify-center q-col-gutter-sm q-mt-sm">
             <div class="col-10 col-sm-4 col-md-2">
               <q-select
                 label="A/c Type"
@@ -128,7 +128,7 @@
             </div>
           </div>
           <template v-if="localAccountHead.accountType === 'B'">
-            <div class="row justify-center">
+            <div class="row justify-center q-mt-sm q-col-gutter-sm">
               <div class="col-5 col-sm-4 col-md-3">
                 <q-input
                   :mask="'X'.repeat(20)"
@@ -147,7 +147,7 @@
                   hide-bottom-space
                 />
               </div>
-              <div class="col-6 col-sm-4 col-md-2">
+              <div class="col-7 col-sm-4 col-md-2">
                 <q-select
                   v-model="localAccountHead.bankFormatCode"
                   :options="bankFormatOptions"
@@ -167,8 +167,8 @@
                 />
               </div>
             </div>
-            <div class="row justify-center">
-              <div class="col-5 col-md-3">
+            <div class="row justify-center q-mt-sm q-col-gutter-sm">
+              <div class="col-6 col-md-3">
                 <q-input
                   label="NACH Unique Id"
                   v-model="localAccountHead.nachUniqueId"
@@ -185,7 +185,7 @@
                   hide-bottom-space
                 />
               </div>
-              <div class="col-5 col-md-3">
+              <div class="col-6 col-md-3">
                 <q-input
                   label="NACH Bank Code"
                   v-model="localAccountHead.nachBankCode"
@@ -203,8 +203,8 @@
                 />
               </div>
             </div>
-            <div class="row justify-center">
-              <div class="col-5 col-md-3">
+            <div class="row justify-center q-mt-sm q-col-gutter-sm">
+              <div class="col-6 col-md-3">
                 <q-input
                   label="ECS User Code"
                   v-model="localAccountHead.ecsUserCode"
@@ -221,7 +221,7 @@
                   hide-bottom-space
                 />
               </div>
-              <div class="col-5 col-md-3">
+              <div class="col-6 col-md-3">
                 <q-input
                   label="MICR Code"
                   v-model="localAccountHead.micrCode"
@@ -240,8 +240,8 @@
               </div>
             </div>
           </template>
-          <div class="row items-center justify-center">
-            <div class="col-5 col-md-3">
+          <div class="row items-center justify-center q-col-gutter-sm q-mt-sm">
+            <div class="col-10 col-sm-5 col-md-3">
               <q-select
                 label="Company"
                 v-model="localAccountHead.companyCode"
@@ -259,7 +259,7 @@
                 hide-bottom-space
               />
             </div>
-            <div class="col-5 col-md-3">
+            <div class="col-10 col-sm-5 col-md-3">
               <q-select
                 label="Branch"
                 v-model="localAccountHead.branchCode"
@@ -278,7 +278,7 @@
                 hide-bottom-space
               />
             </div>
-            <div class="col-12 col-md-4">
+            <div class="col-auto">
               <div
                 class="row items-center justify-evenly justify-sm-center justify-md-start"
               >
@@ -293,8 +293,8 @@
               </div>
             </div>
           </div>
-          <div class="row justify-center">
-            <div class="col-auto">
+          <div class="row justify-center q-col-gutter-sm q-mt-sm">
+            <div class="col-6 col-sm-auto">
               <q-input
                 label="Credit Days"
                 v-model.number="localAccountHead.creditDays"
@@ -311,7 +311,7 @@
                 hide-bottom-space
               />
             </div>
-            <div class="col-auto">
+            <div class="col-6 col-sm-auto">
               <q-input
                 label="Interest Rate"
                 v-model.number="localAccountHead.rateInt"
@@ -328,7 +328,7 @@
                 hide-bottom-space
               />
             </div>
-            <div class="col-auto">
+            <div class="col-6 col-sm-auto">
               <q-input
                 label="Share Percent"
                 v-model.number="localAccountHead.sharePercent"
@@ -345,7 +345,7 @@
                 hide-bottom-space
               />
             </div>
-            <div class="col-auto">
+            <div class="col-10 col-sm-auto">
               <q-input
                 outlined
                 v-model="localAccountHead.lockedOn"
@@ -390,7 +390,7 @@
               </q-input>
             </div>
             <div
-              class="col-8 col-sm-6 col-md-3"
+              class="col-10 col-sm-6 col-md-3"
               v-if="localAccountHead.accountType === 'B'"
             >
               <q-input
@@ -409,8 +409,8 @@
               />
             </div>
           </div>
-          <div class="row justify-center">
-            <div class="col-auto">
+          <div class="row justify-center q-col-gutter-sm q-mt-sm">
+            <div class="col-10 col-sm-auto">
               <q-input
                 label="Pan Number"
                 v-model="localAccountHead.panNo"
@@ -438,7 +438,7 @@
               />
             </div>
           </div>
-          <div class="row justify-center">
+          <div class="row justify-center q-col-gutter-sm q-mt-sm">
             <div class="col-10 col-sm-5 col-md-4">
               <q-input
                 label="Cheque Format File"
@@ -478,7 +478,7 @@
               />
             </div>
           </div>
-          <div class="row justify-center">
+          <div class="row justify-center q-col-gutter-sm q-mt-sm">
             <div class="col-10 col-sm-5 col-md-2">
               <q-select
                 outlined
@@ -536,7 +536,9 @@
               />
             </div>
           </div>
-          <div class="row justify-center items-center">
+          <div
+            class="row justify-center items-center q-col-gutter-x-sm q-mt-sm"
+          >
             <div class="col-9 col-sm-7 col-md-4">
               <q-select
                 options-dense
@@ -556,12 +558,12 @@
                 behavior="menu"
               />
             </div>
-            <div class="col-2">
+            <div class="col-3">
               <q-checkbox v-model="localAccountHead.tax" label="TAX" />
             </div>
           </div>
-          <div class="row items-center justify-center">
-            <div class="col-5 col-sm-4 col-md-3">
+          <div class="row items-center justify-center q-col-gutter-sm q-mt-sm">
+            <div class="col-6 col-sm-4 col-md-3">
               <q-select
                 v-model="localAccountHead.tdsClassId"
                 outlined
@@ -579,7 +581,7 @@
                 behavior="menu"
               />
             </div>
-            <div class="col-5 col-sm-4 col-md-3">
+            <div class="col-6 col-sm-4 col-md-3">
               <q-select
                 v-model="localAccountHead.tdsType"
                 outlined
@@ -603,8 +605,8 @@
               />
             </div>
           </div>
-          <div class="row justify-center">
-            <div class="col-5 col-sm-auto col-md-2">
+          <div class="row justify-center q-col-gutter-sm q-mt-sm">
+            <div class="col-6 col-sm-auto col-md-2">
               <q-input
                 v-model.number="localAccountHead.hsnCode"
                 mask="##########"
@@ -621,7 +623,7 @@
                 label="HSN Code"
               />
             </div>
-            <div class="col-5 col-sm-auto col-md-2">
+            <div class="col-6 col-sm-auto col-md-2">
               <q-input
                 hide-bottom-space
                 v-model="localAccountHead.ndsi500ItemCode"
@@ -656,7 +658,7 @@
               />
             </div>
           </div>
-          <div class="row justify-center">
+          <div class="row justify-center q-mt-md">
             <div class="col-10 col-sm-7 col-md-5">
               <SearchableMultiselect
                 label="Role Code"
@@ -668,8 +670,8 @@
               />
             </div>
           </div>
-          <div class="row justify-center">
-            <div class="col-5 col-sm-3 col-md-2">
+          <div class="row justify-center q-col-gutter-x-sm q-mt-sm">
+            <div class="col-6 col-sm-3 col-md-2">
               <q-input
                 v-model.number="localAccountHead.drFromAmount"
                 :mask="'#'.repeat(15)"
@@ -686,7 +688,7 @@
                 hide-bottom-space
               />
             </div>
-            <div class="col-5 col-sm-3 col-md-2">
+            <div class="col-6 col-sm-3 col-md-2">
               <q-input
                 hide-bottom-space
                 v-model.number="localAccountHead.drToAmount"
@@ -704,8 +706,8 @@
               />
             </div>
           </div>
-          <div class="row justify-center">
-            <div class="col-5 col-sm-3 col-md-2">
+          <div class="row justify-center q-col-gutter-x-sm q-mt-sm">
+            <div class="col-6 col-sm-3 col-md-2">
               <q-input
                 v-model.number="localAccountHead.crFromAmount"
                 :mask="'#'.repeat(15)"
@@ -721,7 +723,7 @@
                 "
               />
             </div>
-            <div class="col-5 col-sm-3 col-md-2">
+            <div class="col-6 col-sm-3 col-md-2">
               <q-input
                 v-model.number="localAccountHead.crToAmount"
                 :mask="'#'.repeat(15)"
@@ -739,16 +741,18 @@
             </div>
           </div>
 
-          <div class="row justify-center">
-            <div class="col-11 col-md-6">
+          <div class="row justify-center q-col-gutter-sm q-mt-sm">
+            <div class="col-12 col-md-6">
               <q-expansion-item hide-expand-icon v-model="addressRequired">
                 <template v-slot:header>
-                  <q-checkbox
-                    v-model="addressRequired"
-                    label="Address required"
-                  />
+                  <div class="col-grow flex justify-md-end">
+                    <q-checkbox
+                      v-model="addressRequired"
+                      label="Address required"
+                    />
+                  </div>
                 </template>
-                <div class="q-px-lg q-py-md">
+                <div class="q-px-sm">
                   <AddressForm
                     v-model="address"
                     :address-id="props.accountHead?.addressId"
@@ -758,12 +762,12 @@
                 </div>
               </q-expansion-item>
             </div>
-            <div class="col-11 col-md-6">
+            <div class="col-12 col-md-6">
               <q-expansion-item hide-expand-icon v-model="kycRequired">
                 <template v-slot:header>
                   <q-checkbox v-model="kycRequired" label="Kyc" />
                 </template>
-                <div class="q-px-lg q-py-md">
+                <div class="q-px-sm">
                   <KycDataList v-model:kycDataList="kycData" />
                 </div>
               </q-expansion-item>
