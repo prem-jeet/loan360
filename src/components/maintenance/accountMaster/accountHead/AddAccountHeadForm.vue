@@ -21,6 +21,17 @@
           <div class="row justify-center gap-2 q-col-gutter-x-sm">
             <div class="col-6 col-sm-3">
               <q-input
+                label="Account Name"
+                v-model="localAccountHead.name"
+                outlined
+                dense
+                :rules="[(val:string|null) => !(val === null || val === '')]"
+                :error="[null, ''].includes(localAccountHead.name)"
+                no-error-icon
+              />
+            </div>
+            <div class="col-6 col-sm-3">
+              <q-input
                 label="Code"
                 v-model="localAccountHead.code"
                 outlined
@@ -39,17 +50,6 @@
                     }
                   }
                 "
-              />
-            </div>
-            <div class="col-6 col-sm-3">
-              <q-input
-                label="Account Name"
-                v-model="localAccountHead.name"
-                outlined
-                dense
-                :rules="[(val:string|null) => !(val === null || val === '')]"
-                :error="[null, ''].includes(localAccountHead.name)"
-                no-error-icon
               />
             </div>
             <div class="col-6 col-sm-3">
@@ -1044,7 +1044,7 @@ const saveAccountHead = async () => {
     }
   } catch (e) {
     // @ts-expect-error response data contains message if error occurs
-    const msg = e.response.data.displayMessage;
+    const msg = e.response.data.displayMessage || 'Some error occured';
     if (msg) {
       alertDialog(msg);
     }
