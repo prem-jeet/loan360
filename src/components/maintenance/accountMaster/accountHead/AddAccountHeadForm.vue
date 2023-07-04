@@ -348,32 +348,28 @@
             <div class="col-10 col-sm-auto">
               <q-input
                 outlined
-                v-model="localAccountHead.lockedOn"
+                v-model="lockedOn"
                 dense
                 label="Locked Upto"
                 hide-bottom-space
               >
                 <q-popup-proxy
                   @before-show="
-                    localAccountHead.lockedOn ||
-                      (localAccountHead.lockedOn = date.formatDate(
+                    lockedOn ||
+                      (lockedOn = date.formatDate(
                         new Date(),
-                        'DD/MM/YYYY'
+                        lockedOnDateFormat
                       ))
                   "
                 >
-                  <q-date
-                    v-model="localAccountHead.lockedOn"
-                    minimal
-                    mask="DD/MM/YYYY"
-                  >
+                  <q-date v-model="lockedOn" minimal :mask="lockedOnDateFormat">
                     <div class="row items-center justify-end q-gutter-sm">
                       <q-btn
                         label="Clear"
                         color="primary"
                         flat
                         v-close-popup
-                        @click="localAccountHead.lockedOn = null"
+                        @click="lockedOn = null"
                       />
                       <q-btn
                         label="Reset"
@@ -915,6 +911,7 @@ const tdsType = {
   I: 'Individual',
   O: 'Other',
 };
+const lockedOnDateFormat = 'DD/MM/YYYY';
 
 const emits = defineEmits(['close']);
 const props = defineProps<{
@@ -922,7 +919,7 @@ const props = defineProps<{
 }>();
 
 const { allowedCompany, allowedBranch } = storeToRefs(useUserStore());
-
+const lockedOn = ref<string | null>(null);
 const localAccountHead = reactive<AccountHead>(
   props.accountHead ? { ...props.accountHead } : { ...initialAccountHead }
 );
@@ -956,7 +953,6 @@ const kycRequired = ref(false);
 const isResettingAccountHeadForm = ref(false);
 const address = reactive<Address>({ ...initailAddress });
 const kycData = ref<KycDataItem[]>([]);
-
 const roleCodeOptions = ref<{ label: string; value: string }[]>([]);
 const roleCodes = ref<string[]>([]);
 
@@ -1025,6 +1021,15 @@ const saveAccountHead = async () => {
   if (roleCodes.value.length) {
     localAccountHead.roleCode = roleCodes.value.join(',');
   }
+
+  if (lockedOn.value) {
+    const [day, month, year] = lockedOn.value.split('/');
+    const lockdeOnDate = new Date(`${month}/${day}/${year}`);
+    localAccountHead.lockedOn = date.formatDate(lockdeOnDate, 'YYYY-MM-DD');
+  } else {
+    localAccountHead.lockedOn = null;
+  }
+
   const payload = {
     accountHead: { ...localAccountHead },
     address: addressRequired.value ? { ...address } : {},
@@ -1086,6 +1091,7 @@ const clerBankData = () => {
 const resetFormData = () => {
   isResettingAccountHeadForm.value = true;
   resetAddressForm.value = true;
+  resetLockedOnDate();
   if (initialAccountHead.addressId) {
     addressRequired.value = true;
   }
@@ -1123,8 +1129,10 @@ const fixNullBooleanValues = () => {
 };
 
 const resetLockedOnDate = () => {
-  localAccountHead.lockedOn =
-    props.accountHead?.lockedOn || date.formatDate(Date.now(), 'DD/MM/YYYY');
+  lockedOn.value = date.formatDate(
+    initialAccountHead.lockedOn || Date.now(),
+    lockedOnDateFormat
+  );
 };
 
 const updateKycIds = () => {
@@ -1204,6 +1212,13 @@ onMounted(async () => {
     }
     if (props.accountHead.roleCode) {
       roleCodes.value = props.accountHead.roleCode.split(',');
+    }
+
+    if (props.accountHead.lockedOn) {
+      lockedOn.value = date.formatDate(
+        props.accountHead.lockedOn,
+        lockedOnDateFormat
+      );
     }
     let key: keyof AccountHead;
     for (key in props.accountHead) {
