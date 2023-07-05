@@ -69,6 +69,8 @@
                   (val) => {
                     if (val === '') {
                       localAccountHead.alias = null;
+                    } else if (val !== null && typeof val === 'string') {
+                      localAccountHead.alias = capitalCase(val);
                     }
                   }
                 "
