@@ -138,8 +138,8 @@
             <div class="row justify-center q-mt-sm q-col-gutter-sm">
               <div class="col-5 col-sm-4 col-md-3">
                 <q-input
-                  :mask="'X'.repeat(20)"
-                  v-model="localAccountHead.accountNo"
+                  :mask="'#'.repeat(20)"
+                  v-model.number="localAccountHead.accountNo"
                   dense
                   outlined
                   label="Bank A/c number"
