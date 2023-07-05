@@ -28,6 +28,13 @@
                 :rules="[(val:string|null) => !(val === null || val === '')]"
                 :error="[null, ''].includes(localAccountHead.name)"
                 no-error-icon
+                @update:model-value="
+                  (val) => {
+                    if (val !== '' && val !== null && typeof val === 'string') {
+                      localAccountHead.name = capitalCase(val);
+                    }
+                  }
+                "
               />
             </div>
             <div class="col-6 col-sm-3">
@@ -802,6 +809,7 @@ import {
   asyncConfirmDialog,
   onSuccess,
 } from 'src/utils/notification';
+import { capitalCase } from 'src/utils/string';
 
 type KycDataItem = {
   kycCode: 'string';
