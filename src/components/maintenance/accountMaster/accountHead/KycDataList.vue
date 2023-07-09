@@ -191,6 +191,7 @@
 
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
+import { alertDialog } from 'src/utils/notification';
 
 import { reactive, onMounted, ref, computed } from 'vue';
 
@@ -278,8 +279,10 @@ const submitHandler = () => {
       kycBeingEdited.value = tempKycData.value!;
       emits('update:kycDataList', [...localKycDataList.value]);
     }
+    kycModel.value = false;
+  } else {
+    alertDialog('Please fill the value');
   }
-  kycModel.value = false;
 };
 const removeKycdata = (index: number) => {
   emits('update:kycDataList', [
