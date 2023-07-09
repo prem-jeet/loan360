@@ -384,7 +384,7 @@
                         label="Reset"
                         color="primary"
                         flat
-                        @click="resetLockedOnDate"
+                        @click="() => resetLockedOnDate(true)"
                       />
                     </div>
                   </q-date>
@@ -1101,7 +1101,7 @@ const clerBankData = () => {
 const resetFormData = () => {
   isResettingAccountHeadForm.value = true;
   resetAddressForm.value = true;
-  resetLockedOnDate();
+  resetLockedOnDate(false);
   if (initialAccountHead.addressId) {
     addressRequired.value = true;
   }
@@ -1138,11 +1138,13 @@ const fixNullBooleanValues = () => {
   });
 };
 
-const resetLockedOnDate = () => {
-  lockedOn.value = date.formatDate(
-    initialAccountHead.lockedOn || Date.now(),
-    lockedOnDateFormat
-  );
+const resetLockedOnDate = (setToday: boolean) => {
+  const ressetedDate =
+    initialAccountHead.lockedOn || (setToday ? Date.now() : null);
+  const newDateformat = ressetedDate
+    ? date.formatDate(ressetedDate, lockedOnDateFormat)
+    : null;
+  lockedOn.value = newDateformat;
 };
 
 const updateKycIds = () => {
