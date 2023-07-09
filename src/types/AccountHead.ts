@@ -1,16 +1,15 @@
 interface AccountHead {
-  id?: number;
   accountGroupCode: string | null;
   accountNo: string | null;
   accountType: string | null;
   addressId: number | null;
   alias: string | null;
   attachments: string | null;
-  automatic: boolean;
+  automatic: boolean | null;
   bankFormatCode: string | null;
   branchCode: string | null;
-  chequeFormatFile: string | null;
   chequeFileName: string | null;
+  chequeFormatFile: string | null;
   code: string | null;
   companyCode: string | null;
   costCenter: boolean | null;
@@ -23,12 +22,13 @@ interface AccountHead {
   drToAmount: number | null;
   ecsUserCode: string | null;
   hsnCode: string | null;
-  inactive: boolean;
-  inactiveOn: string | null;
+  inactive: boolean | null;
+  inactiveOn: Date | string | null;
   inactiveOnBy: string | null;
+  id?: number;
   kyc: string | null;
   lockedOn: string | null;
-  lockedUpdatedOn: string | null;
+  lockedUpdatedOn: Date | string | null;
   micrCode: string | null;
   name: string | null;
   nachBankCode: string | null;
@@ -41,7 +41,7 @@ interface AccountHead {
   reverseAccountGroupCode: string | null;
   roleCode: string | null;
   sharePercent: number | null;
-  showInAllBranches: boolean;
+  showInAllBranches: boolean | null;
   stateId: number | null;
   subLedgerCode: string | null;
   tds: boolean | null;
