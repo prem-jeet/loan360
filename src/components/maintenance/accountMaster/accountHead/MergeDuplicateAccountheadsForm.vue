@@ -35,6 +35,7 @@
               emit-value
               map-options
               outlined
+              behavior="menu"
             />
           </div>
         </div>

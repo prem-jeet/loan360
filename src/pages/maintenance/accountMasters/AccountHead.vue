@@ -172,6 +172,7 @@
                             map-options
                             outlined
                             dense
+                            behavior="menu"
                           />
                         </div>
                         <div class="col-7 col-sm-5 col-md-3 q-ml-sm-md">
