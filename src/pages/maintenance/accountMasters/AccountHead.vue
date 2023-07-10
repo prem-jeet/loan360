@@ -1,7 +1,7 @@
 <template>
   <div class="absolute q-pa-md full-width full-height bg-gre-4">
     <div class="row">
-      <div class="col">
+      <div class="col q-mb-lg q-pb-lg">
         <q-table
           :rows="accountHeads"
           :columns="tableColumns"
