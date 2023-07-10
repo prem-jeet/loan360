@@ -1,5 +1,5 @@
 <template>
-  <div class="absolute q-pa-md full-width full-height bg-gre-4">
+  <div class="absolute q-px-md q-pt-sm full-width full-height bg-gre-4">
     <div class="row">
       <div class="col q-mb-lg q-pb-lg">
         <q-table
@@ -12,12 +12,28 @@
           :rows-per-page-options="[0]"
           :grid="$q.screen.width < 830"
           card-container-class="q-gutter-y-md q-mt-xs"
-          :hide-bottom="!!accountHeads.length"
           selection="multiple"
           v-model:selected="selectedAccountHeads"
           row-key="id"
           @selection="({ rows }) => varifySelectedAccountHead(rows as AccountHead[])"
         >
+          <template v-slot:bottom>
+            <div class="row col-grow q-py-sm">
+              <q-btn
+                icon="keyboard_double_arrow_left"
+                label="Previous"
+                v-if="pagination.pageNo > 1"
+                @click="pagination.pageNo -= 1"
+              />
+              <q-btn
+                icon-right="keyboard_double_arrow_right"
+                class="q-ml-md"
+                label="Next"
+                v-if="pagination.rowsPerPage === accountHeads.length"
+                @click="pagination.pageNo += 1"
+              />
+            </div>
+          </template>
           <template v-slot:header-selection>
             <q-btn-group>
               <q-btn
@@ -518,6 +534,10 @@ const tableColumns: {
   { name: 'actions', field: '', align: 'left', label: 'Actions' },
 ];
 
+const pagination = reactive({
+  pageNo: 1,
+  rowsPerPage: 10,
+});
 const searchExpansionItemExpanded = ref(true);
 const isAddAccountHeadFormActive = ref(false);
 const editingAccountHeadIndex = ref<number | null>(null);
@@ -586,13 +606,18 @@ const resetSearchParameters = () => {
   nameSearchcriteria.value = 'sw';
 };
 
+watch(
+  () => pagination.pageNo,
+  () => search()
+);
+
 const search = async () => {
   isPerformingAction.value = true;
   const query = buildQuery();
 
   const rsp = await api.post('accountHead/search', {
-    pageNo: 1,
-    pageSize: 10,
+    pageNo: pagination.pageNo,
+    pageSize: pagination.rowsPerPage,
     where: query,
   });
 
