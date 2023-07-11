@@ -79,7 +79,7 @@
       @before-show="setDialogData"
     >
       <q-card :style="{ width: '350px' }">
-        <q-card-section class="row items-center q-pb-none bg-grey-2">
+        <q-card-section class="row items-center q-py-sm bg-grey-2">
           <div class="text-h6">
             {{ editingRowindex === null ? 'Add' : 'Edit' }} KYC
           </div>
