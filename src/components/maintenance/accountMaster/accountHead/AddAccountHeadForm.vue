@@ -1272,16 +1272,7 @@ watch(
   },
   { immediate: true }
 );
-watch(
-  shouldNullresetId,
-  () => {
-    console.log(
-      '🚀 ~ file: AddAccountHeadForm.vue:1276 ~ watch ~ shouldNullresetId:',
-      { shouldNullresetId: shouldNullresetId.value }
-    );
-  },
-  { immediate: true }
-);
+
 watch(
   () => localAccountHead.accountType,
   (newVal, oldVal) => {
@@ -1289,31 +1280,6 @@ watch(
       localAccountHead.reverseAccountGroupCode = null;
       localAccountHead.accountGroupCode = null;
     }
-  }
-);
-
-watch(
-  () => localAccountHead.stateId,
-  (val, oldVal) => {
-    console.log(
-      '🚀 ~ file: AddAccountHeadForm.vue:1284 ~ watch ~ val, oldVal: stateid',
-      { val, oldVal }
-    );
-  },
-  {
-    immediate: true,
-  }
-);
-watch(
-  () => address.countryId,
-  (val, oldVal) => {
-    console.log(
-      '🚀 ~ file: AddAccountHeadForm.vue:1300 ~ val, oldVal: countryID',
-      { val, oldVal }
-    );
-  },
-  {
-    immediate: true,
   }
 );
 </script>
