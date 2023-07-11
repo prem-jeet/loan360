@@ -955,7 +955,7 @@ const tdsClassOptions = ref<{ id: number; name: string; inactive: boolean }[]>(
   []
 );
 const statesOptions = ref<{ id: number; name: string }[]>([]);
-
+const shouldNullresetId = ref(true);
 const resetAddressForm = ref(false);
 const isActive = ref(true);
 const addressRequired = ref(false);
@@ -1111,11 +1111,13 @@ const resetFormData = () => {
   if (initialAccountHead.roleCode) {
     roleCodes.value = initialAccountHead.roleCode.split(',');
   }
+  shouldNullresetId.value = address.countryId === initailAddress.countryId;
   let key: keyof AccountHead;
   for (key in initialAccountHead) {
     // @ts-expect-error intended overrite
     localAccountHead[key] = initialAccountHead[key];
   }
+
   setTimeout(() => (isResettingAccountHeadForm.value = false), 0);
 };
 
@@ -1257,7 +1259,7 @@ watch(
   () => address.countryId,
   async (newVal, oldVal) => {
     if (newVal) {
-      if (oldVal) {
+      if (oldVal && shouldNullresetId.value) {
         localAccountHead.stateId = null;
       }
 
@@ -1265,11 +1267,21 @@ watch(
       if (rsp.data) {
         statesOptions.value = [...rsp.data];
       }
+      shouldNullresetId.value = true;
     }
   },
   { immediate: true }
 );
-
+watch(
+  shouldNullresetId,
+  () => {
+    console.log(
+      '🚀 ~ file: AddAccountHeadForm.vue:1276 ~ watch ~ shouldNullresetId:',
+      { shouldNullresetId: shouldNullresetId.value }
+    );
+  },
+  { immediate: true }
+);
 watch(
   () => localAccountHead.accountType,
   (newVal, oldVal) => {
@@ -1277,6 +1289,31 @@ watch(
       localAccountHead.reverseAccountGroupCode = null;
       localAccountHead.accountGroupCode = null;
     }
+  }
+);
+
+watch(
+  () => localAccountHead.stateId,
+  (val, oldVal) => {
+    console.log(
+      '🚀 ~ file: AddAccountHeadForm.vue:1284 ~ watch ~ val, oldVal: stateid',
+      { val, oldVal }
+    );
+  },
+  {
+    immediate: true,
+  }
+);
+watch(
+  () => address.countryId,
+  (val, oldVal) => {
+    console.log(
+      '🚀 ~ file: AddAccountHeadForm.vue:1300 ~ val, oldVal: countryID',
+      { val, oldVal }
+    );
+  },
+  {
+    immediate: true,
   }
 );
 </script>
