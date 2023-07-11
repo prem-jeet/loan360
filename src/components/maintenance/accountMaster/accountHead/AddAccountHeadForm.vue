@@ -802,16 +802,16 @@ import { storeToRefs } from 'pinia';
 import { api } from 'src/boot/axios';
 import { useUserStore } from 'src/stores/user/userStore';
 import { watch, computed, onMounted, reactive, ref, watchEffect } from 'vue';
-import AddressForm from 'components/commonForms/AddressForm.vue';
-import SearchableMultiselect from 'components/SearchableMultiselect.vue';
-import KycDataList from './KycDataList.vue';
 import { inactiveFilter } from 'src/utils/filters';
+import { capitalCase } from 'src/utils/string';
 import {
   alertDialog,
   asyncConfirmDialog,
   onSuccess,
 } from 'src/utils/notification';
-import { capitalCase } from 'src/utils/string';
+import KycDataList from './KycDataList.vue';
+import AddressForm from 'components/commonForms/AddressForm.vue';
+import SearchableMultiselect from 'components/SearchableMultiselect.vue';
 
 type KycDataItem = {
   kycCode: 'string';
@@ -824,6 +824,15 @@ interface AccountGroup {
   code: string;
   name: string;
   groupType: keyof typeof accountTypes;
+}
+interface TaxClass {
+  id: number;
+  taxType: string;
+  name: string;
+  inactive: boolean;
+}
+interface Props {
+  accountHead: AccountHead | null;
 }
 
 const initialAccountHead: AccountHead = {
@@ -882,6 +891,7 @@ const initialAccountHead: AccountHead = {
   updatedOn: null,
   updatedOnBy: null,
 };
+
 const initailAddress: Address = {
   address1: null,
   address2: null,
@@ -921,50 +931,38 @@ const tdsType = {
   I: 'Individual',
   O: 'Other',
 };
+
 const lockedOnDateFormat = 'DD/MM/YYYY';
 
 const emits = defineEmits(['close', 'updateList']);
-const props = defineProps<{
-  accountHead: AccountHead | null;
-}>();
+const props = defineProps<Props>();
 
 const { allowedCompany, allowedBranch } = storeToRefs(useUserStore());
-const lockedOn = ref<string | null>(null);
-const localAccountHead = reactive<AccountHead>(
-  props.accountHead ? { ...props.accountHead } : { ...initialAccountHead }
-);
-const accountGroups = ref<AccountGroup[]>([]);
-const accountGroupsOptions = ref<AccountGroup[]>([]);
-const bankFormatOptions = ref<{ code: string; name: string }[]>([]);
-const subLedgerOptions = ref<{ code: string; name: string }[]>([]);
-const reverseAcGroupCodeOptions = computed(() => {
-  if (!localAccountHead.accountType) {
-    return [];
-  }
-  const key = ['A', 'B'].includes(localAccountHead.accountType!) ? 'L' : 'A';
 
-  return inactiveFilter(
-    accountGroups.value.filter((group) => key === group.groupType)
-  ) as AccountGroup[];
-});
-const taxClassOptions = ref<
-  { id: number; taxType: string; name: string; inactive: boolean }[]
->([]);
-
-const tdsClassOptions = ref<{ id: number; name: string; inactive: boolean }[]>(
-  []
-);
-const statesOptions = ref<{ id: number; name: string }[]>([]);
 const shouldNullresetId = ref(true);
 const resetAddressForm = ref(false);
 const isActive = ref(true);
 const addressRequired = ref(false);
 const kycRequired = ref(false);
 const isResettingAccountHeadForm = ref(false);
-const address = reactive<Address>({ ...initailAddress });
-const kycData = ref<KycDataItem[]>([]);
+
+const accountGroupsOptions = ref<AccountGroup[]>([]);
+const bankFormatOptions = ref<{ code: string; name: string }[]>([]);
+const subLedgerOptions = ref<{ code: string; name: string }[]>([]);
+const taxClassOptions = ref<TaxClass[]>([]);
+const tdsClassOptions = ref<Omit<TaxClass, 'taxType'>[]>([]);
+const statesOptions = ref<{ id: number; name: string }[]>([]);
 const roleCodeOptions = ref<{ label: string; value: string }[]>([]);
+
+const lockedOn = ref<string | null>(null);
+const kycData = ref<KycDataItem[]>([]);
+const accountGroups = ref<AccountGroup[]>([]);
 const roleCodes = ref<string[]>([]);
+
+const localAccountHead = reactive<AccountHead>(
+  props.accountHead ? { ...props.accountHead } : { ...initialAccountHead }
+);
+const address = reactive<Address>({ ...initailAddress });
 
 const isAddressFormValid = computed(
   () =>
@@ -976,6 +974,23 @@ const isAddressFormValid = computed(
 const isKycFormValid = computed(() =>
   kycRequired.value ? !!kycData.value.length : true
 );
+const shouldSetKyc = computed(() => {
+  if (!(props.accountHead && props.accountHead.kyc)) {
+    return false;
+  }
+  return !!JSON.parse(props.accountHead.kyc).length;
+});
+
+const reverseAcGroupCodeOptions = computed(() => {
+  if (!localAccountHead.accountType) {
+    return [];
+  }
+  const key = ['A', 'B'].includes(localAccountHead.accountType!) ? 'L' : 'A';
+
+  return inactiveFilter(
+    accountGroups.value.filter((group) => key === group.groupType)
+  ) as AccountGroup[];
+});
 const computedKycIdList = computed(() => {
   const list: number[] = [];
 
@@ -988,13 +1003,109 @@ const computedKycIdList = computed(() => {
   return list;
 });
 
-const shouldSetKyc = computed(() => {
-  if (!(props.accountHead && props.accountHead.kyc)) {
-    return false;
-  }
-  return !!JSON.parse(props.accountHead.kyc).length;
-});
+const close = () => emits('close');
+const getOptionsFromObject = (obj: { [key: string]: string }) => {
+  return Object.keys(obj).map((key) => ({
+    value: key,
+    label: obj[key as keyof typeof obj],
+  }));
+};
 
+const deleteAddress = async (id: number) => {
+  try {
+    const rsp = await api.delete('address' + '/' + id);
+    if (rsp.data) {
+      onSuccess({ msg: 'Address ' + rsp.data.displayMessage });
+    }
+  } catch (e) {
+    // @ts-expect-error response data contains message if error occurs
+    const msg = e.response.data.displayMessage;
+    if (msg) {
+      alertDialog(msg);
+    }
+  }
+};
+
+const clerBankData = () => {
+  localAccountHead.accountNo = null;
+  localAccountHead.bankFormatCode = null;
+  localAccountHead.nachUniqueId = null;
+  localAccountHead.nachBankCode = null;
+  localAccountHead.ecsUserCode = null;
+  localAccountHead.micrCode = null;
+};
+const resetLockedOnDate = (setToday: boolean) => {
+  const ressetedDate =
+    initialAccountHead.lockedOn || (setToday ? Date.now() : null);
+  const newDateformat = ressetedDate
+    ? date.formatDate(ressetedDate, lockedOnDateFormat)
+    : null;
+  lockedOn.value = newDateformat;
+};
+const fixNullBooleanValues = () => {
+  const booleanKeys = [
+    'automatic',
+    'costCenter',
+    'refrenceAdjust',
+    'showInAllBranches',
+    'tds',
+    'tdsEditable',
+    'tax',
+  ];
+
+  booleanKeys.forEach((key) => {
+    if (initialAccountHead[key as keyof AccountHead] === null) {
+      // @ts-expect-error not assigning to id
+      initialAccountHead[key as keyof AccountHead] = false;
+    }
+  });
+};
+
+const setKycData = (kycDataArray: KycDataItem[]) => {
+  kycData.value = [...kycDataArray];
+};
+const updateKycIds = () => {
+  if (props.accountHead) {
+    let maxId = Math.max(...computedKycIdList.value);
+    kycData.value = kycData.value.map((val) => {
+      if (val.id !== undefined) {
+        return val;
+      }
+      return { ...val, id: ++maxId };
+    });
+  } else {
+    kycData.value = kycData.value.map((val, index) => ({
+      ...val,
+      id: index + 1,
+    }));
+  }
+};
+
+const resetFormData = () => {
+  isResettingAccountHeadForm.value = true;
+  resetAddressForm.value = true;
+  if (!localAccountHead.addressId) {
+    addressRequired.value = false;
+  }
+  resetLockedOnDate(false);
+  if (initialAccountHead.addressId) {
+    addressRequired.value = true;
+  }
+  kycRequired.value = shouldSetKyc.value;
+  setKycData(shouldSetKyc.value ? JSON.parse(props.accountHead!.kyc!) : []);
+
+  if (initialAccountHead.roleCode) {
+    roleCodes.value = initialAccountHead.roleCode.split(',');
+  }
+  shouldNullresetId.value = address.countryId === initailAddress.countryId;
+  let key: keyof AccountHead;
+  for (key in initialAccountHead) {
+    // @ts-expect-error intended overrite
+    localAccountHead[key] = initialAccountHead[key];
+  }
+
+  setTimeout(() => (isResettingAccountHeadForm.value = false), 0);
+};
 const saveAccountHead = async () => {
   if (
     (localAccountHead.taxNo && !addressRequired.value) ||
@@ -1066,112 +1177,40 @@ const saveAccountHead = async () => {
   }
 };
 
-const deleteAddress = async (id: number) => {
-  try {
-    const rsp = await api.delete('address' + '/' + id);
-    if (rsp.data) {
-      onSuccess({ msg: 'Address ' + rsp.data.displayMessage });
-    }
-  } catch (e) {
-    // @ts-expect-error response data contains message if error occurs
-    const msg = e.response.data.displayMessage;
-    if (msg) {
-      alertDialog(msg);
-    }
-  }
-};
-const close = () => emits('close');
+watchEffect(() => {
+  const { accountType } = localAccountHead;
+  accountGroupsOptions.value = inactiveFilter(
+    accountGroups.value.filter((group) => accountType === group.groupType)
+  ) as AccountGroup[];
+});
 
-const getOptionsFromObject = (obj: { [key: string]: string }) => {
-  return Object.keys(obj).map((key) => ({
-    value: key,
-    label: obj[key as keyof typeof obj],
-  }));
-};
-
-const clerBankData = () => {
-  localAccountHead.accountNo = null;
-  localAccountHead.bankFormatCode = null;
-  localAccountHead.nachUniqueId = null;
-  localAccountHead.nachBankCode = null;
-  localAccountHead.ecsUserCode = null;
-  localAccountHead.micrCode = null;
-};
-
-const resetFormData = () => {
-  isResettingAccountHeadForm.value = true;
-  resetAddressForm.value = true;
-  if (!localAccountHead.addressId) {
-    addressRequired.value = false;
-  }
-  resetLockedOnDate(false);
-  if (initialAccountHead.addressId) {
-    addressRequired.value = true;
-  }
-  kycRequired.value = shouldSetKyc.value;
-  setKycData(shouldSetKyc.value ? JSON.parse(props.accountHead!.kyc!) : []);
-
-  if (initialAccountHead.roleCode) {
-    roleCodes.value = initialAccountHead.roleCode.split(',');
-  }
-  shouldNullresetId.value = address.countryId === initailAddress.countryId;
-  let key: keyof AccountHead;
-  for (key in initialAccountHead) {
-    // @ts-expect-error intended overrite
-    localAccountHead[key] = initialAccountHead[key];
-  }
-
-  setTimeout(() => (isResettingAccountHeadForm.value = false), 0);
-};
-
-const fixNullBooleanValues = () => {
-  const booleanKeys = [
-    'automatic',
-    'costCenter',
-    'refrenceAdjust',
-    'showInAllBranches',
-    'tds',
-    'tdsEditable',
-    'tax',
-  ];
-
-  booleanKeys.forEach((key) => {
-    if (initialAccountHead[key as keyof AccountHead] === null) {
-      // @ts-expect-error not assigning to id
-      initialAccountHead[key as keyof AccountHead] = false;
-    }
-  });
-};
-
-const resetLockedOnDate = (setToday: boolean) => {
-  const ressetedDate =
-    initialAccountHead.lockedOn || (setToday ? Date.now() : null);
-  const newDateformat = ressetedDate
-    ? date.formatDate(ressetedDate, lockedOnDateFormat)
-    : null;
-  lockedOn.value = newDateformat;
-};
-
-const updateKycIds = () => {
-  if (props.accountHead) {
-    let maxId = Math.max(...computedKycIdList.value);
-    kycData.value = kycData.value.map((val) => {
-      if (val.id !== undefined) {
-        return val;
+watch(
+  () => address.countryId,
+  async (newVal, oldVal) => {
+    if (newVal) {
+      if (oldVal && shouldNullresetId.value) {
+        localAccountHead.stateId = null;
       }
-      return { ...val, id: ++maxId };
-    });
-  } else {
-    kycData.value = kycData.value.map((val, index) => ({
-      ...val,
-      id: index + 1,
-    }));
-  }
-};
 
-const setKycData = (kycDataArray: KycDataItem[]) => {
-  kycData.value = [...kycDataArray];
-};
+      const rsp = await api.get(`statesByCountry/${newVal}`);
+      if (rsp.data) {
+        statesOptions.value = [...rsp.data];
+      }
+      shouldNullresetId.value = true;
+    }
+  },
+  { immediate: true }
+);
+
+watch(
+  () => localAccountHead.accountType,
+  (newVal, oldVal) => {
+    if (newVal !== oldVal && !isResettingAccountHeadForm.value) {
+      localAccountHead.reverseAccountGroupCode = null;
+      localAccountHead.accountGroupCode = null;
+    }
+  }
+);
 
 onMounted(async () => {
   const [
@@ -1250,41 +1289,6 @@ onMounted(async () => {
     }
   }
 });
-
-watchEffect(() => {
-  const { accountType } = localAccountHead;
-  accountGroupsOptions.value = inactiveFilter(
-    accountGroups.value.filter((group) => accountType === group.groupType)
-  ) as AccountGroup[];
-});
-
-watch(
-  () => address.countryId,
-  async (newVal, oldVal) => {
-    if (newVal) {
-      if (oldVal && shouldNullresetId.value) {
-        localAccountHead.stateId = null;
-      }
-
-      const rsp = await api.get(`statesByCountry/${newVal}`);
-      if (rsp.data) {
-        statesOptions.value = [...rsp.data];
-      }
-      shouldNullresetId.value = true;
-    }
-  },
-  { immediate: true }
-);
-
-watch(
-  () => localAccountHead.accountType,
-  (newVal, oldVal) => {
-    if (newVal !== oldVal && !isResettingAccountHeadForm.value) {
-      localAccountHead.reverseAccountGroupCode = null;
-      localAccountHead.accountGroupCode = null;
-    }
-  }
-);
 </script>
 
 <style lang="scss"></style>
