@@ -1101,6 +1101,9 @@ const clerBankData = () => {
 const resetFormData = () => {
   isResettingAccountHeadForm.value = true;
   resetAddressForm.value = true;
+  if (!localAccountHead.addressId) {
+    addressRequired.value = false;
+  }
   resetLockedOnDate(false);
   if (initialAccountHead.addressId) {
     addressRequired.value = true;
