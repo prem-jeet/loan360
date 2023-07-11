@@ -550,6 +550,7 @@
 
 <script setup lang="ts">
 import type { AccountHead } from 'src/types/AccountHead';
+import type { TableColumn } from 'src/types/Common';
 import { date } from 'quasar';
 import { storeToRefs } from 'pinia';
 import { api } from 'src/boot/axios';
@@ -569,14 +570,7 @@ interface SearchObject {
   inActive: boolean;
 }
 
-const tableColumns: {
-  name: string;
-  required?: boolean;
-  label: string;
-  field: string;
-  align: 'left';
-  sortable?: boolean;
-}[] = [
+const tableColumns: TableColumn[] = [
   { name: 'name', field: 'name', align: 'left', label: 'Name' },
   { name: 'alias', field: 'alias', align: 'left', label: 'Alias' },
   { name: 'code', field: 'code', align: 'left', label: 'Code' },
@@ -596,6 +590,7 @@ const pagination = reactive({
   pageNo: 1,
   rowsPerPage: 10,
 });
+
 const searchExpansionItemExpanded = ref(true);
 const isAddAccountHeadFormActive = ref(false);
 const editingAccountHeadIndex = ref<number | null>(null);
