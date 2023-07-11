@@ -546,6 +546,7 @@
           : accountHeads[editingAccountHeadIndex]
       "
       @close="isAddAccountHeadFormActive = false"
+      @update-list="search"
     />
   </div>
 </template>

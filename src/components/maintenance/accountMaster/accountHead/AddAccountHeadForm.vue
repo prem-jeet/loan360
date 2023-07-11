@@ -923,7 +923,7 @@ const tdsType = {
 };
 const lockedOnDateFormat = 'DD/MM/YYYY';
 
-const emits = defineEmits(['close']);
+const emits = defineEmits(['close', 'updateList']);
 const props = defineProps<{
   accountHead: AccountHead | null;
 }>();
@@ -1055,7 +1055,7 @@ const saveAccountHead = async () => {
         rsp.data[isEditing ? 'updatedOnBy' : 'createdOnBy'];
 
       emits('close');
-      // also emit the new data
+      emits('updateList');
     }
   } catch (e) {
     // @ts-expect-error response data contains message if error occurs
