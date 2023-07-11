@@ -715,7 +715,7 @@ const toggleActivation = async (
   if (rsp.data) {
     onSuccess({ msg: rsp.data.displayMessage });
   }
-  accountHeads.value[index].inactive = !accountHeads.value[index].inactive;
+  search();
 };
 
 const varifySelectedAccountHead = (currentSelectedAccount: AccountHead[]) => {
