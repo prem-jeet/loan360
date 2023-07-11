@@ -763,13 +763,17 @@ watch(accountHeads, () => (selectedAccountHeads.value = []));
 
 onMounted(async () => {
   isPerformingAction.value = true;
-  const accountGroup = await api.get('accountGroup');
-  if (accountGroup.data) {
-    accountGroupOptions.value = [...accountGroup.data];
-  }
-  const subLedger = await api.get('subLedger');
-  if (subLedger.data) {
-    subLedgerCodeOptions.value = [...subLedger.data];
+  try {
+    const accountGroup = await api.get('accountGroup');
+    if (accountGroup.data) {
+      accountGroupOptions.value = [...accountGroup.data];
+    }
+    const subLedger = await api.get('subLedger');
+    if (subLedger.data) {
+      subLedgerCodeOptions.value = [...subLedger.data];
+    }
+  } catch (e) {
+    alertDialog('Unable to fetch options');
   }
   isPerformingAction.value = false;
 });
