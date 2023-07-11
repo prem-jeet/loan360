@@ -16,6 +16,7 @@
           v-model:selected="selectedAccountHeads"
           row-key="id"
           @selection="({ rows }) => varifySelectedAccountHead(rows as AccountHead[])"
+          :hide-bottom="$q.screen.width < 830"
         >
           <template v-slot:bottom>
             <div class="row col-grow q-py-sm">
@@ -262,6 +263,44 @@
                     </div>
                   </div>
                 </q-expansion-item>
+              </div>
+
+              <div
+                class="flex items-center q-py-md"
+                :style="{ gap: '1rem' }"
+                v-if="$q.screen.width < 830"
+              >
+                <q-btn
+                  icon="first_page"
+                  v-if="pagination.pageNo > 1"
+                  class="q-pa-sm"
+                  color="grey-4"
+                  text-color="blue-grey-10"
+                  round
+                  size="sm"
+                  @click="pagination.pageNo = 1"
+                />
+                <q-btn
+                  icon="keyboard_double_arrow_left"
+                  v-if="pagination.pageNo > 1"
+                  class="q-pa-sm"
+                  color="grey-4"
+                  text-color="blue-grey-10"
+                  round
+                  size="sm"
+                  @click="pagination.pageNo -= 1"
+                />
+                <q-btn
+                  icon="keyboard_double_arrow_right"
+                  v-if="pagination.rowsPerPage === accountHeads.length"
+                  class="q-pa-sm"
+                  round
+                  color="grey-4"
+                  text-color="blue-grey-10"
+                  size="sm"
+                  @click="pagination.pageNo += 1"
+                />
+                <span><b>On page</b> : {{ pagination.pageNo }}</span>
               </div>
             </div>
           </template>
