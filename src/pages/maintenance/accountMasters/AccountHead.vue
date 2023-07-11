@@ -327,7 +327,12 @@
                 :key="key"
                 :props="props"
               >
-                {{ props.row[key] }}
+                <template v-if="key === 'name' && props.row.subLedgerCode">
+                  {{ props.row[key] }} -- {{ props.row.subLedgerCode }}
+                </template>
+                <template v-else>
+                  {{ props.row[key] }}
+                </template>
               </q-td>
               <q-td key="inactive">
                 <div class="flex flex-center">
