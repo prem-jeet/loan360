@@ -676,14 +676,26 @@ const search = async () => {
   isPerformingAction.value = true;
   const query = buildQuery();
 
-  const rsp = await api.post('accountHead/search', {
-    pageNo: pagination.pageNo,
-    pageSize: pagination.rowsPerPage,
-    where: query,
-  });
+  try {
+    const rsp = await api.post('accountHead/search', {
+      pageNo: pagination.pageNo,
+      pageSize: pagination.rowsPerPage,
+      where: query,
+    });
 
-  if (rsp.data) {
-    accountHeads.value = [...rsp.data];
+    if (rsp.data) {
+      accountHeads.value = [...rsp.data];
+    }
+  } catch (e) {
+    // @ts-expect-error intended spred of error object
+    const { response } = { ...e };
+    let errorMessage = 'Some error occured, unable to fetch data.';
+    if (response.status === 401) {
+      errorMessage = response.statusText;
+    } else if (response.data) {
+      errorMessage = response.data.displayMessage;
+    }
+    alertDialog(errorMessage);
   }
   isPerformingAction.value = false;
 };
