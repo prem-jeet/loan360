@@ -47,11 +47,7 @@
               </div>
 
               <div class="col-xs-12 col-sm-3 col-md-6 q-pb-sm">
-                <q-checkbox
-                  v-model="checkBox"
-                  label=" In-Active"
-                  @click="(editingRowIndex = null), (isEditing = false)"
-                />
+                <q-checkbox v-model="checkBox" label=" In-Active" />
               </div>
               <div class="col-xs-12 col-sm-5 col-md-3 q-pb-sm">
                 <q-input
@@ -88,62 +84,20 @@
           <template v-slot:body="props">
             <q-tr :props="props">
               <q-td key="actions" auto-width>
-                <q-btn-group push unelevated>
-                  <q-btn
-                    icon="edit"
-                    size="xs"
-                    outline
-                    color="accent"
-                    v-if="editingRowIndex !== props.rowIndex"
-                    @click="() => editEntry(props.row.id, props.rowIndex)"
-                  >
-                    <q-tooltip>Edit</q-tooltip>
-                  </q-btn>
-
-                  <q-btn
-                    v-if="editingRowIndex !== props.rowIndex"
-                    :label="props.row.inactive ? 'activate' : 'deactivate'"
-                    size="xs"
-                    outline
-                    color="red"
-                    @click="
-                      () => changeActive(props.row.id, props.row.inactive)
-                    "
-                  >
-                  </q-btn>
-                  <q-btn
-                    icon="check"
-                    size="xs"
-                    outline
-                    color="green-10"
-                    v-if="editingRowIndex === props.rowIndex"
-                    @click="saveEdited"
-                  >
-                    <q-tooltip>Save</q-tooltip>
-                  </q-btn>
-                  <q-btn
-                    icon="close"
-                    size="xs"
-                    outline
-                    color="red"
-                    v-if="editingRowIndex === props.rowIndex"
-                    @click="(isEditing = false), (editingRowIndex = null)"
-                  >
-                    <q-tooltip>Cancel</q-tooltip>
-                  </q-btn>
-                </q-btn-group>
+                <q-btn
+                  icon="edit"
+                  size="xs"
+                  outline
+                  rounded
+                  color="accent"
+                  v-if="editingRowIndex !== props.rowIndex"
+                  @click="() => editEntry(props.row.id)"
+                >
+                  <q-tooltip>Edit</q-tooltip>
+                </q-btn>
               </q-td>
               <q-td key="name" :props="props">
-                <q-input
-                  v-if="editingRowIndex === props.rowIndex"
-                  v-model="editName"
-                  placeholder="Name required"
-                  dense
-                  outlined
-                  :color="editName ? 'green' : 'red'"
-                  autofocus
-                />
-                <span v-else> {{ firstLetterCpitalze(props.row.name) }} </span>
+                <span> {{ firstLetterCpitalze(props.row.name) }} </span>
               </q-td>
 
               <q-td
@@ -164,16 +118,7 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">Name :</div>
                     <div class="col-12">
-                      <q-input
-                        v-if="editingRowIndex === props.rowIndex"
-                        v-model="editName"
-                        placeholder="Name required"
-                        dense
-                        outlined
-                        :color="editName ? 'green' : 'red'"
-                        autofocus
-                      />
-                      <span v-else>
+                      <span>
                         {{ firstLetterCpitalze(props.row.name) }}
                       </span>
                     </div>
@@ -202,40 +147,8 @@
                     size="sm"
                     color="teal"
                     v-if="editingRowIndex !== props.rowIndex"
-                    @click="() => editEntry(props.row.id, props.rowIndex)"
+                    @click="() => editEntry(props.row.id)"
                   >
-                    <q-tooltip>Edit</q-tooltip>
-                  </q-btn>
-
-                  <q-btn
-                    v-if="editingRowIndex !== props.rowIndex"
-                    :label="props.row.inactive ? 'activate' : 'deactivate'"
-                    size="sm"
-                    color="red"
-                    @click="
-                      () => changeActive(props.row.id, props.row.inactive)
-                    "
-                  >
-                  </q-btn>
-                  <q-btn
-                    label="save"
-                    icon="save"
-                    size="sm"
-                    color="teal"
-                    v-if="editingRowIndex === props.rowIndex"
-                    @click="saveEdited"
-                  >
-                    <q-tooltip>Save</q-tooltip>
-                  </q-btn>
-                  <q-btn
-                    label="close"
-                    icon="close"
-                    size="sm"
-                    color="red"
-                    v-if="editingRowIndex === props.rowIndex"
-                    @click="(isEditing = false), (editingRowIndex = null)"
-                  >
-                    <q-tooltip>Cancel</q-tooltip>
                   </q-btn>
                 </q-card-actions>
               </q-card>
@@ -245,24 +158,35 @@
       </div>
     </div>
   </div>
+
+  <q-dialog v-model="isEditModalActive">
+    <CommonEditForMaintenancePages
+      :editObject="editObject"
+      @close="isEditModalActive = false"
+      @saveEdit="saveEdit"
+      editMsg="Edit Name Suffix"
+    ></CommonEditForMaintenancePages>
+  </q-dialog>
 </template>
 
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { ref, onMounted, computed, watch } from 'vue';
-import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
+import { ref, onMounted, computed, reactive } from 'vue';
+import { onSuccess, onFailure } from 'src/utils/notification';
+import { tableTypeOne } from 'src/utils/types';
 import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
-interface NameSuffix {
-  name: string;
-  id: number | null;
-  createdOn: string;
-  inactive: boolean;
-  inactiveOn: string;
-  updatedOn: string;
-}
+import CommonEditForMaintenancePages from 'src/components/modals/CommonEditForMaintenancePages.vue';
+// interface NameSuffix {
+//   name: string;
+//   id: number | null;
+//   createdOn: string;
+//   inactive: boolean;
+//   inactiveOn: string;
+//   updatedOn: string;
+// }
 
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
@@ -324,13 +248,21 @@ const $q = useQuasar();
 const fetchingData = ref(false);
 const name = ref('');
 const nameSearchQuery = ref('');
-const nameSuffix = ref<NameSuffix[]>([]);
+const nameSuffix = ref<tableTypeOne[]>([]);
 const checkBox = ref(false);
-const isEditing = ref(false);
 const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
-const editName = ref('');
 const format = 'DD/MM/YYYY @hh:mmA';
+const isEditModalActive = ref(false);
+let editObject = reactive<{
+  firstInputValue: string;
+  inactive: boolean;
+  firstInputLabel: string;
+}>({
+  firstInputValue: '',
+  inactive: false,
+  firstInputLabel: 'NameSuffix',
+});
 
 const filteredData = computed(() =>
   nameSuffix.value.filter(
@@ -355,44 +287,55 @@ const setFormData = () => {
     );
     temp = nameSuffix.value[index];
   }
-  editName.value = temp ? temp.name : '';
+  editObject.firstInputValue = temp ? temp.name : '';
+  editObject.inactive = temp ? temp.inactive : false;
 };
 
-const editEntryConfirmed = (id: number, index: number) => {
-  editingRowIndex.value = index;
+const editEntry = (id: number) => {
   editingRowId.value = id;
   setFormData();
+  isEditModalActive.value = true;
 };
 
-const editEntry = (id: number, rowIndex: number) => {
-  if (isEditing.value) {
-    confirmDialog(() => editEntryConfirmed(id, rowIndex), {
-      msg: 'Are you sure you want to cancel editing the current row?',
-    });
-  } else {
-    isEditing.value = true;
-    editingRowIndex.value = rowIndex;
-    editEntryConfirmed(id, rowIndex);
+const saveEdit = (editSaveObject: {
+  firstInputValue: string;
+  inactive: boolean;
+  firstInputLabel: string;
+}) => {
+  const { firstInputValue, inactive } = editSaveObject;
+  const tempInactive = editObject.inactive;
+
+  if (firstInputValue !== editObject.firstInputValue) {
+    const temp = nameSuffix.value.filter(
+      (item) => item.id !== editingRowId.value
+    );
+
+    const isDuplicate = temp.find(
+      (item) =>
+        item.name.toLowerCase() === editSaveObject.firstInputValue.toLowerCase()
+    );
+    if (isDuplicate) {
+      onFailure({
+        msg: 'Item already exist',
+        icon: 'warning',
+      });
+      return;
+    }
+    editObject = { ...editSaveObject };
+    saveEditedConfirm();
   }
+
+  if (inactive !== tempInactive) {
+    changeActiveConfirm(editingRowId.value!, editSaveObject.inactive);
+  }
+
+  editingRowId.value = null;
+  isEditModalActive.value = false;
 };
-const saveEdited = async () => {
-  const temp = nameSuffix.value.filter(
-    (item) => item.id !== editingRowId.value
-  );
 
-  const isDuplicate = temp.find(
-    (item) => item.name.toLowerCase() === editName.value.toLowerCase()
-  );
-  if (isDuplicate) {
-    onFailure({
-      msg: 'Item already exist',
-      icon: 'warning',
-    });
-    return;
-  }
-
+const saveEditedConfirm = async () => {
   let payLoad = {
-    name: editName.value,
+    name: editObject.firstInputValue,
     id: editingRowId.value,
     updatedOn: new Date(),
   };
@@ -423,18 +366,8 @@ const saveEntry = async () => {
   }
 };
 
-const changeActive = (id: number, state: boolean) => {
-  if (editingRowIndex.value === null) {
-    confirmDialog(() => changeActiveConfirm(id, state), {
-      msg: state
-        ? 'Are you sure you want to activate ?'
-        : 'Are you sure you want to deactivate ?',
-    });
-  }
-};
-
 const changeActiveConfirm = async (id: number, state: boolean) => {
-  const str = state ? 'active' : 'inactive';
+  const str = state ? 'inactive' : 'active';
   const rsp = await api.put('/nameSuffix/' + str, {
     id,
   });
@@ -453,11 +386,6 @@ const loadSource = async () => {
   }
   fetchingData.value = false;
 };
-
-watch(filteredData, () => {
-  editingRowIndex.value = null;
-  isEditing.value = false;
-});
 
 onMounted(() => {
   loadSource();
