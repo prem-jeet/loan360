@@ -510,11 +510,7 @@
                       @click="
                         confirmDialog(
                           () =>
-                            toggleActivation(
-                              props.row.id,
-                              props.row.inactive,
-                              props.rowIndex
-                            ),
+                            toggleActivation(props.row.id, props.row.inactive),
                           {
                             msg: `Are you sure you want to ${
                               props.row.inactive ? 'Activate' : 'De-Activate'
