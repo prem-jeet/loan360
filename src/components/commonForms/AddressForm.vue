@@ -200,12 +200,14 @@ interface Props {
 const props = defineProps<Props>();
 const emits = defineEmits(['update:modelValue', 'onReset']);
 
-const isRessseting = ref(false);
-const initialData = ref<Address>({ ...props.modelValue });
-const address = reactive<Address>(props.modelValue);
 const countries = ref<{ id: number; name: string }[]>([]);
 const states = ref<{ id: number; name: string }[]>([]);
+
+const isResetting = ref(false);
 const shouldReset = computed(() => props.resetForm);
+const initialData = ref<Address>({ ...props.modelValue });
+const address = reactive<Address>(props.modelValue);
+
 const testStdCode = (value: string) => {
   const regex = /^[-+\d]*$/;
   if (![null, ''].includes(value)) {
@@ -220,7 +222,7 @@ const testStdCode = (value: string) => {
   return true;
 };
 const reset = () => {
-  isRessseting.value = address.countryId !== initialData.value.countryId;
+  isResetting.value = address.countryId !== initialData.value.countryId;
   let key: keyof Address;
   for (key in initialData.value) {
     // @ts-expect-error intended iteration
@@ -256,14 +258,14 @@ watch(
     const { countryId } = address;
 
     if (countryId !== null) {
-      if (!isRessseting.value) {
+      if (!isResetting.value) {
         address.stateId = null;
       }
       const rsp = await api.get(`statesByCountry/${countryId}`);
       if (rsp.data) {
         states.value = [...rsp.data];
       }
-      isRessseting.value = false;
+      isResetting.value = false;
     }
   },
   { immediate: true }
