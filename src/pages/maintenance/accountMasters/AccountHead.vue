@@ -19,21 +19,39 @@
         >
           <template v-slot:bottom>
             <div class="row col-grow q-py-sm">
-              <q-btn
-                icon="keyboard_double_arrow_left"
-                label="Previous"
-                v-if="pagination.pageNo > 1"
-                @click="pagination.pageNo -= 1"
-              />
-              <q-btn
-                icon-right="keyboard_double_arrow_right"
-                class="q-ml-md"
-                label="Next"
-                v-if="pagination.rowsPerPage === accountHeads.length"
-                @click="pagination.pageNo += 1"
-              />
+              <div class="flex items-center" :style="{ gap: '1rem' }">
+                <q-btn
+                  icon="first_page"
+                  v-if="pagination.pageNo > 1"
+                  class="q-pa-sm"
+                  color="grey-4"
+                  text-color="blue-grey-10"
+                  round
+                  @click="pagination.pageNo = 1"
+                />
+                <q-btn
+                  icon="keyboard_double_arrow_left"
+                  v-if="pagination.pageNo > 1"
+                  class="q-pa-sm"
+                  color="grey-4"
+                  text-color="blue-grey-10"
+                  round
+                  @click="pagination.pageNo -= 1"
+                />
+                <q-btn
+                  icon="keyboard_double_arrow_right"
+                  v-if="pagination.rowsPerPage === accountHeads.length"
+                  class="q-pa-sm"
+                  round
+                  color="grey-4"
+                  text-color="blue-grey-10"
+                  @click="pagination.pageNo += 1"
+                />
+                <span><b>On page</b> : {{ pagination.pageNo }}</span>
+              </div>
             </div>
           </template>
+
           <template v-slot:header-selection>
             <q-btn-group>
               <q-btn
@@ -64,7 +82,10 @@
           </template>
 
           <template v-slot:top>
-            <div class="q-pb-xs-md col-grow">
+            <div
+              class="col-grow"
+              :class="{ 'q-pb-xs-md': searchExpansionItemExpanded }"
+            >
               <div class="row items-center">
                 <div class="col-12 col-sm-auto text-h4">Account Heads</div>
                 <div class="col-12 col-sm-auto q-mt-md q-mt-sm-none q-ml-sm-md">
