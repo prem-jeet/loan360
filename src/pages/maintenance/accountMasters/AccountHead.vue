@@ -400,11 +400,7 @@
                     @click="
                       confirmDialog(
                         () =>
-                          toggleActivation(
-                            props.row.id,
-                            props.row.inactive,
-                            props.rowIndex
-                          ),
+                          toggleActivation(props.row.id, props.row.inactive),
                         {
                           msg: `Are you sure you want to ${
                             props.row.inactive ? 'Activate' : 'De-Activate'
@@ -705,11 +701,7 @@ const search = async () => {
   isPerformingAction.value = false;
 };
 
-const toggleActivation = async (
-  id: number,
-  isInactive: boolean,
-  index: number
-) => {
+const toggleActivation = async (id: number, isInactive: boolean) => {
   const url = `accountHead/${isInactive ? 'active' : 'inactive'}`;
   const rsp = await api.put(url, { id });
   if (rsp.data) {
