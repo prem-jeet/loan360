@@ -60,7 +60,11 @@
                 color="orange"
                 icon="dynamic_feed"
                 padding="sm"
-                @click="removeDuplicate"
+                @click="
+                  () => {
+                    isMergeFormActive = shouldEnableMergeDialog();
+                  }
+                "
               >
                 <q-tooltip> Remove duplicate</q-tooltip>
               </q-btn>
@@ -253,7 +257,11 @@
                       <div class="flex flex-center">
                         <q-btn
                           label="remove duplicate"
-                          @click="removeDuplicate"
+                          @click="
+                            () => {
+                              isMergeFormActive = shouldEnableMergeDialog();
+                            }
+                          "
                           color="orange"
                           icon="dynamic_feed"
                           padding="sm"
@@ -561,6 +569,7 @@ import { alertDialog } from 'src/utils/notification';
 import MergeDuplicateAccoutheadsForm from 'src/components/maintenance/accountMaster/accountHead/MergeDuplicateAccountheadsForm.vue';
 import AddAccountHeadForm from 'src/components/maintenance/accountMaster/accountHead/AddAccountHeadForm.vue';
 
+type SelectInputOption = { code: string; name: string };
 interface SearchObject {
   companyCode: string | null;
   branchCode: string | null;
@@ -569,7 +578,6 @@ interface SearchObject {
   accountName: string | null;
   inActive: boolean;
 }
-
 const tableColumns: TableColumn[] = [
   { name: 'name', field: 'name', align: 'left', label: 'Name' },
   { name: 'alias', field: 'alias', align: 'left', label: 'Alias' },
@@ -591,16 +599,20 @@ const pagination = reactive({
   rowsPerPage: 10,
 });
 
+const { allowedCompany, allowedBranch } = storeToRefs(useUserStore());
+const accountGroupOptions = ref<SelectInputOption[]>([]);
+const subLedgerCodeOptions = ref<SelectInputOption[]>([]);
+const nameSearchcriteria = ref<'sw' | 'c'>('sw');
+
+const isPerformingAction = ref(false);
 const searchExpansionItemExpanded = ref(true);
 const isAddAccountHeadFormActive = ref(false);
+const isMergeFormActive = ref(false);
 const editingAccountHeadIndex = ref<number | null>(null);
-const isPerformingAction = ref(false);
-const { allowedCompany, allowedBranch } = storeToRefs(useUserStore());
-const accountGroupOptions = ref<{ code: string; name: string }[]>([]);
-const subLedgerCodeOptions = ref<{ code: string; name: string }[]>([]);
-const nameSearchcriteria = ref<'sw' | 'c'>('sw');
+
 const accountHeads = ref<AccountHead[]>([]);
 const selectedAccountHeads = ref<AccountHead[]>([]);
+
 const searchObject = reactive<SearchObject>({
   companyCode: null,
   branchCode: null,
@@ -609,7 +621,7 @@ const searchObject = reactive<SearchObject>({
   accountName: null,
   inActive: false,
 });
-const isMergeFormActive = ref(false);
+
 const duplicateAccountHeads = computed(() => {
   if (!selectedAccountHeads.value.length) {
     return [];
@@ -620,34 +632,7 @@ const duplicateAccountHeads = computed(() => {
   }));
 });
 
-const getDate = (_date: Date) => {
-  return date.formatDate(_date, 'DD/MM/YY @h:mma');
-};
-
-const buildQuery = () => {
-  const parameters = [
-    'companyCode',
-    'branchCode',
-    'accountGroupCode',
-    'subLedgerCode',
-  ].reduce((acc, key) => {
-    const parameter = searchObject[key as keyof SearchObject];
-    if (parameter) {
-      return acc + ` and ${key}='${parameter}'`;
-    }
-    return acc;
-  }, '');
-  const nameParameter = searchObject.accountName
-    ? ` and lower(name) like lower('${
-        nameSearchcriteria.value === 'c' ? '%' : ''
-      }${searchObject.accountName}%')`
-    : '';
-
-  const inActiveParameter = searchObject.inActive
-    ? ' and c.inactive= true'
-    : ' and (c.inactive is null or c.inactive is false)';
-  return `1=1 ${parameters}${nameParameter}${inActiveParameter} ORDER BY c.name ASC`;
-};
+const getDate = (_date: Date) => date.formatDate(_date, 'DD/MM/YY @h:mma');
 
 const resetSearchParameters = () => {
   searchObject.companyCode = null;
@@ -658,12 +643,6 @@ const resetSearchParameters = () => {
   searchObject.inActive = false;
   nameSearchcriteria.value = 'sw';
 };
-
-watch(
-  () => pagination.pageNo,
-  () => search()
-);
-
 const search = async () => {
   isPerformingAction.value = true;
   const query = buildQuery();
@@ -691,6 +670,30 @@ const search = async () => {
   }
   isPerformingAction.value = false;
 };
+const buildQuery = () => {
+  const parameters = [
+    'companyCode',
+    'branchCode',
+    'accountGroupCode',
+    'subLedgerCode',
+  ].reduce((acc, key) => {
+    const parameter = searchObject[key as keyof SearchObject];
+    if (parameter) {
+      return acc + ` and ${key}='${parameter}'`;
+    }
+    return acc;
+  }, '');
+  const nameParameter = searchObject.accountName
+    ? ` and lower(name) like lower('${
+        nameSearchcriteria.value === 'c' ? '%' : ''
+      }${searchObject.accountName}%')`
+    : '';
+
+  const inActiveParameter = searchObject.inActive
+    ? ' and c.inactive= true'
+    : ' and (c.inactive is null or c.inactive is false)';
+  return `1=1 ${parameters}${nameParameter}${inActiveParameter} ORDER BY c.name ASC`;
+};
 
 const toggleActivation = async (id: number, isInactive: boolean) => {
   const url = `accountHead/${isInactive ? 'active' : 'inactive'}`;
@@ -703,23 +706,25 @@ const toggleActivation = async (id: number, isInactive: boolean) => {
 
 const varifySelectedAccountHead = (currentSelectedAccount: AccountHead[]) => {
   if (selectedAccountHeads.value.length) {
-    const { subLedgerCode } = selectedAccountHeads.value[0];
+    const isSubledgerAlreadySelected =
+      !!selectedAccountHeads.value[0].subLedgerCode;
 
-    if (!currentSelectedAccount[0].subLedgerCode && subLedgerCode) {
+    const isSubledgerCurrentlySelected =
+      !!currentSelectedAccount[0].subLedgerCode;
+
+    const subledgerMismatch =
+      +isSubledgerCurrentlySelected ^ +!!isSubledgerAlreadySelected;
+
+    if (subledgerMismatch) {
       alertDialog(
-        "Currently selected account doesn't has subledger but Already selected accounts has subledger",
+        `Currently selected account ${
+          isSubledgerCurrentlySelected ? '' : "doesn't"
+        } has subledger but Already selected accounts ${
+          isSubledgerCurrentlySelected ? "doesn't" : ''
+        }has subledger`,
         'Error'
       );
-      setTimeout(
-        () => removeSelectedAccountHead(currentSelectedAccount[0].id!),
-        0
-      );
-    }
-    if (currentSelectedAccount[0].subLedgerCode && !subLedgerCode) {
-      alertDialog(
-        "Currently selected account has subledger but Already selected accounts doesn't have subledger",
-        'Error'
-      );
+
       setTimeout(
         () => removeSelectedAccountHead(currentSelectedAccount[0].id!),
         0
@@ -727,7 +732,6 @@ const varifySelectedAccountHead = (currentSelectedAccount: AccountHead[]) => {
     }
   }
 };
-
 const removeSelectedAccountHead = (id: number) =>
   (selectedAccountHeads.value = selectedAccountHeads.value.filter(
     (accountHead) => {
@@ -735,31 +739,31 @@ const removeSelectedAccountHead = (id: number) =>
     }
   ));
 
-const removeDuplicate = () => {
-  if (!selectedAccountHeads.value.length) {
-    alertDialog('Please select Account Heads.', 'Error');
-    return;
-  }
-  if (selectedAccountHeads.value.length === 1) {
-    alertDialog('Please select atleast 2 Accountn Heads', 'Error');
-    return;
-  }
-  isMergeFormActive.value = true;
-};
+const shouldEnableMergeDialog = () => {
+  const selectedItems = selectedAccountHeads.value.length;
 
+  if (selectedItems > 1) {
+    return true;
+  }
+
+  alertDialog('Please select atleast 2 Account Heads for merging.', 'Error');
+  return false;
+};
 const mergeAccountHeads = async (payload: { id: number; ids: number[] }) => {
   const rsp = await api.post('accountHead/dedupe', payload);
 
   if (rsp.data) {
     onSuccess({ msg: rsp.data.displayMessage });
+    search();
   }
-
-  accountHeads.value = accountHeads.value.filter(
-    ({ id }) => !payload.ids.includes(id!)
-  );
 };
 
 watch(accountHeads, () => (selectedAccountHeads.value = []));
+
+watch(
+  () => pagination.pageNo,
+  () => search()
+);
 
 onMounted(async () => {
   isPerformingAction.value = true;
@@ -773,7 +777,7 @@ onMounted(async () => {
       subLedgerCodeOptions.value = [...subLedger.data];
     }
   } catch (e) {
-    alertDialog('Unable to fetch options');
+    alertDialog('Unable to fetch options.');
   }
   isPerformingAction.value = false;
 });
