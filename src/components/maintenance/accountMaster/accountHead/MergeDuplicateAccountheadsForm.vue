@@ -50,13 +50,15 @@
 </template>
 
 <script setup lang="ts">
-import { alertDialog, confirmDialog } from 'src/utils/notification';
+import { alertDialog, asyncConfirmDialog } from 'src/utils/notification';
 import { ref, watch } from 'vue';
 
+interface Props {
+  duplicateList: { id: number; name: string }[];
+}
+
 const emits = defineEmits(['close', 'merge']);
-const props = defineProps<{
-  duplicateList: { id: number | undefined; name: string | null }[];
-}>();
+const props = defineProps<Props>();
 
 const isActive = ref(true);
 const parentAccountHead = ref(props.duplicateList[0].id);
@@ -66,11 +68,7 @@ const toBeRemovedAccountHeads = ref(
     .map((accountHead) => ({ ...accountHead, isSelected: false }))
 );
 
-const close = () => {
-  emits('close');
-};
-
-const merge = () => {
+const merge = async () => {
   const ids = toBeRemovedAccountHeads.value
     .filter(({ isSelected }) => isSelected)
     .map(({ id }) => id);
@@ -81,13 +79,18 @@ const merge = () => {
     return;
   }
 
-  confirmDialog(
-    () => {
-      emits('merge', { id, ids });
-      close();
-    },
-    { msg: 'Are you sure you want to merge ?' }
-  );
+  const confirmation = await asyncConfirmDialog({
+    title: 'Confirm',
+    msg: 'Are you sure you want to merge ?',
+  });
+
+  if (confirmation) {
+    emits('merge', { id, ids });
+    close();
+  }
+};
+const close = () => {
+  emits('close');
 };
 
 watch(parentAccountHead, (newVal, oldVal) => {
