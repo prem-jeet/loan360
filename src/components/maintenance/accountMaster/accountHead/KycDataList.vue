@@ -28,7 +28,7 @@
         <div
           class="col-auto"
           v-for="(kycData, index) in localKycDataList"
-          :key="kycData.kycCode"
+          :key="kycData.kycCode!"
         >
           <q-card :style="{ minWidth: '150px' }">
             <q-bar class="bg-grey-3">
@@ -53,7 +53,7 @@
             </q-bar>
             <q-card-section class="q-gutter-y-sm">
               <div class="row text-weight-medium text-subtitle1">
-                {{ getKycName(kycData.kycCode) }}
+                {{ getKycName(kycData.kycCode!) }}
               </div>
               <div class="row" v-if="kycData.pattern">
                 <div class="col-12">Pattern :</div>
@@ -196,11 +196,12 @@ import { alertDialog } from 'src/utils/notification';
 import { reactive, onMounted, ref, computed } from 'vue';
 
 type KycDataItem = {
-  kycCode: string;
+  kycCode: string | null;
   pattern: string | null;
-  value: string;
+  value: string | null;
   id: number;
 };
+
 interface KycOptions {
   code: string;
   name: string;
@@ -215,8 +216,16 @@ interface Props {
 const props = defineProps<Props>();
 const emits = defineEmits(['update:kycDataList']);
 
-const localKycDataList = computed(() => [...props.kycDataList]);
 const availableKycOptions = ref<KycOptions[]>([]);
+const kycModel = ref(false);
+const editingRowindex = ref<null | number>(null);
+const tempKycData = reactive<Omit<KycDataItem, 'id'>>({
+  kycCode: null,
+  pattern: null,
+  value: null,
+});
+
+const localKycDataList = computed(() => [...props.kycDataList]);
 const computedKycOptions = computed(() => {
   if (!localKycDataList.value.length) {
     return availableKycOptions.value;
@@ -238,32 +247,50 @@ const computedKycOptions = computed(() => {
         ),
       ];
 });
-
-const kycModel = ref(false);
-const editingRowindex = ref<null | number>(null);
-const tempKycData = reactive<{
-  kycCode: string | null;
-  pattern: string | null;
-  value: string | null;
-}>({ kycCode: null, pattern: null, value: null });
 const avalablePatternOptions = computed(() => {
   if (!tempKycData.kycCode) {
     return [];
-  } else {
-    const matchedKycData = availableKycOptions.value.find(
-      (kyc) => kyc.code === tempKycData.kycCode
-    );
-    if (!matchedKycData?.patterns) {
-      return [];
-    }
-    return matchedKycData.patterns.split(',');
   }
+  const matchedKycData = availableKycOptions.value.find(
+    (kyc) => kyc.code === tempKycData.kycCode
+  );
+  if (!matchedKycData?.patterns) {
+    return [];
+  }
+  return matchedKycData.patterns.split(',');
 });
-
 const computeMask = computed(() =>
   !tempKycData.pattern ? '' : tempKycData.pattern.replaceAll('9', '#')
 );
 
+const clearDialogFields = () => {
+  editingRowindex.value = null;
+  tempKycData.kycCode = null;
+  tempKycData.pattern = null;
+  tempKycData.value = null;
+};
+const setDialogData = () => {
+  if (editingRowindex.value !== null) {
+    const { kycCode, pattern, value } =
+      localKycDataList.value[editingRowindex.value];
+    tempKycData.pattern = pattern;
+    tempKycData.kycCode = kycCode;
+    setTimeout(() => (tempKycData.value = value), 0);
+  }
+};
+const getKycName = (kycCode: string) => {
+  if (!availableKycOptions.value.length) {
+    return '';
+  }
+  return availableKycOptions.value.find(({ code }) => kycCode === code)!.name;
+};
+
+const removeKycdata = (index: number) => {
+  emits('update:kycDataList', [
+    ...localKycDataList.value.slice(0, index),
+    ...localKycDataList.value.slice(index + 1),
+  ]);
+};
 const submitHandler = () => {
   const { pattern, value } = tempKycData;
   if (!pattern || pattern.length === value!.length) {
@@ -282,36 +309,6 @@ const submitHandler = () => {
     kycModel.value = false;
   } else {
     alertDialog('Please fill the value');
-  }
-};
-const removeKycdata = (index: number) => {
-  emits('update:kycDataList', [
-    ...localKycDataList.value.slice(0, index),
-    ...localKycDataList.value.slice(index + 1),
-  ]);
-};
-const clearDialogFields = () => {
-  editingRowindex.value = null;
-  tempKycData.kycCode = null;
-  tempKycData.pattern = null;
-  tempKycData.value = null;
-  // setTimeout(() => (tempKycData.value = null), 0);
-};
-
-const getKycName = (kycCode: string) => {
-  if (!availableKycOptions.value.length) {
-    return '';
-  }
-  return availableKycOptions.value.find(({ code }) => kycCode === code)!.name;
-};
-
-const setDialogData = () => {
-  if (editingRowindex.value !== null) {
-    const { kycCode, pattern, value } =
-      localKycDataList.value[editingRowindex.value];
-    tempKycData.pattern = pattern;
-    tempKycData.kycCode = kycCode;
-    setTimeout(() => (tempKycData.value = value), 0);
   }
 };
 onMounted(async () => {
