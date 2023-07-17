@@ -87,19 +87,13 @@
               </q-td>
 
               <q-td key="createdOn" :props="props">
-                {{
-                  props.row.createdOn.toLocaleString('en-US', DateTimeOptions)
-                }}
+                {{ props.row.createdOn }}
               </q-td>
               <q-td key="updatedOn" :props="props">
-                {{
-                  props.row.updatedOn.toLocaleString('en-US', DateTimeOptions)
-                }}
+                {{ props.row.updatedOn }}
               </q-td>
               <q-td key="inactiveOn" :props="props">
-                {{
-                  props.row.inactiveOn.toLocaleString('en-US', DateTimeOptions)
-                }}
+                {{ props.row.inactiveOn }}
               </q-td>
             </q-tr>
           </template>
@@ -137,12 +131,7 @@
                   <div class="row q-gutter-y-xs items-center">
                     <div class="col-12 text-weight-medium">CreatedOn :</div>
                     <div class="col-12">
-                      {{
-                        props.row.createdOn.toLocaleString(
-                          'en-US',
-                          DateTimeOptions
-                        )
-                      }}
+                      {{ props.row.createdOn }}
                     </div>
                   </div>
                 </q-card-section>
@@ -151,12 +140,7 @@
                   <div class="row q-gutter-y-xs items-center">
                     <div class="col-12 text-weight-medium">UpdatedOn :</div>
                     <div class="col-12">
-                      {{
-                        props.row.updatedOn.toLocaleString(
-                          'en-US',
-                          DateTimeOptions
-                        )
-                      }}
+                      {{ props.row.updatedOn }}
                     </div>
                   </div>
                 </q-card-section>
@@ -165,12 +149,7 @@
                   <div class="row q-gutter-y-xs items-center">
                     <div class="col-12 text-weight-medium">inactiveOn :</div>
                     <div class="col-12">
-                      {{
-                        props.row.inactiveOn.toLocaleString(
-                          'en-US',
-                          DateTimeOptions
-                        )
-                      }}
+                      {{ props.row.inactiveOn }}
                     </div>
                   </div>
                 </q-card-section>
@@ -357,15 +336,6 @@ const columns: {
   },
 ];
 
-const DateTimeOptions = {
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-  hour: 'numeric',
-  minute: 'numeric',
-  hour12: true, // Use 12-hour format
-};
-
 const newSource = reactive<BureauScore>({
   createdOn: '',
   inactive: false,
@@ -489,25 +459,12 @@ const loadSource = async () => {
   const rsp = await api.get('bureauScoreRate');
 
   if (rsp.data) {
-    const transformedData = rsp.data.map(
-      (item: {
-        createdOn: string | number | Date;
-        updatedOn: string | number | Date;
-        inactiveOn: string | number | Date;
-      }) => {
-        return {
-          ...item,
-          createdOn: item.createdOn !== null ? new Date(item.createdOn) : '',
-          updatedOn: item.updatedOn !== null ? new Date(item.updatedOn) : '',
-          inactiveOn: item.inactiveOn !== null ? new Date(item.inactiveOn) : '',
-        };
-      }
-    );
-    bureauScore.value = transformedData.filter(
+    const fetchedBureauScoreData: BureauScore[] = rsp.data;
+
+    bureauScore.value = fetchedBureauScoreData.filter(
       (item: { inactive: boolean }) => item.inactive === checkBox.value
     );
-    bureauScoreTemp.value = transformedData;
-    console.log(bureauScore.value);
+    bureauScoreTemp.value = rsp.data;
   }
   fetchingData.value = false;
 };
