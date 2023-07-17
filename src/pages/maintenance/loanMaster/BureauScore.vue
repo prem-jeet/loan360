@@ -68,11 +68,13 @@
                     <q-tooltip>Edit</q-tooltip>
                   </q-btn>
                   <q-btn
-                    :label="props.row.inactive ? 'activate' : 'deactivate'"
+                    :label="props.row.inactive ? 'activate' : 'de-activate'"
                     size="xs"
                     outline
                     color="red"
-                    @click="changeActive(props.row.id, props.row.inactive)"
+                    @click="
+                      () => changeActive(props.row.id, props.row.inactive)
+                    "
                   >
                   </q-btn>
                 </q-btn-group>
@@ -168,10 +170,12 @@
                   >
                   </q-btn>
                   <q-btn
-                    :label="props.row.inactive ? 'activate' : 'deactivate'"
+                    :label="props.row.inactive ? 'activate' : 'de-activate'"
                     size="sm"
                     color="red"
-                    @click="changeActive(props.row.id, props.row.inactive)"
+                    @click="
+                      () => changeActive(props.row.id, props.row.inactive)
+                    "
                   >
                   </q-btn>
                 </q-card-actions>
@@ -443,29 +447,31 @@ const saveEntry = () => {
   mode === 'new' ? saveNewEntry() : saveEdited();
 };
 
-const changeActive = async (id: number, state: boolean) => {
-  if (editingRowIndex.value === null) {
-    confirmDialog(() => changeActiveConfirm(id, state), {
-      msg: state
-        ? 'Are you sure you want to activate ?'
-        : 'Are you sure you want to deactivate ?',
-    });
-  } else {
-    return;
-  }
-};
-
-const changeActiveConfirm = async (id: number, state: boolean) => {
-  const payLoad = {
-    id: id,
-  };
-
-  const str = state ? 'active' : 'inactive';
-  const rsp = await api.put('/bureauScoreRate/' + str, payLoad);
-  if (rsp.data) {
-    onSuccess({ msg: rsp.data.displayMessage });
-  }
-  loadSource();
+const changeActive = async (id: number, inActive: boolean) => {
+  confirmDialog(
+    async () => {
+      const rsp = await api.put(
+        `/bureauScoreRate/${inActive ? 'active' : 'inactive'}`,
+        { id }
+      );
+      if (rsp.data) {
+        onSuccess({ msg: rsp.data.displayMessage });
+      }
+      bureauScore.value.forEach((score) => {
+        if (score.id === id) {
+          score.inactive = !inActive;
+          if (!inActive) {
+            score.inactiveOn = new Date().toString();
+          }
+        }
+      });
+    },
+    {
+      msg: `Are you sure you want to ${
+        inActive ? 'Activate' : 'De-Activate'
+      } ?`,
+    }
+  );
 };
 
 const loadSource = async () => {
