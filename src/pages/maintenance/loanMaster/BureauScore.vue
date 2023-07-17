@@ -33,7 +33,7 @@
                       icon="add"
                       label="Add new"
                       size="md"
-                      @click="newEntry()"
+                      @click="isFormActive = true"
                     />
                   </div>
                 </div>
@@ -63,7 +63,10 @@
                     size="xs"
                     outline
                     color="accent"
-                    @click="editEntry(props.rowIndex)"
+                    @click="
+                      editingRowId = props.row.id;
+                      isFormActive = true;
+                    "
                   >
                     <q-tooltip>Edit</q-tooltip>
                   </q-btn>
@@ -166,7 +169,10 @@
                     icon="edit"
                     size="sm"
                     color="teal"
-                    @click="editEntry(props.rowIndex)"
+                    @click="
+                      editingRowId = props.row.id;
+                      isFormActive = true;
+                    "
                   >
                   </q-btn>
                   <q-btn
@@ -186,9 +192,13 @@
       </div>
     </div>
   </div>
-  <q-dialog v-model="isEntryModalActive">
+  <q-dialog
+    v-model="isFormActive"
+    @before-hide="editingRowId = null"
+    @before-show="setCurrentFormData"
+  >
     <q-card style="width: 500px">
-      <q-form @submit.prevent="saveEntry" @reset="setFormData()">
+      <q-form @submit.prevent="saveEntry" @reset="setCurrentFormData">
         <q-card-section class="bg-grey-2">
           <div class="flex items-center">
             <span class="text-bold q-mr-xl">{{
@@ -199,7 +209,7 @@
               class="q-ml-xs-md q-ml-sm-xl"
               icon="close"
               flat
-              @click="isEntryModalActive = false"
+              @click="isFormActive = false"
             />
           </div>
         </q-card-section>
@@ -209,31 +219,41 @@
               <div class="col-12 q-mt-sm">
                 <q-input
                   outlined
-                  v-model.number="newSource.scoreFrom"
+                  v-model.number="currentFormData.scoreFrom"
                   label="Score From"
                   dense
-                  type="number"
-                  :rules="[(val:number) => val!==null]"
+                  :mask="'#'.repeat(4)"
+                  no-error-icon
+                  :rules="[(val) => val !== null && val !== '']"
                 />
               </div>
               <div class="col-12 q-mt-sm">
                 <q-input
                   outlined
-                  v-model.number="newSource.scoreUpto"
+                  v-model.number="currentFormData.scoreUpto"
                   label="Score Upto"
                   dense
-                  type="number"
-                  :rules="[(val:number) => val!==null]"
+                  :mask="'#'.repeat(4)"
+                  no-error-icon
+                  :rules="[(val) => val !== null && val !== '']"
                 />
               </div>
               <div class="col-12 q-mt-sm">
                 <q-input
                   outlined
-                  v-model.number="newSource.rate"
-                  label="Rate"
+                  v-model.number="currentFormData.rate"
+                  label="Rate(%)"
                   dense
-                  type="number"
-                  :rules="[(val:number) => val!==null]"
+                  no-error-icon
+                  :rules="[(val) => val !== null && val !== '']"
+                  :mask="'#'.repeat(3)"
+                  @update:model-value="
+                    (val) => {
+                      if (typeof val === 'number' && val > 100) {
+                        currentFormData.rate = 100;
+                      }
+                    }
+                  "
                 />
               </div>
             </div>
@@ -259,7 +279,7 @@ import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { formatDate } from 'src/utils/date';
 import { onSuccess, confirmDialog } from 'src/utils/notification';
-import { ref, onMounted, computed, reactive } from 'vue';
+import { ref, onMounted, computed, reactive, watch } from 'vue';
 
 interface BureauScore {
   createdOn: string;
@@ -267,6 +287,12 @@ interface BureauScore {
   inactiveOn: string;
   updatedOn: string;
   id: number | null;
+  rate: number | null;
+  scoreFrom: number | null;
+  scoreUpto: number | null;
+}
+
+interface ScoreRateForm {
   rate: number | null;
   scoreFrom: number | null;
   scoreUpto: number | null;
@@ -360,11 +386,17 @@ const newSource = reactive<BureauScore>({
 });
 
 let mode: 'new' | 'edit' = 'new';
+const editingRowId = ref<number | null>(null);
 const checkBox = ref(false);
 const editingRowIndex = ref<number | null>(null);
-const isEntryModalActive = ref(false);
+const isFormActive = ref(false);
 const fetchingData = ref(false);
 const bureauScore = ref<BureauScore[]>([]);
+const currentFormData = ref<ScoreRateForm>({
+  rate: null,
+  scoreFrom: null,
+  scoreUpto: null,
+});
 
 const filteredbureauScore = computed(() => {
   if (!bureauScore.value.length) {
@@ -375,32 +407,32 @@ const filteredbureauScore = computed(() => {
   );
 });
 
+const initialFormData = computed(() => {
+  const temp: ScoreRateForm = {
+    rate: null,
+    scoreFrom: null,
+    scoreUpto: null,
+  };
+
+  if (editingRowId.value) {
+    const editingRow = bureauScore.value.find(
+      (score) => score.id === editingRowId.value
+    );
+    if (editingRow) {
+      temp.rate = editingRow.rate;
+      temp.scoreFrom = editingRow.scoreFrom;
+      temp.scoreUpto = editingRow.scoreUpto;
+    }
+  }
+
+  return temp;
+});
+
 const fixDateFormat = (dateString: string | null) =>
   dateString !== null ? formatDate(dateString, dateFormat) : '';
 
-const setFormData = () => {
-  let temp;
-  if (editingRowIndex.value !== null) {
-    temp = bureauScore.value[editingRowIndex.value];
-  }
-
-  newSource.scoreFrom = temp ? temp.scoreFrom : null;
-  newSource.scoreUpto = temp ? temp.scoreUpto : null;
-  newSource.rate = temp ? temp.rate : null;
-  newSource.id = temp ? temp.id : null;
-};
-
-const newEntry = () => {
-  mode = 'new';
-  editingRowIndex.value = null;
-  setFormData();
-  isEntryModalActive.value = true;
-};
-const editEntry = (index: number) => {
-  mode = 'edit';
-  editingRowIndex.value = index;
-  setFormData();
-  isEntryModalActive.value = true;
+const setCurrentFormData = () => {
+  currentFormData.value = { ...initialFormData.value };
 };
 
 const saveNewEntry = async () => {
@@ -419,7 +451,7 @@ const saveNewEntry = async () => {
       icon: 'sync_alt',
     });
     loadSource();
-    isEntryModalActive.value = false;
+    isFormActive.value = false;
   }
 };
 
@@ -438,13 +470,13 @@ const saveEdited = async () => {
       icon: 'sync_alt',
     });
     loadSource();
-    isEntryModalActive.value = false;
+    isFormActive.value = false;
     editingRowIndex.value = null;
   }
 };
 
 const saveEntry = () => {
-  mode === 'new' ? saveNewEntry() : saveEdited();
+  console.log('save');
 };
 
 const changeActive = async (id: number, inActive: boolean) => {
