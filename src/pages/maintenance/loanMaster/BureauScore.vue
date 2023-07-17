@@ -7,7 +7,7 @@
     <div class="row q-mt-lg q-pb-xl">
       <div class="col">
         <q-table
-          :rows="filteredData"
+          :rows="filteredbureauScore"
           :columns="columns"
           row-key="code"
           :loading="fetchingData"
@@ -17,10 +17,10 @@
           title="Nature entry"
           no-data-label="No result found"
           :rows-per-page-options="[0]"
-          :hide-bottom="!!filteredData.length"
           :grid="$q.screen.width < 830"
           card-container-class="q-gutter-y-md q-mt-xs"
           binary-state-sort
+          hide-bottom
         >
           <template v-slot:top>
             <div class="row q-gutter-y-lg q-pb-xs-md">
@@ -255,7 +255,7 @@ import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { formatDate } from 'src/utils/date';
 import { onSuccess, confirmDialog } from 'src/utils/notification';
-import { ref, onMounted, computed, watch, reactive } from 'vue';
+import { ref, onMounted, computed, reactive } from 'vue';
 
 interface BureauScore {
   createdOn: string;
@@ -357,15 +357,18 @@ const newSource = reactive<BureauScore>({
 
 let mode: 'new' | 'edit' = 'new';
 const checkBox = ref(false);
+const editingRowIndex = ref<number | null>(null);
 const isEntryModalActive = ref(false);
 const fetchingData = ref(false);
 const bureauScore = ref<BureauScore[]>([]);
-const bureauScoreTemp = ref<BureauScore[]>([]);
 
-const editingRowIndex = ref<number | null>(null);
-
-const filteredData = computed(() => {
-  return bureauScore.value;
+const filteredbureauScore = computed(() => {
+  if (!bureauScore.value.length) {
+    return [];
+  }
+  return bureauScore.value.filter(
+    (score) => !!score.inactive === checkBox.value
+  );
 });
 
 const fixDateFormat = (dateString: string | null) =>
@@ -472,19 +475,10 @@ const loadSource = async () => {
   if (rsp.data) {
     const fetchedBureauScoreData: BureauScore[] = rsp.data;
 
-    bureauScore.value = fetchedBureauScoreData.filter(
-      (item: { inactive: boolean }) => item.inactive === checkBox.value
-    );
-    bureauScoreTemp.value = rsp.data;
+    bureauScore.value = fetchedBureauScoreData;
   }
   fetchingData.value = false;
 };
-
-watch(checkBox, () => {
-  bureauScore.value = bureauScoreTemp.value.filter(
-    (item) => item.inactive === checkBox.value
-  );
-});
 
 onMounted(async () => {
   loadSource();
