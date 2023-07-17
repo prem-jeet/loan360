@@ -20,6 +20,7 @@
           :hide-bottom="!!filteredData.length"
           :grid="$q.screen.width < 830"
           card-container-class="q-gutter-y-md q-mt-xs"
+          binary-state-sort
         >
           <template v-slot:top>
             <div class="row q-gutter-y-lg q-pb-xs-md">
@@ -284,6 +285,7 @@ const columns: {
   label: string;
   field: string;
   align: 'left';
+  sortable?: boolean;
 }[] = [
   {
     name: 'actions',
@@ -297,6 +299,7 @@ const columns: {
     align: 'left',
     field: 'scoreFrom',
     label: 'Score From',
+    sortable: true,
   },
   {
     name: 'scoreUpto',
@@ -304,6 +307,7 @@ const columns: {
     align: 'left',
     field: 'scoreUpto',
     label: 'Score Upto',
+    sortable: true,
   },
 
   {
@@ -312,6 +316,7 @@ const columns: {
     align: 'left',
     field: 'rate',
     label: 'Rate',
+    sortable: true,
   },
 
   {
