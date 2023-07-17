@@ -87,13 +87,13 @@
               </q-td>
 
               <q-td key="createdOn" :props="props">
-                {{ props.row.createdOn }}
+                {{ fixDateFormat(props.row.createdOn) }}
               </q-td>
               <q-td key="updatedOn" :props="props">
-                {{ props.row.updatedOn }}
+                {{ fixDateFormat(props.row.updatedOn) }}
               </q-td>
               <q-td key="inactiveOn" :props="props">
-                {{ props.row.inactiveOn }}
+                {{ fixDateFormat(props.row.inactiveOn) }}
               </q-td>
             </q-tr>
           </template>
@@ -131,7 +131,7 @@
                   <div class="row q-gutter-y-xs items-center">
                     <div class="col-12 text-weight-medium">CreatedOn :</div>
                     <div class="col-12">
-                      {{ props.row.createdOn }}
+                      {{ fixDateFormat(props.row.createdOn) }}
                     </div>
                   </div>
                 </q-card-section>
@@ -140,7 +140,7 @@
                   <div class="row q-gutter-y-xs items-center">
                     <div class="col-12 text-weight-medium">UpdatedOn :</div>
                     <div class="col-12">
-                      {{ props.row.updatedOn }}
+                      {{ fixDateFormat(props.row.updatedOn) }}
                     </div>
                   </div>
                 </q-card-section>
@@ -149,7 +149,7 @@
                   <div class="row q-gutter-y-xs items-center">
                     <div class="col-12 text-weight-medium">inactiveOn :</div>
                     <div class="col-12">
-                      {{ props.row.inactiveOn }}
+                      {{ fixDateFormat(props.row.inactiveOn) }}
                     </div>
                   </div>
                 </q-card-section>
@@ -252,6 +252,7 @@
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
+import { formatDate } from 'src/utils/date';
 import { onSuccess, confirmDialog } from 'src/utils/notification';
 import { ref, onMounted, computed, watch, reactive } from 'vue';
 
@@ -336,6 +337,8 @@ const columns: {
   },
 ];
 
+const dateFormat = 'DD/MM/YYYY hh:mmA';
+
 const newSource = reactive<BureauScore>({
   createdOn: '',
   inactive: false,
@@ -359,6 +362,9 @@ const editingRowIndex = ref<number | null>(null);
 const filteredData = computed(() => {
   return bureauScore.value;
 });
+
+const fixDateFormat = (dateString: string | null) =>
+  dateString !== null ? formatDate(dateString, dateFormat) : '';
 
 const setFormData = () => {
   let temp;
