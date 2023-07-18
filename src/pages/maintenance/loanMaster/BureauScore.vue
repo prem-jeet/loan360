@@ -20,7 +20,7 @@
           :grid="$q.screen.width < 830"
           card-container-class="q-gutter-y-md q-mt-xs"
           binary-state-sort
-          hide-bottom
+          :hide-bottom="!!bureauScore.length"
         >
           <template v-slot:top>
             <div class="row q-gutter-y-lg q-pb-xs-md">
@@ -76,7 +76,7 @@
                     outline
                     color="red"
                     @click="
-                      () => changeActive(props.row.id, props.row.inactive)
+                      () => toggleActiveState(props.row.id, props.row.inactive)
                     "
                   >
                   </q-btn>
@@ -180,7 +180,7 @@
                     size="sm"
                     color="red"
                     @click="
-                      () => changeActive(props.row.id, props.row.inactive)
+                      () => toggleActiveState(props.row.id, props.row.inactive)
                     "
                   >
                   </q-btn>
@@ -279,13 +279,13 @@ import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { formatDate } from 'src/utils/date';
 import { onSuccess, confirmDialog } from 'src/utils/notification';
-import { ref, onMounted, computed, reactive, watch } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 
 interface BureauScore {
-  createdOn: string;
-  inactive: boolean;
-  inactiveOn: string;
-  updatedOn: string;
+  createdOn: string | null;
+  inactive: boolean | null;
+  inactiveOn: string | null;
+  updatedOn: string | null;
   id: number | null;
   rate: number | null;
   scoreFrom: number | null;
@@ -374,17 +374,6 @@ const columns: {
 
 const dateFormat = 'DD/MM/YYYY hh:mmA';
 
-const newSource = reactive<BureauScore>({
-  createdOn: '',
-  inactive: false,
-  inactiveOn: '',
-  updatedOn: '',
-  id: null,
-  rate: null,
-  scoreFrom: null,
-  scoreUpto: null,
-});
-
 let mode: 'new' | 'edit' = 'new';
 const editingRowId = ref<number | null>(null);
 const checkBox = ref(false);
@@ -435,51 +424,63 @@ const setCurrentFormData = () => {
   currentFormData.value = { ...initialFormData.value };
 };
 
-const saveNewEntry = async () => {
-  let payLoad = {
-    scoreFrom: newSource.scoreFrom,
-    scoreUpto: newSource.scoreUpto,
-    rate: newSource.rate,
-    createdOn: new Date(),
+const saveEntry = async () => {
+  let payload: Partial<BureauScore> = {
+    ...currentFormData.value,
     inactive: false,
   };
-
-  const rsp = await api.post('/bureauScoreRate', payLoad);
-  if (rsp.data) {
-    onSuccess({
-      msg: rsp.data.displayMessage,
-      icon: 'sync_alt',
-    });
-    loadSource();
-    isFormActive.value = false;
+  const editingRow = filteredbureauScore.value.find(
+    (score) => score.id === editingRowId.value
+  );
+  if (editingRow) {
+    payload.id = editingRow.id;
+    payload.inactive =
+      editingRow.inactive === null ? false : editingRow.inactive;
   }
-};
+  const method = editingRow ? 'put' : 'post';
+  const endpoint = `/bureauScoreRate/${editingRow ? 'update' : ''}`;
+  // replace with new post and put method with try and catch
+  const rsp = await api[method](endpoint, payload);
 
-const saveEdited = async () => {
-  let payLoad = {
-    id: newSource.id,
-    scoreFrom: newSource.scoreFrom,
-    scoreUpto: newSource.scoreUpto,
-    rate: newSource.rate,
-    updatedOn: new Date(),
-  };
-  const rsp = await api.put('/bureauScoreRate/update', payLoad);
   if (rsp.data) {
-    onSuccess({
-      msg: rsp.data.displayMessage,
-      icon: 'sync_alt',
-    });
-    loadSource();
-    isFormActive.value = false;
-    editingRowIndex.value = null;
+    onSuccess({ msg: rsp.data.displayMessage });
+
+    const currentTime = new Date().toString();
+
+    const newScoreRate: BureauScore = {
+      createdOn: editingRow ? editingRow.createdOn : currentTime,
+      updatedOn: editingRow ? currentTime : null,
+      inactive: payload.inactive!,
+      inactiveOn: editingRow ? editingRow.inactiveOn : null,
+      id: editingRow ? editingRow.id : rsp.data.id,
+      rate: payload.rate!,
+      scoreFrom: payload.scoreFrom!,
+      scoreUpto: payload.scoreUpto!,
+    };
+
+    if (editingRow) {
+      bureauScore.value = bureauScore.value.map((score) => {
+        if (score.id === editingRow.id) {
+          return { ...newScoreRate };
+        }
+        return score;
+      });
+    } else {
+      bureauScore.value = [
+        ...bureauScore.value,
+        {
+          ...newScoreRate,
+        },
+      ];
+    }
+    bureauScore.value.sort((a, b) => (a.scoreFrom! <= b.scoreFrom! ? -1 : 1));
   }
+
+  isFormActive.value = false;
 };
 
-const saveEntry = () => {
-  console.log('save');
-};
-
-const changeActive = async (id: number, inActive: boolean) => {
+const toggleActiveState = async (id: number, inActive: boolean) => {
+  // replace with async dialog
   confirmDialog(
     async () => {
       const rsp = await api.put(
@@ -489,6 +490,7 @@ const changeActive = async (id: number, inActive: boolean) => {
       if (rsp.data) {
         onSuccess({ msg: rsp.data.displayMessage });
       }
+
       bureauScore.value.forEach((score) => {
         if (score.id === id) {
           score.inactive = !inActive;
