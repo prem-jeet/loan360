@@ -248,6 +248,18 @@ import { formatDate } from 'src/utils/date';
 import { onSuccess, confirmDialog } from 'src/utils/notification';
 import { ref, onMounted, computed } from 'vue';
 
+const breadcrumbs = [
+  { path: '/module/maintenance', label: 'Maintenance' },
+  {
+    path: '/module/maintenance/loanMaster/bureauScoreRate',
+    label: 'Loan Master',
+  },
+  {
+    path: '/module/maintenance/loanMaster/bureauScoreRate',
+    label: 'Bureau ScoreRate',
+  },
+];
+
 interface BureauScore {
   createdOn: string | null;
   inactive: boolean | null;
@@ -264,18 +276,6 @@ interface ScoreRateForm {
   scoreFrom: number | null;
   scoreUpto: number | null;
 }
-
-const breadcrumbs = [
-  { path: '/module/maintenance', label: 'Maintenance' },
-  {
-    path: '/module/maintenance/loanMaster/bureauScoreRate',
-    label: 'Loan Master',
-  },
-  {
-    path: '/module/maintenance/loanMaster/bureauScoreRate',
-    label: 'Bureau ScoreRate',
-  },
-];
 
 // replace the typedef with column type when account head is merged
 const columns: {
