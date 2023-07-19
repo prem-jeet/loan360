@@ -82,25 +82,22 @@
                   </q-btn>
                 </q-btn-group>
               </q-td>
-              <q-td key="scoreFrom" :props="props">
-                {{ props.row.scoreFrom }}
-              </q-td>
-              <q-td key="scoreUpto" :props="props">
-                {{ props.row.scoreUpto }}
-              </q-td>
-              <q-td key="rate" :props="props">
-                {{ props.row.rate }}
+              <q-td
+                :props="props"
+                v-for="key in ['scoreFrom', 'scoreUpto', 'rate']"
+                :key="key"
+              >
+                {{ props.row[key] }}
               </q-td>
 
-              <q-td key="createdOn" :props="props">
-                {{ fixDateFormat(props.row.createdOn) }}
-              </q-td>
-              <q-td key="updatedOn" :props="props">
-                {{ fixDateFormat(props.row.updatedOn) }}
-              </q-td>
-              <q-td key="inactiveOn" :props="props">
-                {{ fixDateFormat(props.row.inactiveOn) }}
-              </q-td>
+              <template
+                :key="key"
+                v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
+              >
+                <q-td :props="props">
+                  {{ fixDateFormat(props.row[key]) }}
+                </q-td>
+              </template>
             </q-tr>
           </template>
 
@@ -108,57 +105,32 @@
           <template v-slot:item="props">
             <div class="col-xs-12 col-sm-6 q-px-sm-sm">
               <q-card>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Score From:</div>
-                    <div class="col-12">
-                      {{ props.row.scoreFrom }}
-                    </div>
+                <q-card-section
+                  v-for="key in ['scoreFrom', 'scoreUpto', 'rate']"
+                  :key="key"
+                  class="q-pb-none"
+                >
+                  <div class="text-weight-medium">
+                    {{ props.colsMap[key].label }}
                   </div>
-                </q-card-section>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Score Upto :</div>
-                    <div class="col-12">
-                      {{ props.row.scoreUpto }}
-                    </div>
-                  </div>
-                </q-card-section>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">rate :</div>
-                    <div class="col-12">
-                      {{ props.row.rate }}
-                    </div>
+                  <div>
+                    {{ props.row[key] }}
                   </div>
                 </q-card-section>
 
-                <q-card-section>
-                  <div class="row q-gutter-y-xs items-center">
-                    <div class="col-12 text-weight-medium">CreatedOn :</div>
-                    <div class="col-12">
-                      {{ fixDateFormat(props.row.createdOn) }}
+                <template
+                  :key="key"
+                  v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
+                >
+                  <q-card-section v-if="props.row[key]" class="q-pb-none">
+                    <div class="text-weight-medium">
+                      {{ props.colsMap[key].label }}
                     </div>
-                  </div>
-                </q-card-section>
-
-                <q-card-section>
-                  <div class="row q-gutter-y-xs items-center">
-                    <div class="col-12 text-weight-medium">UpdatedOn :</div>
-                    <div class="col-12">
-                      {{ fixDateFormat(props.row.updatedOn) }}
+                    <div>
+                      {{ fixDateFormat(props.row[key]) }}
                     </div>
-                  </div>
-                </q-card-section>
-
-                <q-card-section>
-                  <div class="row q-gutter-y-xs items-center">
-                    <div class="col-12 text-weight-medium">inactiveOn :</div>
-                    <div class="col-12">
-                      {{ fixDateFormat(props.row.inactiveOn) }}
-                    </div>
-                  </div>
-                </q-card-section>
+                  </q-card-section>
+                </template>
 
                 <q-card-actions
                   align="center"
@@ -218,26 +190,21 @@
             <div class="col-12">
               <div class="col-12 q-mt-sm">
                 <q-input
+                  v-for="input in [
+                    { key: 'scoreFrom', label: 'Score From' },
+                    { key: 'scoreUpto', label: 'Score Upto' },
+                  ]"
+                  :key="input.key"
                   outlined
-                  v-model.number="currentFormData.scoreFrom"
-                  label="Score From"
+                  v-model.number="currentFormData[input.key as keyof ScoreRateForm]"
+                  :label="input.label"
                   dense
                   :mask="'#'.repeat(4)"
                   no-error-icon
                   :rules="[(val) => val !== null && val !== '']"
                 />
               </div>
-              <div class="col-12 q-mt-sm">
-                <q-input
-                  outlined
-                  v-model.number="currentFormData.scoreUpto"
-                  label="Score Upto"
-                  dense
-                  :mask="'#'.repeat(4)"
-                  no-error-icon
-                  :rules="[(val) => val !== null && val !== '']"
-                />
-              </div>
+
               <div class="col-12 q-mt-sm">
                 <q-input
                   outlined
@@ -354,21 +321,21 @@ const columns: {
     required: true,
     align: 'left',
     field: 'createdOn',
-    label: 'Created',
+    label: 'Created On',
   },
   {
     name: 'updatedOn',
     required: true,
     align: 'left',
     field: 'updatedOn',
-    label: 'Updated',
+    label: 'Updated On',
   },
   {
     name: 'inactiveOn',
     required: true,
     align: 'left',
     field: 'inactiveOn',
-    label: 'In-Active',
+    label: 'In-Active On',
   },
 ];
 
