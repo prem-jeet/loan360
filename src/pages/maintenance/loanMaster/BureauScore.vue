@@ -174,7 +174,7 @@
         <q-card-section class="bg-grey-2">
           <div class="flex items-center">
             <span class="text-bold q-mr-xl">{{
-              mode === 'new' ? 'Add Bureau ScoreRate' : 'Edit Bureau ScoreRate'
+              `${editingRowId ? 'Edit' : 'Add'} Bureau ScoreRate`
             }}</span>
             <q-space />
             <q-btn
@@ -229,8 +229,8 @@
         <q-separator class="q-mt-md" />
         <q-card-actions align="center" class="q-py-md bg-grey-2 q-mt-auto">
           <q-btn
-            :label="editingRowIndex === null ? 'Add' : 'Save '"
-            :icon="editingRowIndex === null ? 'add' : 'save '"
+            :label="editingRowId ? 'Save' : 'Add '"
+            :icon="editingRowId ? 'save' : 'add '"
             color="teal"
             type="submit"
           />
@@ -276,6 +276,8 @@ const breadcrumbs = [
     label: 'Bureau ScoreRate',
   },
 ];
+
+// replace the typedef with column type when account head is merged
 const columns: {
   name: string;
   required?: boolean;
@@ -341,10 +343,8 @@ const columns: {
 
 const dateFormat = 'DD/MM/YYYY hh:mmA';
 
-let mode: 'new' | 'edit' = 'new';
 const editingRowId = ref<number | null>(null);
 const checkBox = ref(false);
-const editingRowIndex = ref<number | null>(null);
 const isFormActive = ref(false);
 const fetchingData = ref(false);
 const bureauScore = ref<BureauScore[]>([]);
