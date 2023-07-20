@@ -226,74 +226,70 @@
     </div>
   </div>
 
-  <q-dialog v-model="isEntryModalActive">
-    <q-card style="width: 500px">
-      <q-form @submit.prevent="saveEntry" @reset="setFormData()">
-        <q-card-section class="bg-grey-2">
-          <div class="flex items-center">
-            <span class="text-bold q-mr-xl">{{
-              mode === 'new' ? 'Add Advertisement' : 'Edit Advertisement'
-            }}</span>
-            <q-space />
-            <q-btn
-              class="q-ml-xs-md q-ml-sm-xl"
-              icon="close"
-              flat
-              @click="isEntryModalActive = false"
-            />
-          </div>
+  <q-dialog v-model="isEntryModalActive" :maximized="screen.lt.sm">
+    <q-card :style="{ minWidth: 'calc(250px + 30vw)' }" class="column">
+      <q-card-section class="row items-center q-pb-none">
+        <div class="text-h6">
+          {{ mode === 'new' ? 'Add Advertisement' : 'Edit Advertisement' }}
+        </div>
+        <q-space />
+        <q-btn
+          @click="isEntryModalActive = false"
+          icon="close"
+          flat
+          round
+          dense
+          v-close-popup
+        />
+      </q-card-section>
+
+      <q-form
+        @submit.prevent="saveEntry"
+        @reset="setFormData"
+        class="col-grow column"
+      >
+        <q-card-section
+          class="q-pa-md col-grow column justify-evenly"
+          :style="{ minHeight: '40vh' }"
+        >
+          <q-select
+            outlined
+            v-model="newSouce.advertisementMediaId"
+            :options="AdvertisementMedia"
+            map-options
+            emit-value
+            no-error-icon
+            label="Select media"
+            :rules="[(val) => !!val]"
+            clear-icon="backspace"
+            dropdown-icon="expand_more"
+            behavior="menu"
+            options-dense
+            hide-bottom-space
+          />
+
+          <q-input
+            v-model="newSouce.name"
+            outlined
+            no-error-icon
+            :error="error"
+            :error-message="msg"
+            :rules="[(val) => !!val]"
+            hide-bottom-space
+            label="Name"
+          />
+
+          <q-input
+            v-model="newSouce.description"
+            outlined
+            hide-bottom-space
+            no-error-icon
+            label="Description"
+          />
+
+          <q-input outlined v-model="newSouce.date" type="date" />
         </q-card-section>
-        <q-card-section class="q-px-lg q-py-sm">
-          <div class="row">
-            <div class="col-12 q-mt-sm">
-              <q-select
-                outlined
-                v-model="newSouce.advertisementMediaId"
-                :options="AdvertisementMedia"
-                map-options
-                emit-value
-                no-error-icon
-                label="Select media"
-                :rules="[(val) => !!val]"
-                clear-icon="backspace"
-                dropdown-icon="expand_more"
-                behavior="menu"
-                options-dense
-              />
-            </div>
-            <div class="col-12">
-              <div class="col-12 q-mt-sm">
-                <q-input
-                  v-model="newSouce.name"
-                  outlined
-                  dense
-                  no-error-icon
-                  :error="error"
-                  :error-message="msg"
-                  placeholder="name"
-                  :rules="[(val) => !!val || '']"
-                >
-                </q-input>
-              </div>
-              <div class="col-12 q-mt-sm">
-                <q-input
-                  v-model="newSouce.description"
-                  outlined
-                  dense
-                  hide-bottom-space
-                  no-error-icon
-                  placeholder="description"
-                >
-                </q-input>
-              </div>
-              <div class="col-12 q-mt-lg">
-                <q-input outlined v-model="newSouce.date" type="date" dense />
-              </div>
-            </div>
-          </div>
-        </q-card-section>
-        <q-separator class="q-mt-md" />
-        <q-card-actions align="center" class="q-py-md bg-grey-2 q-mt-auto">
+        <q-card-actions align="center" class="q-py-md bg-grey-2">
           <q-btn
             :label="editingRowId === null ? 'Add' : 'Save '"
             :icon="editingRowId === null ? 'add' : 'save '"
@@ -395,7 +391,7 @@ const columns: {
   },
 ];
 
-const $q = useQuasar();
+const { screen } = useQuasar();
 const fetchingData = ref(false);
 const nameSearchQuery = ref('');
 const descriptionSearchQuery = ref('');
