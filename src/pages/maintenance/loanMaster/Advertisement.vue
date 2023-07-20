@@ -47,16 +47,12 @@
                   map-options
                   emit-value
                   label="Select Media"
-                >
-                  <template v-slot:append>
-                    <q-icon
-                      v-if="media"
-                      name="close"
-                      @click.stop.prevent="media = null"
-                      class="cursor-pointer"
-                    ></q-icon>
-                  </template>
-                </q-select>
+                  clear-icon="backspace"
+                  dropdown-icon="expand_more"
+                  behavior="menu"
+                  clearable
+                  options-dense
+                />
               </div>
             </div>
 
@@ -252,24 +248,18 @@
             <div class="col-12 q-mt-sm">
               <q-select
                 outlined
-                dense
                 v-model="newSouce.advertisementMediaId"
                 :options="AdvertisementMedia"
                 map-options
                 emit-value
                 no-error-icon
                 label="Select media"
-                :rules="[(val) => !!val || '']"
-              >
-                <template v-slot:append>
-                  <q-icon
-                    v-if="newSouce.advertisementMediaId"
-                    name="close"
-                    @click.stop.prevent="newSouce.advertisementMediaId = null"
-                    class="cursor-pointer"
-                  ></q-icon>
-                </template>
-              </q-select>
+                :rules="[(val) => !!val]"
+                clear-icon="backspace"
+                dropdown-icon="expand_more"
+                behavior="menu"
+                options-dense
+              />
             </div>
             <div class="col-12">
               <div class="col-12 q-mt-sm">
