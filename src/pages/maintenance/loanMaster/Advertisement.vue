@@ -132,18 +132,21 @@
                   )!.label
                 }}</span>
               </q-td>
-              <q-td key="name" :props="props">
-                <span>{{ firstLetterCpitalze(props.row.name) }}</span>
+
+              <q-td
+                :key="key"
+                :props="props"
+                v-for="key in ['name', 'description']"
+              >
+                <span>{{ firstLetterCpitalze(props.row[key]) }}</span>
               </q-td>
 
-              <q-td key="description" :props="props">
-                <span>{{ firstLetterCpitalze(props.row.description) }}</span>
-              </q-td>
-              <q-td key="date" :props="props">
-                {{ formatDate(props.row.date, format) }}
-              </q-td>
-              <q-td key="inactiveOn" :props="props">
-                {{ formatDate(props.row.inactiveOn, format) }}
+              <q-td
+                :key="key"
+                :props="props"
+                v-for="key in ['date', 'inactiveOn']"
+              >
+                {{ formatDate(props.row[key], format) }}
               </q-td>
             </q-tr>
           </template>
@@ -175,23 +178,16 @@
                   </q-card-section>
                 </template>
 
-                <q-card-section class="q-pb-none" v-if="props.row.date">
-                  <div class="text-weight-medium">
-                    {{ props.colsMap.date.label }}
-                  </div>
-                  <div>
-                    {{ formatDate(props.row.date, format) }}
-                  </div>
-                </q-card-section>
-
-                <q-card-section class="q-pb-none" v-if="props.row.inactiveOn">
-                  <div class="text-weight-medium">
-                    {{ props.colsMap.inactiveOn.label }}
-                  </div>
-                  <div>
-                    {{ formatDate(props.row.inactiveOn, format) }}
-                  </div>
-                </q-card-section>
+                <template v-for="key in ['date', 'inactiveOn']" :key="key">
+                  <q-card-section class="q-pb-none" v-if="props.row[key]">
+                    <div class="text-weight-medium">
+                      {{ props.colsMap[key].label }}
+                    </div>
+                    <div>
+                      {{ formatDate(props.row[key], format) }}
+                    </div>
+                  </q-card-section>
+                </template>
 
                 <q-card-actions
                   align="center"
