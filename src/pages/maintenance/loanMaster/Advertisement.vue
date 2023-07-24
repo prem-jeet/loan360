@@ -7,7 +7,7 @@
     <div class="row q-mt-lg q-pb-xl">
       <div class="col">
         <q-table
-          :rows="filteredData"
+          :rows="advertisement"
           :columns="columns"
           row-key="code"
           :loading="fetchingData"
@@ -16,7 +16,7 @@
           bordered
           title="Nature entry"
           :rows-per-page-options="[0]"
-          :hide-bottom="!!filteredData.length"
+          :hide-bottom="!!advertisement.length"
           :grid="$q.screen.width < 830"
           card-container-class="q-gutter-y-md q-mt-xs"
         >
@@ -40,9 +40,11 @@
                   outlined
                   dense
                   v-model="media"
-                  :options="AdvertisementMedia"
+                  :options="mediaOptions"
                   map-options
                   emit-value
+                  option-label="name"
+                  option-value="id"
                   label="Select Media"
                   clear-icon="backspace"
                   dropdown-icon="expand_more"
@@ -126,11 +128,7 @@
               </q-td>
 
               <q-td key="advertisementMediaId" :props="props">
-                <span>{{
-                  AdvertisementMedia.find(
-                    (item) => item.value === props.row.advertisementMediaId
-                  )!.label
-                }}</span>
+                {{ resolveMediaName(props.row.advertisementMediaId) }}
               </q-td>
 
               <q-td
@@ -138,7 +136,7 @@
                 :props="props"
                 v-for="key in ['name', 'description']"
               >
-                <span>{{ firstLetterCpitalze(props.row[key]) }}</span>
+                {{ props.row[key] && firstLetterCpitalze(props.row[key]) }}
               </q-td>
 
               <q-td
@@ -160,11 +158,7 @@
                     {{ props.colsMap.advertisementMediaId.label }}
                   </div>
                   <div>
-                    <span>{{
-                      AdvertisementMedia.find(
-                        (item) => item.value === props.row.advertisementMediaId
-                      )!.label
-                    }}</span>
+                    {{ resolveMediaName(props.row.advertisementMediaId) }}
                   </div>
                 </q-card-section>
                 <template v-for="key in ['name', 'description']" :key="key">
@@ -247,9 +241,11 @@
           <q-select
             outlined
             v-model="newSouce.advertisementMediaId"
-            :options="AdvertisementMedia"
+            :options="mediaOptions"
             map-options
             emit-value
+            option-label="name"
+            option-value="id"
             no-error-icon
             label="Select media"
             :rules="[(val) => !!val]"
@@ -315,9 +311,13 @@ interface Advertisement {
   advertisementMediaId: number | null;
 }
 
-interface AdvertisementMedia {
-  label: string;
-  value: number | null;
+interface MediaOptions {
+  id: number;
+  name: string;
+  createdOn: string | null;
+  updatedOn: string | null;
+  inactive: boolean;
+  inactiveOn: string | null;
 }
 
 const breadcrumbs = [
@@ -389,7 +389,7 @@ const nameSearchQuery = ref('');
 const descriptionSearchQuery = ref('');
 const advertisement = ref<Advertisement[]>([]);
 const advertisementTemp = ref<Advertisement[]>([]);
-const AdvertisementMedia = ref<AdvertisementMedia[]>([]);
+const mediaOptions = ref<MediaOptions[]>([]);
 const checkBox = ref(false);
 const editingRowId = ref<number | null>(null);
 const error = ref(false);
@@ -409,16 +409,15 @@ const newSouce = reactive<Advertisement>({
   advertisementMediaId: null,
 });
 
-const filteredData = computed(() =>
-  advertisement.value.filter(
-    (item) =>
-      item.inactive === checkBox.value &&
-      item.name.toLowerCase().includes(nameSearchQuery.value.toLowerCase()) &&
-      item.description
-        .toLowerCase()
-        .includes(descriptionSearchQuery.value.toLowerCase())
-  )
-);
+const resolveMediaName = (id: number) => {
+  const media = mediaOptions.value.find((media) => {
+    return media.id === id;
+  });
+  if (media) {
+    return media.name;
+  }
+  return '';
+};
 
 const setFormData = () => {
   let temp;
@@ -473,7 +472,6 @@ const saveNewEntry = async () => {
       msg: rsp.data.displayMessage,
       icon: 'sync_alt',
     });
-    loadadvertisementMedia();
     editingRowId.value = null;
     isEntryModalActive.value = false;
   }
@@ -506,7 +504,6 @@ const saveEdited = async () => {
       icon: 'sync_alt',
     });
     editingRowId.value = null;
-    loadadvertisementMedia();
     isEntryModalActive.value = false;
   }
 };
@@ -537,7 +534,6 @@ const changeActiveConfirm = async (id: number, state: boolean) => {
   if (rsp.data) {
     onSuccess({ msg: rsp.data.displayMessage });
   }
-  loadadvertisementMedia();
 };
 
 const loadSource = async () => {
@@ -545,40 +541,10 @@ const loadSource = async () => {
   const rsp = await api.get('advertisement');
 
   if (rsp.data) {
-    const transformedData = rsp.data.map(
-      (item: { description: string | null }) => {
-        return {
-          ...item,
-          description: item.description ? item.description : '',
-        };
-      }
-    );
-    advertisementTemp.value = transformedData;
-    advertisement.value = transformedData;
-    if (media.value) {
-      advertisement.value = advertisement.value.filter(
-        (item) => item.advertisementMediaId === media.value
-      );
-    }
+    advertisementTemp.value = rsp.data;
+    advertisement.value = rsp.data;
   }
-  fetchingData.value = false;
-};
 
-const loadadvertisementMedia = async () => {
-  fetchingData.value = true;
-  const rsp = await api.get('advertisementMedia');
-
-  if (rsp.data) {
-    AdvertisementMedia.value = rsp.data.map(
-      (item: { id: number | null; name: string }) => {
-        return {
-          label: item.name,
-          value: item.id,
-        };
-      }
-    );
-    loadSource();
-  }
   fetchingData.value = false;
 };
 
@@ -608,8 +574,18 @@ watch(media, () => {
   }
 });
 
-onMounted(() => {
-  loadadvertisementMedia();
+onMounted(async () => {
+  /* replace with useFetch */
+  try {
+    const rsp = await api.get('advertisementMedia');
+
+    if (rsp.data) {
+      mediaOptions.value = rsp.data;
+      loadSource();
+    }
+  } catch (e) {
+    onFailure({ msg: 'Unanle to fetch Media options' });
+  }
 });
 </script>
 
