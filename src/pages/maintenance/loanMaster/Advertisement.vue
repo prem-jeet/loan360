@@ -21,24 +21,21 @@
           card-container-class="q-gutter-y-md q-mt-xs"
         >
           <template v-slot:top>
-            <div class="row q-gutter-y-lg q-pb-xs-md">
-              <div class="col-12">
-                <div class="row items-center q-gutter-md">
-                  <div class="col-auto text-h6">Advertisement</div>
-                  <div class="col-auto">
-                    <q-btn
-                      color="blue-7"
-                      icon="add"
-                      label="Add new"
-                      size="md"
-                      @click="newEntry()"
-                    />
-                  </div>
-                </div>
+            <div class="row q-gutter-x-md q-gutter-y-sm">
+              <div class="col-auto text-h6">Advertisement</div>
+              <div class="col-auto">
+                <q-btn
+                  color="blue-7"
+                  icon="add"
+                  label="Add new"
+                  size="md"
+                  @click="newEntry"
+                  class="full-width"
+                />
               </div>
             </div>
-            <div class="row full-width q-pb-md">
-              <div class="col-xs-12 col-sm-3 col-md-2">
+            <div class="row full-width q-mt-md">
+              <div class="col-12 col-sm-6 col-md-3">
                 <q-select
                   outlined
                   dense
@@ -56,15 +53,15 @@
               </div>
             </div>
 
-            <div class="row full-width q-col-gutter-y-md">
-              <div class="col-xs-12 col-sm-2 col-md-2">
+            <div class="row full-width q-mt-md q-col-gutter-y-sm">
+              <div class="col-12 col-sm-5 col-md-2">
                 <q-input
                   v-model="nameSearchQuery"
                   outlined
                   clearable
                   dense
                   rounded
-                  placeholder="name"
+                  placeholder="Name"
                   @clear="nameSearchQuery = ''"
                 >
                   <template v-slot:prepend>
@@ -72,14 +69,14 @@
                   </template>
                 </q-input>
               </div>
-              <div class="col-xs-12 col-sm-2 col-md-2 q-pl-xs">
+              <div class="col-12 col-sm-5 col-md-2 q-ml-sm-md">
                 <q-input
                   v-model="descriptionSearchQuery"
                   outlined
                   clearable
                   dense
                   rounded
-                  placeholder="description"
+                  placeholder="Description"
                   @clear="descriptionSearchQuery = ''"
                 >
                   <template v-slot:prepend>
@@ -88,7 +85,9 @@
                 </q-input>
               </div>
 
-              <div class="col-xs-12 col-sm-3 col-md-2">
+              <div
+                class="col-12 col-md-auto flex items-center justify-end justify-sm-start"
+              >
                 <q-checkbox v-model="checkBox" label=" In-Active" />
               </div>
             </div>
