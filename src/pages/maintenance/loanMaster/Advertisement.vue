@@ -152,54 +152,51 @@
           <template v-slot:item="props">
             <div class="col-xs-12 col-sm-6 q-px-sm-sm">
               <q-card>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Media :</div>
-                    <div class="col-12">
-                      <span>{{
-                        AdvertisementMedia.find(
-                          (item) =>
-                            item.value === props.row.advertisementMediaId
-                        )!.label
-                      }}</span>
-                    </div>
+                <q-card-section class="q-pb-none">
+                  <div class="text-weight-medium">
+                    {{ props.colsMap.advertisementMediaId.label }}
+                  </div>
+                  <div>
+                    <span>{{
+                      AdvertisementMedia.find(
+                        (item) => item.value === props.row.advertisementMediaId
+                      )!.label
+                    }}</span>
                   </div>
                 </q-card-section>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Name :</div>
-                    <div class="col-12">
-                      {{ firstLetterCpitalze(props.row.name) }}
+                <template v-for="key in ['name', 'description']" :key="key">
+                  <q-card-section class="q-pb-none" v-if="props.row[key]">
+                    <div class="text-weight-medium">
+                      {{ props.colsMap[key].label }}
                     </div>
+                    <div>
+                      {{ firstLetterCpitalze(props.row[key]) }}
+                    </div>
+                  </q-card-section>
+                </template>
+
+                <q-card-section class="q-pb-none" v-if="props.row.date">
+                  <div class="text-weight-medium">
+                    {{ props.colsMap.date.label }}
                   </div>
-                </q-card-section>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Description :</div>
-                    <div class="col-12">
-                      {{ firstLetterCpitalze(props.row.description) }}
-                    </div>
-                  </div>
-                </q-card-section>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Date :</div>
-                    <div class="col-12">
-                      {{ formatDate(props.row.date, format) }}
-                    </div>
+                  <div>
+                    {{ formatDate(props.row.date, format) }}
                   </div>
                 </q-card-section>
 
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">InactiveOn :</div>
-                    <div class="col-12">
-                      {{ formatDate(props.row.inactiveOn, format) }}
-                    </div>
+                <q-card-section class="q-pb-none" v-if="props.row.inactiveOn">
+                  <div class="text-weight-medium">
+                    {{ props.colsMap.inactiveOn.label }}
+                  </div>
+                  <div>
+                    {{ formatDate(props.row.inactiveOn, format) }}
                   </div>
                 </q-card-section>
 
-                <q-card-actions align="center" class="q-py-md bg-grey-2">
+                <q-card-actions
+                  align="center"
+                  class="q-py-md bg-grey-2 q-mt-md"
+                >
                   <q-btn
                     label="edit"
                     icon="edit"
