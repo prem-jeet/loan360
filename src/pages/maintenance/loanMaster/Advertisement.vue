@@ -31,7 +31,7 @@
                   size="md"
                   @click="
                     editingRowId = null;
-                    isEntryModalActive = true;
+                    isAdvertisementFormActive = true;
                   "
                   class="full-width"
                 />
@@ -42,7 +42,7 @@
                 <q-select
                   outlined
                   dense
-                  v-model="filter.mediaId"
+                  v-model="filter.advertisementMediaId"
                   :options="mediaOptions"
                   map-options
                   emit-value
@@ -128,7 +128,7 @@
                     color="accent"
                     @click="
                       editingRowId = props.row.id;
-                      isEntryModalActive = true;
+                      isAdvertisementFormActive = true;
                     "
                   >
                     <q-tooltip>Edit</q-tooltip>
@@ -220,7 +220,10 @@
                     icon="edit"
                     size="sm"
                     color="teal"
-                    @click="editEntry(props.row.id)"
+                    @click="
+                      editingRowId = props.row.id;
+                      isAdvertisementFormActive = true;
+                    "
                   >
                   </q-btn>
 
@@ -240,15 +243,20 @@
     </div>
   </div>
 
-  <q-dialog v-model="isEntryModalActive" :maximized="screen.lt.sm">
+  <q-dialog
+    v-model="isAdvertisementFormActive"
+    :maximized="screen.lt.sm"
+    @before-hide="editingRowId = null"
+    @before-show="setInitialFormData"
+  >
     <q-card :style="{ minWidth: 'calc(250px + 30vw)' }" class="column">
       <q-card-section class="row items-center q-pb-none">
         <div class="text-h6">
-          {{ mode === 'new' ? 'Add Advertisement' : 'Edit Advertisement' }}
+          {{ `${editingRowId ? 'Edit' : 'New'} Advertisement` }}
         </div>
         <q-space />
         <q-btn
-          @click="isEntryModalActive = false"
+          @click="isAdvertisementFormActive = false"
           icon="close"
           flat
           round
@@ -258,8 +266,8 @@
       </q-card-section>
 
       <q-form
-        @submit.prevent="saveEntry"
-        @reset="setFormData"
+        @submit.prevent="handleAdvertisementFormSubmit"
+        @reset="setInitialFormData"
         class="col-grow column"
       >
         <q-card-section
@@ -268,7 +276,7 @@
         >
           <q-select
             outlined
-            v-model="newSouce.advertisementMediaId"
+            v-model="newAdvertisement.advertisementMediaId"
             :options="mediaOptions"
             map-options
             emit-value
@@ -285,25 +293,23 @@
           />
 
           <q-input
-            v-model="newSouce.name"
+            v-model="newAdvertisement.name"
             outlined
             no-error-icon
-            :error="error"
-            :error-message="msg"
             :rules="[(val) => !!val]"
             hide-bottom-space
             label="Name"
           />
 
           <q-input
-            v-model="newSouce.description"
+            v-model="newAdvertisement.description"
             outlined
             hide-bottom-space
             no-error-icon
             label="Description"
           />
 
-          <q-input outlined v-model="newSouce.date" type="date" />
+          <q-input outlined v-model="newAdvertisement.date" type="date" />
         </q-card-section>
         <q-card-actions align="center" class="q-py-md bg-grey-2">
           <q-btn
@@ -311,7 +317,6 @@
             :icon="editingRowId === null ? 'add' : 'save '"
             color="teal"
             type="submit"
-            :disable="error"
           />
           <q-btn label="Reset" color="red-5" type="reset" icon="refresh" />
         </q-card-actions>
@@ -349,14 +354,14 @@ interface MediaOptions {
 }
 
 interface Filter {
-  mediaId: number | null;
+  advertisementMediaId: number | null;
   name: string | null;
   description: string | null;
   inActive: boolean;
 }
 
 interface AdvertisementForm {
-  media: number | null;
+  advertisementMediaId: number | null;
   name: string | null;
   description: string | null;
   date: string | null;
@@ -428,39 +433,33 @@ const columns: {
 const { screen } = useQuasar();
 const fetchingData = ref(false);
 const advertisement = ref<Advertisement[]>([]);
-const advertisementTemp = ref<Advertisement[]>([]);
 const mediaOptions = ref<MediaOptions[]>([]);
 const editingRowId = ref<number | null>(null);
-const error = ref(false);
-const msg = ref('');
-const media = ref<number | null>(null);
-let mode: 'new' | 'edit' = 'new';
-const isEntryModalActive = ref(false);
+const isAdvertisementFormActive = ref(false);
 
 const filter = reactive<Filter>({
-  mediaId: null,
+  advertisementMediaId: null,
   name: null,
   description: null,
   inActive: false,
 });
 
-const newSouce = reactive<Advertisement>({
-  name: '',
-  description: '',
-  id: null,
-  inactive: false,
-  inactiveOn: '',
-  date: '',
+const newAdvertisement = ref<AdvertisementForm>({
   advertisementMediaId: null,
+  name: null,
+  description: null,
+  date: null,
 });
 
 const filteredAdvertisement = computed(() => {
   const data = [...advertisement.value];
 
-  const { mediaId, name, description, inActive } = filter;
+  const { advertisementMediaId, name, description, inActive } = filter;
 
   const filteredData = data.filter((item) => {
-    const isMedaiIdMatched = !mediaId || item.advertisementMediaId === mediaId;
+    const isMedaiIdMatched =
+      !advertisementMediaId ||
+      item.advertisementMediaId === advertisementMediaId;
     const isNameMatched =
       !name || item.name.toLocaleLowerCase().includes(name.toLowerCase());
 
@@ -486,7 +485,7 @@ const filteredAdvertisement = computed(() => {
 
 const initialFormData = computed(() => {
   const temp: AdvertisementForm = {
-    media: null,
+    advertisementMediaId: null,
     name: null,
     description: null,
     date: null,
@@ -497,7 +496,7 @@ const initialFormData = computed(() => {
       (advertisement) => advertisement.id === editingRowId.value
     );
     if (editingRow) {
-      temp.media = editingRow.advertisementMediaId;
+      temp.advertisementMediaId = editingRow.advertisementMediaId;
       temp.name = editingRow.name;
       temp.description = editingRow.description;
       temp.date = editingRow.date;
@@ -506,6 +505,7 @@ const initialFormData = computed(() => {
 
   return temp;
 });
+
 const resolveMediaName = (id: number) => {
   const media = mediaOptions.value.find((media) => {
     return media.id === id;
@@ -516,46 +516,19 @@ const resolveMediaName = (id: number) => {
   return '';
 };
 
-const setFormData = () => {
-  let temp;
-  let dateTemp;
-  if (editingRowId.value !== null) {
-    let index = advertisement.value.findIndex(
-      (obj) => obj.id === editingRowId.value
-    );
-    temp = advertisement.value[index];
-    if (temp.date) {
-      const arr = temp.date.split(' ');
-      dateTemp = formatDate(arr[0], 'YYYY-MM-DD');
-    }
-  }
+const setInitialFormData = () =>
+  (newAdvertisement.value = { ...initialFormData.value });
 
-  newSouce.name = temp ? temp.name : '';
-  newSouce.advertisementMediaId = temp
-    ? temp.advertisementMediaId
-    : media.value;
-  newSouce.description = temp ? temp.description : '';
-  newSouce.date = dateTemp ? dateTemp : '';
-  newSouce.id = temp ? temp.id : null;
+const handleAdvertisementFormSubmit = () => {
+  console.log(
+    '🚀 ~ file: Advertisement.vue:524 ~ handleAdvertisementFormSubmit ~ newAdvertisement.value:',
+    newAdvertisement.value
+  );
+  // const payload:
+  return true;
 };
 
-const newEntry = () => {
-  mode = 'new';
-  editingRowId.value = null;
-  setFormData();
-  error.value = false;
-  msg.value = '';
-  isEntryModalActive.value = true;
-};
-
-const editEntry = (id: number) => {
-  mode = 'edit';
-  editingRowId.value = id;
-  setFormData();
-  isEntryModalActive.value = true;
-};
-
-const saveNewEntry = async () => {
+/* const saveNewEntry = async () => {
   let payLoad = {
     advertisementMediaId: newSouce.advertisementMediaId,
     inactive: false,
@@ -570,7 +543,7 @@ const saveNewEntry = async () => {
       icon: 'sync_alt',
     });
     editingRowId.value = null;
-    isEntryModalActive.value = false;
+    isAdvertisementFormActive.value = false;
   }
 };
 const saveEdited = async () => {
@@ -601,14 +574,10 @@ const saveEdited = async () => {
       icon: 'sync_alt',
     });
     editingRowId.value = null;
-    isEntryModalActive.value = false;
+    isAdvertisementFormActive.value = false;
   }
 };
-
-const saveEntry = () => {
-  mode === 'new' ? saveNewEntry() : saveEdited();
-};
-
+ */
 const changeActive = async (id: number, state: boolean) => {
   if (editingRowId.value === null) {
     confirmDialog(() => changeActiveConfirm(id, state), {
@@ -638,38 +607,11 @@ const loadSource = async () => {
   const rsp = await api.get('advertisement');
 
   if (rsp.data) {
-    advertisementTemp.value = rsp.data;
     advertisement.value = rsp.data;
   }
 
   fetchingData.value = false;
 };
-
-watch(newSouce, () => {
-  if (newSouce.name) {
-    error.value = false;
-    msg.value = '';
-
-    const temp = advertisement.value.find(
-      (item) => item.name.toLowerCase() === newSouce.name.toLocaleLowerCase()
-    );
-
-    if (temp && mode == 'new') {
-      error.value = true;
-      msg.value = 'Item already exists!';
-    }
-  }
-});
-
-watch(media, () => {
-  if (media.value) {
-    advertisement.value = advertisementTemp.value.filter(
-      (temp) => temp.advertisementMediaId === media.value
-    );
-  } else {
-    advertisement.value = advertisementTemp.value;
-  }
-});
 
 onMounted(async () => {
   /* replace with useFetch */
