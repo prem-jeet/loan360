@@ -39,7 +39,7 @@
                 <q-select
                   outlined
                   dense
-                  v-model="media"
+                  v-model="filter.mediaId"
                   :options="mediaOptions"
                   map-options
                   emit-value
@@ -58,13 +58,19 @@
             <div class="row full-width q-mt-md q-col-gutter-y-sm">
               <div class="col-12 col-sm-5 col-md-2">
                 <q-input
-                  v-model="nameSearchQuery"
+                  v-model="filter.name"
                   outlined
                   clearable
                   dense
                   rounded
                   placeholder="Name"
-                  @clear="nameSearchQuery = ''"
+                  @update:model-value="
+                    (val) => {
+                      if (val === '') {
+                        filter.name = null;
+                      }
+                    }
+                  "
                 >
                   <template v-slot:prepend>
                     <q-icon name="search" />
@@ -73,13 +79,19 @@
               </div>
               <div class="col-12 col-sm-5 col-md-2 q-ml-sm-md">
                 <q-input
-                  v-model="descriptionSearchQuery"
+                  v-model="filter.description"
                   outlined
                   clearable
                   dense
                   rounded
                   placeholder="Description"
-                  @clear="descriptionSearchQuery = ''"
+                  @update:model-value="
+                    (val) => {
+                      if (val === '') {
+                        filter.name = null;
+                      }
+                    }
+                  "
                 >
                   <template v-slot:prepend>
                     <q-icon name="search" />
@@ -90,7 +102,7 @@
               <div
                 class="col-12 col-md-auto flex items-center justify-end justify-sm-start"
               >
-                <q-checkbox v-model="checkBox" label=" In-Active" />
+                <q-checkbox v-model="filter.inActive" label=" In-Active" />
               </div>
             </div>
           </template>
@@ -320,6 +332,13 @@ interface MediaOptions {
   inactiveOn: string | null;
 }
 
+interface Filter {
+  mediaId: number | null;
+  name: string | null;
+  description: string | null;
+  inActive: boolean;
+}
+
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
   {
@@ -385,12 +404,9 @@ const columns: {
 
 const { screen } = useQuasar();
 const fetchingData = ref(false);
-const nameSearchQuery = ref('');
-const descriptionSearchQuery = ref('');
 const advertisement = ref<Advertisement[]>([]);
 const advertisementTemp = ref<Advertisement[]>([]);
 const mediaOptions = ref<MediaOptions[]>([]);
-const checkBox = ref(false);
 const editingRowId = ref<number | null>(null);
 const error = ref(false);
 const msg = ref('');
@@ -398,6 +414,13 @@ const media = ref<number | null>(null);
 let mode: 'new' | 'edit' = 'new';
 const isEntryModalActive = ref(false);
 const format = 'DD/MM/YYYY @hh:mmA';
+
+const filter = reactive<Filter>({
+  mediaId: null,
+  name: null,
+  description: null,
+  inActive: false,
+});
 
 const newSouce = reactive<Advertisement>({
   name: '',
