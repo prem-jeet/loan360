@@ -156,7 +156,12 @@
                 :props="props"
                 v-for="key in ['date', 'inactiveOn']"
               >
-                {{ formatDate(props.row[key], format) }}
+                {{
+                  formatDate(
+                    props.row[key],
+                    `DD/MM/YYYY ${key === 'date' ? '' : '@hh:mmA'}`
+                  )
+                }}
               </q-td>
             </q-tr>
           </template>
@@ -190,7 +195,12 @@
                       {{ props.colsMap[key].label }}
                     </div>
                     <div>
-                      {{ formatDate(props.row[key], format) }}
+                      {{
+                        formatDate(
+                          props.row[key],
+                          `DD/MM/YYYY ${key === 'date' ? '' : '@hh:mmA'}`
+                        )
+                      }}
                     </div>
                   </q-card-section>
                 </template>
@@ -413,7 +423,6 @@ const msg = ref('');
 const media = ref<number | null>(null);
 let mode: 'new' | 'edit' = 'new';
 const isEntryModalActive = ref(false);
-const format = 'DD/MM/YYYY @hh:mmA';
 
 const filter = reactive<Filter>({
   mediaId: null,
