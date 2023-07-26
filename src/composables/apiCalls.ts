@@ -56,4 +56,24 @@ const usePost = async (url: string, payload: { [key: string]: any }) => {
   }
 };
 
-export { useFetch, usePost };
+const usePut = async (url: string, payload: { [key: string]: any }) => {
+  try {
+    const rsp = await api.put(url, payload);
+
+    if (rsp.data) {
+      onSuccess({ msg: rsp.data.displayMessage });
+      return rsp.data;
+    } else {
+      return null;
+    }
+  } catch (e) {
+    // @ts-expect-error intended spred of error object
+
+    const { response } = { ...e };
+
+    const errorMessage = 'Some error occured, unable to update data.';
+    handleError(response, errorMessage);
+  }
+};
+
+export { useFetch, usePost, usePut };
