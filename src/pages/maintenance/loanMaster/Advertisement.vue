@@ -330,7 +330,7 @@ import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 
 import { usePut, usePost } from 'src/composables/apiCalls';
-import { ref, onMounted, computed, watch, reactive } from 'vue';
+import { ref, onMounted, computed, reactive } from 'vue';
 import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
 import { firstLetterCpitalze } from 'src/utils/string';
 import { formatDate } from 'src/utils/date';
@@ -523,27 +523,17 @@ const setInitialFormData = () =>
   (newAdvertisement.value = { ...initialFormData.value });
 
 const handleAdvertisementFormSubmit = async () => {
-  // console.log(
-  // '🚀 ~ file: Advertisement.vue:524 ~ handleAdvertisementFormSubmit ~ newAdvertisement.value:',
-  // newAdvertisement.value
-  // );
-
   const payload = { ...newAdvertisement.value };
 
-  // new
   let rsp;
   if (!editingRowId.value) {
     rsp = await usePost('/advertisement', payload);
   } else {
-    // edited
     payload.id = editingRowId.value;
     rsp = await usePut('/advertisement/update', payload);
   }
+
   if (rsp) {
-    console.log(
-      '🚀 ~ file: Advertisement.vue:543 ~ handleAdvertisementFormSubmit ~ rsp:',
-      rsp
-    );
     isAdvertisementFormActive.value = false;
     loadSource();
   }
@@ -551,56 +541,6 @@ const handleAdvertisementFormSubmit = async () => {
   return true;
 };
 
-/* const saveNewEntry = async () => {
-  let payLoad = {
-    advertisementMediaId: newSouce.advertisementMediaId,
-    inactive: false,
-    date: newSouce.date,
-    description: newSouce.description,
-    name: newSouce.name,
-  };
-  const rsp = await api.post('/advertisement', payLoad);
-  if (rsp.data) {
-    onSuccess({
-      msg: rsp.data.displayMessage,
-      icon: 'sync_alt',
-    });
-    editingRowId.value = null;
-    isAdvertisementFormActive.value = false;
-  }
-};
-const saveEdited = async () => {
-  const temp = advertisement.value.filter((item) => item.id !== newSouce.id);
-
-  const isDuplicate = temp.find(
-    (item) => item.name.toLowerCase() === newSouce.name.toLowerCase()
-  );
-  if (isDuplicate) {
-    onFailure({
-      msg: 'Item alredy exits',
-      icon: 'warning',
-    });
-    return;
-  }
-  let payLoad = {
-    advertisementMediaId: newSouce.advertisementMediaId,
-    inactive: false,
-    date: newSouce.date,
-    description: newSouce.description,
-    name: newSouce.name,
-    id: newSouce.id,
-  };
-  const rsp = await api.put('/advertisement/update', payLoad);
-  if (rsp.data) {
-    onSuccess({
-      msg: rsp.data.displayMessage,
-      icon: 'sync_alt',
-    });
-    editingRowId.value = null;
-    isAdvertisementFormActive.value = false;
-  }
-};
- */
 const changeActive = async (id: number, state: boolean) => {
   if (editingRowId.value === null) {
     confirmDialog(() => changeActiveConfirm(id, state), {
