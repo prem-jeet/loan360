@@ -29,7 +29,10 @@
                   icon="add"
                   label="Add new"
                   size="md"
-                  @click="newEntry"
+                  @click="
+                    editingRowId = null;
+                    isEntryModalActive = true;
+                  "
                   class="full-width"
                 />
               </div>
@@ -123,7 +126,10 @@
                     size="xs"
                     outline
                     color="accent"
-                    @click="editEntry(props.row.id)"
+                    @click="
+                      editingRowId = props.row.id;
+                      isEntryModalActive = true;
+                    "
                   >
                     <q-tooltip>Edit</q-tooltip>
                   </q-btn>
@@ -349,6 +355,13 @@ interface Filter {
   inActive: boolean;
 }
 
+interface AdvertisementForm {
+  media: number | null;
+  name: string | null;
+  description: string | null;
+  date: string | null;
+}
+
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
   {
@@ -471,6 +484,28 @@ const filteredAdvertisement = computed(() => {
   return filteredData;
 });
 
+const initialFormData = computed(() => {
+  const temp: AdvertisementForm = {
+    media: null,
+    name: null,
+    description: null,
+    date: null,
+  };
+
+  if (editingRowId.value) {
+    const editingRow = filteredAdvertisement.value.find(
+      (advertisement) => advertisement.id === editingRowId.value
+    );
+    if (editingRow) {
+      temp.media = editingRow.advertisementMediaId;
+      temp.name = editingRow.name;
+      temp.description = editingRow.description;
+      temp.date = editingRow.date;
+    }
+  }
+
+  return temp;
+});
 const resolveMediaName = (id: number) => {
   const media = mediaOptions.value.find((media) => {
     return media.id === id;
