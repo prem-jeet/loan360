@@ -7,7 +7,7 @@
     <div class="row q-mt-lg q-pb-xl">
       <div class="col">
         <q-table
-          :rows="advertisement"
+          :rows="filteredAdvertisement"
           :columns="columns"
           row-key="code"
           :loading="fetchingData"
@@ -430,6 +430,36 @@ const newSouce = reactive<Advertisement>({
   inactiveOn: '',
   date: '',
   advertisementMediaId: null,
+});
+
+const filteredAdvertisement = computed(() => {
+  const data = [...advertisement.value];
+
+  const { mediaId, name, description, inActive } = filter;
+
+  const filteredData = data.filter((item) => {
+    const isMedaiIdMatched = !mediaId || item.advertisementMediaId === mediaId;
+    const isNameMatched =
+      !name || item.name.toLocaleLowerCase().includes(name.toLowerCase());
+
+    const isDescriptiondMatched =
+      !description ||
+      (item.description &&
+        item.description
+          .toLocaleLowerCase()
+          .includes(description.toLowerCase()));
+
+    const isInActiveMatched = inActive === item.inactive;
+
+    return (
+      isMedaiIdMatched &&
+      isNameMatched &&
+      isDescriptiondMatched &&
+      isInActiveMatched
+    );
+  });
+
+  return filteredData;
 });
 
 const resolveMediaName = (id: number) => {
