@@ -328,6 +328,8 @@
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
+
+import { usePut, usePost } from 'src/composables/apiCalls';
 import { ref, onMounted, computed, watch, reactive } from 'vue';
 import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
 import { firstLetterCpitalze } from 'src/utils/string';
@@ -361,6 +363,7 @@ interface Filter {
 }
 
 interface AdvertisementForm {
+  id?: number;
   advertisementMediaId: number | null;
   name: string | null;
   description: string | null;
@@ -519,12 +522,32 @@ const resolveMediaName = (id: number) => {
 const setInitialFormData = () =>
   (newAdvertisement.value = { ...initialFormData.value });
 
-const handleAdvertisementFormSubmit = () => {
-  console.log(
-    '🚀 ~ file: Advertisement.vue:524 ~ handleAdvertisementFormSubmit ~ newAdvertisement.value:',
-    newAdvertisement.value
-  );
-  // const payload:
+const handleAdvertisementFormSubmit = async () => {
+  // console.log(
+  // '🚀 ~ file: Advertisement.vue:524 ~ handleAdvertisementFormSubmit ~ newAdvertisement.value:',
+  // newAdvertisement.value
+  // );
+
+  const payload = { ...newAdvertisement.value };
+
+  // new
+  let rsp;
+  if (!editingRowId.value) {
+    rsp = await usePost('/advertisement', payload);
+  } else {
+    // edited
+    payload.id = editingRowId.value;
+    rsp = await usePut('/advertisement/update', payload);
+  }
+  if (rsp) {
+    console.log(
+      '🚀 ~ file: Advertisement.vue:543 ~ handleAdvertisementFormSubmit ~ rsp:',
+      rsp
+    );
+    isAdvertisementFormActive.value = false;
+    loadSource();
+  }
+
   return true;
 };
 
