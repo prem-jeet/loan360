@@ -27,7 +27,6 @@ const handleError = (
     errorMessage = response.data.displayMessage;
   }
 
-  // replace this with alert dialog when it is merged (alert dialog present in account head pr)
   alertDialog(errorMessage);
 };
 
