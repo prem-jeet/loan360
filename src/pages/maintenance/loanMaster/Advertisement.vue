@@ -328,6 +328,7 @@
 <script setup lang="ts">
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 
+import type { API_OBJECT } from 'src/composables/apiCalls';
 import { usePut, usePost, useFetch } from 'src/composables/apiCalls';
 import { ref, onMounted, computed, reactive } from 'vue';
 import { asyncConfirmDialog } from 'src/utils/notification';
@@ -340,9 +341,17 @@ interface Advertisement {
   description: string;
   id: number | null;
   inactive: boolean;
-  inactiveOn: string;
-  date: string;
+  inactiveOn: string | null;
+  date: string | null;
+  advertisementMediaId: number;
+}
+
+interface AdvertisementForm {
+  id?: number;
   advertisementMediaId: number | null;
+  name: string | null;
+  description: string | null;
+  date: string | null;
 }
 
 interface MediaOptions {
@@ -359,14 +368,6 @@ interface Filter {
   name: string | null;
   description: string | null;
   inActive: boolean;
-}
-
-interface AdvertisementForm {
-  id?: number;
-  advertisementMediaId: number | null;
-  name: string | null;
-  description: string | null;
-  date: string | null;
 }
 
 const breadcrumbs = [
@@ -524,7 +525,7 @@ const setInitialFormData = () =>
 const handleAdvertisementFormSubmit = async () => {
   const payload = { ...newAdvertisement.value };
 
-  let rsp;
+  let rsp: API_OBJECT | null;
 
   if (!editingRowId.value) {
     rsp = await usePost(
@@ -542,20 +543,41 @@ const handleAdvertisementFormSubmit = async () => {
   }
 
   if (rsp) {
+    const editingRow = advertisement.value.filter(
+      (advertisement) => payload.id && payload.id === advertisement.id
+    )[0];
+    const newAdvertisement: Advertisement = {
+      advertisementMediaId: payload.advertisementMediaId as number,
+      date: payload.date,
+      description: payload.description as string,
+      id: payload.id || rsp.id,
+      inactive: editingRow ? editingRow.inactive : false,
+      inactiveOn: editingRow ? editingRow.inactiveOn : null,
+      name: payload.name as string,
+    };
+
+    let newAdvertisementArray = editingRow
+      ? advertisement.value.map((advertisement) =>
+          advertisement.id === payload.id
+            ? { ...newAdvertisement }
+            : advertisement
+        )
+      : [...advertisement.value, { ...newAdvertisement }];
+
+    advertisement.value = [...newAdvertisementArray];
+
     isAdvertisementFormActive.value = false;
-    fetchAdvertisement();
   }
 };
 
 const toggleInActive = async (advertisement: Advertisement) => {
+  const inActive = advertisement.inactive;
   const confirmed = await asyncConfirmDialog({
-    msg: `Are you sure you want to ${
-      advertisement.inactive ? '' : 'De-'
-    }Activate`,
+    msg: `Are you sure you want to ${inActive ? '' : 'De-'}Activate`,
   });
 
   if (confirmed) {
-    const str = advertisement.inactive ? 'active' : 'inactive';
+    const str = inActive ? 'active' : 'inactive';
     const rsp = await usePut(
       '/advertisement/' + str,
       { id: advertisement.id },
@@ -563,6 +585,9 @@ const toggleInActive = async (advertisement: Advertisement) => {
     );
     if (rsp) {
       advertisement.inactive = !advertisement.inactive;
+      if (!inActive) {
+        advertisement.inactiveOn = new Date().toString();
+      }
     }
   }
 };
