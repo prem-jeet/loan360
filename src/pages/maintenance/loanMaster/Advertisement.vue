@@ -526,6 +526,7 @@ const handleAdvertisementFormSubmit = async () => {
   const payload = { ...newAdvertisement.value };
 
   let rsp;
+
   if (!editingRowId.value) {
     rsp = await usePost('/advertisement', payload);
   } else {
@@ -537,8 +538,6 @@ const handleAdvertisementFormSubmit = async () => {
     isAdvertisementFormActive.value = false;
     loadSource();
   }
-
-  return true;
 };
 
 const changeActive = async (id: number, state: boolean) => {
