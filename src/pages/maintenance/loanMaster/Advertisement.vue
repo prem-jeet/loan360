@@ -326,12 +326,11 @@
 </template>
 
 <script setup lang="ts">
-import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 
-import { usePut, usePost } from 'src/composables/apiCalls';
+import { usePut, usePost, useFetch } from 'src/composables/apiCalls';
 import { ref, onMounted, computed, reactive } from 'vue';
-import { onFailure, asyncConfirmDialog } from 'src/utils/notification';
+import { asyncConfirmDialog } from 'src/utils/notification';
 import { firstLetterCpitalze } from 'src/utils/string';
 import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
@@ -536,7 +535,7 @@ const handleAdvertisementFormSubmit = async () => {
 
   if (rsp) {
     isAdvertisementFormActive.value = false;
-    loadSource();
+    fetchAdvertisement();
   }
 };
 
@@ -556,12 +555,12 @@ const toggleInActive = async (advertisement: Advertisement) => {
   }
 };
 
-const loadSource = async () => {
+const fetchAdvertisement = async () => {
   fetchingData.value = true;
-  const rsp = await api.get('advertisement');
+  const rsp = await useFetch('advertisement');
 
-  if (rsp.data) {
-    advertisement.value = rsp.data;
+  if (rsp) {
+    advertisement.value = rsp as Advertisement[];
   }
 
   fetchingData.value = false;
@@ -569,15 +568,12 @@ const loadSource = async () => {
 
 onMounted(async () => {
   /* replace with useFetch */
-  try {
-    const rsp = await api.get('advertisementMedia');
 
-    if (rsp.data) {
-      mediaOptions.value = rsp.data;
-      loadSource();
-    }
-  } catch (e) {
-    onFailure({ msg: 'Unanle to fetch Media options' });
+  const rsp = await useFetch('advertisementMedia');
+
+  if (rsp) {
+    mediaOptions.value = rsp as MediaOptions[];
+    fetchAdvertisement();
   }
 });
 </script>
