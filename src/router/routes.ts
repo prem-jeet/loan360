@@ -193,6 +193,18 @@ const routes: RouteRecordRaw[] = [
               },
             ],
           },
+
+          {
+            path: 'accounts',
+            children: [
+              {
+                path: 'accountHead',
+                name: 'accountHead',
+                component: () =>
+                  import('pages/maintenance/accountMasters/AccountHead.vue'),
+              },
+            ],
+          },
         ],
       },
     ],
