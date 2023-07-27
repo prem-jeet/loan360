@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { api } from 'src/boot/axios';
-import { onFailure, onSuccess } from 'src/utils/notification';
+import { onSuccess, alertDialog } from 'src/utils/notification';
 
 interface API_OBJECT {
   responseStatus: null;
@@ -28,7 +28,7 @@ const handleError = (
   }
 
   // replace this with alert dialog when it is merged (alert dialog present in account head pr)
-  onFailure({ msg: errorMessage });
+  alertDialog(errorMessage);
 };
 
 const useFetch = async (url: string): Promise<unknown | null> => {
