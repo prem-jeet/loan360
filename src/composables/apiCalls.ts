@@ -2,6 +2,20 @@
 import { api } from 'src/boot/axios';
 import { onFailure, onSuccess } from 'src/utils/notification';
 
+interface API_OBJECT {
+  responseStatus: null;
+  id: number | null;
+  childId: null;
+  code: null;
+  codes: null;
+  displayMessage: 'Item is now in-active';
+  responseCode: null;
+  object: null;
+  inactiveOnBy: string | null;
+  updatedOnBy: string | null;
+  createdOnBy: string | null;
+}
+
 const handleError = (
   response: { [key: string]: any },
   defaultMessage: string
@@ -17,7 +31,7 @@ const handleError = (
   onFailure({ msg: errorMessage });
 };
 
-const useFetch = async (url: string) => {
+const useFetch = async (url: string): Promise<unknown | null> => {
   try {
     const rsp = await api.get(url);
 
@@ -33,10 +47,14 @@ const useFetch = async (url: string) => {
 
     const errorMessage = 'Some error occured, unable to fetch data.';
     handleError(response, errorMessage);
+    return null;
   }
 };
 
-const usePost = async (url: string, payload: { [key: string]: any }) => {
+const usePost = async (
+  url: string,
+  payload: { [key: string]: any }
+): Promise<API_OBJECT | null> => {
   try {
     const rsp = await api.post(url, payload);
 
@@ -53,10 +71,14 @@ const usePost = async (url: string, payload: { [key: string]: any }) => {
 
     const errorMessage = 'Some error occured, unable to post data.';
     handleError(response, errorMessage);
+    return null;
   }
 };
 
-const usePut = async (url: string, payload: { [key: string]: any }) => {
+const usePut = async (
+  url: string,
+  payload: { [key: string]: any }
+): Promise<API_OBJECT | null> => {
   try {
     const rsp = await api.put(url, payload);
 
@@ -73,6 +95,7 @@ const usePut = async (url: string, payload: { [key: string]: any }) => {
 
     const errorMessage = 'Some error occured, unable to update data.';
     handleError(response, errorMessage);
+    return null;
   }
 };
 
