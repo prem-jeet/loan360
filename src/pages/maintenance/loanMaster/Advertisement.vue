@@ -139,7 +139,7 @@
                     size="xs"
                     outline
                     color="red"
-                    @click="() => toggleInActive(props.row)"
+                    @click="() => toggleActiveState(props.row)"
                   >
                   </q-btn>
                 </q-btn-group>
@@ -231,7 +231,7 @@
                     :label="props.row.inactive ? 'activate' : 'deactivate'"
                     size="sm"
                     color="red"
-                    @click="() => toggleInActive(props.row)"
+                    @click="() => toggleActiveState(props.row)"
                   >
                   </q-btn>
                 </q-card-actions>
@@ -440,18 +440,18 @@ const mediaOptions = ref<MediaOptions[]>([]);
 const editingRowId = ref<number | null>(null);
 const isAdvertisementFormActive = ref(false);
 
-const filter = reactive<Filter>({
-  advertisementMediaId: null,
-  name: null,
-  description: null,
-  inActive: false,
-});
-
 const newAdvertisement = ref<AdvertisementForm>({
   advertisementMediaId: null,
   name: null,
   description: null,
   date: null,
+});
+
+const filter = reactive<Filter>({
+  advertisementMediaId: null,
+  name: null,
+  description: null,
+  inActive: false,
 });
 
 const filteredAdvertisement = computed(() => {
@@ -570,8 +570,9 @@ const handleAdvertisementFormSubmit = async () => {
   }
 };
 
-const toggleInActive = async (advertisement: Advertisement) => {
+const toggleActiveState = async (advertisement: Advertisement) => {
   const inActive = advertisement.inactive;
+
   const confirmed = await asyncConfirmDialog({
     msg: `Are you sure you want to ${inActive ? '' : 'De-'}Activate`,
   });
@@ -607,8 +608,6 @@ const fetchAdvertisement = async () => {
 };
 
 onMounted(async () => {
-  /* replace with useFetch */
-
   const rsp = await useFetch(
     'advertisementMedia',
     'Unable to fetch media options.'
