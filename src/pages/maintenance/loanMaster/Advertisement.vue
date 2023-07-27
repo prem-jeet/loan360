@@ -139,7 +139,7 @@
                     size="xs"
                     outline
                     color="red"
-                    @click="changeActive(props.row.id, props.row.inactive)"
+                    @click="() => toggleInActive(props.row)"
                   >
                   </q-btn>
                 </q-btn-group>
@@ -231,7 +231,7 @@
                     :label="props.row.inactive ? 'activate' : 'deactivate'"
                     size="sm"
                     color="red"
-                    @click="changeActive(props.row.id, props.row.inactive)"
+                    @click="() => toggleInActive(props.row)"
                   >
                   </q-btn>
                 </q-card-actions>
@@ -331,7 +331,7 @@ import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 
 import { usePut, usePost } from 'src/composables/apiCalls';
 import { ref, onMounted, computed, reactive } from 'vue';
-import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
+import { onFailure, asyncConfirmDialog } from 'src/utils/notification';
 import { firstLetterCpitalze } from 'src/utils/string';
 import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
@@ -540,27 +540,19 @@ const handleAdvertisementFormSubmit = async () => {
   }
 };
 
-const changeActive = async (id: number, state: boolean) => {
-  if (editingRowId.value === null) {
-    confirmDialog(() => changeActiveConfirm(id, state), {
-      msg: state
-        ? 'Are you sure you want to activate ?'
-        : 'Are you sure you want to deactivate ?',
-    });
-  } else {
-    return;
-  }
-};
+const toggleInActive = async (advertisement: Advertisement) => {
+  const confirmed = await asyncConfirmDialog({
+    msg: `Are you sure you vant to ${
+      advertisement.inactive ? '' : 'De-'
+    } Activate`,
+  });
 
-const changeActiveConfirm = async (id: number, state: boolean) => {
-  const payLoad = {
-    id: id,
-  };
-
-  const str = state ? 'active' : 'inactive';
-  const rsp = await api.put('/advertisement/' + str, payLoad);
-  if (rsp.data) {
-    onSuccess({ msg: rsp.data.displayMessage });
+  if (confirmed) {
+    const str = advertisement.inactive ? 'active' : 'inactive';
+    const rsp = await usePut('/advertisement/' + str, { id: advertisement.id });
+    if (rsp) {
+      advertisement.inactive = !advertisement.inactive;
+    }
   }
 };
 
