@@ -106,5 +106,5 @@ const usePut = async (
     return null;
   }
 };
-
+export type { API_OBJECT };
 export { useFetch, usePost, usePut };
