@@ -31,7 +31,10 @@ const handleError = (
   alertDialog(errorMessage);
 };
 
-const useFetch = async (url: string): Promise<unknown | null> => {
+const useFetch = async (
+  url: string,
+  customErrorMessage?: string
+): Promise<unknown | null> => {
   try {
     const rsp = await api.get(url);
 
@@ -45,7 +48,8 @@ const useFetch = async (url: string): Promise<unknown | null> => {
 
     const { response } = { ...e };
 
-    const errorMessage = 'Some error occured, unable to fetch data.';
+    const errorMessage =
+      customErrorMessage || 'Some error occured, unable to fetch data.';
     handleError(response, errorMessage);
     return null;
   }
@@ -53,7 +57,8 @@ const useFetch = async (url: string): Promise<unknown | null> => {
 
 const usePost = async (
   url: string,
-  payload: { [key: string]: any }
+  payload: { [key: string]: any },
+  customErrorMessage?: string
 ): Promise<API_OBJECT | null> => {
   try {
     const rsp = await api.post(url, payload);
@@ -69,7 +74,8 @@ const usePost = async (
 
     const { response } = { ...e };
 
-    const errorMessage = 'Some error occured, unable to post data.';
+    const errorMessage =
+      customErrorMessage || 'Some error occured, unable to post data.';
     handleError(response, errorMessage);
     return null;
   }
@@ -77,7 +83,8 @@ const usePost = async (
 
 const usePut = async (
   url: string,
-  payload: { [key: string]: any }
+  payload: { [key: string]: any },
+  customErrorMessage?: string
 ): Promise<API_OBJECT | null> => {
   try {
     const rsp = await api.put(url, payload);
@@ -93,7 +100,8 @@ const usePut = async (
 
     const { response } = { ...e };
 
-    const errorMessage = 'Some error occured, unable to update data.';
+    const errorMessage =
+      customErrorMessage || 'Some error occured, unable to update data.';
     handleError(response, errorMessage);
     return null;
   }
