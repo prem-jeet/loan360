@@ -527,10 +527,18 @@ const handleAdvertisementFormSubmit = async () => {
   let rsp;
 
   if (!editingRowId.value) {
-    rsp = await usePost('/advertisement', payload);
+    rsp = await usePost(
+      '/advertisement',
+      payload,
+      'Unable to create new Advertisement.'
+    );
   } else {
     payload.id = editingRowId.value;
-    rsp = await usePut('/advertisement/update', payload);
+    rsp = await usePut(
+      '/advertisement/update',
+      payload,
+      'Unable to edit Advertisement.'
+    );
   }
 
   if (rsp) {
@@ -541,14 +549,18 @@ const handleAdvertisementFormSubmit = async () => {
 
 const toggleInActive = async (advertisement: Advertisement) => {
   const confirmed = await asyncConfirmDialog({
-    msg: `Are you sure you vant to ${
+    msg: `Are you sure you want to ${
       advertisement.inactive ? '' : 'De-'
-    } Activate`,
+    }Activate`,
   });
 
   if (confirmed) {
     const str = advertisement.inactive ? 'active' : 'inactive';
-    const rsp = await usePut('/advertisement/' + str, { id: advertisement.id });
+    const rsp = await usePut(
+      '/advertisement/' + str,
+      { id: advertisement.id },
+      'Unable to change active status.'
+    );
     if (rsp) {
       advertisement.inactive = !advertisement.inactive;
     }
@@ -557,7 +569,10 @@ const toggleInActive = async (advertisement: Advertisement) => {
 
 const fetchAdvertisement = async () => {
   fetchingData.value = true;
-  const rsp = await useFetch('advertisement');
+  const rsp = await useFetch(
+    'advertisement',
+    'Unable to fetch advertisement data.'
+  );
 
   if (rsp) {
     advertisement.value = rsp as Advertisement[];
@@ -569,7 +584,10 @@ const fetchAdvertisement = async () => {
 onMounted(async () => {
   /* replace with useFetch */
 
-  const rsp = await useFetch('advertisementMedia');
+  const rsp = await useFetch(
+    'advertisementMedia',
+    'Unable to fetch media options.'
+  );
 
   if (rsp) {
     mediaOptions.value = rsp as MediaOptions[];
