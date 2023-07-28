@@ -157,19 +157,13 @@
                 <q-checkbox v-model="props.row.inactive" disable />
               </q-td>
               <q-td key="createdOn" :props="props">
-                {{
-                  props.row.createdOn.toLocaleString('en-US', DateTimeOptions)
-                }}
+                {{ formatDate(props.row.createdOn, dateFormat) }}
               </q-td>
               <q-td key="updatedOn" :props="props">
-                {{
-                  props.row.updatedOn.toLocaleString('en-US', DateTimeOptions)
-                }}
+                {{ formatDate(props.row.updatedOn, dateFormat) }}
               </q-td>
               <q-td key="inactiveOn" :props="props">
-                {{
-                  props.row.inactiveOn.toLocaleString('en-US', DateTimeOptions)
-                }}
+                {{ formatDate(props.row.inactiveOn, dateFormat) }}
               </q-td>
             </q-tr>
           </template>
@@ -202,12 +196,7 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">Created :</div>
                     <div class="col-12">
-                      {{
-                        props.row.createdOn.toLocaleString(
-                          'en-US',
-                          DateTimeOptions
-                        )
-                      }}
+                      {{ formatDate(props.row.createdOn, dateFormat) }}
                     </div>
                   </div>
                 </q-card-section>
@@ -215,12 +204,7 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">Updated :</div>
                     <div class="col-12">
-                      {{
-                        props.row.updatedOn.toLocaleString(
-                          'en-US',
-                          DateTimeOptions
-                        )
-                      }}
+                      {{ formatDate(props.row.updatedOn, dateFormat) }}
                     </div>
                   </div>
                 </q-card-section>
@@ -228,12 +212,7 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">Inactive :</div>
                     <div class="col-12">
-                      {{
-                        props.row.inactiveOn.toLocaleString(
-                          'en-US',
-                          DateTimeOptions
-                        )
-                      }}
+                      {{ formatDate(props.row.inactiveOn, dateFormat) }}
                     </div>
                   </div>
                 </q-card-section>
@@ -293,6 +272,7 @@ import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch, reactive } from 'vue';
 import { onSuccess, confirmDialog } from 'src/utils/notification';
+import { formatDate } from 'src/utils/date';
 
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
@@ -371,6 +351,8 @@ const columns: {
   },
 ];
 
+const dateFormat = 'DD/MM/YYYY @hh:mmA';
+
 interface CreditRecommendation {
   name: string;
   code: string;
@@ -387,15 +369,6 @@ interface Filter {
   conditional: boolean;
   inActive: boolean;
 }
-
-const DateTimeOptions = {
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-  hour: 'numeric',
-  minute: 'numeric',
-  hour12: true, // Use 12-hour format
-};
 
 const fetchingData = ref(false);
 const name = ref('');
