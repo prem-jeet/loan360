@@ -156,14 +156,12 @@
               <q-td key="inactive" :props="props">
                 <q-checkbox v-model="props.row.inactive" disable />
               </q-td>
-              <q-td key="createdOn" :props="props">
-                {{ formatDate(props.row.createdOn, dateFormat) }}
-              </q-td>
-              <q-td key="updatedOn" :props="props">
-                {{ formatDate(props.row.updatedOn, dateFormat) }}
-              </q-td>
-              <q-td key="inactiveOn" :props="props">
-                {{ formatDate(props.row.inactiveOn, dateFormat) }}
+              <q-td
+                :key="key"
+                :props="props"
+                v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
+              >
+                {{ !props.key || formatDate(props.row[key], dateFormat) }}
               </q-td>
             </q-tr>
           </template>
@@ -192,30 +190,21 @@
                     </div>
                   </div>
                 </q-card-section>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Created :</div>
-                    <div class="col-12">
-                      {{ formatDate(props.row.createdOn, dateFormat) }}
+                <template
+                  v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
+                  :key="key"
+                >
+                  <q-card-section v-if="props.row[key]">
+                    <div class="row q-gutter-y-xs">
+                      <div class="col-12 text-weight-medium">
+                        {{ props.colsMap[key].label }}
+                      </div>
+                      <div class="col-12">
+                        {{ formatDate(props.row[key], dateFormat) }}
+                      </div>
                     </div>
-                  </div>
-                </q-card-section>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Updated :</div>
-                    <div class="col-12">
-                      {{ formatDate(props.row.updatedOn, dateFormat) }}
-                    </div>
-                  </div>
-                </q-card-section>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Inactive :</div>
-                    <div class="col-12">
-                      {{ formatDate(props.row.inactiveOn, dateFormat) }}
-                    </div>
-                  </div>
-                </q-card-section>
+                  </q-card-section>
+                </template>
 
                 <q-card-actions align="center" class="q-py-md bg-grey-2">
                   <q-btn
@@ -412,13 +401,6 @@ const filterdCreditRecommendation = computed(() => {
     const isCodeMatched = !code || item.code.includes(code!);
     const isConditionalMatched = item.conditional === conditional;
     const isInActiveMatched = item.inactive === inActive;
-    console.log({
-      conditional: item.conditional,
-      filter: conditional,
-      isCodeMatched,
-      isConditionalMatched,
-      isInActiveMatched,
-    });
 
     return isCodeMatched && isConditionalMatched && isInActiveMatched;
   });
