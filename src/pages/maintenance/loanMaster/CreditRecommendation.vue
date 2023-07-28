@@ -21,16 +21,17 @@
           card-container-class="q-gutter-y-md q-mt-xs"
         >
           <template v-slot:top>
-            <div class="row q-gutter-y-lg q-pb-xs-md">
-              <div class="col-12">
-                <div class="row items-center q-gutter-md">
-                  <div class="col-auto text-h6">Credit Recommendation</div>
-                </div>
+            <div class="row q-gutter-md">
+              <div class="col-auto">
+                <div class="col-12 text-h6">Credit Recommendation</div>
+              </div>
+              <div class="col-auto">
+                <q-btn label="Add" icon="add" color="primary" />
               </div>
             </div>
 
-            <div class="row full-width q-mt-sm">
-              <div class="col-xs-12 col-sm-2 col-md-2 q-pb-sm">
+            <div class="row q-mt-lg full-width q-mt-sm items-center">
+              <div class="col-12 col-sm-6 col-md-4">
                 <q-input
                   v-model="nameSearchQuery"
                   outlined
@@ -45,45 +46,17 @@
                   </template>
                 </q-input>
               </div>
-              <div class="col-xs-12 col-sm-2 col-md-2 q-pb-sm">
-                <q-checkbox v-model="conditional" label="Conditional" />
-              </div>
-
-              <div class="col-xs-12 col-sm-2 col-md-2 q-pb-sm">
-                <q-checkbox v-model="checkBox" label="In-Active" />
-              </div>
-              <div class="col-xs-12 col-sm-3 col-md-3 q-pb-sm q-pr-xs">
-                <q-input
-                  v-model="code"
-                  outlined
-                  dense
-                  no-error-icon
-                  :error="error"
-                  :error-message="msg"
-                  placeholder="code"
-                >
-                  <template v-slot:prepend> Group </template>
-                </q-input>
-              </div>
-              <div class="col-xs-12 col-sm-3 col-md-3 q-pb-sm">
-                <q-input
-                  v-model="name"
-                  outlined
-                  dense
-                  no-error-icon
-                  :error="nameError"
-                  placeholder="name"
-                >
-                  <template v-slot:after>
-                    <q-btn
-                      :icon="'add '"
-                      color="teal"
-                      size="md"
-                      :disable="error"
-                      @click="saveEntry()"
-                    />
-                  </template>
-                </q-input>
+              <div
+                class="col-12 col-sm-5 col-md-auto q-mt-md q-mt-sm-none q-ml-md-md"
+              >
+                <div class="flex justify-end">
+                  <q-checkbox v-model="conditional" label="Conditional" />
+                  <q-checkbox
+                    v-model="checkBox"
+                    label="In-Active"
+                    class="q-ml-sm"
+                  />
+                </div>
               </div>
             </div>
           </template>
