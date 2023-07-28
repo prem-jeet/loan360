@@ -31,7 +31,7 @@
                   icon="add"
                   color="primary"
                   @click="
-                    editingRowId = null;
+                    editingRowCode = null;
                     isFormActive = true;
                   "
                 />
@@ -97,7 +97,7 @@
                     outline
                     color="accent"
                     @click="
-                      editingRowId = props.row.code;
+                      editingRowCode = props.row.code;
                       isFormActive = true;
                     "
                   >
@@ -181,7 +181,7 @@
                     color="teal"
                     v-if="editingRowIndex !== props.rowIndex"
                     @click="
-                      editingRowId = props.row.code;
+                      editingRowCode = props.row.code;
                       isFormActive = true;
                     "
                   >
@@ -206,7 +206,7 @@
 
     <q-dialog
       v-model="isFormActive"
-      @before-hide="editingRowId = null"
+      @before-hide="editingRowCode = null"
       @before-show="setFormData"
     >
       <q-card style="width: 500px">
@@ -214,7 +214,7 @@
           <q-card-section class="bg-grey-2">
             <div class="flex items-center">
               <span class="text-bold q-mr-xl">
-                {{ `${editingRowId ? 'Edit' : 'Add'} Credit Recommendation` }}
+                {{ `${editingRowCode ? 'Edit' : 'Add'} Credit Recommendation` }}
               </span>
               <q-space />
               <q-btn
@@ -261,8 +261,8 @@
           </q-card-section>
           <q-card-actions align="center" class="q-py-md bg-grey-2 q-mt-auto">
             <q-btn
-              :label="editingRowId ? 'Save' : 'Add '"
-              :icon="editingRowId ? 'save' : 'add '"
+              :label="editingRowCode ? 'Save' : 'Add '"
+              :icon="editingRowCode ? 'save' : 'add '"
               color="teal"
               type="submit"
             />
@@ -357,7 +357,6 @@ const columns: TableColumn[] = [
 const dateFormat = 'DD/MM/YYYY @hh:mmA';
 
 interface CreditRecommendation {
-  id?: number;
   name: string;
   code: string;
   conditional: boolean | null;
@@ -384,7 +383,7 @@ const creditRecommendation = ref<CreditRecommendation[]>([]);
 
 const editingRowIndex = ref<number | null>(null);
 
-const editingRowId = ref<number | null>(null);
+const editingRowCode = ref<string | null>(null);
 const formData = ref<Form>({
   code: null,
   name: null,
@@ -394,17 +393,6 @@ const filter = reactive<Filter>({
   code: null,
   conditional: true,
   inActive: false,
-});
-
-const newSouce = reactive<CreditRecommendation>({
-  name: '',
-  code: '',
-  id: 12,
-  createdOn: '',
-  inactive: false,
-  conditional: false,
-  inactiveOn: '',
-  updatedOn: '',
 });
 
 const filterdCreditRecommendation = computed(() => {
@@ -420,11 +408,32 @@ const filterdCreditRecommendation = computed(() => {
 
   return filteredData;
 });
+
+const initialFormData = computed(() => {
+  const temp: Form = {
+    code: null,
+    name: null,
+    conditional: false,
+  };
+
+  if (editingRowCode.value) {
+    const editingRow = creditRecommendation.value.find(
+      (item) => item.code === editingRowCode.value
+    );
+    if (editingRow) {
+      temp.code = editingRow.code;
+      temp.name = editingRow.name;
+      temp.conditional =
+        editingRow.conditional === null || editingRow.conditional;
+    }
+  }
+
+  return temp;
+});
 const setFormData = () => {
-  console.log(
-    '🚀 ~ file: CreditRecommendation.vue:371 ~ initialFormData ~ initialFormData:'
-  );
+  formData.value = { ...initialFormData.value };
 };
+
 const handleFormSubmit = () => {
   console.log(
     '🚀 ~ file: CreditRecommendation.vue:375 ~ handleFormSubmit ~ handleFormSubmit'
