@@ -26,7 +26,15 @@
                 <div class="col-12 text-h6">Credit Recommendation</div>
               </div>
               <div class="col-auto">
-                <q-btn label="Add" icon="add" color="primary" />
+                <q-btn
+                  label="Add"
+                  icon="add"
+                  color="primary"
+                  @click="
+                    editingRowId = null;
+                    isFormActive = true;
+                  "
+                />
               </div>
             </div>
 
@@ -88,8 +96,10 @@
                     size="xs"
                     outline
                     color="accent"
-                    v-if="editingRowIndex !== props.rowIndex"
-                    @click="() => editEntry(props.row.id, props.rowIndex)"
+                    @click="
+                      editingRowId = props.row.code;
+                      isFormActive = true;
+                    "
                   >
                     <q-tooltip>Edit</q-tooltip>
                   </q-btn>
@@ -103,55 +113,16 @@
                     @click="changeActive(props.row.code, props.row.inactive)"
                   >
                   </q-btn>
-                  <q-btn
-                    icon="check"
-                    size="xs"
-                    outline
-                    color="green-10"
-                    v-if="editingRowIndex === props.rowIndex"
-                    @click="() => saveEdited()"
-                  >
-                    <q-tooltip>Save</q-tooltip>
-                  </q-btn>
-                  <q-btn
-                    icon="close"
-                    size="xs"
-                    outline
-                    color="red"
-                    v-if="editingRowIndex === props.rowIndex"
-                    @click="(isEditing = false), (editingRowIndex = null)"
-                  >
-                    <q-tooltip>Cancel</q-tooltip>
-                  </q-btn>
                 </q-btn-group>
               </q-td>
               <q-td key="code" :props="props">
-                <span>{{
-                  props.row.code.charAt(0).toUpperCase() +
-                  props.row.code.slice(1)
-                }}</span>
+                {{ props.row.code }}
               </q-td>
               <q-td key="name" :props="props">
-                <q-input
-                  v-if="editingRowIndex === props.rowIndex"
-                  v-model="newSouce.name"
-                  placeholder="Name required"
-                  dense
-                  outlined
-                  :color="newSouce.name ? 'green' : 'red'"
-                  autofocus
-                />
-                <span v-else>{{
-                  props.row.name.charAt(0).toUpperCase() +
-                  props.row.name.slice(1)
-                }}</span>
+                {{ props.row.name }}
               </q-td>
               <q-td key="conditional" :props="props">
-                <q-checkbox
-                  v-if="editingRowIndex === props.rowIndex"
-                  v-model="newSouce.conditional"
-                />
-                <q-checkbox v-else v-model="props.row.conditional" disable />
+                <q-icon name="check" />
               </q-td>
               <q-td key="inactive" :props="props">
                 <q-checkbox v-model="props.row.inactive" disable />
@@ -172,21 +143,17 @@
               <q-card>
                 <q-card-section>
                   <div class="row q-gutter-y-xs">
+                    <div class="col-12 text-weight-medium">Code :</div>
+                    <div class="col-12">
+                      {{ props.row.code }}
+                    </div>
+                  </div>
+                </q-card-section>
+                <q-card-section>
+                  <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">Name :</div>
                     <div class="col-12">
-                      <q-input
-                        v-if="editingRowIndex === props.rowIndex"
-                        v-model="newSouce.name"
-                        placeholder="Name required"
-                        dense
-                        outlined
-                        :color="newSouce.name ? 'green' : 'red'"
-                        autofocus
-                      />
-                      <span v-else>{{
-                        props.row.name.charAt(0).toUpperCase() +
-                        props.row.name.slice(1)
-                      }}</span>
+                      {{ props.row.name }}
                     </div>
                   </div>
                 </q-card-section>
@@ -213,7 +180,10 @@
                     size="sm"
                     color="teal"
                     v-if="editingRowIndex !== props.rowIndex"
-                    @click="() => editEntry(props.row.id, props.rowIndex)"
+                    @click="
+                      editingRowId = props.row.code;
+                      isFormActive = true;
+                    "
                   >
                     <q-tooltip>Edit</q-tooltip>
                   </q-btn>
@@ -226,26 +196,6 @@
                     @click="changeActive(props.row.code, props.row.inactive)"
                   >
                   </q-btn>
-                  <q-btn
-                    label="save"
-                    icon="save"
-                    size="sm"
-                    color="teal"
-                    v-if="editingRowIndex === props.rowIndex"
-                    @click="() => saveEdited()"
-                  >
-                    <q-tooltip>Save</q-tooltip>
-                  </q-btn>
-                  <q-btn
-                    label="close"
-                    icon="close"
-                    size="sm"
-                    color="red"
-                    v-if="editingRowIndex === props.rowIndex"
-                    @click="(isEditing = false), (editingRowIndex = null)"
-                  >
-                    <q-tooltip>Cancel</q-tooltip>
-                  </q-btn>
                 </q-card-actions>
               </q-card>
             </div>
@@ -253,15 +203,85 @@
         </q-table>
       </div>
     </div>
+
+    <q-dialog
+      v-model="isFormActive"
+      @before-hide="editingRowId = null"
+      @before-show="setFormData"
+    >
+      <q-card style="width: 500px">
+        <q-form @submit.prevent="handleFormSubmit" @reset="setFormData">
+          <q-card-section class="bg-grey-2">
+            <div class="flex items-center">
+              <span class="text-bold q-mr-xl">
+                {{ `${editingRowId ? 'Edit' : 'Add'} Credit Recommendation` }}
+              </span>
+              <q-space />
+              <q-btn
+                class="q-ml-xs-md q-ml-sm-xl"
+                icon="close"
+                flat
+                @click="isFormActive = false"
+              />
+            </div>
+          </q-card-section>
+          <q-card-section>
+            <q-input
+              v-model="formData.code"
+              outlined
+              label="Code"
+              @update:model-value="
+                    (val) => {
+                      if (val === '') {
+                        formData.code = null;
+                      } else if (val !== null) {
+                        formData.code = formData.code!.toUpperCase();
+                      }
+                    }"
+            />
+          </q-card-section>
+          <q-card-section>
+            <q-input
+              v-model="formData.name"
+              outlined
+              label="Name"
+              @update:model-value="
+                (val) => {
+                  if (val === '') {
+                    formData.name = null;
+                  } else if (val !== null) {
+                    formData.name = capitalCase(formData.name!);
+                  }
+                }
+              "
+            />
+          </q-card-section>
+          <q-card-section>
+            <q-checkbox v-model="formData.conditional" label="Conditional" />
+          </q-card-section>
+          <q-card-actions align="center" class="q-py-md bg-grey-2 q-mt-auto">
+            <q-btn
+              :label="editingRowId ? 'Save' : 'Add '"
+              :icon="editingRowId ? 'save' : 'add '"
+              color="teal"
+              type="submit"
+            />
+            <q-btn label="Reset" color="red-5" type="reset" icon="refresh" />
+          </q-card-actions>
+        </q-form>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
+import type { TableColumn } from 'src/types/Common';
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch, reactive } from 'vue';
 import { onSuccess, confirmDialog } from 'src/utils/notification';
 import { formatDate } from 'src/utils/date';
+import { capitalCase } from 'src/utils/string';
 
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
@@ -275,13 +295,7 @@ const breadcrumbs = [
   },
 ];
 
-const columns: {
-  name: string;
-  required?: boolean;
-  label: string;
-  field: string;
-  align: 'left';
-}[] = [
+const columns: TableColumn[] = [
   {
     name: 'actions',
     label: 'Actions',
@@ -306,14 +320,14 @@ const columns: {
   {
     name: 'conditional',
     required: true,
-    align: 'left',
+    align: 'center',
     field: 'conditional',
     label: 'Conditional',
   },
   {
     name: 'inactive',
     required: true,
-    align: 'left',
+    align: 'center',
     field: 'inactive',
     label: 'In-active',
   },
@@ -322,37 +336,41 @@ const columns: {
     required: true,
     align: 'left',
     field: 'createdOn',
-    label: 'Created',
+    label: 'Created On',
   },
   {
     name: 'updatedOn',
     required: true,
     align: 'left',
     field: 'updatedOn',
-    label: 'Updated',
+    label: 'Updated On',
   },
   {
     name: 'inactiveOn',
     required: true,
     align: 'left',
     field: 'inactiveOn',
-    label: 'In-Active',
+    label: 'In-Active On',
   },
 ];
 
 const dateFormat = 'DD/MM/YYYY @hh:mmA';
 
 interface CreditRecommendation {
+  id?: number;
   name: string;
   code: string;
-  id: number | null;
-  createdOn: string;
-  inactive: boolean;
-  conditional: boolean;
-  inactiveOn: string;
-  updatedOn: string;
+  conditional: boolean | null;
+  inactive: boolean | null;
+  createdOn: string | null;
+  inactiveOn: string | null;
+  updatedOn: string | null;
 }
-
+interface Form {
+  name: string | null;
+  code: string | null;
+  conditional: boolean;
+}
 interface Filter {
   code: string | null;
   conditional: boolean;
@@ -360,18 +378,18 @@ interface Filter {
 }
 
 const fetchingData = ref(false);
-const name = ref('');
-const code = ref('');
-const conditional = ref(true);
 
+const isFormActive = ref(false);
 const creditRecommendation = ref<CreditRecommendation[]>([]);
 
-const isEditing = ref(false);
 const editingRowIndex = ref<number | null>(null);
-const editingRowId = ref<number | null>(null);
-const error = ref(false);
-const nameError = ref(false);
 
+const editingRowId = ref<number | null>(null);
+const formData = ref<Form>({
+  code: null,
+  name: null,
+  conditional: false,
+});
 const filter = reactive<Filter>({
   code: null,
   conditional: true,
@@ -381,7 +399,7 @@ const filter = reactive<Filter>({
 const newSouce = reactive<CreditRecommendation>({
   name: '',
   code: '',
-  id: null,
+  id: 12,
   createdOn: '',
   inactive: false,
   conditional: false,
@@ -402,71 +420,54 @@ const filterdCreditRecommendation = computed(() => {
 
   return filteredData;
 });
-
 const setFormData = () => {
-  const index = creditRecommendation.value.findIndex(
-    (obj) => obj.id === editingRowId.value
+  console.log(
+    '🚀 ~ file: CreditRecommendation.vue:371 ~ initialFormData ~ initialFormData:'
   );
-  newSouce.name = index >= 0 ? creditRecommendation.value[index].name : '';
-  newSouce.code = index >= 0 ? creditRecommendation.value[index].code : '';
-  newSouce.conditional =
-    index >= 0 ? creditRecommendation.value[index].conditional : true;
+};
+const handleFormSubmit = () => {
+  console.log(
+    '🚀 ~ file: CreditRecommendation.vue:375 ~ handleFormSubmit ~ handleFormSubmit'
+  );
 };
 
-const editEntryConfirmed = (id: number, index: number) => {
-  editingRowIndex.value = index;
-  editingRowId.value = id;
-  setFormData();
-};
-
-const editEntry = (id: number, rowIndex: number) => {
-  if (isEditing.value) {
-    confirmDialog(() => editEntryConfirmed(id, rowIndex), {
-      msg: 'Are you sure you want to cancel editing the current Code?',
-    });
-  } else {
-    isEditing.value = true;
-    editingRowIndex.value = rowIndex;
-    editEntryConfirmed(id, rowIndex);
-  }
-};
-const saveNewEntry = async () => {
-  let payLoad = {
-    name: name.value,
-    code: code.value,
-    conditional: conditional.value,
-    inactive: false,
-    createdOn: new Date(),
-  };
-  const rsp = await api.post('/creditRecommendation', payLoad);
-  if (rsp.data) {
-    onSuccess({
-      msg: rsp.data.displayMessage,
-      icon: 'sync_alt',
-    });
-    name.value = '';
-    code.value = '';
-    loadSource();
-  }
-};
-const saveEdited = async () => {
-  let payLoad = {
-    name: newSouce.name,
-    code: newSouce.code,
-    conditional: newSouce.conditional,
-    updatedOn: new Date(),
-  };
-  const rsp = await api.put('/creditRecommendation/update', payLoad);
-  if (rsp.data) {
-    onSuccess({
-      msg: rsp.data.displayMessage,
-      icon: 'sync_alt',
-    });
-    isEditing.value = false;
-    editingRowIndex.value = null;
-    loadSource();
-  }
-};
+// const saveNewEntry = async () => {
+//   let payLoad = {
+//     name: name.value,
+//     code: code.value,
+//     conditional: conditional.value,
+//     inactive: false,
+//     createdOn: new Date(),
+//   };
+//   const rsp = await api.post('/creditRecommendation', payLoad);
+//   if (rsp.data) {
+//     onSuccess({
+//       msg: rsp.data.displayMessage,
+//       icon: 'sync_alt',
+//     });
+//     name.value = '';
+//     code.value = '';
+//     loadSource();
+//   }
+// };
+// const saveEdited = async () => {
+//   let payLoad = {
+//     name: newSouce.name,
+//     code: newSouce.code,
+//     conditional: newSouce.conditional,
+//     updatedOn: new Date(),
+//   };
+//   const rsp = await api.put('/creditRecommendation/update', payLoad);
+//   if (rsp.data) {
+//     onSuccess({
+//       msg: rsp.data.displayMessage,
+//       icon: 'sync_alt',
+//     });
+//     isEditing.value = false;
+//     editingRowIndex.value = null;
+//     loadSource();
+//   }
+// };
 
 const changeActive = async (code: string, state: boolean) => {
   if (editingRowIndex.value === null) {
