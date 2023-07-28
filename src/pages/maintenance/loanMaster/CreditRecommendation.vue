@@ -33,13 +33,19 @@
             <div class="row q-mt-lg full-width q-mt-sm items-center">
               <div class="col-12 col-sm-6 col-md-4">
                 <q-input
-                  v-model="nameSearchQuery"
+                  v-model="filter.code"
                   outlined
                   clearable
                   dense
                   rounded
                   placeholder="search code"
-                  @clear="nameSearchQuery = ''"
+                  @update:model-value="
+                    (val) => {
+                      if (val === '') {
+                        filter.code = null;
+                      }
+                    }
+                  "
                 >
                   <template v-slot:prepend>
                     <q-icon name="search" />
@@ -49,10 +55,13 @@
               <div
                 class="col-12 col-sm-5 col-md-auto q-mt-md q-mt-sm-none q-ml-md-md"
               >
-                <div class="flex justify-end">
-                  <q-checkbox v-model="conditional" label="Conditional" />
+                <div class="flex justify-end items-center">
                   <q-checkbox
-                    v-model="checkBox"
+                    v-model="filter.conditional"
+                    label="Conditional"
+                  />
+                  <q-checkbox
+                    v-model="filter.inActive"
                     label="In-Active"
                     class="q-ml-sm"
                   />
@@ -281,7 +290,7 @@
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch, reactive } from 'vue';
-import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
+import { onSuccess, confirmDialog } from 'src/utils/notification';
 
 interface CreditRecommendation {
   name: string;
@@ -394,6 +403,17 @@ const editingRowId = ref<number | null>(null);
 const error = ref(false);
 const nameError = ref(false);
 const msg = ref('');
+
+interface Filter {
+  code: string | null;
+  conditional: boolean;
+  inActive: boolean;
+}
+const filter = reactive<Filter>({
+  code: null,
+  conditional: true,
+  inActive: false,
+});
 
 const newSouce = reactive<CreditRecommendation>({
   name: '',
