@@ -3,7 +3,7 @@ interface TableColumn {
   required?: boolean;
   label: string;
   field: string;
-  align: 'left';
+  align?: 'left' | 'right' | 'center';
   sortable?: boolean;
 }
 
