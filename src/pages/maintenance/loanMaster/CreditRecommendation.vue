@@ -16,7 +16,7 @@
           bordered
           title="Nature entry"
           :rows-per-page-options="[0]"
-          :hide-bottom="!!filteredData.length"
+          :hide-bottom="!!filterdCreditRecommendation.length"
           :grid="$q.screen.width < 830"
           card-container-class="q-gutter-y-md q-mt-xs"
         >
@@ -365,8 +365,7 @@ const code = ref('');
 const conditional = ref(true);
 
 const creditRecommendation = ref<CreditRecommendation[]>([]);
-const creditRecommendationTemp = ref<CreditRecommendation[]>([]);
-const checkBox = ref(false);
+
 const isEditing = ref(false);
 const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
@@ -389,10 +388,6 @@ const newSouce = reactive<CreditRecommendation>({
   inactiveOn: '',
   updatedOn: '',
 });
-
-const filteredData = computed(() =>
-  creditRecommendation.value.filter((item) => item.inactive === checkBox.value)
-);
 
 const filterdCreditRecommendation = computed(() => {
   const { code, conditional, inActive } = filter;
@@ -473,14 +468,6 @@ const saveEdited = async () => {
   }
 };
 
-const saveEntry = () => {
-  if (code.value) {
-    name.value ? saveNewEntry() : (nameError.value = true);
-  } else {
-    error.value = true;
-  }
-};
-
 const changeActive = async (code: string, state: boolean) => {
   if (editingRowIndex.value === null) {
     confirmDialog(() => changeActiveConfirm(code, state), {
@@ -511,22 +498,7 @@ const loadSource = async () => {
   const rsp = await api.get('creditRecommendation');
 
   if (rsp.data) {
-    const transformedData = rsp.data.map(
-      (item: {
-        createdOn: string | number | Date;
-        updatedOn: string | number | Date;
-        inactiveOn: string | number | Date;
-      }) => {
-        return {
-          ...item,
-          createdOn: item.createdOn !== null ? new Date(item.createdOn) : '',
-          updatedOn: item.updatedOn !== null ? new Date(item.updatedOn) : '',
-          inactiveOn: item.inactiveOn !== null ? new Date(item.inactiveOn) : '',
-        };
-      }
-    );
-    creditRecommendation.value = transformedData;
-    creditRecommendationTemp.value = transformedData;
+    creditRecommendation.value = rsp.data;
   }
   fetchingData.value = false;
 };
