@@ -7,7 +7,7 @@
     <div class="row q-mt-lg q-pb-xl">
       <div class="col">
         <q-table
-          :rows="filteredData"
+          :rows="filterdCreditRecommendation"
           :columns="columns"
           row-key="code"
           :loading="fetchingData"
@@ -38,11 +38,13 @@
                   clearable
                   dense
                   rounded
-                  placeholder="search code"
+                  placeholder="Code"
                   @update:model-value="
                     (val) => {
                       if (val === '') {
                         filter.code = null;
+                      } else if (val !== null) {
+                        filter.code = filter.code!.toUpperCase();
                       }
                     }
                   "
@@ -292,17 +294,6 @@ import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch, reactive } from 'vue';
 import { onSuccess, confirmDialog } from 'src/utils/notification';
 
-interface CreditRecommendation {
-  name: string;
-  code: string;
-  id: number | null;
-  createdOn: string;
-  inactive: boolean;
-  conditional: boolean;
-  inactiveOn: string;
-  updatedOn: string;
-}
-
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
   {
@@ -380,6 +371,23 @@ const columns: {
   },
 ];
 
+interface CreditRecommendation {
+  name: string;
+  code: string;
+  id: number | null;
+  createdOn: string;
+  inactive: boolean;
+  conditional: boolean;
+  inactiveOn: string;
+  updatedOn: string;
+}
+
+interface Filter {
+  code: string | null;
+  conditional: boolean;
+  inActive: boolean;
+}
+
 const DateTimeOptions = {
   year: 'numeric',
   month: '2-digit',
@@ -393,7 +401,7 @@ const fetchingData = ref(false);
 const name = ref('');
 const code = ref('');
 const conditional = ref(true);
-const nameSearchQuery = ref('');
+
 const creditRecommendation = ref<CreditRecommendation[]>([]);
 const creditRecommendationTemp = ref<CreditRecommendation[]>([]);
 const checkBox = ref(false);
@@ -402,13 +410,7 @@ const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
 const error = ref(false);
 const nameError = ref(false);
-const msg = ref('');
 
-interface Filter {
-  code: string | null;
-  conditional: boolean;
-  inActive: boolean;
-}
 const filter = reactive<Filter>({
   code: null,
   conditional: true,
@@ -429,6 +431,27 @@ const newSouce = reactive<CreditRecommendation>({
 const filteredData = computed(() =>
   creditRecommendation.value.filter((item) => item.inactive === checkBox.value)
 );
+
+const filterdCreditRecommendation = computed(() => {
+  const { code, conditional, inActive } = filter;
+  const data = [...creditRecommendation.value];
+  const filteredData = data.filter((item) => {
+    const isCodeMatched = !code || item.code.includes(code!);
+    const isConditionalMatched = item.conditional === conditional;
+    const isInActiveMatched = item.inactive === inActive;
+    console.log({
+      conditional: item.conditional,
+      filter: conditional,
+      isCodeMatched,
+      isConditionalMatched,
+      isInActiveMatched,
+    });
+
+    return isCodeMatched && isConditionalMatched && isInActiveMatched;
+  });
+
+  return filteredData;
+});
 
 const setFormData = () => {
   const index = creditRecommendation.value.findIndex(
@@ -547,52 +570,11 @@ const loadSource = async () => {
         };
       }
     );
-    creditRecommendation.value = transformedData.filter(
-      (item: { conditional: boolean }) => item.conditional === conditional.value
-    );
+    creditRecommendation.value = transformedData;
     creditRecommendationTemp.value = transformedData;
   }
   fetchingData.value = false;
 };
-
-watch(code, () => {
-  error.value = false;
-  msg.value = '';
-
-  if (!code.value) {
-    return;
-  }
-
-  const temp = creditRecommendationTemp.value.find(
-    (item) => item.code.toLowerCase() === code.value.toLocaleLowerCase()
-  );
-
-  if (temp) {
-    error.value = true;
-    msg.value = 'Item already exists!';
-  }
-});
-
-watch(name, () => {
-  nameError.value = false;
-});
-
-watch(nameSearchQuery, () => {
-  const transformedData = creditRecommendationTemp.value.filter((item) => {
-    return item.code
-      .toLowerCase()
-      .includes(nameSearchQuery.value.toLowerCase());
-  });
-  creditRecommendation.value = transformedData.filter(
-    (item: { conditional: boolean }) => item.conditional === conditional.value
-  );
-});
-
-watch(conditional, () => {
-  creditRecommendation.value = creditRecommendationTemp.value.filter((item) => {
-    return item.conditional === conditional.value;
-  });
-});
 
 onMounted(() => {
   loadSource();
