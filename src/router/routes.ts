@@ -80,7 +80,6 @@ const routes: RouteRecordRaw[] = [
             component: () =>
               import('pages/settings/accounts/InterestDepositGenerate.vue'),
           },
-
           {
             path: 'leadMaster',
             children: [
@@ -145,6 +144,12 @@ const routes: RouteRecordRaw[] = [
                 name: 'advertisementMedia',
                 component: () =>
                   import('pages/maintenance/loanMaster/AdvertisementMedia.vue'),
+              },
+              {
+                path: 'bureauScoreRate',
+                name: 'bureauScoreRate',
+                component: () =>
+                  import('pages/maintenance/loanMaster/BureauScore.vue'),
               },
             ],
           },
