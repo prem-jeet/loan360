@@ -230,6 +230,10 @@
               v-model="formData.code"
               outlined
               label="Code"
+              hide-bottom-space
+              no-error-icon
+              :error="formData.code === null"
+              :rules="[(val) => val !== null]"
               @update:model-value="
                     (val) => {
                       if (val === '') {
@@ -245,6 +249,10 @@
               v-model="formData.name"
               outlined
               label="Name"
+              hide-bottom-space
+              no-error-icon
+              :error="formData.name === null"
+              :rules="[(val) => val !== null]"
               @update:model-value="
                 (val) => {
                   if (val === '') {
@@ -279,9 +287,10 @@ import type { TableColumn } from 'src/types/Common';
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch, reactive } from 'vue';
-import { onSuccess, confirmDialog } from 'src/utils/notification';
+import { onSuccess, confirmDialog, alertDialog } from 'src/utils/notification';
 import { formatDate } from 'src/utils/date';
 import { capitalCase } from 'src/utils/string';
+import { useFetch } from 'src/composables/apiCalls';
 
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
@@ -357,8 +366,8 @@ const columns: TableColumn[] = [
 const dateFormat = 'DD/MM/YYYY @hh:mmA';
 
 interface CreditRecommendation {
-  name: string;
-  code: string;
+  name: string | null;
+  code: string | null;
   conditional: boolean | null;
   inactive: boolean | null;
   createdOn: string | null;
@@ -387,8 +396,9 @@ const editingRowCode = ref<string | null>(null);
 const formData = ref<Form>({
   code: null,
   name: null,
-  conditional: false,
+  conditional: true,
 });
+
 const filter = reactive<Filter>({
   code: null,
   conditional: true,
@@ -399,9 +409,10 @@ const filterdCreditRecommendation = computed(() => {
   const { code, conditional, inActive } = filter;
   const data = [...creditRecommendation.value];
   const filteredData = data.filter((item) => {
-    const isCodeMatched = !code || item.code.includes(code!);
+    const isCodeMatched = !code || item.code!.includes(code!);
     const isConditionalMatched = item.conditional === conditional;
-    const isInActiveMatched = item.inactive === inActive;
+    const isInActiveMatched =
+      item.inactive == inActive || item.inactive === null;
 
     return isCodeMatched && isConditionalMatched && isInActiveMatched;
   });
@@ -413,7 +424,7 @@ const initialFormData = computed(() => {
   const temp: Form = {
     code: null,
     name: null,
-    conditional: false,
+    conditional: true,
   };
 
   if (editingRowCode.value) {
@@ -434,49 +445,40 @@ const setFormData = () => {
   formData.value = { ...initialFormData.value };
 };
 
-const handleFormSubmit = () => {
-  console.log(
-    '🚀 ~ file: CreditRecommendation.vue:375 ~ handleFormSubmit ~ handleFormSubmit'
-  );
+const isCodeDuplicate = (code: string) => {
+  const isDuplicate = !!creditRecommendation.value.some((item) => {
+    return (
+      item.code === code &&
+      !(editingRowCode.value && editingRowCode.value === item.code)
+    );
+  });
+
+  return isDuplicate;
 };
 
-// const saveNewEntry = async () => {
-//   let payLoad = {
-//     name: name.value,
-//     code: code.value,
-//     conditional: conditional.value,
-//     inactive: false,
-//     createdOn: new Date(),
-//   };
-//   const rsp = await api.post('/creditRecommendation', payLoad);
-//   if (rsp.data) {
-//     onSuccess({
-//       msg: rsp.data.displayMessage,
-//       icon: 'sync_alt',
-//     });
-//     name.value = '';
-//     code.value = '';
-//     loadSource();
-//   }
-// };
-// const saveEdited = async () => {
-//   let payLoad = {
-//     name: newSouce.name,
-//     code: newSouce.code,
-//     conditional: newSouce.conditional,
-//     updatedOn: new Date(),
-//   };
-//   const rsp = await api.put('/creditRecommendation/update', payLoad);
-//   if (rsp.data) {
-//     onSuccess({
-//       msg: rsp.data.displayMessage,
-//       icon: 'sync_alt',
-//     });
-//     isEditing.value = false;
-//     editingRowIndex.value = null;
-//     loadSource();
-//   }
-// };
+const handleFormSubmit = async () => {
+  if (formData.value.code && isCodeDuplicate(formData.value.code)) {
+    alertDialog('Duplicate Code');
+    return;
+  }
+
+  const payload: Partial<CreditRecommendation> = {
+    ...formData.value,
+  };
+
+  if (!editingRowCode.value) {
+    payload.inactive = false;
+  }
+  const method = editingRowCode.value ? 'put' : 'post';
+  const endpoint = `/creditRecommendation/${
+    editingRowCode.value ? 'update' : ''
+  }`;
+
+  const rsp = await api[method](endpoint, payload);
+  if (rsp.data) {
+    loadCreditRecommendation();
+  }
+};
 
 const changeActive = async (code: string, state: boolean) => {
   if (editingRowIndex.value === null) {
@@ -500,21 +502,21 @@ const changeActiveConfirm = async (code: string, state: boolean) => {
   if (rsp.data) {
     onSuccess({ msg: rsp.data.displayMessage });
   }
-  loadSource();
+  loadCreditRecommendation();
 };
 
-const loadSource = async () => {
+const loadCreditRecommendation = async () => {
   fetchingData.value = true;
-  const rsp = await api.get('creditRecommendation');
+  const rsp = await useFetch('creditRecommendation');
 
-  if (rsp.data) {
-    creditRecommendation.value = rsp.data;
+  if (rsp) {
+    creditRecommendation.value = rsp as CreditRecommendation[];
   }
   fetchingData.value = false;
 };
 
 onMounted(() => {
-  loadSource();
+  loadCreditRecommendation();
 });
 </script>
 
