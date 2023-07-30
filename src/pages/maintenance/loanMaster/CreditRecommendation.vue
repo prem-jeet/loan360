@@ -413,7 +413,6 @@ interface Filter {
 
 const fetchingData = ref(false);
 const isFormActive = ref(false);
-const editingRowIndex = ref<number | null>(null);
 const editingRowCode = ref<string | null>(null);
 
 const creditRecommendation = ref<CreditRecommendation[]>([]);
