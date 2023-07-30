@@ -17,13 +17,13 @@ interface API_OBJECT {
 }
 
 const handleError = (
-  response: { [key: string]: any },
+  response: { [key: string]: any } | undefined,
   defaultMessage: string
 ) => {
   let errorMessage = defaultMessage;
-  if (response.status === 401) {
+  if (response && response.status === 401) {
     errorMessage = response.statusText;
-  } else if (response.data) {
+  } else if (response && response.data) {
     errorMessage = response.data.displayMessage;
   }
 
