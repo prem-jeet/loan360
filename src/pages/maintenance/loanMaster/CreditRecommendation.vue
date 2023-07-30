@@ -105,8 +105,7 @@
                   </q-btn>
 
                   <q-btn
-                    v-if="editingRowIndex !== props.rowIndex"
-                    :label="props.row.inactive ? 'activate' : 'deactivate'"
+                    :label="props.row.inactive ? 'Activate' : 'De-Activate'"
                     size="xs"
                     outline
                     color="red"
@@ -207,18 +206,13 @@
                     icon="edit"
                     size="sm"
                     color="teal"
-                    v-if="editingRowIndex !== props.rowIndex"
                     @click="
                       editingRowCode = props.row.code;
                       isFormActive = true;
                     "
-                  >
-                    <q-tooltip>Edit</q-tooltip>
-                  </q-btn>
-
+                  />
                   <q-btn
-                    v-if="editingRowIndex !== props.rowIndex"
-                    :label="props.row.inactive ? 'activate' : 'deactivate'"
+                    :label="props.row.inactive ? 'Activate' : 'De-activate'"
                     size="sm"
                     color="red"
                     @click="() => toggleActiveState(props.row)"
@@ -313,7 +307,7 @@
 <script setup lang="ts">
 import type { TableColumn } from 'src/types/Common';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { ref, onMounted, computed, watch, reactive } from 'vue';
+import { ref, onMounted, computed, reactive } from 'vue';
 import { alertDialog, asyncConfirmDialog } from 'src/utils/notification';
 import { formatDate } from 'src/utils/date';
 import { capitalCase } from 'src/utils/string';
@@ -418,13 +412,12 @@ interface Filter {
 }
 
 const fetchingData = ref(false);
-
 const isFormActive = ref(false);
+const editingRowIndex = ref<number | null>(null);
+const editingRowCode = ref<string | null>(null);
+
 const creditRecommendation = ref<CreditRecommendation[]>([]);
 
-const editingRowIndex = ref<number | null>(null);
-
-const editingRowCode = ref<string | null>(null);
 const formData = ref<Form>({
   code: null,
   name: null,
