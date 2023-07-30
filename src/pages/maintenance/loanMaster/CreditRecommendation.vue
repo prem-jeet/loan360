@@ -521,7 +521,27 @@ const handleFormSubmit = async () => {
   }
 
   if (rsp) {
-    loadCreditRecommendation();
+    const editingRow = creditRecommendation.value.filter(
+      (item) => item.code === editingRowCode.value
+    )[0];
+    const newCreditRecommendation: CreditRecommendation = {
+      code: payload.code!,
+      name: payload.name!,
+      conditional: payload.conditional!,
+      inactive: editingRow ? editingRow.inactive : false,
+      createdOn: editingRow ? editingRow.createdOn : new Date().toString(),
+      inactiveOn: editingRow ? editingRow.inactiveOn : null,
+      updatedOn: editingRow ? new Date().toString() : null,
+    };
+    let newCreditRecommendationArray = editingRow
+      ? creditRecommendation.value.map((item) =>
+          item.code === payload.code ? { ...newCreditRecommendation } : item
+        )
+      : [...creditRecommendation.value, { ...newCreditRecommendation }];
+
+    creditRecommendation.value = [...newCreditRecommendationArray];
+
+    isFormActive.value = false;
   }
 };
 
