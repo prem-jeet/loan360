@@ -552,6 +552,9 @@ const toggleActiveState = async (row: CreditRecommendation) => {
     const str = isInactive ? 'active' : 'inactive';
     const rsp = await usePut('/creditRecommendation/' + str, { code });
     if (rsp) {
+      if (!isInactive) {
+        row.inactiveOn = new Date().toString();
+      }
       row.inactive = !row.inactive;
     }
   }
