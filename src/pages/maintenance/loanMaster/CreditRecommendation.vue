@@ -294,7 +294,12 @@ import {
 } from 'src/utils/notification';
 import { formatDate } from 'src/utils/date';
 import { capitalCase } from 'src/utils/string';
-import { useFetch } from 'src/composables/apiCalls';
+import {
+  API_OBJECT,
+  useFetch,
+  usePost,
+  usePut,
+} from 'src/composables/apiCalls';
 
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
@@ -473,13 +478,26 @@ const handleFormSubmit = async () => {
   if (!editingRowCode.value) {
     payload.inactive = false;
   }
-  const method = editingRowCode.value ? 'put' : 'post';
-  const endpoint = `/creditRecommendation/${
-    editingRowCode.value ? 'update' : ''
-  }`;
 
-  const rsp = await api[method](endpoint, payload);
-  if (rsp.data) {
+  let rsp: API_OBJECT | null;
+
+  if (!editingRowCode.value) {
+    rsp = await usePost(
+      '/creditRecommendation',
+      payload,
+      'Unable to create new Credit Recommendation.'
+    );
+  } else {
+    payload.code = editingRowCode.value;
+    rsp = await usePut(
+      '/creditRecommendation/update',
+      payload,
+      'Unable to edit Credit Recommendation.'
+    );
+  }
+
+  if (rsp) {
+    onSuccess({ msg: rsp.displayMessage });
     loadCreditRecommendation();
   }
 };
