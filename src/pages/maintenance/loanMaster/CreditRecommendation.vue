@@ -38,7 +38,7 @@
               </div>
             </div>
 
-            <div class="row q-mt-lg full-width q-mt-sm items-center">
+            <div class="row q-mt-lg full-width q-mt-sm items-center q-mb-md">
               <div class="col-12 col-sm-6 col-md-4">
                 <q-input
                   v-model="filter.code"
@@ -532,7 +532,7 @@ const toggleActiveState = async (row: CreditRecommendation) => {
     const str = isInactive ? 'active' : 'inactive';
     const rsp = await usePut('/creditRecommendation/' + str, { code });
     if (rsp) {
-      loadCreditRecommendation();
+      row.inactive = !row.inactive;
     }
   }
 };
