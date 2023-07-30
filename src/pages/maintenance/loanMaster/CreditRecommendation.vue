@@ -110,7 +110,7 @@
                     size="xs"
                     outline
                     color="red"
-                    @click="changeActive(props.row.code, props.row.inactive)"
+                    @click="() => toggleActiveState(props.row)"
                   >
                   </q-btn>
                 </q-btn-group>
@@ -193,7 +193,7 @@
                     :label="props.row.inactive ? 'activate' : 'deactivate'"
                     size="sm"
                     color="red"
-                    @click="changeActive(props.row.code, props.row.inactive)"
+                    @click="() => toggleActiveState(props.row)"
                   >
                   </q-btn>
                 </q-card-actions>
@@ -287,7 +287,11 @@ import type { TableColumn } from 'src/types/Common';
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch, reactive } from 'vue';
-import { onSuccess, confirmDialog, alertDialog } from 'src/utils/notification';
+import {
+  onSuccess,
+  alertDialog,
+  asyncConfirmDialog,
+} from 'src/utils/notification';
 import { formatDate } from 'src/utils/date';
 import { capitalCase } from 'src/utils/string';
 import { useFetch } from 'src/composables/apiCalls';
@@ -480,29 +484,17 @@ const handleFormSubmit = async () => {
   }
 };
 
-const changeActive = async (code: string, state: boolean) => {
-  if (editingRowIndex.value === null) {
-    confirmDialog(() => changeActiveConfirm(code, state), {
-      msg: state
-        ? 'Are you sure you want to activate ?'
-        : 'Are you sure you want to deactivate ?',
-    });
-  } else {
-    return;
+const toggleActiveState = async (row: CreditRecommendation) => {
+  const { code, inactive: isInactive } = row;
+  const confirmed = await asyncConfirmDialog();
+  if (confirmed) {
+    const str = isInactive ? 'active' : 'inactive';
+    const rsp = await api.put('/creditRecommendation/' + str, { code });
+    if (rsp.data) {
+      onSuccess({ msg: rsp.data.displayMessage });
+      loadCreditRecommendation();
+    }
   }
-};
-
-const changeActiveConfirm = async (code: string, state: boolean) => {
-  const payLoad = {
-    code: code,
-  };
-
-  const str = state ? 'active' : 'inactive';
-  const rsp = await api.put('/creditRecommendation/' + str, payLoad);
-  if (rsp.data) {
-    onSuccess({ msg: rsp.data.displayMessage });
-  }
-  loadCreditRecommendation();
 };
 
 const loadCreditRecommendation = async () => {
