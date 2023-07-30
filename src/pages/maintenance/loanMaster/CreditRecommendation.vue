@@ -126,10 +126,16 @@
                 :key="key"
               >
                 <q-icon
+                  size="xs"
                   :name="
                     props.row[key] === null || props.row[key]
-                      ? 'check'
-                      : 'close'
+                      ? 'check_circle'
+                      : 'cancel'
+                  "
+                  :color="
+                    props.row[key] === null || props.row[key]
+                      ? 'teal-10'
+                      : 'red-10'
                   "
                 />
               </q-td>
@@ -148,39 +154,54 @@
           <template v-slot:item="props">
             <div class="col-xs-12 col-sm-6 q-px-sm-sm">
               <q-card>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Code :</div>
-                    <div class="col-12">
-                      {{ props.row.code }}
-                    </div>
+                <q-card-section
+                  v-for="key in ['code', 'name']"
+                  :key="key"
+                  class="q-pb-none"
+                >
+                  <div class="text-weight-medium">
+                    {{ props.colsMap[key].label }}
                   </div>
+                  <div>{{ props.row[key] }}</div>
                 </q-card-section>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Name :</div>
-                    <div class="col-12">
-                      {{ props.row.name }}
+                <template v-for="key in ['conditional', 'inactive']" :key="key">
+                  <q-card-section class="q-pb-none">
+                    <div class="text-weight-medium">
+                      {{ props.colsMap[key].label }}
                     </div>
-                  </div>
-                </q-card-section>
+                    <q-icon
+                      size="xs"
+                      :name="
+                        props.row[key] === null || props.row[key]
+                          ? 'check_circle'
+                          : 'cancel'
+                      "
+                      :color="
+                        props.row[key] === null || props.row[key]
+                          ? 'teal-10'
+                          : 'red-10'
+                      "
+                    />
+                  </q-card-section>
+                </template>
                 <template
                   v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
                   :key="key"
                 >
-                  <q-card-section v-if="props.row[key]">
-                    <div class="row q-gutter-y-xs">
-                      <div class="col-12 text-weight-medium">
-                        {{ props.colsMap[key].label }}
-                      </div>
-                      <div class="col-12">
-                        {{ formatDate(props.row[key], dateFormat) }}
-                      </div>
+                  <q-card-section v-if="props.row[key]" class="q-pb-none">
+                    <div class="text-weight-medium">
+                      {{ props.colsMap[key].label }}
+                    </div>
+                    <div>
+                      {{ formatDate(props.row[key], dateFormat) }}
                     </div>
                   </q-card-section>
                 </template>
 
-                <q-card-actions align="center" class="q-py-md bg-grey-2">
+                <q-card-actions
+                  align="center"
+                  class="q-py-md bg-grey-2 q-mt-md"
+                >
                   <q-btn
                     label="edit"
                     icon="edit"
