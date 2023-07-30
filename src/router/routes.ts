@@ -146,6 +146,14 @@ const routes: RouteRecordRaw[] = [
                   import('pages/maintenance/loanMaster/AdvertisementMedia.vue'),
               },
               {
+                path: 'creditRecommendation',
+                name: 'creditRecommendation',
+                component: () =>
+                  import(
+                    'pages/maintenance/loanMaster/CreditRecommendation.vue'
+                  ),
+              },
+              {
                 path: 'advertisement',
                 name: 'advertisement',
                 component: () =>
