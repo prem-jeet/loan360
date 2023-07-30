@@ -69,12 +69,17 @@ const routes: RouteRecordRaw[] = [
             component: () => import('pages/settings/accounts/NatureEntry.vue'),
           },
           {
+            path: 'accountCodeDeposit',
+            name: 'accountCodeDeposit',
+            component: () =>
+              import('pages/settings/accounts//AccountCodeDeposit.vue'),
+          },
+          {
             path: 'interestDepositGenerate',
             name: 'interestDepositGenerate',
             component: () =>
               import('pages/settings/accounts/InterestDepositGenerate.vue'),
           },
-
           {
             path: 'leadMaster',
             children: [
@@ -146,6 +151,26 @@ const routes: RouteRecordRaw[] = [
                 component: () =>
                   import('pages/maintenance/loanMaster/StageReason.vue'),
               },
+              {
+                path: 'creditRecommendation',
+                name: 'creditRecommendation',
+                component: () =>
+                  import(
+                    'pages/maintenance/loanMaster/CreditRecommendation.vue'
+                  ),
+              },
+              {
+                path: 'advertisement',
+                name: 'advertisement',
+                component: () =>
+                  import('pages/maintenance/loanMaster/Advertisement.vue'),
+              },
+              {
+                path: 'bureauScoreRate',
+                name: 'bureauScoreRate',
+                component: () =>
+                  import('pages/maintenance/loanMaster/BureauScore.vue'),
+              },
             ],
           },
           {
@@ -184,6 +209,18 @@ const routes: RouteRecordRaw[] = [
                   import(
                     'pages/maintenance/customerMaster/StopGuaranteeReason.vue'
                   ),
+              },
+            ],
+          },
+
+          {
+            path: 'accounts',
+            children: [
+              {
+                path: 'accountHead',
+                name: 'accountHead',
+                component: () =>
+                  import('pages/maintenance/accountMasters/AccountHead.vue'),
               },
             ],
           },
