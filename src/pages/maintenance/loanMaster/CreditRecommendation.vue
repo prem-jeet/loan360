@@ -497,7 +497,6 @@ const handleFormSubmit = async () => {
   }
 
   if (rsp) {
-    onSuccess({ msg: rsp.displayMessage });
     loadCreditRecommendation();
   }
 };
@@ -507,9 +506,8 @@ const toggleActiveState = async (row: CreditRecommendation) => {
   const confirmed = await asyncConfirmDialog();
   if (confirmed) {
     const str = isInactive ? 'active' : 'inactive';
-    const rsp = await api.put('/creditRecommendation/' + str, { code });
-    if (rsp.data) {
-      onSuccess({ msg: rsp.data.displayMessage });
+    const rsp = await usePut('/creditRecommendation/' + str, { code });
+    if (rsp) {
       loadCreditRecommendation();
     }
   }
