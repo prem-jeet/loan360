@@ -17,13 +17,13 @@ interface API_OBJECT {
 }
 
 const handleError = (
-  response: { [key: string]: any },
+  response: { [key: string]: any } | undefined,
   defaultMessage: string
 ) => {
   let errorMessage = defaultMessage;
-  if (response.status === 401) {
+  if (response && response.status === 401) {
     errorMessage = response.statusText;
-  } else if (response.data) {
+  } else if (response && response.data) {
     errorMessage = response.data.displayMessage;
   }
 
@@ -32,7 +32,7 @@ const handleError = (
 
 const useFetch = async (
   url: string,
-  customErrorMessage?: string
+  defaultErrorMessage?: string
 ): Promise<unknown | null> => {
   try {
     const rsp = await api.get(url);
@@ -48,7 +48,7 @@ const useFetch = async (
     const { response } = { ...e };
 
     const errorMessage =
-      customErrorMessage || 'Some error occured, unable to fetch data.';
+      defaultErrorMessage || 'Some error occured, unable to fetch data.';
     handleError(response, errorMessage);
     return null;
   }
@@ -57,7 +57,7 @@ const useFetch = async (
 const usePost = async (
   url: string,
   payload: { [key: string]: any },
-  customErrorMessage?: string
+  defaultErrorMessage?: string
 ): Promise<API_OBJECT | null> => {
   try {
     const rsp = await api.post(url, payload);
@@ -74,7 +74,7 @@ const usePost = async (
     const { response } = { ...e };
 
     const errorMessage =
-      customErrorMessage || 'Some error occured, unable to post data.';
+      defaultErrorMessage || 'Some error occured, unable to post data.';
     handleError(response, errorMessage);
     return null;
   }
@@ -83,7 +83,7 @@ const usePost = async (
 const usePut = async (
   url: string,
   payload: { [key: string]: any },
-  customErrorMessage?: string
+  defaultErrorMessage?: string
 ): Promise<API_OBJECT | null> => {
   try {
     const rsp = await api.put(url, payload);
@@ -100,7 +100,7 @@ const usePut = async (
     const { response } = { ...e };
 
     const errorMessage =
-      customErrorMessage || 'Some error occured, unable to update data.';
+      defaultErrorMessage || 'Some error occured, unable to update data.';
     handleError(response, errorMessage);
     return null;
   }
