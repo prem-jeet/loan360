@@ -115,18 +115,25 @@
                   </q-btn>
                 </q-btn-group>
               </q-td>
-              <q-td key="code" :props="props">
-                {{ props.row.code }}
+
+              <q-td :props="props" v-for="key in ['code', 'name']" :key="key">
+                {{ props.row[key] }}
               </q-td>
-              <q-td key="name" :props="props">
-                {{ props.row.name }}
+
+              <q-td
+                :props="props"
+                v-for="key in ['conditional', 'inactive']"
+                :key="key"
+              >
+                <q-icon
+                  :name="
+                    props.row[key] === null || props.row[key]
+                      ? 'check'
+                      : 'close'
+                  "
+                />
               </q-td>
-              <q-td key="conditional" :props="props">
-                <q-icon name="check" />
-              </q-td>
-              <q-td key="inactive" :props="props">
-                <q-checkbox v-model="props.row.inactive" disable />
-              </q-td>
+
               <q-td
                 :key="key"
                 :props="props"
@@ -284,14 +291,9 @@
 
 <script setup lang="ts">
 import type { TableColumn } from 'src/types/Common';
-import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch, reactive } from 'vue';
-import {
-  onSuccess,
-  alertDialog,
-  asyncConfirmDialog,
-} from 'src/utils/notification';
+import { alertDialog, asyncConfirmDialog } from 'src/utils/notification';
 import { formatDate } from 'src/utils/date';
 import { capitalCase } from 'src/utils/string';
 import {
@@ -419,9 +421,10 @@ const filterdCreditRecommendation = computed(() => {
   const data = [...creditRecommendation.value];
   const filteredData = data.filter((item) => {
     const isCodeMatched = !code || item.code!.includes(code!);
-    const isConditionalMatched = item.conditional === conditional;
+    const isConditionalMatched =
+      item.conditional === conditional || item.conditional == null;
     const isInActiveMatched =
-      item.inactive == inActive || item.inactive === null;
+      item.inactive === inActive || item.inactive === null;
 
     return isCodeMatched && isConditionalMatched && isInActiveMatched;
   });
