@@ -279,6 +279,7 @@ import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
 import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
+import { useFetch } from 'src/composables/apiCalls';
 interface StageReason {
   reason: string;
   stageCode: number | null;
@@ -287,11 +288,6 @@ interface StageReason {
   inactive: boolean;
   inactiveOn: string;
   updatedOn: string;
-}
-
-interface Stage {
-  label: string;
-  value: string;
 }
 
 const breadcrumbs = [
@@ -305,6 +301,12 @@ const breadcrumbs = [
     label: 'Stage Reason',
   },
 ];
+
+interface Stage {
+  code: string;
+  name: string;
+  inactive: boolean;
+}
 
 const columns: {
   name: string;
@@ -494,15 +496,10 @@ const loadSource = async () => {
 
 const loadStages = async () => {
   fetchingData.value = true;
-  const rsp = await api.get('stage');
+  const rsp = await useFetch('stage', 'Unable to fetch Stage Options.');
 
-  if (rsp.data) {
-    stages.value = rsp.data.map((item: { code: string; name: string }) => {
-      return {
-        label: item.name,
-        value: item.code,
-      };
-    });
+  if (rsp) {
+    stages.value = rsp as Stage[];
   }
   fetchingData.value = false;
 };
