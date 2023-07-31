@@ -49,6 +49,8 @@
                   dropdown-icon="expand_more"
                   behavior="menu"
                   options-dense
+                  no-error-icon
+                  :error="!selectedStageCode"
                 />
               </div>
             </div>
