@@ -35,13 +35,13 @@
             <div class="row full-width q-my-sm">
               <div class="col-xs-12 col-sm-4 col-md-3 q-pb-sm">
                 <q-select
-                  v-model="selectedSatge"
+                  v-model="selectedStageCode"
                   :options="(inactiveFilter(stageOptions) as Stage[])"
                   map-options
                   emit-value
                   option-label="name"
                   option-value="code"
-                  :label="`${!selectedSatge ? 'Select ' : ''}Stage`"
+                  :label="`${!selectedStageCode ? 'Select ' : ''}Stage`"
                   outlined
                   hide-bottom-space
                   clearable
@@ -357,7 +357,7 @@ const columns: {
 const $q = useQuasar();
 const fetchingData = ref(false);
 const reason = ref('');
-const selectedSatge = ref('');
+const selectedStageCode = ref('');
 const stageOptions = ref<Stage[]>([]);
 const nameSearchQuery = ref('');
 const stageReason = ref<StageReason[]>([]);
@@ -432,7 +432,7 @@ const saveEdited = async () => {
     reason: editReason.value,
     id: editingRowId.value,
     updatedOn: new Date(),
-    stageCode: selectedSatge.value,
+    stageCode: selectedStageCode.value,
   };
   const rsp = await api.put('/stageReason/update', payLoad);
   if (rsp.data.displayMessage) {
@@ -445,7 +445,7 @@ const saveEdited = async () => {
 };
 
 const saveEntry = () => {
-  selectedSatge.value ? saveNewEntry() : (selectedError.value = true);
+  selectedStageCode.value ? saveNewEntry() : (selectedError.value = true);
 };
 
 const saveNewEntry = async () => {
@@ -453,7 +453,7 @@ const saveNewEntry = async () => {
     reason: reason.value,
     inactive: false,
     createdOn: new Date(),
-    stageCode: selectedSatge.value,
+    stageCode: selectedStageCode.value,
   };
   const rsp = await api.post('/stageReason', payLoad);
   if (rsp.data.displayMessage) {
@@ -489,7 +489,7 @@ const changeActiveConfirm = async (id: number, state: boolean) => {
 
 const loadSource = async () => {
   fetchingData.value = true;
-  const rsp = await api.get('stageReason/stageCode/' + selectedSatge.value);
+  const rsp = await api.get('stageReason/stageCode/' + selectedStageCode.value);
 
   if (rsp.data) {
     stageReason.value = rsp.data;
@@ -512,9 +512,9 @@ watch(filteredData, () => {
   isEditing.value = false;
 });
 
-watch(selectedSatge, () => {
+watch(selectedStageCode, () => {
   selectedError.value = false;
-  if (selectedSatge.value) {
+  if (selectedStageCode.value) {
     loadSource();
   }
 });
