@@ -49,7 +49,11 @@
                   emit-value
                   option-label="name"
                   option-value="code"
-                  :label="`${!selectedStageCode ? 'Select ' : ''}Stage`"
+                  :label="
+                    stageOptions.length
+                      ? `${!selectedStageCode ? 'Select ' : ''}Stage`
+                      : 'No options available'
+                  "
                   outlined
                   hide-bottom-space
                   clearable
@@ -59,6 +63,7 @@
                   options-dense
                   no-error-icon
                   :error="!selectedStageCode"
+                  :disable="!stageOptions.length"
                 />
               </div>
             </div>
