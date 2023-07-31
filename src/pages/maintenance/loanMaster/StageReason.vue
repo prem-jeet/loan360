@@ -36,26 +36,18 @@
               <div class="col-xs-12 col-sm-4 col-md-3 q-pb-sm">
                 <q-select
                   v-model="selectedSatge"
-                  dense
                   :options="stages"
                   map-options
                   emit-value
-                  label="Select stage"
+                  :label="`${!selectedSatge ? 'Select ' : ''}Stage`"
                   outlined
                   hide-bottom-space
-                  :error="selectedError"
-                >
-                  <template v-slot:append>
-                    <q-icon
-                      v-if="selectedSatge"
-                      name="close"
-                      @click.stop.prevent="
-                        (selectedSatge = ''), (stageReason = [])
-                      "
-                      class="cursor-pointer"
-                    />
-                  </template>
-                </q-select>
+                  clearable
+                  clear-icon="backspace"
+                  dropdown-icon="expand_more"
+                  behavior="menu"
+                  options-dense
+                />
               </div>
             </div>
 
