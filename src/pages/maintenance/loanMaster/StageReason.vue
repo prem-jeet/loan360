@@ -362,23 +362,13 @@ const fetchingData = ref(false);
 const reason = ref('');
 const selectedStageCode = ref('');
 const stageOptions = ref<Stage[]>([]);
-const nameSearchQuery = ref('');
 const stageReason = ref<StageReason[]>([]);
-const checkBox = ref(false);
 const isEditing = ref(false);
 const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
 const editReason = ref('');
 const format = 'DD/MM/YYYY @hh:mmA';
 const selectedError = ref(false);
-
-const filteredData = computed(() =>
-  stageReason.value.filter(
-    (item) =>
-      item.reason.toLowerCase().includes(nameSearchQuery.value.toLowerCase()) &&
-      item.inactive === checkBox.value
-  )
-);
 
 const filteredStageReason = computed(() => {
   const stageCode = selectedStageCode.value;
