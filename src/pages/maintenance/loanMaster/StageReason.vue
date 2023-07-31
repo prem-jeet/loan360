@@ -74,28 +74,6 @@
               <div class="col-xs-12 col-sm-3 col-md-6 q-pb-sm">
                 <q-checkbox v-model="filter.inActive" label=" In-Active" />
               </div>
-              <div class="col-xs-12 col-sm-5 col-md-3 q-pb-sm">
-                <q-input
-                  v-model="reason"
-                  outlined
-                  dense
-                  no-error-icon
-                  :error="isDuplicate"
-                  error-message="Item alredy exits"
-                  placeholder="Reason"
-                >
-                  <template v-slot:prepend> Stage </template>
-                  <template v-slot:after>
-                    <q-btn
-                      icon="add"
-                      color="teal"
-                      size="md"
-                      :disable="isDuplicate || reason === ''"
-                      @click="saveEntry"
-                    />
-                  </template>
-                </q-input>
-              </div>
             </div>
           </template>
 
