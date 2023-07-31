@@ -36,9 +36,11 @@
               <div class="col-xs-12 col-sm-4 col-md-3 q-pb-sm">
                 <q-select
                   v-model="selectedSatge"
-                  :options="stages"
+                  :options="(inactiveFilter(stageOptions) as Stage[])"
                   map-options
                   emit-value
+                  option-label="name"
+                  option-value="code"
                   :label="`${!selectedSatge ? 'Select ' : ''}Stage`"
                   outlined
                   hide-bottom-space
@@ -280,6 +282,7 @@ import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
 import { useFetch } from 'src/composables/apiCalls';
+import { inactiveFilter } from 'src/utils/filters';
 interface StageReason {
   reason: string;
   stageCode: number | null;
@@ -355,7 +358,7 @@ const $q = useQuasar();
 const fetchingData = ref(false);
 const reason = ref('');
 const selectedSatge = ref('');
-const stages = ref<Stage[]>([]);
+const stageOptions = ref<Stage[]>([]);
 const nameSearchQuery = ref('');
 const stageReason = ref<StageReason[]>([]);
 const checkBox = ref(false);
@@ -499,7 +502,7 @@ const loadStages = async () => {
   const rsp = await useFetch('stage', 'Unable to fetch Stage Options.');
 
   if (rsp) {
-    stages.value = rsp as Stage[];
+    stageOptions.value = rsp as Stage[];
   }
   fetchingData.value = false;
 };
