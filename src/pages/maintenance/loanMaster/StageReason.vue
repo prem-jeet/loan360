@@ -14,7 +14,6 @@
           table-header-class="bg-deep-purple-10 text-white"
           separator="cell"
           bordered
-          title="Nature entry"
           :no-data-label="
             stageReason.length ? 'No data available' : 'select stage'
           "
@@ -24,16 +23,25 @@
           card-container-class="q-gutter-y-md q-mt-xs"
         >
           <template v-slot:top>
-            <div class="row q-gutter-y-lg q-pb-xs-md">
-              <div class="col-12">
-                <div class="row items-center q-gutter-md">
-                  <div class="col-auto text-h6">Stage Reason</div>
+            <div class="row full-width q-gutter-x-md q-gutter-y-sm">
+              <div class="col-auto">
+                <span class="text-h6">Stage Reason</span>
+              </div>
+              <div class="col-auto">
+                <div class="col-auto">
+                  <q-btn
+                    color="blue-7"
+                    icon="add"
+                    label="Add new"
+                    size="md"
+                    class="full-width"
+                  />
                 </div>
               </div>
             </div>
 
-            <div class="row full-width q-my-sm">
-              <div class="col-xs-12 col-sm-4 col-md-3 q-pb-sm">
+            <div class="row full-width q-mt-md">
+              <div class="col-12 col-sm-8 col-md-5">
                 <q-select
                   v-model="selectedStageCode"
                   :options="(inactiveFilter(stageOptions) as Stage[])"
@@ -55,8 +63,8 @@
               </div>
             </div>
 
-            <div class="row full-width q-mt-sm">
-              <div class="col-xs-12 col-sm-4 col-md-3 q-pb-sm">
+            <div class="row full-width q-mt-md q-mb-md items-center">
+              <div class="col-12 col-sm-8 col-md-4">
                 <q-input
                   v-model="filter.reason"
                   outlined
@@ -71,7 +79,7 @@
                 </q-input>
               </div>
 
-              <div class="col-xs-12 col-sm-3 col-md-6 q-pb-sm">
+              <div class="col-12 q-mt-sm q-mt-sm-none col-sm-auto q-ml-md-md">
                 <q-checkbox v-model="filter.inActive" label=" In-Active" />
               </div>
             </div>
