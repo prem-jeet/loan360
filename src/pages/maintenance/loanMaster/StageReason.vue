@@ -7,7 +7,7 @@
     <div class="row q-mt-lg q-pb-xl">
       <div class="col">
         <q-table
-          :rows="filteredData"
+          :rows="filteredStageReason"
           :columns="columns"
           row-key="code"
           :loading="fetchingData"
@@ -19,7 +19,7 @@
             stageReason.length ? 'No data available' : 'select stage'
           "
           :rows-per-page-options="[0]"
-          :hide-bottom="!!filteredData.length"
+          :hide-bottom="!!filteredStageReason.length"
           :grid="$q.screen.width < 830"
           card-container-class="q-gutter-y-md q-mt-xs"
         >
@@ -56,13 +56,12 @@
             <div class="row full-width q-mt-sm">
               <div class="col-xs-12 col-sm-4 col-md-3 q-pb-sm">
                 <q-input
-                  v-model="nameSearchQuery"
+                  v-model="filter.reason"
                   outlined
                   clearable
                   dense
                   rounded
-                  placeholder="search"
-                  @clear="nameSearchQuery = ''"
+                  placeholder="Search Reason"
                 >
                   <template v-slot:prepend>
                     <q-icon name="search" />
@@ -71,11 +70,7 @@
               </div>
 
               <div class="col-xs-12 col-sm-3 col-md-6 q-pb-sm">
-                <q-checkbox
-                  v-model="checkBox"
-                  label=" In-Active"
-                  @click="(editingRowIndex = null), (isEditing = false)"
-                />
+                <q-checkbox v-model="filter.inActive" label=" In-Active" />
               </div>
               <div class="col-xs-12 col-sm-5 col-md-3 q-pb-sm">
                 <q-input
@@ -276,22 +271,13 @@
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed, watch, reactive } from 'vue';
 import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
 import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
 import { useFetch } from 'src/composables/apiCalls';
 import { inactiveFilter } from 'src/utils/filters';
-interface StageReason {
-  reason: string;
-  stageCode: number | null;
-  id: number | null;
-  createdOn: string;
-  inactive: boolean;
-  inactiveOn: string;
-  updatedOn: string;
-}
 
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
@@ -304,12 +290,6 @@ const breadcrumbs = [
     label: 'Stage Reason',
   },
 ];
-
-interface Stage {
-  code: string;
-  name: string;
-  inactive: boolean;
-}
 
 const columns: {
   name: string;
@@ -354,6 +334,29 @@ const columns: {
   },
 ];
 
+interface StageReason {
+  reason: string;
+  stageCode: string | null;
+  id: number | null;
+  createdOn: string;
+  inactive: boolean;
+  inactiveOn: string;
+  updatedOn: string;
+}
+
+interface Stage {
+  code: string;
+  name: string;
+  inactive: boolean;
+}
+
+interface Filter {
+  reason: string | null;
+  inActive: boolean;
+}
+
+const filter = reactive<Filter>({ inActive: false, reason: null });
+
 const $q = useQuasar();
 const fetchingData = ref(false);
 const reason = ref('');
@@ -376,6 +379,20 @@ const filteredData = computed(() =>
       item.inactive === checkBox.value
   )
 );
+
+const filteredStageReason = computed(() => {
+  const stageCode = selectedStageCode.value;
+  const filteredArray = stageReason.value.filter((reason) => {
+    const isReasonMatched =
+      !filter.reason ||
+      reason.reason.toLowerCase().includes(filter.reason.toLowerCase());
+    const isInactiveMatched = reason.inactive === filter.inActive;
+    const isStageMatched = !stageCode || stageCode === reason.stageCode;
+
+    return isReasonMatched && isInactiveMatched && isStageMatched;
+  });
+  return filteredArray;
+});
 
 const isDuplicate = computed(
   () =>
@@ -506,11 +523,6 @@ const loadStages = async () => {
   }
   fetchingData.value = false;
 };
-
-watch(filteredData, () => {
-  editingRowIndex.value = null;
-  isEditing.value = false;
-});
 
 watch(selectedStageCode, () => {
   selectedError.value = false;
