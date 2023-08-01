@@ -101,63 +101,17 @@
             <q-tr :props="props">
               <q-td key="actions" auto-width>
                 <q-btn-group push unelevated>
+                  <q-btn icon="edit" size="xs" outline color="accent" />
                   <q-btn
-                    icon="edit"
-                    size="xs"
-                    outline
-                    color="accent"
-                    v-if="editingRowIndex !== props.rowIndex"
-                    @click="() => editEntry(props.row.id, props.rowIndex)"
-                  >
-                    <q-tooltip>Edit</q-tooltip>
-                  </q-btn>
-
-                  <q-btn
-                    v-if="editingRowIndex !== props.rowIndex"
-                    :label="props.row.inactive ? 'activate' : 'deactivate'"
+                    :label="props.row.inactive ? 'activate' : 'de-activate'"
                     size="xs"
                     outline
                     color="red"
-                    @click="
-                      () => changeActive(props.row.id, props.row.inactive)
-                    "
-                  >
-                  </q-btn>
-                  <q-btn
-                    icon="check"
-                    size="xs"
-                    outline
-                    color="green-10"
-                    v-if="editingRowIndex === props.rowIndex"
-                    @click="saveEdited"
-                  >
-                    <q-tooltip>Save</q-tooltip>
-                  </q-btn>
-                  <q-btn
-                    icon="close"
-                    size="xs"
-                    outline
-                    color="red"
-                    v-if="editingRowIndex === props.rowIndex"
-                    @click="(isEditing = false), (editingRowIndex = null)"
-                  >
-                    <q-tooltip>Cancel</q-tooltip>
-                  </q-btn>
+                  />
                 </q-btn-group>
               </q-td>
               <q-td key="reason" :props="props">
-                <q-input
-                  v-if="editingRowIndex === props.rowIndex"
-                  v-model="editReason"
-                  placeholder="Name required"
-                  dense
-                  outlined
-                  :color="editReason ? 'green' : 'red'"
-                  autofocus
-                />
-                <span v-else>
-                  {{ firstLetterCpitalze(props.row.reason) }}
-                </span>
+                {{ firstLetterCpitalze(props.row.reason) }}
               </q-td>
 
               <q-td
