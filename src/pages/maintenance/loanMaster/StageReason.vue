@@ -44,13 +44,13 @@
               <div class="col-12 col-sm-8 col-md-5">
                 <q-select
                   v-model="selectedStageCode"
-                  :options="(inactiveFilter(stageOptions) as Stage[])"
+                  :options="(inactiveFilter(stageCodeOptions) as Stage[])"
                   map-options
                   emit-value
                   option-label="name"
                   option-value="code"
                   :label="
-                    stageOptions.length
+                    stageCodeOptions.length
                       ? `${!selectedStageCode ? 'Select ' : ''}Stage`
                       : 'No options available'
                   "
@@ -63,7 +63,7 @@
                   options-dense
                   no-error-icon
                   :error="!selectedStageCode"
-                  :disable="!stageOptions.length"
+                  :disable="!stageCodeOptions.length"
                 />
               </div>
             </div>
@@ -107,6 +107,7 @@
                     size="xs"
                     outline
                     color="red"
+                    @click="() => toggleActiveState(props.row)"
                   />
                 </q-btn-group>
               </q-td>
@@ -159,6 +160,7 @@
                     :label="props.row.inactive ? 'activate' : 'de-activate'"
                     size="sm"
                     color="red"
+                    @click="() => toggleActiveState(props.row)"
                   />
                 </q-card-actions>
               </q-card>
@@ -174,11 +176,11 @@
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch, reactive } from 'vue';
-import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
+import { asyncConfirmDialog } from 'src/utils/notification';
 import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
-import { useFetch } from 'src/composables/apiCalls';
+import { useFetch, usePut } from 'src/composables/apiCalls';
 import { inactiveFilter } from 'src/utils/filters';
 
 const breadcrumbs = [
@@ -263,14 +265,9 @@ const $q = useQuasar();
 const fetchingData = ref(false);
 const reason = ref('');
 const selectedStageCode = ref('');
-const stageOptions = ref<Stage[]>([]);
+const stageCodeOptions = ref<Stage[]>([]);
 const stageReason = ref<StageReason[]>([]);
-const isEditing = ref(false);
-const editingRowIndex = ref<number | null>(null);
-const editingRowId = ref<number | null>(null);
-const editReason = ref('');
 const format = 'DD/MM/YYYY @hh:mmA';
-const selectedError = ref(false);
 
 const filteredStageReason = computed(() => {
   const stageCode = selectedStageCode.value;
@@ -293,7 +290,7 @@ const isDuplicate = computed(
     )
 );
 
-const setFormData = () => {
+/*const setFormData = () => {
   let temp;
   if (editingRowId.value !== null) {
     let index = stageReason.value.findIndex(
@@ -304,13 +301,13 @@ const setFormData = () => {
   editReason.value = temp ? temp.reason : '';
 };
 
-const editEntryConfirmed = (id: number, index: number) => {
+ const editEntryConfirmed = (id: number, index: number) => {
   editingRowIndex.value = index;
   editingRowId.value = id;
   setFormData();
 };
 
-const editEntry = (id: number, rowIndex: number) => {
+ const editEntry = (id: number, rowIndex: number) => {
   if (isEditing.value) {
     confirmDialog(() => editEntryConfirmed(id, rowIndex), {
       msg: 'Are you sure you want to cancel editing the current row?',
@@ -374,25 +371,20 @@ const saveNewEntry = async () => {
     loadSource();
   }
 };
+ */
 
-const changeActive = (id: number, state: boolean) => {
-  if (editingRowIndex.value === null) {
-    confirmDialog(() => changeActiveConfirm(id, state), {
-      msg: state
-        ? 'Are you sure you want to activate ?'
-        : 'Are you sure you want to deactivate ?',
+const toggleActiveState = async (row: StageReason) => {
+  const msg = `Are you sure you want to ${row.inactive ? '' : 'De-'}Activate?`;
+  const confirmed = await asyncConfirmDialog({ msg });
+
+  if (confirmed) {
+    const state = row.inactive ? 'active' : 'inactive';
+    const rsp = await usePut('/stageReason/' + state, {
+      id: row.id,
     });
-  }
-};
-
-const changeActiveConfirm = async (id: number, state: boolean) => {
-  const str = state ? 'active' : 'inactive';
-  const rsp = await api.put('/stageReason/' + str, {
-    id,
-  });
-  if (rsp.data && rsp.data.displayMessage) {
-    onSuccess({ msg: rsp.data.displayMessage });
-    loadSource();
+    if (rsp) {
+      loadSource();
+    }
   }
 };
 
@@ -411,13 +403,12 @@ const loadStages = async () => {
   const rsp = await useFetch('stage', 'Unable to fetch Stage Options.');
 
   if (rsp) {
-    stageOptions.value = rsp as Stage[];
+    stageCodeOptions.value = rsp as Stage[];
   }
   fetchingData.value = false;
 };
 
 watch(selectedStageCode, () => {
-  selectedError.value = false;
   if (selectedStageCode.value) {
     loadSource();
   }
