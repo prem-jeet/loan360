@@ -15,7 +15,11 @@
           separator="cell"
           bordered
           :no-data-label="
-            stageReason.length ? 'No data available' : 'select stage'
+            !selectedStageCode
+              ? 'Select Stage'
+              : !filteredStageReason.length
+              ? 'No Data available'
+              : ''
           "
           :rows-per-page-options="[0]"
           :hide-bottom="!!filteredStageReason.length"
@@ -66,6 +70,15 @@
                   no-error-icon
                   :error="!selectedStageCode"
                   :disable="!stageCodeOptions.length"
+                  :loading="fetchingStageOptions"
+                  @clear="stageReason = []"
+                  @update:model-value="
+                    (val) => {
+                      if (val) {
+                        loadStageReason();
+                      }
+                    }
+                  "
                 />
               </div>
             </div>
@@ -270,15 +283,15 @@
 </template>
 
 <script setup lang="ts">
-import { api } from 'src/boot/axios';
-import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { ref, onMounted, computed, watch, reactive } from 'vue';
-import { alertDialog, asyncConfirmDialog } from 'src/utils/notification';
-import { formatDate } from 'src/utils/date';
+import type { TableColumn } from 'src/types/Common';
 import { useQuasar } from 'quasar';
+import { ref, onMounted, computed, reactive } from 'vue';
+import { alertDialog, asyncConfirmDialog } from 'src/utils/notification';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
-import { useFetch, usePost, usePut } from 'src/composables/apiCalls';
+import { formatDate } from 'src/utils/date';
 import { inactiveFilter } from 'src/utils/filters';
+import { useFetch, usePost, usePut } from 'src/composables/apiCalls';
+import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
@@ -292,13 +305,7 @@ const breadcrumbs = [
   },
 ];
 
-const columns: {
-  name: string;
-  required?: boolean;
-  label: string;
-  field: string;
-  align: 'left';
-}[] = [
+const columns: TableColumn[] = [
   {
     name: 'actions',
     label: 'Actions',
@@ -361,20 +368,25 @@ interface Form {
   reason: string | null;
 }
 
-const filter = reactive<Filter>({ inActive: false, reason: null });
-
-const isStageReasonFormActive = ref(false);
-const $q = useQuasar();
-const fetchingData = ref(false);
-const selectedStageCode = ref('');
-const stageCodeOptions = ref<Stage[]>([]);
-const stageReason = ref<StageReason[]>([]);
 const format = 'DD/MM/YYYY @hh:mmA';
+
+const $q = useQuasar();
+
+const fetchingStageOptions = ref(false);
+const fetchingData = ref(false);
+const isStageReasonFormActive = ref(false);
+
+const stageReason = ref<StageReason[]>([]);
+const selectedStageCode = ref<string | null>(null);
+const stageCodeOptions = ref<Stage[]>([]);
+
 const editingRowId = ref<number | null>(null);
 const formData = ref<Form>({
   reason: null,
   stageCode: null,
 });
+
+const filter = reactive<Filter>({ inActive: false, reason: null });
 
 const filteredStageReason = computed(() => {
   const stageCode = selectedStageCode.value;
@@ -405,6 +417,7 @@ const initialFormData = computed(() => {
 
   return temp;
 });
+
 const isStageReasonDuplicate = (reason: string) => {
   const matchedStageReason = stageReason.value.find(
     ({ reason: rsn }) => rsn.toLowerCase() === reason.toLowerCase()
@@ -450,7 +463,7 @@ const handleFormsubmit = async () => {
     rsp = await usePost(
       '/stageReason',
       payload,
-      'Unable to edit Stage Reason.'
+      'Unable to create Stage Reason.'
     );
   }
   {
@@ -494,29 +507,25 @@ const toggleActiveState = async (row: StageReason) => {
 
 const loadStageReason = async () => {
   fetchingData.value = true;
-  const rsp = await api.get('stageReason/stageCode/' + selectedStageCode.value);
+  const rsp = await useFetch(
+    'stageReason/stageCode/' + selectedStageCode.value
+  );
 
-  if (rsp.data) {
-    stageReason.value = rsp.data;
+  if (rsp) {
+    stageReason.value = rsp as StageReason[];
   }
   fetchingData.value = false;
 };
 
 const loadStages = async () => {
-  fetchingData.value = true;
+  fetchingStageOptions.value = true;
   const rsp = await useFetch('stage', 'Unable to fetch Stage Options.');
 
   if (rsp) {
     stageCodeOptions.value = rsp as Stage[];
   }
-  fetchingData.value = false;
+  fetchingStageOptions.value = false;
 };
-
-watch(selectedStageCode, (newVal) => {
-  if (newVal) {
-    loadStageReason();
-  }
-});
 
 onMounted(() => {
   loadStages();
