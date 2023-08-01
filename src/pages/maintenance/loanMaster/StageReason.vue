@@ -422,6 +422,7 @@ const handleFormsubmit = async () => {
     alertDialog('Duplicate reason.');
     return;
   }
+  const currentDataStr = new Date().toISOString();
 
   const payload: Partial<StageReason> = {
     reason: formData.value.reason!,
@@ -433,7 +434,7 @@ const handleFormsubmit = async () => {
   );
 
   if (!editingRowId.value) {
-    payload.createdOn = new Date().toISOString();
+    payload.createdOn = currentDataStr;
     payload.inactive = false;
   } else if (editingRow) {
     payload.id = editingRow.id;
@@ -454,8 +455,21 @@ const handleFormsubmit = async () => {
   }
   {
     if (rsp) {
+      const newStageReason: StageReason = {
+        id: editingRow ? editingRow.id : rsp.id!,
+        reason: payload.reason!,
+        stageCode: payload.stageCode!,
+        inactive: editingRow ? editingRow.inactive : false,
+        createdOn: editingRow ? editingRow.createdOn : currentDataStr,
+        updatedOn: editingRow ? currentDataStr : null,
+        inactiveOn: editingRow ? editingRow.inactiveOn : null,
+      };
+      stageReason.value = !editingRow
+        ? [...stageReason.value, { ...newStageReason }]
+        : stageReason.value.map((stageReason) =>
+            stageReason.id === editingRow.id ? newStageReason : stageReason
+          );
       isStageReasonFormActive.value = false;
-      loadStageReason();
     }
   }
 };
