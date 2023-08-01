@@ -128,34 +128,35 @@
           <template v-slot:item="props">
             <div class="col-xs-12 col-sm-6 q-px-sm-sm">
               <q-card>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Reason :</div>
-                    <div class="col-12">
-                      {{ firstLetterCpitalze(props.row.reason) }}
-                    </div>
+                <q-card-section class="q-pb-none">
+                  <div class="text-weight-medium">
+                    {{ props.colsMap.reason.label }}
+                  </div>
+                  <div>
+                    {{ capitalCase(props.row.reason) }}
                   </div>
                 </q-card-section>
                 <template
                   v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
                   :key="key"
                 >
-                  <q-card-section v-if="props.row[key]">
-                    <div class="row q-gutter-y-xs">
-                      <div class="col-12 text-weight-medium">
-                        {{ capitalCase(key.split('On').join(' on')) }} :
-                      </div>
-                      <div class="col-12">
-                        {{ formatDate(props.row[key], format) }}
-                      </div>
+                  <q-card-section class="q-pb-none" v-if="props.row[key]">
+                    <div class="text-weight-medium">
+                      {{ props.colsMap[key].label }}
+                    </div>
+                    <div>
+                      {{ formatDate(props.row[key], format) }}
                     </div>
                   </q-card-section>
                 </template>
 
-                <q-card-actions align="center" class="q-py-md bg-grey-2">
+                <q-card-actions
+                  align="center"
+                  class="q-py-md bg-grey-2 q-mt-md"
+                >
                   <q-btn label="edit" icon="edit" size="sm" color="teal" />
                   <q-btn
-                    :label="props.row.inactive ? 'activate' : 'deactivate'"
+                    :label="props.row.inactive ? 'activate' : 'de-activate'"
                     size="sm"
                     color="red"
                   />
