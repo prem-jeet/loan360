@@ -438,11 +438,6 @@ const handleFormsubmit = async () => {
   } else if (editingRow) {
     payload.id = editingRow.id;
   }
-
-  console.log(
-    '🚀 ~ file: StageReason.vue:430 ~ handleFormsubmit ~ payload:',
-    payload
-  );
   let rsp;
   if (editingRowId.value) {
     rsp = await usePut(
@@ -464,79 +459,6 @@ const handleFormsubmit = async () => {
     }
   }
 };
-
-/*
- const editEntryConfirmed = (id: number, index: number) => {
-  editingRowIndex.value = index;
-  editingRowId.value = id;
-  setInitialFormData();
-};
-
- const editEntry = (id: number, rowIndex: number) => {
-  if (isEditing.value) {
-    confirmDialog(() => editEntryConfirmed(id, rowIndex), {
-      msg: 'Are you sure you want to cancel editing the current row?',
-    });
-  } else {
-    isEditing.value = true;
-    editingRowIndex.value = rowIndex;
-    editEntryConfirmed(id, rowIndex);
-  }
-};
-const saveEdited = async () => {
-  const temp = stageReason.value.filter(
-    (item) => item.id !== editingRowId.value
-  );
-
-  const isDuplicate = temp.find(
-    (item) => item.reason.toLowerCase() === editReason.value.toLowerCase()
-  );
-  if (isDuplicate) {
-    onFailure({
-      msg: 'Item already exist',
-      icon: 'warning',
-    });
-    return;
-  }
-
-  let payLoad = {
-    reason: editReason.value,
-    id: editingRowId.value,
-    updatedOn: new Date(),
-    stageCode: selectedStageCode.value,
-  };
-  const rsp = await api.put('/stageReason/update', payLoad);
-  if (rsp.data.displayMessage) {
-    onSuccess({
-      msg: rsp.data.displayMessage,
-      icon: 'sync_alt',
-    });
-    loadStageReason();
-  }
-};
-
-const saveEntry = () => {
-  selectedStageCode.value ? saveNewEntry() : (selectedError.value = true);
-};
-
-const saveNewEntry = async () => {
-  let payLoad = {
-    reason: reason.value,
-    inactive: false,
-    createdOn: new Date(),
-    stageCode: selectedStageCode.value,
-  };
-  const rsp = await api.post('/stageReason', payLoad);
-  if (rsp.data.displayMessage) {
-    onSuccess({
-      msg: rsp.data.displayMessage,
-      icon: 'sync_alt',
-    });
-    reason.value = '';
-    loadStageReason();
-  }
-};
- */
 
 const toggleActiveState = async (row: StageReason) => {
   const msg = `Are you sure you want to ${row.inactive ? '' : 'De-'}Activate?`;
@@ -573,8 +495,8 @@ const loadStages = async () => {
   fetchingData.value = false;
 };
 
-watch(selectedStageCode, () => {
-  if (selectedStageCode.value) {
+watch(selectedStageCode, (newVal) => {
+  if (newVal) {
     loadStageReason();
   }
 });
