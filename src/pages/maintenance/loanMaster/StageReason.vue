@@ -192,9 +192,8 @@
     <q-dialog
       v-model="isStageReasonFormActive"
       @before-hide="editingRowId = null"
+      @before-show="setInitialFormData"
     >
-      <!-- @before-show="setInitialFormData" -->
-
       <q-card :style="{ minWidth: 'calc(250px + 30vw)' }" class="column">
         <q-card-section class="row items-center q-pb-none">
           <div class="text-h6">
@@ -211,8 +210,8 @@
           />
         </q-card-section>
         <q-form
-          @submit.prevent="() => 1"
-          @reset="() => 1"
+          @submit.prevent="handleFormsubmit"
+          @reset="setInitialFormData"
           class="col-grow column"
         >
           <q-card-section
@@ -233,7 +232,8 @@
               behavior="menu"
               options-dense
               no-error-icon
-              :error="!selectedStageCode"
+              :rules="[(val) => !!val]"
+              :error="!formData.stageCode"
               :disable="!(stageCodeOptions.length && !editingRowId)"
             />
             <q-input
@@ -241,6 +241,7 @@
               outlined
               no-error-icon
               :rules="[(val) => !!val]"
+              :error="!formData.reason"
               hide-bottom-space
               label="Reason"
             />
@@ -381,7 +382,21 @@ const filteredStageReason = computed(() => {
   return filteredArray;
 });
 
-/*const setFormData = () => {
+const setInitialFormData = () => {
+  console.log(
+    '🚀 ~ file: StageReason.vue:389 ~ handleFormData ~ handleFormData:',
+    'setInitialFormData'
+  );
+};
+
+const handleFormsubmit = () => {
+  console.log(
+    '🚀 ~ file: StageReason.vue:389 ~ handleFormsubmit ~ handleFormsubmit:',
+    'handleFormsubmit'
+  );
+};
+
+/*const setInitialFormData = () => {
   let temp;
   if (editingRowId.value !== null) {
     let index = stageReason.value.findIndex(
@@ -395,7 +410,7 @@ const filteredStageReason = computed(() => {
  const editEntryConfirmed = (id: number, index: number) => {
   editingRowIndex.value = index;
   editingRowId.value = id;
-  setFormData();
+  setInitialFormData();
 };
 
  const editEntry = (id: number, rowIndex: number) => {
