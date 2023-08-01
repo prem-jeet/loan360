@@ -283,13 +283,6 @@ const filteredStageReason = computed(() => {
   return filteredArray;
 });
 
-const isDuplicate = computed(
-  () =>
-    !!stageReason.value.find(
-      (item) => item.reason.toLocaleLowerCase() === reason.value
-    )
-);
-
 /*const setFormData = () => {
   let temp;
   if (editingRowId.value !== null) {
