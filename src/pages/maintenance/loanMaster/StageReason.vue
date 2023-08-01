@@ -277,7 +277,7 @@ import { alertDialog, asyncConfirmDialog } from 'src/utils/notification';
 import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
-import { useFetch, usePut } from 'src/composables/apiCalls';
+import { useFetch, usePost, usePut } from 'src/composables/apiCalls';
 import { inactiveFilter } from 'src/utils/filters';
 
 const breadcrumbs = [
@@ -336,13 +336,13 @@ const columns: {
 ];
 
 interface StageReason {
+  id: number;
   reason: string;
-  stageCode: string | null;
-  id: number | null;
-  createdOn: string;
+  stageCode: string;
   inactive: boolean;
-  inactiveOn: string;
-  updatedOn: string;
+  createdOn: string | null;
+  inactiveOn: string | null;
+  updatedOn: string | null;
 }
 
 interface Stage {
@@ -409,7 +409,7 @@ const isStageReasonDuplicate = (reason: string) => {
   const matchedStageReason = stageReason.value.find(
     ({ reason: rsn }) => rsn.toLowerCase() === reason.toLowerCase()
   );
-  return matchedStageReason && editingRowId
+  return matchedStageReason && editingRowId.value
     ? matchedStageReason?.id !== editingRowId.value
     : !!matchedStageReason;
 };
@@ -417,10 +417,51 @@ const isStageReasonDuplicate = (reason: string) => {
 const setInitialFormData = () =>
   (formData.value = { ...initialFormData.value });
 
-const handleFormsubmit = () => {
+const handleFormsubmit = async () => {
   if (isStageReasonDuplicate(formData.value.reason!)) {
     alertDialog('Duplicate reason.');
     return;
+  }
+
+  const payload: Partial<StageReason> = {
+    reason: formData.value.reason!,
+    stageCode: formData.value.stageCode!,
+  };
+
+  const editingRow = stageReason.value.find(
+    ({ id }) => id === editingRowId.value
+  );
+
+  if (!editingRowId.value) {
+    payload.createdOn = new Date().toISOString();
+    payload.inactive = false;
+  } else if (editingRow) {
+    payload.id = editingRow.id;
+  }
+
+  console.log(
+    '🚀 ~ file: StageReason.vue:430 ~ handleFormsubmit ~ payload:',
+    payload
+  );
+  let rsp;
+  if (editingRowId.value) {
+    rsp = await usePut(
+      '/stageReason/update',
+      payload,
+      'Unable to edit Stage Reason.'
+    );
+  } else {
+    rsp = await usePost(
+      '/stageReason',
+      payload,
+      'Unable to edit Stage Reason.'
+    );
+  }
+  {
+    if (rsp) {
+      isStageReasonFormActive.value = false;
+      loadStageReason();
+    }
   }
 };
 
