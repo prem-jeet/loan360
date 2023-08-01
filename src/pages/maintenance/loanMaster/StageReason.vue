@@ -35,6 +35,7 @@
                     label="Add new"
                     size="md"
                     class="full-width"
+                    @click="isStageReasonFormActive = true"
                   />
                 </div>
               </div>
@@ -101,7 +102,16 @@
             <q-tr :props="props">
               <q-td key="actions" auto-width>
                 <q-btn-group push unelevated>
-                  <q-btn icon="edit" size="xs" outline color="accent" />
+                  <q-btn
+                    icon="edit"
+                    size="xs"
+                    outline
+                    color="accent"
+                    @click="
+                      editingRowId = props.row.id;
+                      isStageReasonFormActive = true;
+                    "
+                  />
                   <q-btn
                     :label="props.row.inactive ? 'activate' : 'de-activate'"
                     size="xs"
@@ -155,7 +165,16 @@
                   align="center"
                   class="q-py-md bg-grey-2 q-mt-md"
                 >
-                  <q-btn label="edit" icon="edit" size="sm" color="teal" />
+                  <q-btn
+                    label="edit"
+                    icon="edit"
+                    size="sm"
+                    color="teal"
+                    @click="
+                      editingRowId = props.row.id;
+                      isStageReasonFormActive = true;
+                    "
+                  />
                   <q-btn
                     :label="props.row.inactive ? 'activate' : 'de-activate'"
                     size="sm"
@@ -169,6 +188,52 @@
         </q-table>
       </div>
     </div>
+
+    <q-dialog
+      v-model="isStageReasonFormActive"
+      @before-hide="editingRowId = null"
+    >
+      <!-- 
+    @before-show="setInitialFormData" -->
+
+      <q-card :style="{ minWidth: 'calc(250px + 30vw)' }" class="column">
+        <q-card-section class="row items-center q-pb-none">
+          <div class="text-h6">
+            {{ `${editingRowId ? 'Edit' : 'New'} Stage Reason` }}
+          </div>
+          <q-space />
+          <q-btn
+            @click="isStageReasonFormActive = false"
+            icon="close"
+            flat
+            round
+            dense
+            v-close-popup
+          />
+        </q-card-section>
+
+        <q-form
+          @submit.prevent="() => 1"
+          @reset="() => 1"
+          class="col-grow column"
+        >
+          <q-card-section
+            class="q-pa-md col-grow column justify-evenly"
+            :style="{ minHeight: '40vh' }"
+          >
+          </q-card-section>
+          <q-card-actions align="center" class="q-py-md bg-grey-2">
+            <q-btn
+              color="teal"
+              type="submit"
+              :label="editingRowId === null ? 'Add' : 'Save '"
+              :icon="editingRowId === null ? 'add' : 'save '"
+            />
+            <q-btn label="Reset" color="red-5" type="reset" icon="refresh" />
+          </q-card-actions>
+        </q-form>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -261,13 +326,14 @@ interface Filter {
 
 const filter = reactive<Filter>({ inActive: false, reason: null });
 
+const isStageReasonFormActive = ref(false);
 const $q = useQuasar();
 const fetchingData = ref(false);
-const reason = ref('');
 const selectedStageCode = ref('');
 const stageCodeOptions = ref<Stage[]>([]);
 const stageReason = ref<StageReason[]>([]);
 const format = 'DD/MM/YYYY @hh:mmA';
+const editingRowId = ref<number | null>(null);
 
 const filteredStageReason = computed(() => {
   const stageCode = selectedStageCode.value;
