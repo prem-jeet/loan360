@@ -193,8 +193,7 @@
       v-model="isStageReasonFormActive"
       @before-hide="editingRowId = null"
     >
-      <!-- 
-    @before-show="setInitialFormData" -->
+      <!-- @before-show="setInitialFormData" -->
 
       <q-card :style="{ minWidth: 'calc(250px + 30vw)' }" class="column">
         <q-card-section class="row items-center q-pb-none">
@@ -211,7 +210,6 @@
             v-close-popup
           />
         </q-card-section>
-
         <q-form
           @submit.prevent="() => 1"
           @reset="() => 1"
@@ -221,6 +219,31 @@
             class="q-pa-md col-grow column justify-evenly"
             :style="{ minHeight: '40vh' }"
           >
+            <q-select
+              v-model="formData.stageCode"
+              :options="(inactiveFilter(stageCodeOptions) as Stage[])"
+              map-options
+              emit-value
+              option-label="name"
+              option-value="code"
+              :label="stageCodeOptions.length ? 'Stag' : 'No options available'"
+              outlined
+              hide-bottom-space
+              dropdown-icon="expand_more"
+              behavior="menu"
+              options-dense
+              no-error-icon
+              :error="!selectedStageCode"
+              :disable="!(stageCodeOptions.length && !editingRowId)"
+            />
+            <q-input
+              v-model="formData.reason"
+              outlined
+              no-error-icon
+              :rules="[(val) => !!val]"
+              hide-bottom-space
+              label="Reason"
+            />
           </q-card-section>
           <q-card-actions align="center" class="q-py-md bg-grey-2">
             <q-btn
@@ -324,6 +347,11 @@ interface Filter {
   inActive: boolean;
 }
 
+interface Form {
+  stageCode: string | null;
+  reason: string | null;
+}
+
 const filter = reactive<Filter>({ inActive: false, reason: null });
 
 const isStageReasonFormActive = ref(false);
@@ -334,6 +362,10 @@ const stageCodeOptions = ref<Stage[]>([]);
 const stageReason = ref<StageReason[]>([]);
 const format = 'DD/MM/YYYY @hh:mmA';
 const editingRowId = ref<number | null>(null);
+const formData = ref<Form>({
+  reason: null,
+  stageCode: null,
+});
 
 const filteredStageReason = computed(() => {
   const stageCode = selectedStageCode.value;
