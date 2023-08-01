@@ -346,7 +346,7 @@ const saveEdited = async () => {
       msg: rsp.data.displayMessage,
       icon: 'sync_alt',
     });
-    loadSource();
+    loadStageReason();
   }
 };
 
@@ -368,7 +368,7 @@ const saveNewEntry = async () => {
       icon: 'sync_alt',
     });
     reason.value = '';
-    loadSource();
+    loadStageReason();
   }
 };
  */
@@ -383,12 +383,12 @@ const toggleActiveState = async (row: StageReason) => {
       id: row.id,
     });
     if (rsp) {
-      loadSource();
+      loadStageReason();
     }
   }
 };
 
-const loadSource = async () => {
+const loadStageReason = async () => {
   fetchingData.value = true;
   const rsp = await api.get('stageReason/stageCode/' + selectedStageCode.value);
 
@@ -410,7 +410,7 @@ const loadStages = async () => {
 
 watch(selectedStageCode, () => {
   if (selectedStageCode.value) {
-    loadSource();
+    loadStageReason();
   }
 });
 
