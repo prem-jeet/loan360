@@ -470,7 +470,10 @@ const toggleActiveState = async (row: StageReason) => {
       id: row.id,
     });
     if (rsp) {
-      loadStageReason();
+      row.inactive = !row.inactive;
+      if (row.inactive) {
+        row.inactiveOn = new Date().toISOString();
+      }
     }
   }
 };
