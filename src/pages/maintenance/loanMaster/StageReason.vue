@@ -36,6 +36,7 @@
                     size="md"
                     class="full-width"
                     @click="isStageReasonFormActive = true"
+                    :disable="!selectedStageCode"
                   />
                 </div>
               </div>
@@ -234,7 +235,7 @@
               no-error-icon
               :rules="[(val) => !!val]"
               :error="!formData.stageCode"
-              :disable="!(stageCodeOptions.length && !editingRowId)"
+              disable
             />
             <q-input
               v-model="formData.reason"
