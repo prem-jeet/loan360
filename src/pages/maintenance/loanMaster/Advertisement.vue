@@ -14,7 +14,6 @@
           table-header-class="bg-deep-purple-10 text-white"
           separator="cell"
           bordered
-          title="Nature entry"
           :rows-per-page-options="[0]"
           :hide-bottom="!!advertisement.length"
           :grid="$q.screen.width < 830"
