@@ -244,6 +244,13 @@
               :error="!formData.reason"
               hide-bottom-space
               label="Reason"
+              @update:model-value="
+                (val) => {
+                  if (val && typeof val === 'string') {
+                    formData.reason = capitalCase(val);
+                  }
+                }
+              "
             />
           </q-card-section>
           <q-card-actions align="center" class="q-py-md bg-grey-2">
@@ -265,7 +272,7 @@
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch, reactive } from 'vue';
-import { asyncConfirmDialog } from 'src/utils/notification';
+import { alertDialog, asyncConfirmDialog } from 'src/utils/notification';
 import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
@@ -391,34 +398,32 @@ const initialFormData = computed(() => {
     );
     if (editingRow) {
       temp.stageCode === editingRow.stageCode;
-      temp.reason = editingRow.reason;
+      temp.reason = capitalCase(editingRow.reason);
     }
   }
 
   return temp;
 });
+const isStageReasonDuplicate = (reason: string) => {
+  const matchedStageReason = stageReason.value.find(
+    ({ reason: rsn }) => rsn.toLowerCase() === reason.toLowerCase()
+  );
+  return matchedStageReason && editingRowId
+    ? matchedStageReason?.id !== editingRowId.value
+    : !!matchedStageReason;
+};
 
 const setInitialFormData = () =>
   (formData.value = { ...initialFormData.value });
 
 const handleFormsubmit = () => {
-  console.log(
-    '🚀 ~ file: StageReason.vue:389 ~ handleFormsubmit ~ handleFormsubmit:',
-    'handleFormsubmit'
-  );
-};
-
-/*const setInitialFormData = () => {
-  let temp;
-  if (editingRowId.value !== null) {
-    let index = stageReason.value.findIndex(
-      (obj) => obj.id === editingRowId.value
-    );
-    temp = stageReason.value[index];
+  if (isStageReasonDuplicate(formData.value.reason!)) {
+    alertDialog('Duplicate reason.');
+    return;
   }
-  editReason.value = temp ? temp.reason : '';
 };
 
+/*
  const editEntryConfirmed = (id: number, index: number) => {
   editingRowIndex.value = index;
   editingRowId.value = id;
