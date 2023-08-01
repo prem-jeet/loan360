@@ -382,12 +382,24 @@ const filteredStageReason = computed(() => {
   return filteredArray;
 });
 
-const setInitialFormData = () => {
-  console.log(
-    '🚀 ~ file: StageReason.vue:389 ~ handleFormData ~ handleFormData:',
-    'setInitialFormData'
-  );
-};
+const initialFormData = computed(() => {
+  const temp: Form = { stageCode: selectedStageCode.value, reason: null };
+
+  if (editingRowId.value) {
+    const editingRow = stageReason.value.find(
+      (reason) => reason.id === editingRowId.value
+    );
+    if (editingRow) {
+      temp.stageCode === editingRow.stageCode;
+      temp.reason = editingRow.reason;
+    }
+  }
+
+  return temp;
+});
+
+const setInitialFormData = () =>
+  (formData.value = { ...initialFormData.value });
 
 const handleFormsubmit = () => {
   console.log(
