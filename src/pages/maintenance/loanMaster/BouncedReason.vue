@@ -7,7 +7,7 @@
     <div class="row q-mt-lg q-pb-xl">
       <div class="col">
         <q-table
-          :rows="filteredData"
+          :rows="filteredBouncedReason"
           :columns="columns"
           row-key="code"
           :loading="fetchingData"
@@ -16,7 +16,7 @@
           bordered
           title="Nature entry"
           :rows-per-page-options="[0]"
-          :hide-bottom="!!filteredData.length"
+          :hide-bottom="!!filteredBouncedReason.length"
           :grid="$q.screen.width < 830"
           card-container-class="q-gutter-y-md q-mt-xs"
         >
@@ -38,13 +38,19 @@
             <div class="row full-width q-mt-lg q-mb-sm items-center">
               <div class="col-12 col-sm-6 col-md-4">
                 <q-input
-                  v-model="nameSearchQuery"
+                  v-model="filter.name"
                   outlined
                   clearable
                   dense
                   rounded
-                  placeholder="search"
-                  @clear="nameSearchQuery = ''"
+                  placeholder="Search Bounced Reason"
+                  @update:model-value="
+                    (val) => {
+                      if (val === '') {
+                        filter.name = null;
+                      }
+                    }
+                  "
                 >
                   <template v-slot:prepend>
                     <q-icon name="search" />
@@ -54,7 +60,7 @@
 
               <div class="col-12 col-sm-auto">
                 <div class="flex items-center justify-end">
-                  <q-checkbox v-model="checkBox" label=" In-Active" />
+                  <q-checkbox v-model="filter.inactive" label=" In-Active" />
                 </div>
               </div>
             </div>
@@ -249,7 +255,7 @@
 import type { TableColumn } from 'src/types/Common';
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { ref, onMounted, computed, watch, reactive } from 'vue';
+import { ref, onMounted, computed, reactive, watch } from 'vue';
 
 import { formatDate } from 'src/utils/date';
 import { capitalCase } from 'src/utils/string';
@@ -267,6 +273,11 @@ interface BouncedReason {
 interface Form {
   bouncedReason: string | null;
   technicalReason: boolean;
+}
+
+interface Filter {
+  name: string | null;
+  inactive: boolean;
 }
 
 const breadcrumbs = [
@@ -329,17 +340,29 @@ const formData = ref<Form>({
   bouncedReason: null,
   technicalReason: false,
 });
+
+const filter = reactive<Filter>({
+  inactive: false,
+  name: null,
+});
+watch(
+  filter,
+  () => {
+    console.log('🚀 ~ file: BouncedReason.vue:343 ~ watch ~ filter:', {
+      ...filter,
+    });
+  },
+  { immediate: true }
+);
+
 const fetchingData = ref(false);
 const isBouncedReasonFormActive = ref(false);
-const nameSearchQuery = ref('');
 const bouncedReason = ref<BouncedReason[]>([]);
-const bouncedReasonTemp = ref<BouncedReason[]>([]);
-const checkBox = ref(false);
 const editingRowId = ref<number | null>(null);
 
-const filteredData = computed(() =>
-  bouncedReason.value.filter((item) => item.inactive === checkBox.value)
-);
+const filteredBouncedReason = computed(() => {
+  return bouncedReason.value;
+});
 
 const handleBouncedReasonFormsubmit = () => {
   console.log('Form submit');
@@ -463,19 +486,9 @@ const loadBouncedReason = async () => {
 
   if (rsp.data) {
     bouncedReason.value = rsp.data;
-    bouncedReason.value = bouncedReason.value.reverse();
-    bouncedReasonTemp.value = bouncedReason.value;
   }
   fetchingData.value = false;
 };
-
-watch(nameSearchQuery, () => {
-  bouncedReason.value = bouncedReasonTemp.value.filter((item) => {
-    return item.name
-      .toLowerCase()
-      .includes(nameSearchQuery.value.toLowerCase());
-  });
-});
 
 onMounted(() => {
   loadBouncedReason();
