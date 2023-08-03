@@ -273,46 +273,15 @@
 
 <script setup lang="ts">
 import type { TableColumn } from 'src/types/Common';
-import { api } from 'src/boot/axios';
-import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import {
-  ref,
-  onMounted,
-  computed,
-  reactive,
-  watch,
-  resolveDirective,
-} from 'vue';
 
+import { ref, onMounted, computed, reactive } from 'vue';
+
+import { useFetch, usePost, usePut } from 'src/composables/apiCalls';
 import { formatDate } from 'src/utils/date';
 import { capitalCase } from 'src/utils/string';
 import { alertDialog, asyncConfirmDialog } from 'src/utils/notification';
-import {
-  API_OBJECT,
-  useFetch,
-  usePost,
-  usePut,
-} from 'src/composables/apiCalls';
 
-interface BouncedReason {
-  name: string;
-  id: number;
-  inactive: boolean;
-  technicalReason: boolean;
-  createdOn: string | null;
-  inactiveOn: string | null;
-  updatedOn: string | null;
-}
-
-interface Form {
-  bouncedReason: string | null;
-  technicalReason: boolean;
-}
-
-interface Filter {
-  name: string | null;
-  inactive: boolean;
-}
+import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
@@ -370,18 +339,37 @@ const columns: TableColumn[] = [
   },
 ];
 
+interface BouncedReason {
+  name: string;
+  id: number;
+  inactive: boolean;
+  technicalReason: boolean;
+  createdOn: string | null;
+  inactiveOn: string | null;
+  updatedOn: string | null;
+}
+
+interface Form {
+  bouncedReason: string | null;
+  technicalReason: boolean;
+}
+
+interface Filter {
+  name: string | null;
+  inactive: boolean;
+}
+
+const fetchingData = ref(false);
+const isBouncedReasonFormActive = ref(false);
 const formData = ref<Form>({
   bouncedReason: null,
   technicalReason: false,
 });
-
 const filter = reactive<Filter>({
   inactive: false,
   name: null,
 });
 
-const fetchingData = ref(false);
-const isBouncedReasonFormActive = ref(false);
 const bouncedReason = ref<BouncedReason[]>([]);
 const editingRowId = ref<number | null>(null);
 
@@ -451,6 +439,7 @@ const isNameDuplicate = (name: string) => {
 
   return isDuplicate;
 };
+
 const handleBouncedReasonFormsubmit = async () => {
   if (isNameDuplicate(formData.value.bouncedReason!)) {
     alertDialog('Duplicate Bounced Reason.');
@@ -507,118 +496,6 @@ const handleBouncedReasonFormsubmit = async () => {
     }
   }
 };
-
-/* const setFormData = () => {
-  const index = bouncedReason.value.findIndex(
-    (obj) => obj.id === editingRowId.value
-  );
-  newSouce.name = index >= 0 ? bouncedReason.value[index].name : '';
-  newSouce.id = index >= 0 ? bouncedReason.value[index].id : null;
-  newSouce.technicalReason =
-    index >= 0 ? bouncedReason.value[index].technicalReason : false;
-};
-
-const editEntryConfirmed = (id: number, index: number) => {
-  editingRowIndex.value = index;
-  editingRowId.value = id;
-  setFormData();
-};
-
-const editEntry = (id: number, rowIndex: number) => {
-  if (isEditing.value) {
-    confirmDialog(() => editEntryConfirmed(id, rowIndex), {
-      msg: 'Are you sure you want to cancel editing the current Code?',
-    });
-  } else {
-    isEditing.value = true;
-    editingRowIndex.value = rowIndex;
-    editEntryConfirmed(id, rowIndex);
-  }
-};
-const saveNewEntry = async () => {
-  let payLoad = {
-    name: name.value,
-    technicalReason: technicalReason.value,
-    inactive: false,
-    createdOn: new Date(),
-  };
-  const rsp = await api.post('/bouncedReason', payLoad);
-  if (rsp.data) {
-    onSuccess({
-      msg: rsp.data.displayMessage,
-      icon: 'sync_alt',
-    });
-    name.value = '';
-    technicalReason.value = false;
-    fetchBouncedReason();
-  }
-};
-const saveEdited = async () => {
-  const temp = bouncedReasonTemp.value.filter(
-    (item) => item.id !== editingRowId.value
-  );
-
-  const isDuplicate = temp.find(
-    (item) => item.name.toLowerCase() === newSouce.name.toLowerCase()
-  );
-  if (isDuplicate) {
-    onFailure({
-      msg: 'Duplicate Account Found',
-      icon: 'warning',
-    });
-    return;
-  }
-
-  let payLoad = {
-    name: newSouce.name,
-    id: editingRowId.value,
-    updatedOn: new Date(),
-    technicalReason: newSouce.technicalReason,
-  };
-  const rsp = await api.put('/bouncedReason/update', payLoad);
-  if (rsp.data) {
-    onSuccess({
-      msg: rsp.data.displayMessage,
-      icon: 'sync_alt',
-    });
-    isEditing.value = false;
-    editingRowIndex.value = null;
-    fetchBouncedReason();
-  }
-};
-
-const saveEntry = () => {
-  if (name.value) {
-    saveNewEntry();
-  } else {
-    error.value = true;
-  }
-};
-
-const changeActive = async (id: number, state: boolean) => {
-  if (editingRowIndex.value === null) {
-    confirmDialog(() => changeActiveConfirm(id, state), {
-      msg: state
-        ? 'Are you sure you want to activate ?'
-        : 'Are you sure you want to deactivate ?',
-    });
-  } else {
-    return;
-  }
-};
-
-const changeActiveConfirm = async (id: number, state: boolean) => {
-  const payLoad = {
-    id: id,
-  };
-
-  const str = state ? 'active' : 'inactive';
-  const rsp = await api.put('/bouncedReason/' + str, payLoad);
-  if (rsp.data) {
-    onSuccess({ msg: rsp.data.displayMessage });
-  }
-  fetchBouncedReason();
-}; */
 
 const fetchBouncedReason = async () => {
   fetchingData.value = true;
