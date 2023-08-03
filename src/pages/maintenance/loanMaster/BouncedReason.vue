@@ -196,13 +196,39 @@
           />
         </q-card-section>
 
-        <!-- @submit.prevent="handleAdvertisementFormSubmit" -->
         <!-- @reset="setInitialFormData" -->
-        <q-form class="col-grow column">
+        <q-form
+          class="col-grow column"
+          @submit.prevent="handleBouncedReasonFormsubmit"
+        >
           <q-card-section
             class="q-pa-md col-grow column justify-evenly"
-            :style="{ minHeight: '40vh' }"
+            :style="{ minHeight: '25vh' }"
           >
+            <q-input
+              label="Name"
+              v-model="formData.bouncedReason"
+              @update:model-value="
+                (val) => {
+                  if (val === '') {
+                    formData.bouncedReason === null;
+                  }
+                }
+              "
+              :error="!formData.bouncedReason"
+              :rules="[(val) => !!val]"
+              hide-bottom-space
+              no-error-icon
+              outlined
+            />
+
+            <div class="flex justify-start">
+              <q-checkbox
+                v-model="formData.technicalReason"
+                label="Technical Reason"
+                left-label
+              />
+            </div>
           </q-card-section>
           <q-card-actions align="center" class="q-py-md bg-grey-2">
             <q-btn
@@ -235,6 +261,11 @@ interface BouncedReason {
   inactive: boolean;
   inactiveOn: string;
   updatedOn: string;
+  technicalReason: boolean;
+}
+
+interface Form {
+  bouncedReason: string | null;
   technicalReason: boolean;
 }
 
@@ -293,6 +324,11 @@ const columns: TableColumn[] = [
     label: 'In-Active On',
   },
 ];
+
+const formData = ref<Form>({
+  bouncedReason: null,
+  technicalReason: false,
+});
 const fetchingData = ref(false);
 const name = ref('');
 const technicalReason = ref(false);
@@ -320,7 +356,11 @@ const filteredData = computed(() =>
   bouncedReason.value.filter((item) => item.inactive === checkBox.value)
 );
 
-const setFormData = () => {
+const handleBouncedReasonFormsubmit = () => {
+  console.log('Form submit');
+};
+
+/* const setFormData = () => {
   const index = bouncedReason.value.findIndex(
     (obj) => obj.id === editingRowId.value
   );
@@ -430,7 +470,7 @@ const changeActiveConfirm = async (id: number, state: boolean) => {
     onSuccess({ msg: rsp.data.displayMessage });
   }
   loadSource();
-};
+}; */
 
 const loadSource = async () => {
   fetchingData.value = true;
