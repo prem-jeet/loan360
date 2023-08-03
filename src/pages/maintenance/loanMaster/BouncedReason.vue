@@ -495,7 +495,7 @@ const saveNewEntry = async () => {
     });
     name.value = '';
     technicalReason.value = false;
-    loadBouncedReason();
+    fetchBouncedReason();
   }
 };
 const saveEdited = async () => {
@@ -528,7 +528,7 @@ const saveEdited = async () => {
     });
     isEditing.value = false;
     editingRowIndex.value = null;
-    loadBouncedReason();
+    fetchBouncedReason();
   }
 };
 
@@ -562,10 +562,10 @@ const changeActiveConfirm = async (id: number, state: boolean) => {
   if (rsp.data) {
     onSuccess({ msg: rsp.data.displayMessage });
   }
-  loadBouncedReason();
+  fetchBouncedReason();
 }; */
 
-const loadBouncedReason = async () => {
+const fetchBouncedReason = async () => {
   fetchingData.value = true;
   const rsp = await api.get('bouncedReason');
 
@@ -576,7 +576,7 @@ const loadBouncedReason = async () => {
 };
 
 onMounted(() => {
-  loadBouncedReason();
+  fetchBouncedReason();
 });
 </script>
 
