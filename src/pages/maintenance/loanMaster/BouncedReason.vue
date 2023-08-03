@@ -353,16 +353,6 @@ const columns: {
     label: 'In-Active',
   },
 ];
-
-const DateTimeOptions = {
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-  hour: 'numeric',
-  minute: 'numeric',
-  hour12: true, // Use 12-hour format
-};
-
 const fetchingData = ref(false);
 const name = ref('');
 const technicalReason = ref(false);
@@ -507,20 +497,7 @@ const loadSource = async () => {
   const rsp = await api.get('bouncedReason');
 
   if (rsp.data) {
-    bouncedReason.value = rsp.data.map(
-      (item: {
-        createdOn: string | number | Date;
-        updatedOn: string | number | Date;
-        inactiveOn: string | number | Date;
-      }) => {
-        return {
-          ...item,
-          createdOn: item.createdOn !== null ? new Date(item.createdOn) : '',
-          updatedOn: item.updatedOn !== null ? new Date(item.updatedOn) : '',
-          inactiveOn: item.inactiveOn !== null ? new Date(item.inactiveOn) : '',
-        };
-      }
-    );
+    bouncedReason.value = rsp.data;
     bouncedReason.value = bouncedReason.value.reverse();
     bouncedReasonTemp.value = bouncedReason.value;
   }
