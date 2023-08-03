@@ -83,6 +83,7 @@
                     size="xs"
                     outline
                     color="red"
+                    @click="() => toggleActiveState(props.row)"
                   />
                 </q-btn-group>
               </q-td>
@@ -172,6 +173,7 @@
                     :label="`${props.row.inactive ? '' : 'de-'}activate`"
                     size="sm"
                     color="red"
+                    @click="() => toggleActiveState(props.row)"
                   />
                 </q-card-actions>
               </q-card>
@@ -259,6 +261,8 @@ import { ref, onMounted, computed, reactive, watch } from 'vue';
 
 import { formatDate } from 'src/utils/date';
 import { capitalCase } from 'src/utils/string';
+import { asyncConfirmDialog } from 'src/utils/notification';
+import { usePut } from 'src/composables/apiCalls';
 
 interface BouncedReason {
   name: string;
@@ -367,6 +371,28 @@ const handleBouncedReasonFormsubmit = () => {
   console.log('Form submit');
 };
 
+const toggleActiveState = async (row: BouncedReason) => {
+  const inActive = row.inactive;
+
+  const confirmed = await asyncConfirmDialog({
+    msg: `Are you sure you want to ${inActive ? '' : 'De-'}Activate`,
+  });
+
+  if (confirmed) {
+    const str = inActive ? 'active' : 'inactive';
+    const rsp = await usePut(
+      '/bouncedReason/' + str,
+      { id: row.id },
+      'Unable to change active status.'
+    );
+    if (rsp) {
+      row.inactive = !row.inactive;
+      if (!inActive) {
+        row.inactiveOn = new Date().toISOString();
+      }
+    }
+  }
+};
 /* const setFormData = () => {
   const index = bouncedReason.value.findIndex(
     (obj) => obj.id === editingRowId.value
