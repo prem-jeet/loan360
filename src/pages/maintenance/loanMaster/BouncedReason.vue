@@ -287,16 +287,21 @@ import {
 import { formatDate } from 'src/utils/date';
 import { capitalCase } from 'src/utils/string';
 import { alertDialog, asyncConfirmDialog } from 'src/utils/notification';
-import { usePut } from 'src/composables/apiCalls';
+import {
+  API_OBJECT,
+  useFetch,
+  usePost,
+  usePut,
+} from 'src/composables/apiCalls';
 
 interface BouncedReason {
   name: string;
-  id: number | null;
-  createdOn: string;
+  id: number;
   inactive: boolean;
-  inactiveOn: string;
-  updatedOn: string;
   technicalReason: boolean;
+  createdOn: string | null;
+  inactiveOn: string | null;
+  updatedOn: string | null;
 }
 
 interface Form {
@@ -446,10 +451,60 @@ const isNameDuplicate = (name: string) => {
 
   return isDuplicate;
 };
-const handleBouncedReasonFormsubmit = () => {
+const handleBouncedReasonFormsubmit = async () => {
   if (isNameDuplicate(formData.value.bouncedReason!)) {
     alertDialog('Duplicate Bounced Reason.');
     return;
+  }
+  const currentDataStr = new Date().toISOString();
+
+  const payload: Partial<BouncedReason> = {
+    name: formData.value.bouncedReason!,
+    technicalReason: formData.value.technicalReason,
+  };
+
+  const editingRow = bouncedReason.value.find(
+    ({ id }) => id === editingRowId.value
+  );
+
+  if (!editingRowId.value) {
+    payload.createdOn = currentDataStr;
+    payload.inactive = false;
+  } else if (editingRow) {
+    payload.id = editingRow.id;
+  }
+  let rsp;
+  if (editingRowId.value) {
+    rsp = await usePut(
+      '/bouncedReason/update',
+      payload,
+      'Unable to edit Bounced Reason.'
+    );
+  } else {
+    rsp = await usePost(
+      '/bouncedReason',
+      payload,
+      'Unable to create Bounced Reason.'
+    );
+  }
+  {
+    if (rsp) {
+      const newBouncedReason: BouncedReason = {
+        id: editingRow ? editingRow.id : rsp.id!,
+        name: payload.name!,
+        technicalReason: payload.technicalReason!,
+        inactive: editingRow ? editingRow.inactive : false,
+        createdOn: editingRow ? editingRow.createdOn : currentDataStr,
+        updatedOn: editingRow ? currentDataStr : null,
+        inactiveOn: editingRow ? editingRow.inactiveOn : null,
+      };
+      bouncedReason.value = !editingRow
+        ? [...bouncedReason.value, { ...newBouncedReason }]
+        : bouncedReason.value.map((reason) =>
+            reason.id === editingRow.id ? newBouncedReason : reason
+          );
+      isBouncedReasonFormActive.value = false;
+    }
   }
 };
 
@@ -567,10 +622,10 @@ const changeActiveConfirm = async (id: number, state: boolean) => {
 
 const fetchBouncedReason = async () => {
   fetchingData.value = true;
-  const rsp = await api.get('bouncedReason');
+  const rsp = await useFetch('bouncedReason');
 
-  if (rsp.data) {
-    bouncedReason.value = rsp.data;
+  if (rsp) {
+    bouncedReason.value = rsp as BouncedReason[];
   }
   fetchingData.value = false;
 };
