@@ -161,20 +161,12 @@
                   disable
                 />
               </q-td>
-              <q-td key="createdOn" :props="props">
-                {{
-                  props.row.createdOn.toLocaleString('en-US', DateTimeOptions)
-                }}
-              </q-td>
-              <q-td key="updatedOn" :props="props">
-                {{
-                  props.row.updatedOn.toLocaleString('en-US', DateTimeOptions)
-                }}
-              </q-td>
-              <q-td key="inactiveOn" :props="props">
-                {{
-                  props.row.inactiveOn.toLocaleString('en-US', DateTimeOptions)
-                }}
+              <q-td
+                v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
+                :key="key"
+                :props="props"
+              >
+                {{ formatDate(props.row[key], 'DD/MM/YYYY @hh:mmA') }}
               </q-td>
             </q-tr>
           </template>
@@ -314,6 +306,7 @@ import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch, reactive } from 'vue';
 import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
+import { formatDate } from 'src/utils/date';
 
 interface BouncedReason {
   name: string;
