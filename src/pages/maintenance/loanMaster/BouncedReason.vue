@@ -250,7 +250,7 @@ import type { TableColumn } from 'src/types/Common';
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch, reactive } from 'vue';
-import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
+
 import { formatDate } from 'src/utils/date';
 import { capitalCase } from 'src/utils/string';
 
@@ -330,27 +330,12 @@ const formData = ref<Form>({
   technicalReason: false,
 });
 const fetchingData = ref(false);
-const name = ref('');
-const technicalReason = ref(false);
+const isBouncedReasonFormActive = ref(false);
 const nameSearchQuery = ref('');
 const bouncedReason = ref<BouncedReason[]>([]);
 const bouncedReasonTemp = ref<BouncedReason[]>([]);
 const checkBox = ref(false);
-const isEditing = ref(false);
-const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
-const error = ref(false);
-const msg = ref('');
-const isBouncedReasonFormActive = ref(false);
-const newSouce = reactive<BouncedReason>({
-  name: '',
-  id: null,
-  createdOn: '',
-  inactive: false,
-  inactiveOn: '',
-  updatedOn: '',
-  technicalReason: false,
-});
 
 const filteredData = computed(() =>
   bouncedReason.value.filter((item) => item.inactive === checkBox.value)
@@ -402,7 +387,7 @@ const saveNewEntry = async () => {
     });
     name.value = '';
     technicalReason.value = false;
-    loadSource();
+    loadBouncedReason();
   }
 };
 const saveEdited = async () => {
@@ -435,7 +420,7 @@ const saveEdited = async () => {
     });
     isEditing.value = false;
     editingRowIndex.value = null;
-    loadSource();
+    loadBouncedReason();
   }
 };
 
@@ -469,10 +454,10 @@ const changeActiveConfirm = async (id: number, state: boolean) => {
   if (rsp.data) {
     onSuccess({ msg: rsp.data.displayMessage });
   }
-  loadSource();
+  loadBouncedReason();
 }; */
 
-const loadSource = async () => {
+const loadBouncedReason = async () => {
   fetchingData.value = true;
   const rsp = await api.get('bouncedReason');
 
@@ -484,24 +469,6 @@ const loadSource = async () => {
   fetchingData.value = false;
 };
 
-watch(name, () => {
-  error.value = false;
-  msg.value = '';
-
-  if (!name.value) {
-    return;
-  }
-
-  const temp = bouncedReasonTemp.value.find(
-    (item) => item.name.toLowerCase() === name.value.toLocaleLowerCase()
-  );
-
-  if (temp) {
-    error.value = true;
-    msg.value = 'Item already exists!';
-  }
-});
-
 watch(nameSearchQuery, () => {
   bouncedReason.value = bouncedReasonTemp.value.filter((item) => {
     return item.name
@@ -511,7 +478,7 @@ watch(nameSearchQuery, () => {
 });
 
 onMounted(() => {
-  loadSource();
+  loadBouncedReason();
 });
 </script>
 
