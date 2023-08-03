@@ -30,6 +30,7 @@
                   label="Add new"
                   size="md"
                   class="full-width"
+                  @click="isBouncedReasonFormActive = true"
                 />
               </div>
             </div>
@@ -173,6 +174,48 @@
         </q-table>
       </div>
     </div>
+
+    <q-dialog
+      v-model="isBouncedReasonFormActive"
+      @before-hide="editingRowId = null"
+    >
+      <!-- @before-show="setInitialFormData" -->
+      <q-card :style="{ minWidth: 'calc(250px + 20vw)' }" class="column">
+        <q-card-section class="row items-center q-pb-none">
+          <div class="text-h6">
+            {{ `${editingRowId ? 'Edit' : 'New'} Bounced Reason` }}
+          </div>
+          <q-space />
+          <q-btn
+            @click="isBouncedReasonFormActive = false"
+            icon="close"
+            flat
+            round
+            dense
+            v-close-popup
+          />
+        </q-card-section>
+
+        <!-- @submit.prevent="handleAdvertisementFormSubmit" -->
+        <!-- @reset="setInitialFormData" -->
+        <q-form class="col-grow column">
+          <q-card-section
+            class="q-pa-md col-grow column justify-evenly"
+            :style="{ minHeight: '40vh' }"
+          >
+          </q-card-section>
+          <q-card-actions align="center" class="q-py-md bg-grey-2">
+            <q-btn
+              :label="editingRowId === null ? 'Add' : 'Save '"
+              :icon="editingRowId === null ? 'add' : 'save '"
+              color="teal"
+              type="submit"
+            />
+            <q-btn label="Reset" color="red-5" type="reset" icon="refresh" />
+          </q-card-actions>
+        </q-form>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -262,7 +305,7 @@ const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
 const error = ref(false);
 const msg = ref('');
-
+const isBouncedReasonFormActive = ref(false);
 const newSouce = reactive<BouncedReason>({
   name: '',
   id: null,
