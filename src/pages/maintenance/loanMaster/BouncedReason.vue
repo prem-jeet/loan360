@@ -79,7 +79,21 @@
                 }}</span>
               </q-td>
               <q-td key="technicalReason" :props="props">
-                <q-checkbox v-model="props.row.technicalReason" disable />
+                <q-icon
+                  size="xs"
+                  :name="
+                    props.row.technicalReason === null ||
+                    !props.row.technicalReason
+                      ? 'cancel'
+                      : 'check_circle'
+                  "
+                  :color="
+                    props.row.technicalReason === null ||
+                    !props.row.technicalReason
+                      ? 'red-10'
+                      : 'teal-10'
+                  "
+                />
               </q-td>
               <q-td
                 v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
@@ -159,6 +173,7 @@
 </template>
 
 <script setup lang="ts">
+import type { TableColumn } from 'src/types/Common';
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch, reactive } from 'vue';
@@ -188,13 +203,7 @@ const breadcrumbs = [
   },
 ];
 
-const columns: {
-  name: string;
-  required?: boolean;
-  label: string;
-  field: string;
-  align: 'left';
-}[] = [
+const columns: TableColumn[] = [
   {
     name: 'actions',
     label: 'Actions',
@@ -211,7 +220,7 @@ const columns: {
   {
     name: 'technicalReason',
     required: true,
-    align: 'left',
+    align: 'center',
     field: 'technicalReason',
     label: 'Technical Reason',
   },
