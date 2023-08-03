@@ -64,7 +64,6 @@
               <q-td key="actions" auto-width>
                 <q-btn-group push unelevated>
                   <q-btn icon="edit" size="xs" outline color="accent" />
-
                   <q-btn
                     :label="props.row.inactive ? 'activate' : 'deactivate'"
                     size="xs"
@@ -96,26 +95,33 @@
           <template v-slot:item="props">
             <div class="col-xs-12 col-sm-6 q-px-sm-sm">
               <q-card>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Name :</div>
-                    <div class="col-12">
-                      <span>{{
-                        props.row.name.charAt(0).toUpperCase() +
-                        props.row.name.slice(1)
-                      }}</span>
-                    </div>
+                <q-card-section class="q-pb-none">
+                  <div class="text-weight-medium">
+                    {{ props.colsMap.name.label }}
+                  </div>
+                  <div>
+                    {{ capitalCase(props.row.name) }}
                   </div>
                 </q-card-section>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-6 text-weight-medium q-pt-sm">
-                      Technical Reason :
-                    </div>
-                    <div class="col-6">
-                      <q-checkbox v-model="props.row.technicalReason" disable />
-                    </div>
+                <q-card-section class="q-pb-none">
+                  <div class="text-weight-medium">
+                    {{ props.colsMap.technicalReason.label }}
                   </div>
+                  <q-icon
+                    size="xs"
+                    :name="
+                      props.row.technicalReason === null ||
+                      !props.row.technicalReason
+                        ? 'cancel'
+                        : 'check_circle'
+                    "
+                    :color="
+                      props.row.technicalReason === null ||
+                      !props.row.technicalReason
+                        ? 'red-10'
+                        : 'teal-10'
+                    "
+                  />
                 </q-card-section>
                 <template
                   v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
@@ -131,46 +137,17 @@
                   </q-card-section>
                 </template>
 
-                <q-card-actions align="center" class="q-py-md bg-grey-2">
-                  <q-btn
-                    label="edit"
-                    icon="edit"
-                    size="sm"
-                    color="teal"
-                    v-if="editingRowIndex !== props.rowIndex"
-                    @click="() => editEntry(props.row.id, props.rowIndex)"
-                  >
-                    <q-tooltip>Edit</q-tooltip>
-                  </q-btn>
+                <q-card-actions
+                  align="center"
+                  class="q-py-md bg-grey-2 q-mt-md"
+                >
+                  <q-btn label="edit" icon="edit" size="sm" color="teal" />
 
                   <q-btn
-                    v-if="editingRowIndex !== props.rowIndex"
-                    :label="props.row.inactive ? 'activate' : 'deactivate'"
+                    :label="`${props.row.inactive ? '' : 'de-'}activate`"
                     size="sm"
                     color="red"
-                    @click="changeActive(props.row.id, props.row.inactive)"
-                  >
-                  </q-btn>
-                  <q-btn
-                    label="save"
-                    icon="save"
-                    size="sm"
-                    color="teal"
-                    v-if="editingRowIndex === props.rowIndex"
-                    @click="() => saveEdited()"
-                  >
-                    <q-tooltip>Save</q-tooltip>
-                  </q-btn>
-                  <q-btn
-                    label="close"
-                    icon="close"
-                    size="sm"
-                    color="red"
-                    v-if="editingRowIndex === props.rowIndex"
-                    @click="(isEditing = false), (editingRowIndex = null)"
-                  >
-                    <q-tooltip>Cancel</q-tooltip>
-                  </q-btn>
+                  />
                 </q-card-actions>
               </q-card>
             </div>
@@ -187,6 +164,7 @@ import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch, reactive } from 'vue';
 import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
 import { formatDate } from 'src/utils/date';
+import { capitalCase } from 'src/utils/string';
 
 interface BouncedReason {
   name: string;
@@ -242,21 +220,21 @@ const columns: {
     required: true,
     align: 'left',
     field: 'createdOn',
-    label: 'Created',
+    label: 'Created On',
   },
   {
     name: 'updatedOn',
     required: true,
     align: 'left',
     field: 'updatedOn',
-    label: 'Updated',
+    label: 'Updated On',
   },
   {
     name: 'inactiveOn',
     required: true,
     align: 'left',
     field: 'inactiveOn',
-    label: 'In-Active',
+    label: 'In-Active On',
   },
 ];
 const fetchingData = ref(false);
