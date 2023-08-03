@@ -211,45 +211,19 @@
                     </div>
                   </div>
                 </q-card-section>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Created :</div>
-                    <div class="col-12">
-                      {{
-                        props.row.createdOn.toLocaleString(
-                          'en-US',
-                          DateTimeOptions
-                        )
-                      }}
+                <template
+                  v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
+                  :key="key"
+                >
+                  <q-card-section v-if="props.row[key]" class="q-pb-none">
+                    <div class="text-weight-medium">
+                      {{ props.colsMap[key].label }}
                     </div>
-                  </div>
-                </q-card-section>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Updated :</div>
-                    <div class="col-12">
-                      {{
-                        props.row.updatedOn.toLocaleString(
-                          'en-US',
-                          DateTimeOptions
-                        )
-                      }}
+                    <div>
+                      {{ formatDate(props.row[key], 'DD/MM/YYYY @hh:mmA') }}
                     </div>
-                  </div>
-                </q-card-section>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Inactive :</div>
-                    <div class="col-12">
-                      {{
-                        props.row.inactiveOn.toLocaleString(
-                          'en-US',
-                          DateTimeOptions
-                        )
-                      }}
-                    </div>
-                  </div>
-                </q-card-section>
+                  </q-card-section>
+                </template>
 
                 <q-card-actions align="center" class="q-py-md bg-grey-2">
                   <q-btn
