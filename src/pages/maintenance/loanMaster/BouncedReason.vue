@@ -345,15 +345,6 @@ const filter = reactive<Filter>({
   inactive: false,
   name: null,
 });
-watch(
-  filter,
-  () => {
-    console.log('🚀 ~ file: BouncedReason.vue:343 ~ watch ~ filter:', {
-      ...filter,
-    });
-  },
-  { immediate: true }
-);
 
 const fetchingData = ref(false);
 const isBouncedReasonFormActive = ref(false);
@@ -361,7 +352,15 @@ const bouncedReason = ref<BouncedReason[]>([]);
 const editingRowId = ref<number | null>(null);
 
 const filteredBouncedReason = computed(() => {
-  return bouncedReason.value;
+  const { name, inactive } = filter;
+  const filteredArray = bouncedReason.value.filter((reason) => {
+    const isNameMatched =
+      !name || reason.name.toLowerCase().includes(name.toLowerCase());
+    const isInactiveMatched =
+      reason.inactive !== null && reason.inactive === inactive;
+    return isNameMatched && isInactiveMatched;
+  });
+  return filteredArray;
 });
 
 const handleBouncedReasonFormsubmit = () => {
