@@ -77,9 +77,18 @@
             <q-tr :props="props">
               <q-td key="actions" auto-width>
                 <q-btn-group push unelevated>
-                  <q-btn icon="edit" size="xs" outline color="accent" />
                   <q-btn
-                    :label="props.row.inactive ? 'activate' : 'deactivate'"
+                    icon="edit"
+                    size="xs"
+                    outline
+                    color="accent"
+                    @click="
+                      editingRowId = props.row.id;
+                      isBouncedReasonFormActive = true;
+                    "
+                  />
+                  <q-btn
+                    :label="`${props.row.inactive ? '' : 'de-'}activate`"
                     size="xs"
                     outline
                     color="red"
@@ -167,7 +176,16 @@
                   align="center"
                   class="q-py-md bg-grey-2 q-mt-md"
                 >
-                  <q-btn label="edit" icon="edit" size="sm" color="teal" />
+                  <q-btn
+                    label="edit"
+                    icon="edit"
+                    size="sm"
+                    color="teal"
+                    @click="
+                      editingRowId = props.row.id;
+                      isBouncedReasonFormActive = true;
+                    "
+                  />
 
                   <q-btn
                     :label="`${props.row.inactive ? '' : 'de-'}activate`"
@@ -186,8 +204,8 @@
     <q-dialog
       v-model="isBouncedReasonFormActive"
       @before-hide="editingRowId = null"
+      @before-show="setInitialFormData"
     >
-      <!-- @before-show="setInitialFormData" -->
       <q-card :style="{ minWidth: 'calc(250px + 20vw)' }" class="column">
         <q-card-section class="row items-center q-pb-none">
           <div class="text-h6">
@@ -204,8 +222,8 @@
           />
         </q-card-section>
 
-        <!-- @reset="setInitialFormData" -->
         <q-form
+          @reset="setInitialFormData"
           class="col-grow column"
           @submit.prevent="handleBouncedReasonFormsubmit"
         >
@@ -257,7 +275,14 @@
 import type { TableColumn } from 'src/types/Common';
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { ref, onMounted, computed, reactive, watch } from 'vue';
+import {
+  ref,
+  onMounted,
+  computed,
+  reactive,
+  watch,
+  resolveDirective,
+} from 'vue';
 
 import { formatDate } from 'src/utils/date';
 import { capitalCase } from 'src/utils/string';
@@ -367,9 +392,26 @@ const filteredBouncedReason = computed(() => {
   return filteredArray;
 });
 
-const handleBouncedReasonFormsubmit = () => {
-  console.log('Form submit');
-};
+const initialFormData = computed(() => {
+  const temp: Form = {
+    bouncedReason: null,
+    technicalReason: false,
+  };
+  if (editingRowId.value) {
+    const editingRow = bouncedReason.value.find(
+      (reason) => reason.id === editingRowId.value
+    );
+    if (editingRow) {
+      temp.bouncedReason = editingRow.name;
+      temp.technicalReason =
+        editingRow.technicalReason !== null && editingRow.technicalReason;
+    }
+  }
+  return temp;
+});
+
+const setInitialFormData = () =>
+  (formData.value = { ...initialFormData.value });
 
 const toggleActiveState = async (row: BouncedReason) => {
   const inActive = row.inactive;
@@ -393,6 +435,21 @@ const toggleActiveState = async (row: BouncedReason) => {
     }
   }
 };
+
+const isNameDuplicate = (name: string) => {
+  const isDuplicate = !!bouncedReason.value.some((item) => {
+    return (
+      item.name === name &&
+      !(editingRowId.value && editingRowId.value === item.id)
+    );
+  });
+
+  return isDuplicate;
+};
+const handleBouncedReasonFormsubmit = () => {
+  console.log('Form submit');
+};
+
 /* const setFormData = () => {
   const index = bouncedReason.value.findIndex(
     (obj) => obj.id === editingRowId.value
