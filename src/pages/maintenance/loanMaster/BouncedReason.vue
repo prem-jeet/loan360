@@ -286,7 +286,7 @@ import {
 
 import { formatDate } from 'src/utils/date';
 import { capitalCase } from 'src/utils/string';
-import { asyncConfirmDialog } from 'src/utils/notification';
+import { alertDialog, asyncConfirmDialog } from 'src/utils/notification';
 import { usePut } from 'src/composables/apiCalls';
 
 interface BouncedReason {
@@ -447,7 +447,10 @@ const isNameDuplicate = (name: string) => {
   return isDuplicate;
 };
 const handleBouncedReasonFormsubmit = () => {
-  console.log('Form submit');
+  if (isNameDuplicate(formData.value.bouncedReason!)) {
+    alertDialog('Duplicate Bounced Reason.');
+    return;
+  }
 };
 
 /* const setFormData = () => {
