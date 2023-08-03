@@ -21,16 +21,21 @@
           card-container-class="q-gutter-y-md q-mt-xs"
         >
           <template v-slot:top>
-            <div class="row q-gutter-y-lg q-pb-xs-md">
-              <div class="col-12">
-                <div class="row items-center q-gutter-md">
-                  <div class="col-auto text-h6">Bounced Reason</div>
-                </div>
+            <div class="row q-gutter-x-md q-gutter-y-sm">
+              <div class="col-auto text-h6">Bounced Reason</div>
+              <div class="col-auto">
+                <q-btn
+                  color="blue-7"
+                  icon="add"
+                  label="Add new"
+                  size="md"
+                  class="full-width"
+                />
               </div>
             </div>
 
-            <div class="row full-width q-mt-sm">
-              <div class="col-xs-12 col-sm-3 col-md-3 q-pb-sm">
+            <div class="row full-width q-mt-lg q-mb-sm items-center">
+              <div class="col-12 col-sm-6 col-md-4">
                 <q-input
                   v-model="nameSearchQuery"
                   outlined
@@ -46,8 +51,10 @@
                 </q-input>
               </div>
 
-              <div class="col-xs-12 col-sm-3 col-md-3 q-pb-sm">
-                <q-checkbox v-model="checkBox" label=" In-Active" />
+              <div class="col-12 col-sm-auto">
+                <div class="flex items-center justify-end">
+                  <q-checkbox v-model="checkBox" label=" In-Active" />
+                </div>
               </div>
             </div>
           </template>
