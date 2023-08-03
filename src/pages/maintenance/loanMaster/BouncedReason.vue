@@ -49,36 +49,6 @@
               <div class="col-xs-12 col-sm-3 col-md-3 q-pb-sm">
                 <q-checkbox v-model="checkBox" label=" In-Active" />
               </div>
-              <div class="col-xs-12 col-sm-3 col-md-3 q-pb-sm">
-                <q-input
-                  v-model="name"
-                  outlined
-                  dense
-                  no-error-icon
-                  :error="error"
-                  :error-message="msg"
-                  placeholder="Reason"
-                >
-                  <template v-slot:prepend> Bounced </template>
-                </q-input>
-              </div>
-              <div
-                class="col-xs-12 col-sm-2 col-md-2 q-pb-sm q-pr-xs text-center"
-              >
-                <q-checkbox
-                  v-model="technicalReason"
-                  label="Technical Reason"
-                />
-              </div>
-              <div class="col-xs-12 col-sm-1 col-md-1 q-pb-sm">
-                <q-btn
-                  :icon="'add '"
-                  color="teal"
-                  size="md"
-                  :disable="error"
-                  @click="saveEntry()"
-                />
-              </div>
             </div>
           </template>
 
@@ -93,73 +63,24 @@
             <q-tr :props="props">
               <q-td key="actions" auto-width>
                 <q-btn-group push unelevated>
-                  <q-btn
-                    icon="edit"
-                    size="xs"
-                    outline
-                    color="accent"
-                    v-if="editingRowIndex !== props.rowIndex"
-                    @click="() => editEntry(props.row.id, props.rowIndex)"
-                  >
-                    <q-tooltip>Edit</q-tooltip>
-                  </q-btn>
+                  <q-btn icon="edit" size="xs" outline color="accent" />
 
                   <q-btn
-                    v-if="editingRowIndex !== props.rowIndex"
                     :label="props.row.inactive ? 'activate' : 'deactivate'"
                     size="xs"
                     outline
                     color="red"
-                    @click="changeActive(props.row.id, props.row.inactive)"
-                  >
-                  </q-btn>
-                  <q-btn
-                    icon="check"
-                    size="xs"
-                    outline
-                    color="green-10"
-                    v-if="editingRowIndex === props.rowIndex"
-                    @click="() => saveEdited()"
-                  >
-                    <q-tooltip>Save</q-tooltip>
-                  </q-btn>
-                  <q-btn
-                    icon="close"
-                    size="xs"
-                    outline
-                    color="red"
-                    v-if="editingRowIndex === props.rowIndex"
-                    @click="(isEditing = false), (editingRowIndex = null)"
-                  >
-                    <q-tooltip>Cancel</q-tooltip>
-                  </q-btn>
+                  />
                 </q-btn-group>
               </q-td>
               <q-td key="name" :props="props">
-                <q-input
-                  v-if="editingRowIndex === props.rowIndex"
-                  v-model="newSouce.name"
-                  placeholder="Name required"
-                  dense
-                  outlined
-                  :color="newSouce.name ? 'green' : 'red'"
-                  autofocus
-                />
-                <span v-else>{{
+                <span>{{
                   props.row.name.charAt(0).toUpperCase() +
                   props.row.name.slice(1)
                 }}</span>
               </q-td>
               <q-td key="technicalReason" :props="props">
-                <q-checkbox
-                  v-if="editingRowIndex === props.rowIndex"
-                  v-model="newSouce.technicalReason"
-                />
-                <q-checkbox
-                  v-else
-                  v-model="props.row.technicalReason"
-                  disable
-                />
+                <q-checkbox v-model="props.row.technicalReason" disable />
               </q-td>
               <q-td
                 v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
@@ -179,16 +100,7 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">Name :</div>
                     <div class="col-12">
-                      <q-input
-                        v-if="editingRowIndex === props.rowIndex"
-                        v-model="newSouce.name"
-                        placeholder="Name required"
-                        dense
-                        outlined
-                        :color="newSouce.name ? 'green' : 'red'"
-                        autofocus
-                      />
-                      <span v-else>{{
+                      <span>{{
                         props.row.name.charAt(0).toUpperCase() +
                         props.row.name.slice(1)
                       }}</span>
@@ -201,13 +113,7 @@
                       Technical Reason :
                     </div>
                     <div class="col-6">
-                      <q-checkbox
-                        v-if="editingRowIndex === props.rowIndex"
-                        v-model="newSouce.technicalReason"
-                      />
-                      <span v-else>
-                        <q-checkbox v-model="props.row.technicalReason" disable
-                      /></span>
+                      <q-checkbox v-model="props.row.technicalReason" disable />
                     </div>
                   </div>
                 </q-card-section>
