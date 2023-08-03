@@ -73,10 +73,7 @@
                 </q-btn-group>
               </q-td>
               <q-td key="name" :props="props">
-                <span>{{
-                  props.row.name.charAt(0).toUpperCase() +
-                  props.row.name.slice(1)
-                }}</span>
+                {{ capitalCase(props.row.name) }}
               </q-td>
               <q-td key="technicalReason" :props="props">
                 <q-icon
