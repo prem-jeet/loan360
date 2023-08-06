@@ -99,7 +99,7 @@
                 v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
                 :key="key"
               >
-                {{ formatDate(props.row[key], format) }}
+                {{ formatDate(props.row[key], dateFormat) }}
               </q-td>
             </q-tr>
           </template>
@@ -135,7 +135,7 @@
                         {{ capitalCase(key.split('On').join(' on')) }} :
                       </div>
                       <div class="col-12">
-                        {{ formatDate(props.row[key], format) }}
+                        {{ formatDate(props.row[key], dateFormat) }}
                       </div>
                     </div>
                   </q-card-section>
@@ -163,19 +163,19 @@
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch, reactive } from 'vue';
-import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
 import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
+import { TableColumn } from 'src/types/Common';
 
 interface Stations {
+  id: number;
   name: string;
-  id: number | null;
-  createdOn: string;
+  location: string | null;
   inactive: boolean;
-  inactiveOn: string;
-  updatedOn: string;
-  location: string;
+  createdOn: string | null;
+  inactiveOn: string | null;
+  updatedOn: string | null;
 }
 
 const breadcrumbs = [
@@ -190,13 +190,7 @@ const breadcrumbs = [
   },
 ];
 
-const columns: {
-  name: string;
-  required?: boolean;
-  label: string;
-  field: string;
-  align: 'left';
-}[] = [
+const columns: TableColumn[] = [
   {
     name: 'actions',
     label: 'Actions',
@@ -247,17 +241,15 @@ interface Filter {
 const filter = reactive<Filter>({ inActive: false, name: null });
 const $q = useQuasar();
 const fetchingData = ref(false);
-const name = ref('');
-const location = ref('');
+
 const nameSearchQuery = ref('');
 const stations = ref<Stations[]>([]);
 const checkBox = ref(false);
 const isEditing = ref(false);
 const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
-const editName = ref('');
-const editLocation = ref('');
-const format = 'DD/MM/YYYY @hh:mmA';
+
+const dateFormat = 'DD/MM/YYYY @hh:mmA';
 
 const filteredData = computed(() =>
   stations.value.filter(
@@ -267,14 +259,7 @@ const filteredData = computed(() =>
   )
 );
 
-const isDuplicate = computed(
-  () =>
-    !!stations.value.find(
-      (item) => item.name.toLocaleLowerCase() === name.value
-    )
-);
-
-const setFormData = () => {
+/* const setFormData = () => {
   let temp;
   if (editingRowId.value !== null) {
     let index = stations.value.findIndex(
@@ -286,11 +271,18 @@ const setFormData = () => {
   editLocation.value = temp ? temp.location : '';
 };
 
-const editEntryConfirmed = (id: number, index: number) => {
+ const editEntryConfirmed = (id: number, index: number) => {
   editingRowIndex.value = index;
   editingRowId.value = id;
   setFormData();
 };
+
+ const isDuplicate = computed(
+  () =>
+    !!stations.value.find(
+      (item) => item.name.toLocaleLowerCase() === name.value
+    )
+);
 
 const editEntry = (id: number, rowIndex: number) => {
   if (isEditing.value) {
@@ -359,7 +351,7 @@ const changeActive = (id: number, state: boolean) => {
         : 'Are you sure you want to deactivate ?',
     });
   }
-};
+}; 
 
 const changeActiveConfirm = async (id: number, state: boolean) => {
   const str = state ? 'active' : 'inactive';
@@ -371,6 +363,7 @@ const changeActiveConfirm = async (id: number, state: boolean) => {
     fetchStation();
   }
 };
+*/
 
 const fetchStation = async () => {
   fetchingData.value = true;
