@@ -7,7 +7,7 @@
     <div class="row q-mt-lg q-pb-xl">
       <div class="col">
         <q-table
-          :rows="filteredData"
+          :rows="stations"
           :columns="columns"
           row-key="code"
           :loading="fetchingData"
@@ -16,7 +16,7 @@
           bordered
           title="Nature entry"
           :rows-per-page-options="[0]"
-          :hide-bottom="!!filteredData.length"
+          :hide-bottom="!!stations.length"
           :grid="$q.screen.width < 830"
           card-container-class="q-gutter-y-md q-mt-xs"
         >
@@ -35,6 +35,7 @@
                     label="Add new"
                     size="md"
                     class="full-width"
+                    @click="(isStationFormActive = true), (editingRowId = null)"
                   />
                 </div>
               </div>
@@ -75,10 +76,18 @@
             <q-tr :props="props">
               <q-td key="actions" auto-width>
                 <q-btn-group push unelevated>
-                  <q-btn icon="edit" size="xs" outline color="accent" />
+                  <q-btn
+                    icon="edit"
+                    size="xs"
+                    outline
+                    color="accent"
+                    @click="
+                      (isStationFormActive = true),
+                        (editingRowId = props.row.id)
+                    "
+                  />
 
                   <q-btn
-                    v-if="editingRowIndex !== props.rowIndex"
                     :label="`${props.row.inactive ? '' : 'De-'}Activate`"
                     size="xs"
                     outline
@@ -142,7 +151,16 @@
                 </template>
 
                 <q-card-actions align="center" class="q-py-md bg-grey-2">
-                  <q-btn label="edit" icon="edit" size="sm" color="teal" />
+                  <q-btn
+                    label="edit"
+                    icon="edit"
+                    size="sm"
+                    color="teal"
+                    @click="
+                      (isStationFormActive = true),
+                        (editingRowId = props.row.id)
+                    "
+                  />
 
                   <q-btn
                     :label="`${props.row.inactive ? '' : 'De-'}Activate`"
@@ -157,8 +175,11 @@
       </div>
     </div>
 
-    <q-dialog v-model="isStationFormActive" @before-hide="editingRowId = null">
-      <!-- @before-show="setInitialFormData" -->
+    <q-dialog
+      v-model="isStationFormActive"
+      @before-hide="editingRowId = null"
+      @before-show="setInitialFormData"
+    >
       <q-card :style="{ minWidth: 'calc(250px + 20vw)' }" class="column">
         <q-card-section class="row items-center q-pb-none">
           <div class="text-h6">
@@ -174,9 +195,11 @@
             v-close-popup
           />
         </q-card-section>
-        <q-form class="col-grow column">
-          <!-- @submit.prevent="handleFormsubmit"
-        @reset="setInitialFormData" -->
+        <q-form
+          class="col-grow column"
+          @submit.prevent="handleFormsubmit"
+          @reset="setInitialFormData"
+        >
           <q-card-section
             class="q-pa-md col-grow column justify-evenly"
             :style="{ minHeight: '40vh' }"
@@ -188,7 +211,7 @@
               :rules="[(val) => !!val]"
               :error="!stationFormData.name"
               hide-bottom-space
-              label="Reason"
+              label="Name"
               @update:model-value="
                 (val) => {
                   if (val && typeof val === 'string') {
@@ -319,22 +342,38 @@ const filter = reactive<Filter>({ inActive: false, name: null });
 const $q = useQuasar();
 const fetchingData = ref(false);
 
-const nameSearchQuery = ref('');
 const stations = ref<Stations[]>([]);
-const checkBox = ref(false);
-const isEditing = ref(false);
-const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
 
 const dateFormat = 'DD/MM/YYYY @hh:mmA';
-const isStationFormActive = ref(true);
-const filteredData = computed(() =>
-  stations.value.filter(
-    (item) =>
-      item.name.toLowerCase().includes(nameSearchQuery.value.toLowerCase()) &&
-      item.inactive === checkBox.value
-  )
-);
+const isStationFormActive = ref(false);
+
+const initialFormData = computed(() => {
+  const temp: Form = {
+    location: null,
+    name: null,
+  };
+
+  if (editingRowId.value) {
+    const editingRow = stations.value.find(
+      ({ id }) => id === editingRowId.value
+    );
+    if (editingRow) {
+      temp.name = capitalCase(editingRow.name);
+      temp.location = editingRow.location
+        ? location && capitalCase(editingRow.location)
+        : null;
+    }
+  }
+  return temp;
+});
+
+const setInitialFormData = () =>
+  (stationFormData.value = { ...initialFormData.value });
+
+const handleFormsubmit = () => {
+  console.log('form submit');
+};
 
 /* const setFormData = () => {
   let temp;
@@ -451,11 +490,6 @@ const fetchStation = async () => {
   }
   fetchingData.value = false;
 };
-
-watch(filteredData, () => {
-  editingRowIndex.value = null;
-  isEditing.value = false;
-});
 
 onMounted(() => {
   fetchStation();
