@@ -7,7 +7,7 @@
     <div class="row q-mt-lg q-pb-xl">
       <div class="col">
         <q-table
-          :rows="stations"
+          :rows="filteresStations"
           :columns="columns"
           row-key="code"
           :loading="fetchingData"
@@ -16,7 +16,7 @@
           bordered
           title="Nature entry"
           :rows-per-page-options="[0]"
-          :hide-bottom="!!stations.length"
+          :hide-bottom="!!filteresStations.length"
           :grid="$q.screen.width < 830"
           card-container-class="q-gutter-y-md q-mt-xs"
         >
@@ -352,6 +352,18 @@ const editingRowId = ref<number | null>(null);
 
 const dateFormat = 'DD/MM/YYYY @hh:mmA';
 const isStationFormActive = ref(false);
+
+const filteresStations = computed(() => {
+  const filteredArray = stations.value.filter((station) => {
+    const isNameMatched =
+      !filter.name ||
+      station.name.toLowerCase().includes(filter.name.toLowerCase());
+    const isInactiveMatched = station.inactive === filter.inActive;
+
+    return isNameMatched && isInactiveMatched;
+  });
+  return filteredArray;
+});
 
 const initialFormData = computed(() => {
   const temp: Form = {
