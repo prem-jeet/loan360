@@ -25,7 +25,7 @@
               class="row full-width items-center q-gutter-x-md q-gutter-y-sm"
             >
               <div class="col-auto">
-                <span class="text-h6">Stage Reason</span>
+                <span class="text-h6">Station</span>
               </div>
               <div class="col-auto">
                 <div class="col-auto">
@@ -329,7 +329,7 @@ const saveEdited = async () => {
       msg: rsp.data.displayMessage,
       icon: 'sync_alt',
     });
-    loadSource();
+    fetchStation();
   }
 };
 
@@ -347,7 +347,7 @@ const saveEntry = async () => {
       icon: 'sync_alt',
     });
     name.value = '';
-    loadSource();
+    fetchStation();
   }
 };
 
@@ -368,11 +368,11 @@ const changeActiveConfirm = async (id: number, state: boolean) => {
   });
   if (rsp.data && rsp.data.displayMessage) {
     onSuccess({ msg: rsp.data.displayMessage });
-    loadSource();
+    fetchStation();
   }
 };
 
-const loadSource = async () => {
+const fetchStation = async () => {
   fetchingData.value = true;
   const rsp = await api.get('station');
 
@@ -388,7 +388,7 @@ watch(filteredData, () => {
 });
 
 onMounted(() => {
-  loadSource();
+  fetchStation();
 });
 </script>
 
