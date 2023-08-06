@@ -53,41 +53,6 @@
                   @click="(editingRowIndex = null), (isEditing = false)"
                 />
               </div>
-              <div class="col-xs-12 col-sm-3 col-md-3 q-pr-sm">
-                <q-input
-                  v-model="name"
-                  outlined
-                  dense
-                  no-error-icon
-                  :error="isDuplicate"
-                  error-message="Item alredy exits"
-                  placeholder="name"
-                >
-                  <template v-slot:prepend> Station </template>
-                </q-input>
-              </div>
-
-              <div class="col-xs-12 col-sm-4 col-md-3">
-                <q-input
-                  v-model="location"
-                  clearable
-                  outlined
-                  dense
-                  hide-bottom-space
-                  no-error-icon
-                  placeholder="location"
-                >
-                  <template v-slot:after>
-                    <q-btn
-                      icon="add"
-                      color="teal"
-                      size="md"
-                      :disable="isDuplicate || name === ''"
-                      @click="saveEntry"
-                    />
-                  </template>
-                </q-input>
-              </div>
             </div>
           </template>
 
