@@ -96,11 +96,13 @@
                 </q-btn-group>
               </q-td>
               <q-td key="name" :props="props">
-                {{ firstLetterCpitalze(props.row.name) }}
+                {{ props.row.name && firstLetterCpitalze(props.row.name) }}
               </q-td>
 
               <q-td key="location" :props="props">
-                {{ firstLetterCpitalze(props.row.location) }}
+                {{
+                  props.row.location && firstLetterCpitalze(props.row.location)
+                }}
               </q-td>
 
               <q-td
@@ -257,7 +259,7 @@ import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
 import { TableColumn } from 'src/types/Common';
-import { useFetch } from 'src/composables/apiCalls';
+import { useFetch, usePost, usePut } from 'src/composables/apiCalls';
 import { alertDialog } from 'src/utils/notification';
 
 interface Stations {
@@ -381,10 +383,51 @@ const isStationNameDuplicate = (name: string) => {
     : !!matchedStation;
 };
 
-const handleFormsubmit = () => {
+const handleFormsubmit = async () => {
   if (isStationNameDuplicate(stationFormData.value.name!)) {
     alertDialog('Duplicate Station Name');
     return;
+  }
+
+  const currentDataStr = new Date().toISOString();
+
+  const payload: Partial<Stations> = {
+    name: stationFormData.value.name!,
+    location: stationFormData.value.location,
+  };
+
+  const editingRow = stations.value.find(({ id }) => id === editingRowId.value);
+
+  if (!editingRowId.value) {
+    payload.createdOn = currentDataStr;
+    payload.inactive = false;
+  } else if (editingRow) {
+    payload.id = editingRow.id;
+  }
+  let rsp;
+  if (editingRowId.value) {
+    rsp = await usePut('/station/update', payload, 'Unable to edit Station.');
+  } else {
+    rsp = await usePost('/station', payload, 'Unable to create Station.');
+  }
+  {
+    if (rsp) {
+      const newStation: Stations = {
+        id: editingRow ? editingRow.id : rsp.id!,
+        name: payload.name!,
+        location: payload.location!,
+        inactive: editingRow ? editingRow.inactive : false,
+        createdOn: editingRow ? editingRow.createdOn : currentDataStr,
+        updatedOn: editingRow ? currentDataStr : null,
+        inactiveOn: editingRow ? editingRow.inactiveOn : null,
+      };
+      stations.value = !editingRow
+        ? [...stations.value, { ...newStation }]
+        : stations.value.map((station) =>
+            station.id === editingRow.id ? newStation : station
+          );
+      isStationFormActive.value = false;
+    }
   }
 };
 
