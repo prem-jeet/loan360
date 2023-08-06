@@ -67,76 +67,23 @@
             <q-tr :props="props">
               <q-td key="actions" auto-width>
                 <q-btn-group push unelevated>
-                  <q-btn
-                    icon="edit"
-                    size="xs"
-                    outline
-                    color="accent"
-                    v-if="editingRowIndex !== props.rowIndex"
-                    @click="() => editEntry(props.row.id, props.rowIndex)"
-                  >
-                    <q-tooltip>Edit</q-tooltip>
-                  </q-btn>
+                  <q-btn icon="edit" size="xs" outline color="accent" />
 
                   <q-btn
                     v-if="editingRowIndex !== props.rowIndex"
-                    :label="props.row.inactive ? 'activate' : 'deactivate'"
+                    :label="`${props.row.inactive ? '' : 'De-'}Activate`"
                     size="xs"
                     outline
                     color="red"
-                    @click="
-                      () => changeActive(props.row.id, props.row.inactive)
-                    "
-                  >
-                  </q-btn>
-                  <q-btn
-                    icon="check"
-                    size="xs"
-                    outline
-                    color="green-10"
-                    v-if="editingRowIndex === props.rowIndex"
-                    @click="saveEdited"
-                  >
-                    <q-tooltip>Save</q-tooltip>
-                  </q-btn>
-                  <q-btn
-                    icon="close"
-                    size="xs"
-                    outline
-                    color="red"
-                    v-if="editingRowIndex === props.rowIndex"
-                    @click="(isEditing = false), (editingRowIndex = null)"
-                  >
-                    <q-tooltip>Cancel</q-tooltip>
-                  </q-btn>
+                  />
                 </q-btn-group>
               </q-td>
               <q-td key="name" :props="props">
-                <q-input
-                  v-if="editingRowIndex === props.rowIndex"
-                  v-model="editName"
-                  placeholder="Name required"
-                  dense
-                  outlined
-                  :color="editName ? 'green' : 'red'"
-                  autofocus
-                />
-                <span v-else> {{ firstLetterCpitalze(props.row.name) }} </span>
+                {{ firstLetterCpitalze(props.row.name) }}
               </q-td>
 
               <q-td key="location" :props="props">
-                <q-input
-                  v-if="editingRowIndex === props.rowIndex"
-                  v-model="editLocation"
-                  placeholder="Name required"
-                  dense
-                  outlined
-                  color="green"
-                  autofocus
-                />
-                <span v-else>
-                  {{ firstLetterCpitalze(props.row.location) }}
-                </span>
+                {{ firstLetterCpitalze(props.row.location) }}
               </q-td>
 
               <q-td
@@ -157,18 +104,7 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">Name :</div>
                     <div class="col-12">
-                      <q-input
-                        v-if="editingRowIndex === props.rowIndex"
-                        v-model="editName"
-                        placeholder="Name required"
-                        dense
-                        outlined
-                        :color="editName ? 'green' : 'red'"
-                        autofocus
-                      />
-                      <span v-else>
-                        {{ firstLetterCpitalze(props.row.name) }}
-                      </span>
+                      {{ firstLetterCpitalze(props.row.name) }}
                     </div>
                   </div>
                 </q-card-section>
@@ -177,18 +113,7 @@
                   <div class="row q-gutter-y-xs">
                     <div class="col-12 text-weight-medium">Location :</div>
                     <div class="col-12">
-                      <q-input
-                        v-if="editingRowIndex === props.rowIndex"
-                        v-model="editLocation"
-                        placeholder="Name required"
-                        dense
-                        outlined
-                        color="green"
-                        autofocus
-                      />
-                      <span v-else>
-                        {{ firstLetterCpitalze(props.row.location) }}
-                      </span>
+                      {{ firstLetterCpitalze(props.row.location) }}
                     </div>
                   </div>
                 </q-card-section>
@@ -209,47 +134,13 @@
                 </template>
 
                 <q-card-actions align="center" class="q-py-md bg-grey-2">
-                  <q-btn
-                    label="edit"
-                    icon="edit"
-                    size="sm"
-                    color="teal"
-                    v-if="editingRowIndex !== props.rowIndex"
-                    @click="() => editEntry(props.row.id, props.rowIndex)"
-                  >
-                    <q-tooltip>Edit</q-tooltip>
-                  </q-btn>
+                  <q-btn label="edit" icon="edit" size="sm" color="teal" />
 
                   <q-btn
-                    v-if="editingRowIndex !== props.rowIndex"
-                    :label="props.row.inactive ? 'activate' : 'deactivate'"
+                    :label="`${props.row.inactive ? '' : 'De-'}Activate`"
                     size="sm"
                     color="red"
-                    @click="
-                      () => changeActive(props.row.id, props.row.inactive)
-                    "
-                  >
-                  </q-btn>
-                  <q-btn
-                    label="save"
-                    icon="save"
-                    size="sm"
-                    color="teal"
-                    v-if="editingRowIndex === props.rowIndex"
-                    @click="saveEdited"
-                  >
-                    <q-tooltip>Save</q-tooltip>
-                  </q-btn>
-                  <q-btn
-                    label="close"
-                    icon="close"
-                    size="sm"
-                    color="red"
-                    v-if="editingRowIndex === props.rowIndex"
-                    @click="(isEditing = false), (editingRowIndex = null)"
-                  >
-                    <q-tooltip>Cancel</q-tooltip>
-                  </q-btn>
+                  />
                 </q-card-actions>
               </q-card>
             </div>
