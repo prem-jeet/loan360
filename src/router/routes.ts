@@ -80,6 +80,13 @@ const routes: RouteRecordRaw[] = [
             component: () =>
               import('pages/settings/accounts/InterestDepositGenerate.vue'),
           },
+
+          {
+            path: 'customerMaster/station',
+            name: 'station',
+            component: () =>
+              import('pages/maintenance/customerMaster/Station.vue'),
+          },
           {
             path: 'leadMaster',
             children: [
