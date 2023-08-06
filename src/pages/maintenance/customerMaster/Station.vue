@@ -21,24 +21,34 @@
           card-container-class="q-gutter-y-md q-mt-xs"
         >
           <template v-slot:top>
-            <div class="row q-gutter-y-lg q-pb-xs-md">
-              <div class="col-12">
-                <div class="row items-center q-gutter-md">
-                  <div class="col-auto text-h6">Station</div>
+            <div
+              class="row full-width items-center q-gutter-x-md q-gutter-y-sm"
+            >
+              <div class="col-auto">
+                <span class="text-h6">Stage Reason</span>
+              </div>
+              <div class="col-auto">
+                <div class="col-auto">
+                  <q-btn
+                    color="blue-7"
+                    icon="add"
+                    label="Add new"
+                    size="md"
+                    class="full-width"
+                  />
                 </div>
               </div>
             </div>
 
-            <div class="row full-width q-mt-sm">
-              <div class="col-xs-12 col-sm-3 col-md-3">
+            <div class="row full-width q-mt-md q-mb-md items-center">
+              <div class="col-12 col-sm-8 col-md-4">
                 <q-input
-                  v-model="nameSearchQuery"
+                  v-model="filter.name"
                   outlined
                   clearable
                   dense
                   rounded
-                  placeholder="search name"
-                  @clear="nameSearchQuery = ''"
+                  placeholder="Search Name"
                 >
                   <template v-slot:prepend>
                     <q-icon name="search" />
@@ -46,12 +56,10 @@
                 </q-input>
               </div>
 
-              <div class="col-xs-12 col-sm-2 col-md-3">
-                <q-checkbox
-                  v-model="checkBox"
-                  label=" In-Active"
-                  @click="(editingRowIndex = null), (isEditing = false)"
-                />
+              <div class="col-12 q-mt-sm q-mt-sm-none col-sm-auto q-ml-md-md">
+                <div class="flex justify-end">
+                  <q-checkbox v-model="filter.inActive" label=" In-Active" />
+                </div>
               </div>
             </div>
           </template>
@@ -154,7 +162,7 @@
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed, watch, reactive } from 'vue';
 import { onSuccess, confirmDialog, onFailure } from 'src/utils/notification';
 import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
@@ -232,6 +240,11 @@ const columns: {
   },
 ];
 
+interface Filter {
+  name: string | null;
+  inActive: boolean;
+}
+const filter = reactive<Filter>({ inActive: false, name: null });
 const $q = useQuasar();
 const fetchingData = ref(false);
 const name = ref('');
