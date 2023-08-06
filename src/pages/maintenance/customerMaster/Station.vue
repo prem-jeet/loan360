@@ -92,6 +92,7 @@
                     size="xs"
                     outline
                     color="red"
+                    @click="() => toggleActiveState(props.row)"
                   />
                 </q-btn-group>
               </q-td>
@@ -168,6 +169,7 @@
                     :label="`${props.row.inactive ? '' : 'De-'}Activate`"
                     size="sm"
                     color="red"
+                    @click="() => toggleActiveState(props.row)"
                   />
                 </q-card-actions>
               </q-card>
@@ -260,7 +262,7 @@ import { useQuasar } from 'quasar';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
 import { TableColumn } from 'src/types/Common';
 import { useFetch, usePost, usePut } from 'src/composables/apiCalls';
-import { alertDialog } from 'src/utils/notification';
+import { alertDialog, asyncConfirmDialog } from 'src/utils/notification';
 
 interface Stations {
   id: number;
@@ -427,6 +429,24 @@ const handleFormsubmit = async () => {
             station.id === editingRow.id ? newStation : station
           );
       isStationFormActive.value = false;
+    }
+  }
+};
+
+const toggleActiveState = async (row: Stations) => {
+  const msg = `Are you sure you want to ${row.inactive ? '' : 'De-'}Activate?`;
+  const confirmed = await asyncConfirmDialog({ msg });
+
+  if (confirmed) {
+    const state = row.inactive ? 'active' : 'inactive';
+    const rsp = await usePut('/station/' + state, {
+      id: row.id,
+    });
+    if (rsp) {
+      row.inactive = !row.inactive;
+      if (row.inactive) {
+        row.inactiveOn = new Date().toISOString();
+      }
     }
   }
 };
