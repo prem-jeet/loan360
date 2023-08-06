@@ -1,8 +1,6 @@
 <template>
   <div class="absolute q-pa-md full-width full-height bg-gre-4">
-    <q-chip outline square size="md" class="shadow-4" :ripple="false">
-      <BreadCrumbs :ordered-paths="breadcrumbs" />
-    </q-chip>
+    <BreadCrumbs :ordered-paths="breadcrumbs" />
 
     <div class="row q-mt-lg q-pb-xl">
       <div class="col">
@@ -101,7 +99,7 @@
                 :props="props"
                 v-for="key in ['name', 'location']"
               >
-                {{ props.row[key] && firstLetterCpitalze(props.row[key]) }}
+                {{ props.row[key] && capitalCase(props.row[key]) }}
               </q-td>
 
               <q-td
@@ -246,14 +244,14 @@
 </template>
 
 <script setup lang="ts">
-import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { ref, onMounted, computed, reactive } from 'vue';
-import { formatDate } from 'src/utils/date';
+import type { TableColumn } from 'src/types/Common';
 import { useQuasar } from 'quasar';
-import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
-import { TableColumn } from 'src/types/Common';
+import { ref, onMounted, computed, reactive } from 'vue';
 import { useFetch, usePost, usePut } from 'src/composables/apiCalls';
+import { formatDate } from 'src/utils/date';
+import { capitalCase } from 'src/utils/string';
 import { alertDialog, asyncConfirmDialog } from 'src/utils/notification';
+import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
@@ -329,20 +327,21 @@ interface Form {
   name: string | null;
   location: string | null;
 }
+
+const dateFormat = 'DD/MM/YYYY @hh:mmA';
+const $q = useQuasar();
+
+const fetchingData = ref(false);
+const isStationFormActive = ref(false);
+
+const stations = ref<Station[]>([]);
 const stationFormData = ref<Form>({
   name: null,
   location: null,
 });
-
-const filter = reactive<Filter>({ inActive: false, name: null });
-const $q = useQuasar();
-const fetchingData = ref(false);
-
-const stations = ref<Station[]>([]);
 const editingRowId = ref<number | null>(null);
 
-const dateFormat = 'DD/MM/YYYY @hh:mmA';
-const isStationFormActive = ref(false);
+const filter = reactive<Filter>({ inActive: false, name: null });
 
 const filteresStations = computed(() => {
   const filteredArray = stations.value.filter((station) => {
