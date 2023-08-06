@@ -96,14 +96,12 @@
                   />
                 </q-btn-group>
               </q-td>
-              <q-td key="name" :props="props">
-                {{ props.row.name && firstLetterCpitalze(props.row.name) }}
-              </q-td>
-
-              <q-td key="location" :props="props">
-                {{
-                  props.row.location && firstLetterCpitalze(props.row.location)
-                }}
+              <q-td
+                :key="key"
+                :props="props"
+                v-for="key in ['name', 'location']"
+              >
+                {{ props.row[key] && firstLetterCpitalze(props.row[key]) }}
               </q-td>
 
               <q-td
@@ -120,40 +118,33 @@
           <template v-slot:item="props">
             <div class="col-xs-12 col-sm-6 q-px-sm-sm">
               <q-card>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Name :</div>
-                    <div class="col-12">
-                      {{ firstLetterCpitalze(props.row.name) }}
+                <template v-for="key in ['name', 'location']" :key="key">
+                  <q-card-section class="q-pb-none" v-if="props.row[key]">
+                    <div class="text-weight-medium">
+                      {{ props.colsMap[key].label }}
                     </div>
-                  </div>
-                </q-card-section>
+                    <div>{{ capitalCase(props.row[key]) }}</div>
+                  </q-card-section>
+                </template>
 
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Location :</div>
-                    <div class="col-12">
-                      {{ firstLetterCpitalze(props.row.location) }}
-                    </div>
-                  </div>
-                </q-card-section>
                 <template
                   v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
                   :key="key"
                 >
-                  <q-card-section v-if="props.row[key]">
-                    <div class="row q-gutter-y-xs">
-                      <div class="col-12 text-weight-medium">
-                        {{ capitalCase(key.split('On').join(' on')) }} :
-                      </div>
-                      <div class="col-12">
-                        {{ formatDate(props.row[key], dateFormat) }}
-                      </div>
+                  <q-card-section v-if="props.row[key]" class="q-pb-none">
+                    <div class="text-weight-medium">
+                      {{ props.colsMap[key].label }}
+                    </div>
+                    <div>
+                      {{ formatDate(props.row[key], dateFormat) }}
                     </div>
                   </q-card-section>
                 </template>
 
-                <q-card-actions align="center" class="q-py-md bg-grey-2">
+                <q-card-actions
+                  align="center"
+                  class="q-py-md bg-grey-2 q-mt-md"
+                >
                   <q-btn
                     label="edit"
                     icon="edit"
@@ -256,7 +247,7 @@
 
 <script setup lang="ts">
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
-import { ref, onMounted, computed, watch, reactive } from 'vue';
+import { ref, onMounted, computed, reactive } from 'vue';
 import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
