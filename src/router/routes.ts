@@ -8,7 +8,6 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'login',
-
     component: () => import('pages/Login.vue'),
     children: [
       {
@@ -21,11 +20,13 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/moduleselector',
     component: () => import('layouts/MainLayout.vue'),
+    meta: { requiresAuth: true },
     children: [
       {
         path: '',
         name: 'moduleSelector',
         component: () => import('pages/ModuleSelector.vue'),
+        meta: { requiresAuth: true },
       },
     ],
   },
@@ -33,12 +34,14 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/module',
     component: () => import('layouts/MainLayout.vue'),
+    meta: { requiresAuth: true },
     children: [
       {
         path: ':module',
         name: 'module',
         component: () => import('pages/Module.vue'),
         props: ({ params }) => ({ module: params.module }),
+        meta: { requiresAuth: true },
         beforeEnter: (to) => {
           const module = to.params.module as string;
           const availableModules = [
@@ -66,6 +69,12 @@ const routes: RouteRecordRaw[] = [
             component: () => import('pages/settings/accounts/NatureEntry.vue'),
           },
           {
+            path: 'accountCodeDeposit',
+            name: 'accountCodeDeposit',
+            component: () =>
+              import('pages/settings/accounts//AccountCodeDeposit.vue'),
+          },
+          {
             path: 'interestDepositGenerate',
             name: 'interestDepositGenerate',
             component: () =>
@@ -78,11 +87,155 @@ const routes: RouteRecordRaw[] = [
             component: () =>
               import('pages/maintenance/customerMaster/station.vue'),
           },
+          {
+            path: 'leadMaster',
+            children: [
+              {
+                path: 'source',
+                name: 'source',
+
+                component: () =>
+                  import('pages/maintenance/leadMasters/Source.vue'),
+              },
+              {
+                path: 'status',
+                name: 'status',
+                component: () =>
+                  import('pages/maintenance/leadMasters/Status.vue'),
+              },
+              {
+                path: 'asset',
+                name: 'asset',
+                component: () =>
+                  import('pages/maintenance/leadMasters/Asset.vue'),
+              },
+            ],
+          },
+          {
+            path: 'loanMaster',
+            children: [
+              {
+                path: 'goldItem',
+                name: 'goldItem',
+                component: () =>
+                  import('pages/maintenance/loanMaster/goldLoan/GoldItems.vue'),
+              },
+              {
+                path: 'goldItem',
+                name: 'goldItem',
+                component: () =>
+                  import('pages/maintenance/loanMaster/goldLoan/GoldItems.vue'),
+              },
+              {
+                path: 'loanGroup',
+                name: 'loanGroup',
+                component: () =>
+                  import('pages/maintenance/loanMaster/LoanGroup.vue'),
+              },
+              {
+                path: 'goldDeduction',
+                name: 'goldDeduction',
+                component: () =>
+                  import(
+                    'pages/maintenance/loanMaster/goldLoan/GoldDeductions.vue'
+                  ),
+              },
+              {
+                path: 'goldRate',
+                name: 'goldRate',
+                component: () =>
+                  import('pages/maintenance/loanMaster/goldLoan/GoldRate.vue'),
+              },
+              {
+                path: 'advertisementMedia',
+                name: 'advertisementMedia',
+                component: () =>
+                  import('pages/maintenance/loanMaster/AdvertisementMedia.vue'),
+              },
+              {
+                path: 'bouncedReason',
+                name: 'bouncedReason',
+                component: () =>
+                  import('pages/maintenance/loanMaster/BouncedReason.vue'),
+              },
+              {
+                path: 'stageReason',
+                name: 'stageReason',
+                component: () =>
+                  import('pages/maintenance/loanMaster/StageReason.vue'),
+              },
+              {
+                path: 'creditRecommendation',
+                name: 'creditRecommendation',
+                component: () =>
+                  import(
+                    'pages/maintenance/loanMaster/CreditRecommendation.vue'
+                  ),
+              },
+              {
+                path: 'advertisement',
+                name: 'advertisement',
+                component: () =>
+                  import('pages/maintenance/loanMaster/Advertisement.vue'),
+              },
+              {
+                path: 'bureauScoreRate',
+                name: 'bureauScoreRate',
+                component: () =>
+                  import('pages/maintenance/loanMaster/BureauScore.vue'),
+              },
+            ],
+          },
+          {
+            path: 'customerMaster',
+            children: [
+              {
+                path: 'namePrefix',
+                name: 'namePrefix',
+                component: () =>
+                  import('pages/maintenance/customerMaster/NamePrefix.vue'),
+              },
+              {
+                path: 'nameSuffix',
+                name: 'nameSuffix',
+                component: () =>
+                  import('pages/maintenance/customerMaster/NameSuffix.vue'),
+              },
+              {
+                path: 'relation',
+                name: 'relation',
+                component: () =>
+                  import('pages/maintenance/customerMaster/Relations.vue'),
+              },
+              {
+                path: 'customerCategory',
+                name: 'customerCategory',
+                component: () =>
+                  import(
+                    'pages/maintenance/customerMaster/CustomerCategory.vue'
+                  ),
+              },
+              {
+                path: 'stopGuaranteeReason',
+                name: 'stopGuaranteeReason',
+                component: () =>
+                  import(
+                    'pages/maintenance/customerMaster/StopGuaranteeReason.vue'
+                  ),
+              },
+            ],
+          },
 
           {
-            path: 'leadMaster/source',
-            name: 'source',
-            component: () => import('pages/maintenance/leadMasters/Source.vue'),
+            path: 'accounts',
+            children: [
+              {
+                path: 'accountHead',
+                name: 'accountHead',
+                component: () =>
+                  import('pages/maintenance/accountMasters/AccountHead.vue'),
+              },
+            ],
           },
         ],
       },

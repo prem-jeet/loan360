@@ -10,8 +10,10 @@
     menu-shrink
     popup-content-style="height: 300px"
     options-dense
+    :behavior="popupType || 'menu'"
     :emit-value="returnValue"
     :map-options="returnValue"
+    hide-bottom-space
   >
     <template v-slot:before-options>
       <q-item>
@@ -103,11 +105,12 @@ import { ref, watch, computed } from 'vue';
 type Option = { label: string; value: string };
 interface Props {
   options: Option[];
-  modelValue: Option[];
+  modelValue: string[] | Option[];
   label: string;
   maxChips: number;
   chipKey: string;
   returnValue?: boolean;
+  popupType?: 'menu' | 'dialog';
 }
 
 const props = defineProps<Props>();
