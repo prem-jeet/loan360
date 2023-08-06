@@ -255,16 +255,6 @@ import { TableColumn } from 'src/types/Common';
 import { useFetch, usePost, usePut } from 'src/composables/apiCalls';
 import { alertDialog, asyncConfirmDialog } from 'src/utils/notification';
 
-interface Stations {
-  id: number;
-  name: string;
-  location: string | null;
-  inactive: boolean;
-  createdOn: string | null;
-  inactiveOn: string | null;
-  updatedOn: string | null;
-}
-
 const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
   {
@@ -321,6 +311,16 @@ const columns: TableColumn[] = [
   },
 ];
 
+interface Station {
+  id: number;
+  name: string;
+  location: string | null;
+  inactive: boolean;
+  createdOn: string | null;
+  inactiveOn: string | null;
+  updatedOn: string | null;
+}
+
 interface Filter {
   name: string | null;
   inActive: boolean;
@@ -338,7 +338,7 @@ const filter = reactive<Filter>({ inActive: false, name: null });
 const $q = useQuasar();
 const fetchingData = ref(false);
 
-const stations = ref<Stations[]>([]);
+const stations = ref<Station[]>([]);
 const editingRowId = ref<number | null>(null);
 
 const dateFormat = 'DD/MM/YYYY @hh:mmA';
@@ -396,7 +396,7 @@ const handleFormsubmit = async () => {
 
   const currentDataStr = new Date().toISOString();
 
-  const payload: Partial<Stations> = {
+  const payload: Partial<Station> = {
     name: stationFormData.value.name!,
     location: stationFormData.value.location,
   };
@@ -417,7 +417,7 @@ const handleFormsubmit = async () => {
   }
   {
     if (rsp) {
-      const newStation: Stations = {
+      const newStation: Station = {
         id: editingRow ? editingRow.id : rsp.id!,
         name: payload.name!,
         location: payload.location!,
@@ -436,7 +436,7 @@ const handleFormsubmit = async () => {
   }
 };
 
-const toggleActiveState = async (row: Stations) => {
+const toggleActiveState = async (row: Station) => {
   const msg = `Are you sure you want to ${row.inactive ? '' : 'De-'}Activate?`;
   const confirmed = await asyncConfirmDialog({ msg });
 
@@ -459,7 +459,7 @@ const fetchStation = async () => {
   const rsp = await useFetch('station');
 
   if (rsp) {
-    stations.value = rsp as Stations[];
+    stations.value = rsp as Station[];
   }
   fetchingData.value = false;
 };
