@@ -156,11 +156,78 @@
         </q-table>
       </div>
     </div>
+
+    <q-dialog v-model="isStationFormActive" @before-hide="editingRowId = null">
+      <!-- @before-show="setInitialFormData" -->
+      <q-card :style="{ minWidth: 'calc(250px + 20vw)' }" class="column">
+        <q-card-section class="row items-center q-pb-none">
+          <div class="text-h6">
+            {{ `${editingRowId ? 'Edit' : 'New'} Station` }}
+          </div>
+          <q-space />
+          <q-btn
+            @click="isStationFormActive = false"
+            icon="close"
+            flat
+            round
+            dense
+            v-close-popup
+          />
+        </q-card-section>
+        <q-form class="col-grow column">
+          <!-- @submit.prevent="handleFormsubmit"
+        @reset="setInitialFormData" -->
+          <q-card-section
+            class="q-pa-md col-grow column justify-evenly"
+            :style="{ minHeight: '40vh' }"
+          >
+            <q-input
+              v-model="stationFormData.name"
+              outlined
+              no-error-icon
+              :rules="[(val) => !!val]"
+              :error="!stationFormData.name"
+              hide-bottom-space
+              label="Reason"
+              @update:model-value="
+                (val) => {
+                  if (val && typeof val === 'string') {
+                    stationFormData.name = capitalCase(val);
+                  }
+                }
+              "
+            />
+            <q-input
+              v-model="stationFormData.location"
+              outlined
+              no-error-icon
+              hide-bottom-space
+              label="Location"
+              @update:model-value="
+                (val) => {
+                  if (val && typeof val === 'string') {
+                    stationFormData.location = capitalCase(val);
+                  }
+                }
+              "
+            />
+          </q-card-section>
+          <q-card-actions align="center" class="q-py-md bg-grey-2">
+            <q-btn
+              color="teal"
+              type="submit"
+              :label="editingRowId === null ? 'Add' : 'Save '"
+              :icon="editingRowId === null ? 'add' : 'save '"
+            />
+            <q-btn label="Reset" color="red-5" type="reset" icon="refresh" />
+          </q-card-actions>
+        </q-form>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { api } from 'src/boot/axios';
 import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, watch, reactive } from 'vue';
 import { formatDate } from 'src/utils/date';
@@ -239,6 +306,15 @@ interface Filter {
   name: string | null;
   inActive: boolean;
 }
+interface Form {
+  name: string | null;
+  location: string | null;
+}
+const stationFormData = ref<Form>({
+  name: null,
+  location: null,
+});
+
 const filter = reactive<Filter>({ inActive: false, name: null });
 const $q = useQuasar();
 const fetchingData = ref(false);
@@ -251,7 +327,7 @@ const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
 
 const dateFormat = 'DD/MM/YYYY @hh:mmA';
-
+const isStationFormActive = ref(true);
 const filteredData = computed(() =>
   stations.value.filter(
     (item) =>
