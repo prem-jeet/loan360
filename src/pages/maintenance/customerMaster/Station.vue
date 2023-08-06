@@ -258,6 +258,7 @@ import { useQuasar } from 'quasar';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
 import { TableColumn } from 'src/types/Common';
 import { useFetch } from 'src/composables/apiCalls';
+import { alertDialog } from 'src/utils/notification';
 
 interface Stations {
   id: number;
@@ -371,8 +372,20 @@ const initialFormData = computed(() => {
 const setInitialFormData = () =>
   (stationFormData.value = { ...initialFormData.value });
 
+const isStationNameDuplicate = (name: string) => {
+  const matchedStation = stations.value.find(
+    (station) => station.name.toLowerCase() === name.toLowerCase()
+  );
+  return matchedStation && editingRowId.value
+    ? matchedStation?.id !== editingRowId.value
+    : !!matchedStation;
+};
+
 const handleFormsubmit = () => {
-  console.log('form submit');
+  if (isStationNameDuplicate(stationFormData.value.name!)) {
+    alertDialog('Duplicate Station Name');
+    return;
+  }
 };
 
 /* const setFormData = () => {
