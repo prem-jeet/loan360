@@ -167,6 +167,7 @@ import { formatDate } from 'src/utils/date';
 import { useQuasar } from 'quasar';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
 import { TableColumn } from 'src/types/Common';
+import { useFetch } from 'src/composables/apiCalls';
 
 interface Stations {
   id: number;
@@ -367,10 +368,10 @@ const changeActiveConfirm = async (id: number, state: boolean) => {
 
 const fetchStation = async () => {
   fetchingData.value = true;
-  const rsp = await api.get('station');
+  const rsp = await useFetch('station');
 
-  if (rsp.data) {
-    stations.value = rsp.data;
+  if (rsp) {
+    stations.value = rsp as Stations[];
   }
   fetchingData.value = false;
 };
