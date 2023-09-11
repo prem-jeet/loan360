@@ -12,15 +12,6 @@
           :scroll-offset="100"
           :offset="[15, 15]"
         >
-          <q-btn
-            fab
-            icon="keyboard_arrow_up"
-            color="blue-5"
-            class="light-dimmed"
-            @click="goToTop"
-            unelevated
-            :ripple="false"
-          />
         </q-page-scroller>
       </q-page>
     </q-page-container>
@@ -41,8 +32,6 @@ import { useUserStore } from 'src/stores/user/userStore';
 import CompanyAndBranchSelectorModal from 'src/components/modals/CompanyAndBranchSelectorModal.vue';
 
 const userStore = useUserStore();
-
-const goToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
 const drawerLeft = ref(false);
 const menuStore = useMenuStore();
