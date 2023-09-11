@@ -23,10 +23,19 @@ $positive: #21ba45;
 $negative: #c10015;
 $info: #31ccec;
 $warning: #f2c037;
-$indigo: #303f9f;
-$brand-header: #0f4c75;
-$brand-sub-header: #1b262c;
-$brand-button: #0f4c75;
-$brand-footer: #9ed4f9;
-$brand-disabled: #0000001f;
-$brand-reset: #df293f;
+
+:root {
+  // size
+  --c-font-size: calc(12px + 0.5vw);
+
+  // --m-page-header-text-size: calc(var(--m-font-size) * 1.5);
+
+  // --m-filter-card-header-text-size: calc(var(--m-page-header-text-size) / 1.3);
+  // --m-filter-card-input-text-size: calc(var(--m-font-size) * 0.9);
+
+  // --m-table-header-text-size: calc(var(--m-font-size) * 0.9);
+  // --m-table-row-text-size: calc(var(--m-font-size) * 0.8);
+
+  // // default colors
+  // --m-primary: #dcf1fb;
+}

@@ -1,124 +1,54 @@
 <template>
-  <q-toolbar class="brand-header inline row glossy">
-    <q-btn
-      flat
-      @click="openMenu"
-      round
-      dense
-      icon="menu"
-      class=""
-      v-if="route.name !== 'moduleSelector'"
-    />
-    <q-separator
-      v-if="route.name !== 'moduleSelector'"
-      class="q-mr-sm q-ml-xs"
-      color="grey"
-      inset
-      vertical
-    />
-    <q-img :src="logo" style="height: 37px; width: 50px" class="q-ml-xs" />
-    <q-toolbar-title class="q-mt-sm">
-      <router-link
-        :to="{ name: 'moduleSelector' }"
-        :style="{ textDecoration: 'none' }"
-      >
-        <p
-          class="text-h6 text-h6-xs q-mt-sm-sm q-mt-xs-md row text-white text-weight-medium"
-        >
-          <span class="col col-shrink"> Jaguar 360° </span>
-          <span class="col col-shrink"> &nbsp;Cloud </span>
-        </p>
-      </router-link>
-    </q-toolbar-title>
+  <div class="flex flex-center">
     <div
-      class="row inline q-mr-sm gt-xs transparent"
-      v-for="(item, index) in buttonOptions"
-      :key="index"
+      class="q-my-sm text-black flex items-center q-px-lg q-py-md"
+      style="width: 80vw; border-radius: 5px"
+      navbar
     >
-      <q-btn
-        text-color="white"
-        :icon="item.icon"
-        class="q-mx-xs"
-        padding="4px"
-        size="10px"
-        flat
-      >
-        <q-badge
-          v-if="false"
-          color="red-2"
-          rounded
-          size="xs"
-          class="text-weight-bold"
-          text-color="red-10"
-          style="font-size: 8px"
-          floating
-          >22
-        </q-badge>
-      </q-btn>
-    </div>
-    <q-separator
-      v-if="$q.screen.width > 600"
-      inset
-      vertical
-      class="q-mr-sm q-ml-xs"
-      color="grey"
-    />
-    <RightMenuDropDown />
-  </q-toolbar>
-  <div class="example-row-variable-width bg-white shadow-0">
-    <div
-      class="row"
-      :class="$q.screen.width > 600 ? 'justify-end' : 'justify-center'"
-    >
-      <div class="brand-sub-header flex rounded-borders">
-        <q-separator dark vertical />
-        <q-btn-dropdown
-          push
-          glossy
-          no-caps
-          stretch
+      <div class="flex items-center" style="gap: 20px">
+        <q-btn
           flat
-          @click="openCompanyModal()"
-          class="fluid q-px-xs-xs q-px-sm-sm q-ml-sm"
-          :label="
-            $q.screen.width > 600
-              ? userStore.selectedCompany.name
-              : userStore.selectedCompany.name.slice(0, 12)
-          "
-          icon="business"
+          round
+          unelevated
+          :ripple="false"
+          @click="openMenu"
+          icon="menu_open"
+          size="22px"
+          v-if="route.name !== 'moduleSelector'"
         />
-        <q-separator dark vertical />
-        <q-btn-dropdown
-          push
-          glossy
-          no-caps
-          stretch
-          @click="openCompanyModal()"
-          class="fluid q-px-xs-xs q-px-sm-sm"
-          flat
-          icon="burst_mode"
-          :label="
-            $q.screen.width > 600
-              ? userStore.selectedBranch.name
-              : userStore.selectedBranch.name.slice(0, 5)
-          "
-        />
-        <q-separator dark vertical />
-        <q-btn-dropdown
-          push
-          glossy
-          no-caps
-          flat
-          @click="openCompanyModal()"
-          class="fluid q-px-xs-xs q-px-sm-sm q-mr-sm"
-          icon="edit_calendar"
-          :label="
-            $q.screen.width > 600
-              ? userStore.selectedFinancialYear.name
-              : `${fromDate} - ${toDate}`
-          "
-        />
-        <q-separator dark vertical />
+
+        <div class="flex itens-center">
+          <div navbar-logo class="flex flex-center">
+            <q-img :src="logo" fit="cover" />
+          </div>
+
+          <router-link
+            :to="{ name: 'moduleSelector' }"
+            :style="{ textDecoration: 'none' }"
+            class="flex flex-center q-ml-md"
+          >
+            <span navbar-title class="text-weight-medium">
+              Jaguar 360° Cloud
+            </span>
+          </router-link>
+        </div>
+      </div>
+
+      <div class="flex items-center q-ml-auto">
+        <div>
+          <q-btn
+            class="row inline q-mr-sm gt-xs transparent"
+            v-for="(item, index) in buttonOptions"
+            :key="index"
+            text-color="white"
+            :icon="item.icon"
+            padding="4px"
+            size="10px"
+            flat
+          />
+        </div>
+
+        <RightMenuDropDown />
       </div>
     </div>
   </div>
@@ -127,18 +57,14 @@
 import RightMenuDropDown from 'src/components/RightMenuDropDown/RightMenuDropDown.vue';
 import logo from 'src/assets/img/JaguarWhite.png';
 import { useRoute } from 'vue-router';
-import { useUserStore } from 'src/stores/user/userStore';
-import { formatDate } from 'src/utils/date';
-import { useQuasar } from 'quasar';
 
-const $q = useQuasar();
-const userStore = useUserStore();
+import { useScreenSize } from 'src/composables/utilComposibles';
+import { watch } from 'vue';
 
 const emits = defineEmits(['openMenu']);
 const route = useRoute();
 const openMenu = () => emits('openMenu');
-const fromDate = formatDate(userStore.selectedFinancialYear.fromDate, 'YY');
-const toDate = formatDate(userStore.selectedFinancialYear.toDate, 'YY');
+
 const buttonOptions = [
   {
     icon: 'email',
@@ -157,7 +83,29 @@ const buttonOptions = [
     label: 'newspaper News',
   },
 ];
-const openCompanyModal = () => {
-  userStore.openCompanySelectModal(true);
-};
+
+const { screenWidth } = useScreenSize();
+watch(screenWidth, () => console.log(screenWidth.value), { immediate: true });
 </script>
+<style lang="scss">
+[navbar] {
+  background: rgba(112, 214, 255, 0.45);
+  -webkit-backdrop-filter: blur(11px);
+  backdrop-filter: blur(11px);
+  border: 1px solid rgba(112, 214, 255, 0.225);
+  box-shadow: 0px 2px 10px -2px #5a5a5a;
+}
+[navbar-logo] {
+  width: 70px;
+  aspect-ratio: 1;
+  background: #000;
+  padding: 7px;
+  border-radius: 100%;
+  background: #000;
+}
+[navbar-title] {
+  font-size: calc(var(--c-font-size) * 1.7);
+  color: $deep-purple-10;
+  letter-spacing: 1px;
+}
+</style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md q-gutter-y-lg fit">
+  <div class="q-pa-md q-gutter-y-lg fitm" left-drawer>
     <q-input v-model="filter" label="Filter" standout="bg-blue-grey text-white">
       <template v-slot:append>
         <q-icon
@@ -30,11 +30,11 @@
       >
         <template v-slot:default-header="prop">
           <div
-            class="row items-center q-gutter-x-sm cursor-pointer"
+            class="flex items-center q-gutter-x-sm cursor-pointer"
             @click="() => menuItemClickHandler(prop.node.data)"
           >
             <q-icon :name="prop.node.icon" />
-            <span>{{ prop.node.name }}</span>
+            <span class="q-ml-md">{{ prop.node.name }}</span>
           </div>
         </template>
       </q-tree>
@@ -143,4 +143,8 @@ watch(treeFilter, () => {
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+[left-drawer] {
+  font-size: calc(var(--c-font-size) * 0.85);
+}
+</style>
