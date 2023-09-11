@@ -3,9 +3,7 @@
     <q-header>
       <NavBar @openMenu="openMenu" />
     </q-header>
-    <q-footer elevated>
-      <footerMenu />
-    </q-footer>
+
     <q-page-container>
       <q-page>
         <RouterView @openMenu="openMenu"></RouterView>
@@ -36,7 +34,6 @@
 </template>
 <script setup lang="ts">
 import NavBar from 'src/components/ui/header/NavBar.vue';
-import footerMenu from 'src/components/ui/footer/footerMenu.vue';
 import LeftMenu from 'src/components/LeftMenu.vue';
 import { ref, onBeforeMount, computed } from 'vue';
 import { useMenuStore } from 'src/stores/menu/menuStore';
