@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md q-gutter-y-lg fitm" left-drawer>
+  <div class="q-pa-md q-gutter-y-lg fit" left-drawer>
     <q-input v-model="filter" label="Filter" standout="bg-blue-grey text-white">
       <template v-slot:append>
         <q-icon
