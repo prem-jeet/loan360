@@ -223,6 +223,12 @@ const routes: RouteRecordRaw[] = [
                     'pages/maintenance/customerMaster/StopGuaranteeReason.vue'
                   ),
               },
+              {
+                path: 'country',
+                name: 'country',
+                component: () =>
+                  import('pages/maintenance/customerMaster/Country.vue'),
+              },
             ],
           },
 
