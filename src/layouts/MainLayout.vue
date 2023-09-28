@@ -40,7 +40,7 @@
 <script setup lang="ts">
 import NavBar from 'src/components/ui/header/NavBar.vue';
 import LeftMenu from 'src/components/LeftMenu.vue';
-import { ref, onBeforeMount, computed } from 'vue';
+import { watch, ref, onBeforeMount, computed } from 'vue';
 import { useMenuStore } from 'src/stores/menu/menuStore';
 import { useUserStore } from 'src/stores/user/userStore';
 import CompanyAndBranchSelectorModal from 'src/components/modals/CompanyAndBranchSelectorModal.vue';
@@ -49,11 +49,12 @@ const userStore = useUserStore();
 
 const drawerLeft = ref(false);
 const menuStore = useMenuStore();
+const hideHeader = ref(false);
 
 const openMenu = () => {
   drawerLeft.value = !drawerLeft.value;
 };
-const hideHeader = ref(false);
+
 const isCompanyAndBranchSelectorModalActive = computed(
   () => userStore.companyModal
 );
@@ -82,6 +83,15 @@ const toggleHeaderVisibility = (position: number) => {
     hideHeader.value = false;
   }
 };
+
+watch(drawerLeft, () => {
+  const element = document.querySelector('#q-app');
+  if (drawerLeft.value) {
+    element?.classList.add('no-scroll');
+  } else {
+    element?.classList.remove('no-scroll');
+  }
+});
 </script>
 <style>
 [drawer-overlay] {

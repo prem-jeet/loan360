@@ -29,10 +29,19 @@
         class="q-pb-md"
       >
         <template v-slot:default-header="prop">
-          <div
-            class="flex items-center q-gutter-x-sm cursor-pointer"
-            @click="() => menuItemClickHandler(prop.node.data)"
+          <RouterLink
+            :to="`${route.path}${prop.node.data.url}`"
+            v-if="prop.node.data.url"
+            class="text-black"
+            :style="{ 'text-decoration': 'none !important' }"
           >
+            <!-- @click="() => menuItemClickHandler(prop.node.data)" -->
+            <div class="flex items-center q-gutter-x-sm cursor-pointer">
+              <q-icon :name="prop.node.icon" />
+              <span class="q-ml-md">{{ prop.node.name }}</span>
+            </div>
+          </RouterLink>
+          <div v-else class="flex items-center q-gutter-x-sm cursor-pointer">
             <q-icon :name="prop.node.icon" />
             <span class="q-ml-md">{{ prop.node.name }}</span>
           </div>
@@ -144,6 +153,9 @@ watch(treeFilter, () => {
 </script>
 
 <style scoped>
+.no-scroll {
+  overflow: hidden !important;
+}
 [left-drawer] {
   font-size: calc(var(--c-font-size) * 0.85);
 }
