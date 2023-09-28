@@ -35,7 +35,6 @@
             class="text-black"
             :style="{ 'text-decoration': 'none !important' }"
           >
-            <!-- @click="() => menuItemClickHandler(prop.node.data)" -->
             <div class="flex items-center q-gutter-x-sm cursor-pointer">
               <q-icon :name="prop.node.icon" />
               <span class="q-ml-md">{{ prop.node.name }}</span>
@@ -56,7 +55,7 @@ import { useMenuStore } from 'src/stores/menu/menuStore';
 import { ref, watch } from 'vue';
 import { MenuItem } from 'src/stores/menu/menuStoreTypes';
 import { debounce } from 'quasar';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 
 interface TreeNode {
@@ -116,17 +115,11 @@ const createSubmenu = (parentCode: string): TreeNode[] => {
   return subMenuItems.reduce(reduceFn, []);
 };
 
-const menuItemClickHandler = (menuItem: MenuItem) => {
-  if (menuItem.url) {
-    router.push(`${route.path}${menuItem.url}`);
-  }
-};
-
 let treeStructure = createTreeStructure();
 const filter = ref('');
 const treeFilter = ref('');
 const treeRef = ref(null);
-const router = useRouter();
+
 const route = useRoute();
 
 watch(
