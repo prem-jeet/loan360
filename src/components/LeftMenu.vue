@@ -30,14 +30,16 @@
       >
         <template v-slot:default-header="prop">
           <RouterLink
-            :to="`${route.path}${prop.node.data.url}`"
+            :to="`/module/${route.params.module}${prop.node.data.url}`"
             v-if="prop.node.data.url"
             class="text-black"
             :style="{ 'text-decoration': 'none !important' }"
           >
             <div class="flex items-center q-gutter-x-sm cursor-pointer">
               <q-icon :name="prop.node.icon" />
-              <span class="q-ml-md">{{ prop.node.name }}</span>
+              <span class="q-ml-md">
+                {{ prop.node.name }}
+              </span>
             </div>
           </RouterLink>
           <div v-else class="flex items-center q-gutter-x-sm cursor-pointer">

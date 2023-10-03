@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="lHh lpR lFf" v-scroll="toggleHeaderVisibility">
+  <q-layout view="lHh lpR lFf">
     <q-header
       class="transparent"
       :style="{ transition: 'top 250ms', top: `${hideHeader ? '-12%' : 0}` }"
@@ -7,8 +7,8 @@
       <NavBar @openMenu="openMenu" />
     </q-header>
 
-    <q-page-container page-container bg-page>
-      <q-page>
+    <q-page-container bg-page class="overflow-auto" style="max-height: 100vh">
+      <q-page v-scroll="toggleHeaderVisibility">
         <RouterView @openMenu="openMenu"></RouterView>
       </q-page>
     </q-page-container>
