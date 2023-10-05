@@ -1,7 +1,7 @@
 <template>
-  <div class="flex flex-center">
+  <div v-if="screenWidth > 540" class="flex flex-center">
     <div
-      class="q-my-xs text-black flex items-center q-px-lg q-py-sm"
+      class="q-my-xs q-mb-md text-black flex items-center q-px-lg q-py-sm"
       style="width: 98vw; border-radius: 5px"
       navbar
     >
@@ -14,7 +14,7 @@
           @click="openMenu"
           icon="menu_open"
           size="22px"
-          v-if="route.name !== 'moduleSelector'"
+          v-if="!['moduleSelector', 'module'].includes(route.name as string)"
         />
 
         <div class="flex itens-center">
@@ -39,28 +39,55 @@
       </div>
     </div>
   </div>
+  <div
+    v-else
+    class="fixed-bottom full-width q-pa-md q-px-xl text-black flex justify-between"
+    bottom-navbar
+  >
+    <q-icon
+      class="cursor-pointer"
+      name="menu"
+      size="md"
+      @click="openMenu"
+      v-if="!['moduleSelector', 'module'].includes(route.name as string)"
+    />
+    <router-link
+      to="/"
+      :class="[route.name === 'moduleSelector' ? 'text-blue-10' : 'text-black']"
+    >
+      <q-icon class="cursor-pointer" name="home" size="md" />
+    </router-link>
+    <q-icon class="cursor-pointer" name="notifications" size="md" />
+    <q-icon class="cursor-pointer" name="person" size="md" />
+  </div>
 </template>
 <script setup lang="ts">
 import RightMenuDropDown from 'src/components/RightMenuDropDown/RightMenuDropDown.vue';
 import logo from 'src/assets/img/jaguarlogo.png';
 import { useRoute } from 'vue-router';
+import { computed } from 'vue';
+import { useQuasar } from 'quasar';
 
 const emits = defineEmits(['openMenu']);
 const route = useRoute();
-
+const $q = useQuasar();
+const screenWidth = computed(() => $q.screen.width);
 const openMenu = () => emits('openMenu');
 </script>
 <style lang="scss">
 [navbar] {
-  // background: rgba(112, 214, 255, 0.45);
-  // -webkit-backdrop-filter: blur(11px);
-  // backdrop-filter: blur(11px);
-  // border: 1px solid rgba(112, 214, 255, 0.225);
+  background: rgba(112, 214, 255, 0.45);
+  -webkit-backdrop-filter: blur(11px);
+  backdrop-filter: blur(11px);
+  border: 1px solid rgba(112, 214, 255, 0.225);
   box-shadow: 0px 2px 10px -2px #5a5a5a;
-  background: rgba(148, 216, 255, 0.7);
-  -webkit-backdrop-filter: blur(1px);
-  backdrop-filter: blur(1px);
-  border: 1px solid rgba(84, 192, 255, 0.7);
+}
+[bottom-navbar] {
+  background: rgba(247, 247, 247, 0.7);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(247, 247, 247, 0.35);
+  box-shadow: 0px 2px 10px -2px #5a5a5a;
 }
 [navbar-logo] {
   width: 60px;

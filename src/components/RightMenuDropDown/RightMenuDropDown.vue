@@ -2,8 +2,8 @@
   <div class="q-ml-sm">
     <q-btn
       round
-      color="teal-14"
-      text-color="teal-12"
+      color="grey-5"
+      text-color="blue-grey-10"
       class="text-weight-bold text-h5"
       size="25px"
       padding="sm md"

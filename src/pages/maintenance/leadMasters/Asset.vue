@@ -324,7 +324,6 @@ const saveEditedConfirm = async () => {
     id: editingRowId.value,
     updatedOn: new Date(),
   };
-  console.log(payLoad, 'payLoad');
 
   const rsp = await api.put('/assetLead/update', payLoad);
   if (rsp.data.displayMessage) {

@@ -3,15 +3,16 @@
     class="row full-height flex-center q-gutter-xs-y-md q-pa-xs-md q-pa-lg-xl"
   >
     <div
-      v-for="data in moduleCardData"
+      v-for="(data, index) in moduleCardData"
       :key="data.to"
       class="col-12 col-sm-6 col-md-4 col-lg-3 q-pa-sm-md"
+      :class="[
+        screenWidth < 540 && index == moduleCardData.length - 1
+          ? 'q-mb-xl q-pb-md'
+          : '',
+      ]"
     >
-      <router-link
-        :to="data.to"
-        :style="{ textDecoration: 'none' }"
-        v-if="width > 410"
-      >
+      <router-link :to="data.to" :style="{ textDecoration: 'none' }">
         <q-card
           class="my-card module-card"
           :style="{ backgroundImage: `url(${data.img})` }"
@@ -35,14 +36,6 @@
           </q-tooltip>
         </q-card>
       </router-link>
-      <q-card v-else>
-        <q-card-section>
-          <p class="card-label">{{ data.label }}</p>
-        </q-card-section>
-        <q-card-actions align="right">
-          <q-btn icon="fa-solid fa-link" :to="data.to"></q-btn>
-        </q-card-actions>
-      </q-card>
     </div>
   </div>
 </template>
@@ -50,16 +43,17 @@
 import { useQuasar } from 'quasar';
 import { useModuleSelectorKeyboardListener } from 'src/composables/moduleSelectorKeyboardListener';
 import { useRouter } from 'vue-router';
-import { computed, onMounted } from 'vue';
-import { useUserStore } from 'src/stores/user/userStore';
+import { onMounted } from 'vue';
+
 import { useMenuStore } from 'src/stores/menu/menuStore';
+import { useScreenSize } from 'src/composables/utilComposibles';
 
 const router = useRouter();
 const $q = useQuasar();
-const userStore = useUserStore();
+
 const menuStore = useMenuStore();
 
-const width = computed(() => $q.screen.width);
+const { screenWidth } = useScreenSize();
 
 const moduleCardData = [
   {

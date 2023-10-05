@@ -1,54 +1,79 @@
 <template>
   <div class="q-pa-md q-gutter-y-lg fit" left-drawer>
-    <q-input v-model="filter" label="Filter" standout="bg-blue-grey text-white">
-      <template v-slot:append>
-        <q-icon
-          v-if="filter !== ''"
-          name="clear"
-          class="cursor-pointer"
-          @click="resetFilter"
+    <template v-if="!treeStructure.length">
+      <div class="column items-center q-mt-xl q-pt-xl">
+        <div id="atom-loader"></div>
+        <div class="loader q-mt-xl q-pt-md"></div>
+      </div>
+    </template>
+    <template v-else>
+      <div class="flex items-center">
+        <q-input
+          v-model="filter"
+          label="Filter"
+          standout="bg-blue-grey text-white"
+          class="col-grow"
+        >
+          <template v-slot:append>
+            <q-icon
+              v-if="filter !== ''"
+              name="backspace"
+              class="cursor-pointer"
+              @click="resetFilter"
+            />
+            <q-icon name="search" v-else />
+          </template>
+        </q-input>
+        <q-btn
+          icon="close"
+          rounded
+          size="xs"
+          padding="sm sm"
+          class="q-ml-md text-weight-bold"
+          color="red-5"
+          @click="close"
+          v-if="route.name !== 'module' && screenWidth < 560"
         />
-        <q-icon name="search" v-else />
-      </template>
-    </q-input>
+      </div>
 
-    <q-scroll-area
-      :visible="scrollbarVisible"
-      style="height: calc(100% - 70px)"
-    >
-      <q-tree
-        :nodes="treeStructure"
-        node-key="code"
-        label-key="name"
-        no-connectors
-        accordion
-        :filter="treeFilter"
-        ref="treeRef"
-        no-results-label="No result found"
-        icon="navigate_next"
-        class="q-pb-md"
+      <q-scroll-area
+        :visible="scrollbarVisible"
+        style="height: calc(100% - 70px)"
       >
-        <template v-slot:default-header="prop">
-          <RouterLink
-            :to="`/module/${route.params.module}${prop.node.data.url}`"
-            v-if="prop.node.data.url"
-            class="text-black"
-            :style="{ 'text-decoration': 'none !important' }"
-          >
-            <div class="flex items-center q-gutter-x-sm cursor-pointer">
+        <q-tree
+          :nodes="treeStructure"
+          node-key="code"
+          label-key="name"
+          no-connectors
+          accordion
+          :filter="treeFilter"
+          ref="treeRef"
+          no-results-label="No result found"
+          icon="navigate_next"
+          class="q-pb-md"
+        >
+          <template v-slot:default-header="prop">
+            <RouterLink
+              :to="`/module/${route.params.module}${prop.node.data.url}`"
+              v-if="prop.node.data.url"
+              class="text-black"
+              :style="{ 'text-decoration': 'none !important' }"
+            >
+              <div class="flex items-center q-gutter-x-sm cursor-pointer">
+                <q-icon :name="prop.node.icon" />
+                <span class="q-ml-md">
+                  {{ prop.node.name }}
+                </span>
+              </div>
+            </RouterLink>
+            <div v-else class="flex items-center q-gutter-x-sm cursor-pointer">
               <q-icon :name="prop.node.icon" />
-              <span class="q-ml-md">
-                {{ prop.node.name }}
-              </span>
+              <span class="q-ml-md">{{ prop.node.name }}</span>
             </div>
-          </RouterLink>
-          <div v-else class="flex items-center q-gutter-x-sm cursor-pointer">
-            <q-icon :name="prop.node.icon" />
-            <span class="q-ml-md">{{ prop.node.name }}</span>
-          </div>
-        </template>
-      </q-tree>
-    </q-scroll-area>
+          </template>
+        </q-tree>
+      </q-scroll-area>
+    </template>
   </div>
 </template>
 
@@ -59,6 +84,7 @@ import { MenuItem } from 'src/stores/menu/menuStoreTypes';
 import { debounce } from 'quasar';
 import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
+import { useScreenSize } from 'src/composables/utilComposibles';
 
 interface TreeNode {
   name: string;
@@ -75,11 +101,12 @@ const iconSet = {
   MP: 'fa-regular fa-pen-to-square',
   MW: 'fa-regular fa-circle-check',
 };
-
+const emits = defineEmits(['close']);
+const close = () => emits('close');
 const scrollbarVisible = ref(false);
 const menuStore = useMenuStore();
 const { topLevelMenu } = storeToRefs(menuStore);
-
+const { screenWidth } = useScreenSize();
 const resetFilter = () => {
   filter.value = '';
 };
@@ -117,7 +144,7 @@ const createSubmenu = (parentCode: string): TreeNode[] => {
   return subMenuItems.reduce(reduceFn, []);
 };
 
-let treeStructure = createTreeStructure();
+const treeStructure = ref(createTreeStructure());
 const filter = ref('');
 const treeFilter = ref('');
 const treeRef = ref(null);
@@ -131,8 +158,7 @@ watch(
 
 watch(topLevelMenu, () => {
   if (topLevelMenu.value.length > 0) {
-    // console.log('called', topLevelMenu.value);
-    treeStructure = createTreeStructure();
+    treeStructure.value = createTreeStructure();
   }
 });
 
@@ -153,5 +179,50 @@ watch(treeFilter, () => {
 }
 [left-drawer] {
   font-size: calc(var(--c-font-size) * 0.85);
+}
+
+/* HTML: <div class="loader"></div> */
+#atom-loader {
+  width: 60px;
+  height: 25px;
+  border: 2px solid;
+  box-sizing: border-box;
+  border-radius: 50%;
+  display: grid;
+  animation: l2 2s infinite linear;
+}
+#atom-loader:before,
+#atom-loader:after {
+  content: '';
+  grid-area: 1/1;
+  border: inherit;
+  border-radius: 50%;
+  animation: inherit;
+  animation-duration: 3s;
+}
+#atom-loader:after {
+  --s: -1;
+}
+@keyframes l2 {
+  100% {
+    transform: rotate(calc(var(--s, 1) * 1turn));
+  }
+}
+/* HTML: <div class="loader"></div> */
+.loader {
+  width: fit-content;
+  font-weight: bold;
+  font-family: monospace;
+  font-size: 30px;
+  clip-path: inset(0 100% 0 0);
+  animation: l5 1s steps(11) infinite;
+}
+.loader:before {
+  content: 'Loading Menu...';
+}
+@keyframes l5 {
+  to {
+    clip-path: inset(0 -2ch 0 0);
+  }
 }
 </style>

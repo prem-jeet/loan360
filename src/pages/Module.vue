@@ -1,41 +1,21 @@
 <template>
   <div
-    class="absolute full-width full-height column"
-    :class="[$q.platform.is.mobile ? mobileClass : 'flex-center']"
+    class="absolute full-width full-height column flex-center"
     :key="module"
     v-if="route.name === 'module'"
   >
-    <div class="col-auto text-center">
+    <div class="col-auto text-center q-mt-md">
       <p class="text-medium" id="module-label">{{ moduleLabel }} Module</p>
     </div>
 
-    <div class="col" v-if="$q.platform.is.mobile">
+    <div
+      class="col"
+      :style="{
+        width:
+          screenWidth < 560 ? '90vw' : screenWidth < 1000 ? '70vw' : '50vw',
+      }"
+    >
       <LeftMenu :key="menuStore.currentModule" />
-    </div>
-
-    <div class="q-mt-lg" v-else>
-      <q-btn
-        class="brand-btn"
-        glossy
-        label="Open Menu"
-        size="md"
-        rounded
-        push
-        padding="sm lg"
-        @click="openMenu"
-      />
-      <q-btn
-        class="q-ml-lg brand-btn"
-        glossy
-        icon="home"
-        size="md"
-        rounded
-        push
-        padding="sm lg"
-        :to="{ name: 'moduleSelector' }"
-      >
-        <q-tooltip> Module Selector </q-tooltip>
-      </q-btn>
     </div>
   </div>
   <RouterView />
@@ -45,18 +25,16 @@
 import { useMenuStore } from 'src/stores/menu/menuStore';
 import { onMounted, computed } from 'vue';
 import { Modules } from 'src/stores/menu/menuStoreTypes';
-import { useQuasar } from 'quasar';
+
 import LeftMenu from 'src/components/LeftMenu.vue';
 import { useRoute } from 'vue-router';
+import { useScreenSize } from 'src/composables/utilComposibles';
 
 const props = defineProps<{
   module: Modules;
 }>();
-
-const mobileClass = 'items-stretch q-pt-lg';
+const { screenWidth } = useScreenSize();
 const route = useRoute();
-const emits = defineEmits(['openMenu']);
-const $q = useQuasar();
 
 const menuStore = useMenuStore();
 
@@ -73,15 +51,9 @@ const modules = {
 const currentModule = computed(() => props.module);
 const moduleLabel = modules[currentModule.value as keyof typeof modules].label;
 
-const openMenu = () => emits('openMenu');
-
 onMounted(() => {
   menuStore.currentModule = modules[currentModule.value as keyof typeof modules]
     .key as Modules;
-
-  if (!$q.platform.is.mobile && route.name === 'module') {
-    openMenu();
-  }
 });
 </script>
 

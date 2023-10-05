@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="absolute q-px-md q-pt-md-sm q-pt-xs-md q-pb-md full-width"
-    bg-page
-  >
+  <div class="absolute q-px-md q-pt-md-sm q-pt-xs-md q-pb-md full-width">
     <BreadCrumbs :ordered-paths="breadcrumbs" :style-css="'q-mx-xs'" />
 
     <div class="row q-mt-lg q-pb-xl">

@@ -8,7 +8,7 @@
     </q-header>
 
     <q-page-container bg-page class="overflow-auto" style="max-height: 100vh">
-      <q-page v-scroll="toggleHeaderVisibility">
+      <q-page v-scroll="toggleHeaderVisibility" ref="page">
         <RouterView @openMenu="openMenu"></RouterView>
       </q-page>
     </q-page-container>
@@ -16,10 +16,10 @@
       v-model="drawerLeft"
       overlay
       elevated
-      :width="480"
+      :width="screenWidth < 560 ? screenWidth : 480"
       class="bg-white"
     >
-      <LeftMenu :key="menuStore.currentModule" />
+      <LeftMenu :key="menuStore.currentModule" @close="drawerLeft = false" />
       <div v-if="drawerLeft" @click="drawerLeft = false" drawer-overlay />
       <q-btn
         drawer-close
@@ -27,7 +27,7 @@
         size="md"
         round
         icon="close"
-        v-if="drawerLeft"
+        v-if="screenWidth > 560 && drawerLeft"
         @click="drawerLeft = false"
       >
       </q-btn>
@@ -44,6 +44,7 @@ import { watch, ref, onBeforeMount, computed } from 'vue';
 import { useMenuStore } from 'src/stores/menu/menuStore';
 import { useUserStore } from 'src/stores/user/userStore';
 import CompanyAndBranchSelectorModal from 'src/components/modals/CompanyAndBranchSelectorModal.vue';
+import { useScreenSize } from 'src/composables/utilComposibles';
 
 const userStore = useUserStore();
 
@@ -51,6 +52,7 @@ const drawerLeft = ref(false);
 const menuStore = useMenuStore();
 const hideHeader = ref(false);
 
+const { screenWidth } = useScreenSize();
 const openMenu = () => {
   drawerLeft.value = !drawerLeft.value;
 };
@@ -67,8 +69,10 @@ const getDataOnRefresh = async () => {
     userStore.setAuthHeader('');
   }
   if (userStore.fetchUser()) {
-    await userStore.fetchAppRole();
-    await menuStore.fetchMenu();
+    try {
+      await userStore.fetchAppRole();
+      await menuStore.fetchMenu();
+    } catch (e) {}
   }
 };
 
@@ -93,6 +97,7 @@ watch(drawerLeft, () => {
   }
 });
 </script>
+
 <style>
 [drawer-overlay] {
   background: red;

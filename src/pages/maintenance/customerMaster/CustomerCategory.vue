@@ -360,8 +360,6 @@ const editEntry = (code: string, rowIndex: number) => {
 
 const saveEdit = (editSaveObject: EditObject) => {
   const { firstInputValue, inactive } = editSaveObject;
-  console.log(editSaveObject, 'editSave');
-  console.log('editingRowIndex.value', editingRowIndex.value);
 
   const tempInactive = editObject.inactive;
 
