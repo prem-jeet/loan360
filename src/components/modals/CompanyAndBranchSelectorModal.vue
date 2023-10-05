@@ -4,7 +4,7 @@
       <q-dialog v-model="active" position="standard">
         <q-card
           class="q-pa-sm q-pa-md-md"
-          :style="{ minWidth: 'clamp(250px,calc(50vw),500px)' }"
+          :style="{ minWidth: 'clamp(250px,85vw,500px)' }"
         >
           <q-form greedy class="column q-gutter-lg" @submit.prevent="submit">
             <q-select
@@ -18,6 +18,7 @@
               :error="error && !selectedCompany"
               error-message="select a company"
               @update:model-value="userStore.fetchAllowedFinancialYear"
+              behavior="menu"
             />
             <q-select
               outlined
@@ -28,6 +29,7 @@
               label="Branch"
               :error="error && !selectedBranch"
               error-message="select a branch"
+              behavior="menu"
             />
             <q-select
               outlined
@@ -38,12 +40,13 @@
               label="Financial Year"
               :error="error && !selectedFinancialYear"
               error-message="select a financial year"
+              behavior="menu"
             />
-            <div class="q-mt-lg">
-              <q-btn label="Submit" type="submit" class="brand-btn" glossy />
+            <div class="q-pb-md flex flex-center">
+              <q-btn label="Submit" type="submit" outline color="blue" />
               <q-btn
                 v-if="route.name !== 'authenticated'"
-                class="q-ml-lg brand-btn-close"
+                class="q-ml-lg"
                 label="Close"
                 type="button"
                 @click="close"
