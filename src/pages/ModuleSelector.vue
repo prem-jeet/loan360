@@ -2,6 +2,19 @@
   <div
     class="row full-height flex-center q-gutter-xs-y-md q-pa-xs-md q-pa-lg-xl"
   >
+    <div class="flex items-center q-mb-lg full-width" v-if="screenWidth < 540">
+      <div navbar-logo class="flex flex-center">
+        <q-img :src="logo" fit="cover" />
+      </div>
+
+      <router-link
+        :to="{ name: 'moduleSelector' }"
+        :style="{ textDecoration: 'none' }"
+        class="flex flex-center q-ml-md"
+      >
+        <span navbar-title class="text-weight-medium"> Jaguar 360° Cloud </span>
+      </router-link>
+    </div>
     <div
       v-for="(data, index) in moduleCardData"
       :key="data.to"
@@ -44,6 +57,7 @@ import { useQuasar } from 'quasar';
 import { useModuleSelectorKeyboardListener } from 'src/composables/moduleSelectorKeyboardListener';
 import { useRouter } from 'vue-router';
 import { onMounted } from 'vue';
+import logo from 'src/assets/img/jaguarlogo.png';
 
 import { useMenuStore } from 'src/stores/menu/menuStore';
 import { useScreenSize } from 'src/composables/utilComposibles';
