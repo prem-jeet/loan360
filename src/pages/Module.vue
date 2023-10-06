@@ -4,11 +4,13 @@
     :key="module"
     v-if="route.name === 'module'"
   >
-    <div navbar-logo class="flex flex-center fixed-left">
-      <q-img :src="logo" fit="cover" />
+    <div class="full-width full-height absolute-top flex flex-center">
+      <div navbar-logo class="flex flex-center">
+        <q-img :src="logo" fit="cover" />
+      </div>
     </div>
-    <div class="col-auto text-center q-mt-md">
-      <p class="text-medium" id="module-label">{{ moduleLabel }} Module</p>
+    <div class="col-auto text-center q-mt-lg">
+      <p id="module-label">{{ moduleLabel }}</p>
     </div>
 
     <div
@@ -63,16 +65,14 @@ onMounted(() => {
 
 <style scoped>
 #module-label {
-  font-size: calc(2vw + 12px);
+  font-size: calc(2vw + 14px);
 }
 [navbar-logo] {
-  opacity: 0.5;
-  width: 45px;
+  opacity: 0.03;
+  width: 300px;
   aspect-ratio: 1;
   padding: 7px;
   border-radius: 100%;
   background: #152e91;
-  left: 10px;
-  top: 10px;
 }
 </style>
