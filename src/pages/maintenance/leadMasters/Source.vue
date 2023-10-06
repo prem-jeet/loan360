@@ -1,7 +1,33 @@
 <template>
   <div class="absolute q-px-md q-pt-md-sm q-pt-xs-md q-pb-md full-width">
-    <BreadCrumbs :ordered-paths="breadcrumbs" :style-css="'q-mx-xs'" />
+    <div>
+      <Header title="Source" @filter="isFilterExpanded = !isFilterExpanded" />
+    </div>
+    <div class="q-mt-lg">
+      <TablePageFilterLayout v-model="isFilterExpanded">
+        <div class="row items-center text-h6">
+          <div class="col-12 col-sm-8 col-md-6 col-lg-4">
+            <q-input
+              v-model="nameSearchQuery"
+              clearable
+              placeholder="Search name"
+              @clear="nameSearchQuery = ''"
+              clear-icon="backspace"
+              outlined
+              :dense="screenWidth < 540"
+            >
+              <template v-slot:prepend>
+                <q-icon name="search" />
+              </template>
+            </q-input>
+          </div>
 
+          <div class="col-12 q-mt-md col-sm-auto q-mt-sm-none q-ml-sm-md">
+            <q-checkbox v-model="checkBox" label="In-Active" />
+          </div>
+        </div>
+      </TablePageFilterLayout>
+    </div>
     <div class="row q-mt-lg q-pb-xl">
       <div class="col">
         <q-table
@@ -12,41 +38,13 @@
           table-header-class="bg-deep-purple-10 text-white"
           separator="cell"
           bordered
-          title="Nature entry"
           :rows-per-page-options="[0]"
           :hide-bottom="!!filteredData.length"
-          :grid="$q.screen.width < 830"
+          :grid="screenWidth < 830"
           card-container-class="q-gutter-y-md q-mt-xs"
         >
           <template v-slot:top>
-            <div class="row q-gutter-y-lg q-pb-xs-md">
-              <div class="col-12">
-                <div class="row items-center q-gutter-md">
-                  <div class="col-auto text-h6">Source Lead</div>
-                </div>
-              </div>
-            </div>
-
             <div class="row full-width q-mt-sm">
-              <div class="col-xs-12 col-sm-4 col-md-3 q-pb-sm">
-                <q-input
-                  v-model="nameSearchQuery"
-                  outlined
-                  clearable
-                  dense
-                  rounded
-                  placeholder="search"
-                  @clear="nameSearchQuery = ''"
-                >
-                  <template v-slot:prepend>
-                    <q-icon name="search" />
-                  </template>
-                </q-input>
-              </div>
-
-              <div class="col-xs-12 col-sm-3 col-md-6 q-pb-sm">
-                <q-checkbox v-model="checkBox" label=" In-Active" />
-              </div>
               <div class="col-xs-12 col-sm-5 col-md-3 q-pb-sm">
                 <q-input
                   v-model="leadName"
@@ -168,14 +166,19 @@
 
 <script setup lang="ts">
 import { api } from 'src/boot/axios';
-import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
+// import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, reactive } from 'vue';
 import { onSuccess, onFailure } from 'src/utils/notification';
 import { tableTypeOne } from 'src/utils/types';
 import { formatDate } from 'src/utils/date';
-import { useQuasar } from 'quasar';
+
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
 import CommonEditForMaintenancePages from 'src/components/modals/CommonEditForMaintenancePages.vue';
+import Header from 'src/components/ui/TablePageHeader.vue';
+import TablePageFilterLayout from 'src/layouts/TablePageFilterLayout.vue';
+import { useScreenSize } from 'src/composables/utilComposibles';
+const isFilterExpanded = ref(true);
+const { screenWidth } = useScreenSize();
 // interface Source {
 //   name: string;
 //   id: number | null;
@@ -185,7 +188,7 @@ import CommonEditForMaintenancePages from 'src/components/modals/CommonEditForMa
 //   updatedOn: string;
 // }
 
-const breadcrumbs = [
+/* const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
   {
     path: '/module/maintenance/leadMaster/source',
@@ -196,7 +199,7 @@ const breadcrumbs = [
     path: '/module/maintenance/leadMaster/source',
     label: 'Source',
   },
-];
+]; */
 
 const columns: {
   name: string;
@@ -241,7 +244,6 @@ const columns: {
   },
 ];
 
-const $q = useQuasar();
 const fetchingData = ref(false);
 const leadName = ref('');
 const nameSearchQuery = ref('');
