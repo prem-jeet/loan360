@@ -41,7 +41,7 @@
         <div style="transform: translateY(-1vh)" class="full-width flex-column">
           <div
             class="column flex-center q-mx-auto"
-            style="transform: scale(0.6); max-width: 500px"
+            style="transform: scale(0.6); max-width: 700px"
           >
             <q-img
               :src="logo"

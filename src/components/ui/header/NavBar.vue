@@ -17,7 +17,7 @@
           v-if="!['moduleSelector', 'module'].includes(route.name as string)"
         />
 
-        <div class="flex itens-center">
+        <div class="flex items-center">
           <div navbar-logo class="flex flex-center">
             <q-img :src="logo" fit="cover" />
           </div>

@@ -4,6 +4,9 @@
     :key="module"
     v-if="route.name === 'module'"
   >
+    <div navbar-logo class="flex flex-center fixed-left">
+      <q-img :src="logo" fit="cover" />
+    </div>
     <div class="col-auto text-center q-mt-md">
       <p class="text-medium" id="module-label">{{ moduleLabel }} Module</p>
     </div>
@@ -25,6 +28,7 @@
 import { useMenuStore } from 'src/stores/menu/menuStore';
 import { onMounted, computed } from 'vue';
 import { Modules } from 'src/stores/menu/menuStoreTypes';
+import logo from 'src/assets/img/jaguarlogo.png';
 
 import LeftMenu from 'src/components/LeftMenu.vue';
 import { useRoute } from 'vue-router';
@@ -60,5 +64,15 @@ onMounted(() => {
 <style scoped>
 #module-label {
   font-size: calc(2vw + 12px);
+}
+[navbar-logo] {
+  opacity: 0.5;
+  width: 45px;
+  aspect-ratio: 1;
+  padding: 7px;
+  border-radius: 100%;
+  background: #152e91;
+  left: 10px;
+  top: 10px;
 }
 </style>
