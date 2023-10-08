@@ -1,7 +1,11 @@
 <template>
   <div class="absolute q-px-md q-pt-md-sm q-pt-xs-md q-pb-md full-width">
     <div>
-      <Header title="Source" @filter="isFilterExpanded = !isFilterExpanded" />
+      <Header
+        title="Source"
+        @filter="isFilterExpanded = !isFilterExpanded"
+        @add="isEditModalActive = true"
+      />
     </div>
     <div class="q-mt-lg">
       <TablePageFilterLayout v-model="isFilterExpanded">
@@ -142,7 +146,10 @@
                     size="sm"
                     color="teal"
                     v-if="editingRowIndex !== props.rowIndex"
-                    @click="() => editEntry(props.row.id)"
+                    @click="
+                      formData.name = props.row.name;
+                      isEditModalActive = true;
+                    "
                   >
                   </q-btn>
                 </q-card-actions>
@@ -154,13 +161,30 @@
     </div>
   </div>
 
-  <q-dialog v-model="isEditModalActive">
-    <CommonEditForMaintenancePages
-      :editObject="editObject"
+  <q-dialog
+    v-model="isEditModalActive"
+    persistent
+    :maximized="screenWidth < 450"
+  >
+    <AddEditForm
+      label="Source"
+      :initial-object="{ ...formData }"
       @close="isEditModalActive = false"
-      @saveEdit="saveEdit"
-      editMsg="Edit Source"
-    ></CommonEditForMaintenancePages>
+      @submit="test"
+      @reset="(data) => (formData = { ...data })"
+      :editing-data="false"
+    >
+      <div class="row">
+        <div class="col-12">
+          <q-input
+            v-model="formData.name"
+            outlined
+            label="Lead name"
+            no-error-icon
+          />
+        </div>
+      </div>
+    </AddEditForm>
   </q-dialog>
 </template>
 
@@ -169,24 +193,30 @@ import { api } from 'src/boot/axios';
 // import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, reactive } from 'vue';
 import { onSuccess, onFailure } from 'src/utils/notification';
-import { tableTypeOne } from 'src/utils/types';
 import { formatDate } from 'src/utils/date';
-
+import AddEditForm from 'src/components/commonForms/AddEditForm.vue';
 import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
-import CommonEditForMaintenancePages from 'src/components/modals/CommonEditForMaintenancePages.vue';
+
 import Header from 'src/components/ui/TablePageHeader.vue';
 import TablePageFilterLayout from 'src/layouts/TablePageFilterLayout.vue';
 import { useScreenSize } from 'src/composables/utilComposibles';
+import { useFetch } from 'src/composables/apiCalls';
+import { TableColumn } from 'src/types/Common';
 const isFilterExpanded = ref(true);
 const { screenWidth } = useScreenSize();
-// interface Source {
-//   name: string;
-//   id: number | null;
-//   createdOn: string;
-//   inactive: boolean;
-//   inactiveOn: string;
-//   updatedOn: string;
-// }
+
+const test = (a: unknown) => {
+  console.log('hello', a);
+};
+
+interface Source {
+  name: string;
+  id?: number;
+  createdOn: string;
+  inactive: boolean;
+  inactiveOn: string;
+  updatedOn: string;
+}
 
 /* const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
@@ -201,13 +231,7 @@ const { screenWidth } = useScreenSize();
   },
 ]; */
 
-const columns: {
-  name: string;
-  required?: boolean;
-  label: string;
-  field: string;
-  align: 'left';
-}[] = [
+const columns: TableColumn[] = [
   {
     name: 'actions',
     label: 'Actions',
@@ -247,7 +271,7 @@ const columns: {
 const fetchingData = ref(false);
 const leadName = ref('');
 const nameSearchQuery = ref('');
-const source = ref<tableTypeOne[]>([]);
+const source = ref<Source[]>([]);
 const checkBox = ref(false);
 const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
@@ -376,14 +400,22 @@ const changeActiveConfirm = async (id: number, state: boolean) => {
 
 const loadSource = async () => {
   fetchingData.value = true;
-  const rsp = await api.get('sourceLead');
 
-  if (rsp.data) {
-    source.value = rsp.data;
+  const rsp = await useFetch('sourceLead');
+
+  if (rsp) {
+    source.value = rsp as Source[];
   }
+
   fetchingData.value = false;
 };
 
+const formData = ref<{ name: null | string }>({
+  name: null,
+});
+const resetForm = (initialData: { name: string | null }) => {
+  console.log(initialData);
+};
 onMounted(() => {
   loadSource();
 });
