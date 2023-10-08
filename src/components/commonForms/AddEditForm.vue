@@ -45,7 +45,8 @@
 <script setup lang="ts">
 interface Props {
   label: string;
-  initialObject: { [key: string]: unknown };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  initialObject: { [key: string]: any };
   minWidth?: string;
   minHeight?: string;
   editingData: boolean;

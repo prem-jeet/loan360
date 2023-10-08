@@ -147,6 +147,7 @@
                     color="teal"
                     v-if="editingRowIndex !== props.rowIndex"
                     @click="
+                      editingRowId = props.row.id;
                       formData.name = props.row.name;
                       isEditModalActive = true;
                     "
@@ -165,10 +166,12 @@
     v-model="isEditModalActive"
     persistent
     :maximized="screenWidth < 450"
+    @before-hide="editingRowId = null"
+    @before-show="formData = { ...initialFormData }"
   >
     <AddEditForm
       label="Source"
-      :initial-object="{ ...formData }"
+      :initial-object="initialFormData"
       @close="isEditModalActive = false"
       @submit="test"
       @reset="(data) => (formData = { ...data })"
@@ -410,12 +413,28 @@ const loadSource = async () => {
   fetchingData.value = false;
 };
 
-const formData = ref<{ name: null | string }>({
+/* new code */
+interface Form {
+  name: null | string;
+}
+const formData = ref<Form>({
   name: null,
 });
-const resetForm = (initialData: { name: string | null }) => {
-  console.log(initialData);
-};
+
+const initialFormData = computed(() => {
+  const temp: Form = {
+    name: null,
+  };
+
+  if (editingRowId.value) {
+    const editingRow = source.value.find(({ id }) => id === editingRowId.value);
+    if (editingRow) {
+      temp.name = editingRow.name;
+    }
+  }
+  return temp;
+});
+
 onMounted(() => {
   loadSource();
 });
