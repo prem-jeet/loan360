@@ -175,7 +175,7 @@
       @close="isEditModalActive = false"
       @submit="test"
       @reset="(data) => (formData = { ...data })"
-      :editing-data="false"
+      :is-editing="editingRowId !== null"
     >
       <div class="row">
         <div class="col-12">
