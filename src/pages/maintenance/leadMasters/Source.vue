@@ -4,7 +4,7 @@
       <Header
         title="Source"
         @filter="isFilterExpanded = !isFilterExpanded"
-        @add="isEditModalActive = true"
+        @add="isSourceFormActive = true"
       />
     </div>
     <div class="q-mt-lg">
@@ -12,10 +12,9 @@
         <div class="row items-center text-h6">
           <div class="col-12 col-sm-8 col-md-6 col-lg-4">
             <q-input
-              v-model="nameSearchQuery"
+              v-model="filter.name"
               clearable
               placeholder="Search name"
-              @clear="nameSearchQuery = ''"
               clear-icon="backspace"
               outlined
               :dense="screenWidth < 540"
@@ -27,7 +26,7 @@
           </div>
 
           <div class="col-12 q-mt-md col-sm-auto q-mt-sm-none q-ml-sm-md">
-            <q-checkbox v-model="checkBox" label="In-Active" />
+            <q-checkbox v-model="filter.inactive" label="In-Active" />
           </div>
         </div>
       </TablePageFilterLayout>
@@ -35,126 +34,129 @@
     <div class="row q-mt-lg q-pb-xl">
       <div class="col">
         <q-table
-          :rows="filteredData"
+          :rows="filteredSource"
           :columns="columns"
-          row-key="code"
-          :loading="fetchingData"
-          table-header-class="bg-deep-purple-10 text-white"
           separator="cell"
           bordered
+          :loading="fetchingData"
           :rows-per-page-options="[0]"
-          :hide-bottom="!!filteredData.length"
-          :grid="screenWidth < 830"
-          card-container-class="q-gutter-y-md q-mt-xs"
+          :hide-bottom="!!filteredSource.length"
+          :grid="screenWidth < 1240"
         >
-          <template v-slot:top>
-            <div class="row full-width q-mt-sm">
-              <div class="col-xs-12 col-sm-5 col-md-3 q-pb-sm">
-                <q-input
-                  v-model="leadName"
-                  outlined
-                  dense
-                  no-error-icon
-                  :error="isDuplicate"
-                  error-message="Item already exits"
-                  placeholder="name"
-                >
-                  <template v-slot:prepend> Lead </template>
-                  <template v-slot:after>
-                    <q-btn
-                      icon="add"
-                      color="teal"
-                      size="md"
-                      :disable="isDuplicate || leadName === ''"
-                      @click="saveEntry"
-                    />
-                  </template>
-                </q-input>
-              </div>
-            </div>
-          </template>
-
           <template v-slot:header-cell="props">
-            <q-th :props="props" style="font-size: 1rem">
+            <q-th
+              :props="props"
+              class="text-black"
+              style="font-size: 1rem; background-color: #e7f4ff"
+            >
               {{ props.col.label }}
             </q-th>
           </template>
 
           <!-- row design for screens > 800px-->
           <template v-slot:body="props">
-            <q-tr :props="props">
-              <q-td key="actions" auto-width>
-                <q-btn
-                  icon="edit"
-                  size="xs"
-                  outline
-                  rounded
-                  color="accent"
-                  v-if="editingRowIndex !== props.rowIndex"
-                  @click="() => editEntry(props.row.id)"
-                >
-                  <q-tooltip>Edit</q-tooltip>
-                </q-btn>
-              </q-td>
-              <q-td key="name" :props="props">
-                <span> {{ firstLetterCpitalze(props.row.name) }} </span>
-              </q-td>
+            <tr
+              class="text-table-row"
+              :class="[isDark ? 'table-row-dark' : 'table-row-light']"
+            >
+              <template :key="key" v-for="key in Object.keys(props.colsMap)">
+                <td v-if="key === 'actions'" style="width: 10ch">
+                  <div class="flex flex-center">
+                    <q-btn-group push unelevated>
+                      <q-btn
+                        icon="edit"
+                        size="xs"
+                        outline
+                        rounded
+                        color="accent"
+                        @click="
+                          editingRowId = props.row.id;
+                          formData.name = props.row.name;
+                          isSourceFormActive = true;
+                        "
+                      />
+                      <q-btn
+                        size="xs"
+                        outline
+                        rounded
+                        color="red-5"
+                        :label="props.row.inactive ? 'Activate' : 'De-Activate'"
+                        @click="() => toggleActiveState(props.row)"
+                      />
+                    </q-btn-group>
+                  </div>
+                </td>
 
-              <q-td
-                :props="props"
-                v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
-                :key="key"
-              >
-                {{ formatDate(props.row[key], format) }}
-              </q-td>
-            </q-tr>
+                <template v-else>
+                  <!-- if date type -->
+                  <td
+                    :props="props"
+                    v-if="Date.parse(props.row[key])"
+                    style="max-width: 15ch"
+                  >
+                    <div class="row">
+                      <span
+                        class="column items-center text-caption q-col-gutter-sm items-center col-12"
+                      >
+                        <div class="col-auto">
+                          <span>
+                            {{
+                              date.formatDate(props.row[key], 'DD MMM, YYYY')
+                            }}
+                          </span>
+                        </div>
+                        <div class="col-auto">
+                          <q-chip
+                            size="10px"
+                            icon="schedule"
+                            :label="date.formatDate(props.row[key], 'h:mm A')"
+                            class="q-ml-xs text-overline text-weight-light"
+                            color="deep-orange-1"
+                            :ripple="false"
+                            :dark="false"
+                          />
+                        </div>
+                      </span>
+                    </div>
+                  </td>
+                  <!-- if boolean type -->
+                  <td
+                    v-else-if="typeof props.row[key] === 'boolean'"
+                    style="width: 10ch"
+                  >
+                    <div class="flex flex-center">
+                      <q-icon
+                        size="sm"
+                        :name="props.row[key] ? 'cancel' : 'check_circle'"
+                        :color="
+                          props.row[key]
+                            ? `red-${isDark ? '5' : '10'}`
+                            : `green-${isDark ? '5' : '10'}`
+                        "
+                      />
+                    </div>
+                  </td>
+                  <!-- if text type -->
+                  <td
+                    v-else
+                    :props="props"
+                    style="max-width: 30ch"
+                    class="text-subtitle1 text-weight-medium"
+                  >
+                    {{ props.row[key] && capitalCase(props.row[key]) }}
+                  </td>
+                </template>
+              </template>
+            </tr>
           </template>
 
           <!-- card for grid layout screens < 800px -->
           <template v-slot:item="props">
-            <div class="col-xs-12 col-sm-6 q-px-sm-sm">
-              <q-card>
-                <q-card-section>
-                  <div class="row q-gutter-y-xs">
-                    <div class="col-12 text-weight-medium">Name :</div>
-                    <div class="col-12">
-                      <span>
-                        {{ firstLetterCpitalze(props.row.name) }}
-                      </span>
-                    </div>
-                  </div>
-                </q-card-section>
-                <template
-                  v-for="key in ['createdOn', 'updatedOn', 'inactiveOn']"
-                  :key="key"
-                >
-                  <q-card-section v-if="props.row[key]">
-                    <div class="row q-gutter-y-xs">
-                      <div class="col-12 text-weight-medium">
-                        {{ capitalCase(key.split('On').join(' on')) }} :
-                      </div>
-                      <div class="col-12">
-                        {{ formatDate(props.row[key], format) }}
-                      </div>
-                    </div>
-                  </q-card-section>
-                </template>
-                <q-card-actions align="center" class="q-py-md bg-grey-2">
-                  <q-btn
-                    label="edit"
-                    icon="edit"
-                    size="sm"
-                    color="teal"
-                    v-if="editingRowIndex !== props.rowIndex"
-                    @click="
-                      editingRowId = props.row.id;
-                      formData.name = props.row.name;
-                      isEditModalActive = true;
-                    "
-                  >
-                  </q-btn>
-                </q-card-actions>
-              </q-card>
+            <div
+              class="q-pa-sm"
+              :class="[screenWidth < 950 ? 'col-12' : 'col-sm-6']"
+            >
+              <GridCard :data="props.row" :colsMap="props.colsMap" />
             </div>
           </template>
         </q-table>
@@ -163,7 +165,7 @@
   </div>
 
   <q-dialog
-    v-model="isEditModalActive"
+    v-model="isSourceFormActive"
     persistent
     :maximized="screenWidth < 450"
     @before-hide="editingRowId = null"
@@ -172,8 +174,8 @@
     <AddEditForm
       label="Source"
       :initial-object="initialFormData"
-      @close="isEditModalActive = false"
-      @submit="test"
+      @close="isSourceFormActive = false"
+      @submit="handleFormsubmit"
       @reset="(data) => (formData = { ...data })"
       :is-editing="editingRowId !== null"
     >
@@ -184,6 +186,8 @@
             outlined
             label="Lead name"
             no-error-icon
+            :rules="[(val) => !!val]"
+            :error="!formData.name"
           />
         </div>
       </div>
@@ -192,34 +196,18 @@
 </template>
 
 <script setup lang="ts">
-import { api } from 'src/boot/axios';
-// import BreadCrumbs from 'src/components/ui/BreadCrumbs.vue';
 import { ref, onMounted, computed, reactive } from 'vue';
-import { onSuccess, onFailure } from 'src/utils/notification';
-import { formatDate } from 'src/utils/date';
+import { alertDialog, asyncConfirmDialog } from 'src/utils/notification';
 import AddEditForm from 'src/components/commonForms/AddEditForm.vue';
-import { firstLetterCpitalze, capitalCase } from 'src/utils/string';
+import { capitalCase } from 'src/utils/string';
 
 import Header from 'src/components/ui/TablePageHeader.vue';
+import GridCard from 'src/components/ui/TableGridCard.vue';
 import TablePageFilterLayout from 'src/layouts/TablePageFilterLayout.vue';
 import { useScreenSize } from 'src/composables/utilComposibles';
-import { useFetch } from 'src/composables/apiCalls';
+import { useFetch, usePost, usePut } from 'src/composables/apiCalls';
 import { TableColumn } from 'src/types/Common';
-const isFilterExpanded = ref(true);
-const { screenWidth } = useScreenSize();
-
-const test = (a: unknown) => {
-  console.log('hello', a);
-};
-
-interface Source {
-  name: string;
-  id?: number;
-  createdOn: string;
-  inactive: boolean;
-  inactiveOn: string;
-  updatedOn: string;
-}
+import { date, useQuasar } from 'quasar';
 
 /* const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
@@ -233,6 +221,22 @@ interface Source {
     label: 'Source',
   },
 ]; */
+interface Source {
+  name: string;
+  id?: number;
+  inactive: boolean;
+  createdOn: string | null;
+  inactiveOn: string | null;
+  updatedOn: string | null;
+}
+interface Form {
+  name: null | string;
+}
+
+interface Filter {
+  name: string | null;
+  inactive: false;
+}
 
 const columns: TableColumn[] = [
   {
@@ -247,6 +251,13 @@ const columns: TableColumn[] = [
     align: 'left',
     field: 'name',
     label: 'Source Lead',
+  },
+  {
+    name: 'inactive',
+    required: true,
+    align: 'left',
+    field: 'inactive',
+    label: 'InActive',
   },
   {
     name: 'createdOn',
@@ -270,27 +281,18 @@ const columns: TableColumn[] = [
     label: 'In-Active On',
   },
 ];
-
+const $q = useQuasar();
+const isDark = computed(() => $q.dark.isActive);
 const fetchingData = ref(false);
-const leadName = ref('');
 const nameSearchQuery = ref('');
 const source = ref<Source[]>([]);
 const checkBox = ref(false);
-const editingRowIndex = ref<number | null>(null);
 const editingRowId = ref<number | null>(null);
-const format = 'DD/MM/YYYY @hh:mmA';
-const isEditModalActive = ref(false);
+const isSourceFormActive = ref(false);
+const isFilterExpanded = ref(true);
+const { screenWidth } = useScreenSize();
 
-let editObject = reactive<{
-  firstInputValue: string;
-  inactive: boolean;
-  firstInputLabel: string;
-}>({
-  firstInputValue: '',
-  inactive: false,
-  firstInputLabel: 'Source',
-});
-
+const filter = reactive<Filter>({ name: null, inactive: false });
 const filteredData = computed(() =>
   source.value.filter(
     (item) =>
@@ -299,124 +301,18 @@ const filteredData = computed(() =>
   )
 );
 
-const isDuplicate = computed(
-  () =>
-    !!source.value.find(
-      (item) =>
-        item.name.toLocaleLowerCase() === leadName.value.toLocaleLowerCase()
-    )
-);
+const filteredSource = computed(() => {
+  const filteredArray = source.value.filter((source) => {
+    const isNameMatched =
+      !filter.name ||
+      source.name.toLowerCase().includes(filter.name.toLowerCase());
+    const isInactiveMatched = source.inactive === filter.inactive;
 
-const setFormData = () => {
-  let temp;
-  if (editingRowId.value !== null) {
-    let index = source.value.findIndex((obj) => obj.id === editingRowId.value);
-    temp = source.value[index];
-  }
-  editObject.firstInputValue = temp ? temp.name : '';
-  editObject.inactive = temp ? temp.inactive : false;
-};
-
-const editEntry = (id: number) => {
-  editingRowId.value = id;
-  setFormData();
-  isEditModalActive.value = true;
-};
-const saveEdit = (editSaveObject: {
-  firstInputValue: string;
-  inactive: boolean;
-  firstInputLabel: string;
-}) => {
-  const { firstInputValue, inactive } = editSaveObject;
-  const tempInactive = editObject.inactive;
-
-  if (firstInputValue !== editObject.firstInputValue) {
-    const temp = source.value.filter((item) => item.id !== editingRowId.value);
-
-    const isDuplicate = temp.find(
-      (item) =>
-        item.name.toLowerCase() === editSaveObject.firstInputValue.toLowerCase()
-    );
-
-    if (isDuplicate) {
-      onFailure({
-        msg: 'Item already exist',
-        icon: 'warning',
-      });
-      return;
-    }
-    editObject = { ...editSaveObject };
-    saveEditedConfirm();
-  }
-
-  if (inactive !== tempInactive) {
-    changeActiveConfirm(editingRowId.value!, editSaveObject.inactive);
-  }
-
-  editingRowId.value = null;
-  isEditModalActive.value = false;
-};
-
-const saveEditedConfirm = async () => {
-  let payLoad = {
-    name: editObject.firstInputValue,
-    id: editingRowId.value,
-    updatedOn: new Date(),
-  };
-  const rsp = await api.put('/sourceLead/update', payLoad);
-  if (rsp.data.displayMessage) {
-    onSuccess({
-      msg: rsp.data.displayMessage,
-      icon: 'sync_alt',
-    });
-    loadSource();
-  }
-};
-
-const saveEntry = async () => {
-  let payLoad = {
-    name: leadName.value,
-    inactive: false,
-    createdOn: new Date(),
-  };
-  const rsp = await api.post('/sourceLead', payLoad);
-  if (rsp.data.displayMessage) {
-    onSuccess({
-      msg: rsp.data.displayMessage,
-      icon: 'sync_alt',
-    });
-    leadName.value = '';
-    loadSource();
-  }
-};
-
-const changeActiveConfirm = async (id: number, state: boolean) => {
-  const str = state ? 'inactive' : 'active';
-  const rsp = await api.put('/sourceLead/' + str, {
-    id,
+    return isNameMatched && isInactiveMatched;
   });
-  if (rsp.data && rsp.data.displayMessage) {
-    onSuccess({ msg: rsp.data.displayMessage });
-    loadSource();
-  }
-};
+  return filteredArray;
+});
 
-const loadSource = async () => {
-  fetchingData.value = true;
-
-  const rsp = await useFetch('sourceLead');
-
-  if (rsp) {
-    source.value = rsp as Source[];
-  }
-
-  fetchingData.value = false;
-};
-
-/* new code */
-interface Form {
-  name: null | string;
-}
 const formData = ref<Form>({
   name: null,
 });
@@ -435,8 +331,93 @@ const initialFormData = computed(() => {
   return temp;
 });
 
+const isSourceNameDuplicate = (name: string) => {
+  const matchedSource = source.value.find(
+    (source) => source.name.toLowerCase() === name.toLowerCase()
+  );
+  return matchedSource && editingRowId.value
+    ? matchedSource?.id !== editingRowId.value
+    : !!matchedSource;
+};
+
+const handleFormsubmit = async () => {
+  if (isSourceNameDuplicate(formData.value.name!)) {
+    alertDialog('Duplicate Source Name');
+    return;
+  }
+
+  const currentDataStr = new Date().toISOString();
+
+  const payload: Partial<Source> = {
+    name: formData.value.name!,
+  };
+
+  const editingRow = source.value.find(({ id }) => id === editingRowId.value);
+
+  if (!editingRowId.value) {
+    payload.createdOn = currentDataStr;
+    payload.inactive = false;
+  } else if (editingRow) {
+    payload.id = editingRow.id;
+  }
+  let rsp;
+  if (editingRowId.value) {
+    rsp = await usePut('/sourceLead/update', payload, 'Unable to edit Source.');
+  } else {
+    rsp = await usePost('/sourceLead', payload, 'Unable to create Source.');
+  }
+  {
+    if (rsp) {
+      const newSource: Source = {
+        id: editingRow ? editingRow.id : rsp.id!,
+        name: payload.name!,
+        inactive: editingRow ? editingRow.inactive : false,
+        createdOn: editingRow ? editingRow.createdOn : currentDataStr,
+        updatedOn: editingRow ? currentDataStr : null,
+        inactiveOn: editingRow ? editingRow.inactiveOn : null,
+      };
+      source.value = !editingRow
+        ? [...source.value, { ...newSource }]
+        : source.value.map((source) =>
+            source.id === editingRow.id ? newSource : source
+          );
+      isSourceFormActive.value = false;
+    }
+  }
+};
+
+const toggleActiveState = async (row: Source) => {
+  const msg = `Are you sure you want to ${row.inactive ? '' : 'De-'}Activate?`;
+  const confirmed = await asyncConfirmDialog({ msg });
+
+  if (confirmed) {
+    const state = row.inactive ? 'active' : 'inactive';
+    const rsp = await usePut('/sourceLead/' + state, {
+      id: row.id,
+    });
+    if (rsp) {
+      row.inactive = !row.inactive;
+      if (row.inactive) {
+        row.inactiveOn = new Date().toISOString();
+      }
+    }
+  }
+};
+
+const fetchSource = async () => {
+  fetchingData.value = true;
+
+  const rsp = await useFetch('sourceLead');
+
+  if (rsp) {
+    source.value = rsp as Source[];
+  }
+
+  fetchingData.value = false;
+};
+
 onMounted(() => {
-  loadSource();
+  fetchSource();
 });
 </script>
 
