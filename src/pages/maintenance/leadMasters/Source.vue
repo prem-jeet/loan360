@@ -196,18 +196,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, reactive } from 'vue';
-import { alertDialog, asyncConfirmDialog } from 'src/utils/notification';
-import AddEditForm from 'src/components/commonForms/AddEditForm.vue';
-import { capitalCase } from 'src/utils/string';
-
 import Header from 'src/components/ui/TablePageHeader.vue';
 import GridCard from 'src/components/ui/TableGridCard.vue';
 import TablePageFilterLayout from 'src/layouts/TablePageFilterLayout.vue';
+import AddEditForm from 'src/components/commonForms/AddEditForm.vue';
+
+import { ref, onMounted, computed, reactive } from 'vue';
+import { date, useQuasar } from 'quasar';
+
+import { alertDialog, asyncConfirmDialog } from 'src/utils/notification';
+import { capitalCase } from 'src/utils/string';
 import { useScreenSize } from 'src/composables/utilComposibles';
 import { useFetch, usePost, usePut } from 'src/composables/apiCalls';
 import { TableColumn } from 'src/types/Common';
-import { date, useQuasar } from 'quasar';
 
 /* const breadcrumbs = [
   { path: '/module/maintenance', label: 'Maintenance' },
@@ -281,26 +282,24 @@ const columns: TableColumn[] = [
     label: 'In-Active On',
   },
 ];
+
 const $q = useQuasar();
-const isDark = computed(() => $q.dark.isActive);
-const fetchingData = ref(false);
-const nameSearchQuery = ref('');
-const source = ref<Source[]>([]);
-const checkBox = ref(false);
-const editingRowId = ref<number | null>(null);
-const isSourceFormActive = ref(false);
-const isFilterExpanded = ref(true);
 const { screenWidth } = useScreenSize();
 
-const filter = reactive<Filter>({ name: null, inactive: false });
-const filteredData = computed(() =>
-  source.value.filter(
-    (item) =>
-      item.name.toLowerCase().includes(nameSearchQuery.value.toLowerCase()) &&
-      item.inactive === checkBox.value
-  )
-);
+const source = ref<Source[]>([]);
+const editingRowId = ref<number | null>(null);
 
+const formData = ref<Form>({
+  name: null,
+});
+
+const fetchingData = ref(false);
+const isSourceFormActive = ref(false);
+const isFilterExpanded = ref(true);
+
+const filter = reactive<Filter>({ name: null, inactive: false });
+
+const isDark = computed(() => $q.dark.isActive);
 const filteredSource = computed(() => {
   const filteredArray = source.value.filter((source) => {
     const isNameMatched =
@@ -311,10 +310,6 @@ const filteredSource = computed(() => {
     return isNameMatched && isInactiveMatched;
   });
   return filteredArray;
-});
-
-const formData = ref<Form>({
-  name: null,
 });
 
 const initialFormData = computed(() => {
