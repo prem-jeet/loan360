@@ -127,7 +127,7 @@ const columns: TableColumn[] = [
   {
     name: 'actions',
     label: 'Actions',
-    align: 'left',
+    align: 'center',
     field: '',
   },
   {
@@ -140,28 +140,28 @@ const columns: TableColumn[] = [
   {
     name: 'inactive',
     required: true,
-    align: 'left',
+    align: 'center',
     field: 'inactive',
     label: 'InActive',
   },
   {
     name: 'createdOn',
     required: true,
-    align: 'left',
+    align: 'center',
     field: 'createdOn',
     label: 'Created On',
   },
   {
     name: 'updatedOn',
     required: true,
-    align: 'left',
+    align: 'center',
     field: 'updatedOn',
     label: 'Updated On',
   },
   {
     name: 'inactiveOn',
     required: true,
-    align: 'left',
+    align: 'center',
     field: 'inactiveOn',
     label: 'In-Active On',
   },

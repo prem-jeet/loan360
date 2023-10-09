@@ -35,12 +35,7 @@
                   outline
                   rounded
                   color="accent"
-                  @click="
-                    () => emits('edit', props.row)
-                    // editingRowId = props.row.id;
-                    // formData.name = props.row.name;
-                    // isSourceFormActive = true;
-                  "
+                  @click="() => emits('edit', props.row)"
                 />
                 <q-btn
                   size="xs"
@@ -59,30 +54,24 @@
             <td
               :props="props"
               v-if="Date.parse(props.row[key])"
-              style="max-width: 15ch"
+              style="width: 30ch"
             >
-              <div class="row">
-                <span
-                  class="column items-center text-caption q-col-gutter-sm items-center col-12"
-                >
-                  <div class="col-auto">
-                    <span>
-                      {{ date.formatDate(props.row[key], 'DD MMM, YYYY') }}
-                    </span>
-                  </div>
-                  <div class="col-auto">
-                    <q-chip
-                      size="10px"
-                      icon="schedule"
-                      :label="date.formatDate(props.row[key], 'h:mm A')"
-                      class="q-ml-xs text-overline text-weight-light"
-                      color="deep-orange-1"
-                      :ripple="false"
-                      :dark="false"
-                    />
-                  </div>
+              <span class="flex flex-center text-caption">
+                <span>
+                  {{ date.formatDate(props.row[key], 'DD MMM, YYYY') }}
                 </span>
-              </div>
+
+                <q-chip
+                  v-if="date.formatDate(props.row[key], 'h:mm A')"
+                  icon="schedule"
+                  :label="date.formatDate(props.row[key], 'h:mm A')"
+                  class="q-mt-xs q-ml-xs text-overline text-weight-medium"
+                  color="deep-orange-1"
+                  :ripple="false"
+                  :dark="false"
+                  style="font-size: calc(1vw * 0.75)"
+                />
+              </span>
             </td>
             <!-- if boolean type -->
             <td
@@ -151,4 +140,9 @@ const { screenWidth } = useScreenSize();
 const isDark = computed(() => $q.dark.isActive);
 </script>
 
-<style scoped></style>
+<style scoped>
+.text-table-row * {
+  font-size: calc(1vw * 0.9);
+  letter-spacing: 0.7px;
+}
+</style>
