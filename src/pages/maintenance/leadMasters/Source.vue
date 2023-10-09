@@ -125,12 +125,6 @@ interface Filter {
 
 const columns: TableColumn[] = [
   {
-    name: 'actions',
-    label: 'Actions',
-    align: 'center',
-    field: '',
-  },
-  {
     name: 'name',
     required: true,
     align: 'left',

@@ -1,7 +1,15 @@
 <template>
   <q-table
     :rows="rows"
-    :columns="columns"
+    :columns="[
+      {
+        name: 'actions',
+        label: 'Actions',
+        align: 'center',
+        field: '',
+      },
+      ...columns,
+    ]"
     separator="cell"
     bordered
     :loading="fetchingData"
@@ -26,7 +34,7 @@
         :class="[isDark ? 'table-row-dark' : 'table-row-light']"
       >
         <template :key="key" v-for="key in Object.keys(props.colsMap)">
-          <td v-if="key === 'actions'" style="width: 10ch">
+          <!-- <td v-if="key === 'actions'" style="width: 10ch">
             <div class="flex flex-center">
               <q-btn-group push unelevated>
                 <q-btn
@@ -47,8 +55,12 @@
                 />
               </q-btn-group>
             </div>
+          </td> -->
+          <td v-if="key === 'actions'" style="width: 10ch">
+            <div class="flex flex-center">
+              <TableActions icon-size="md" options-iconsize="sm" />
+            </div>
           </td>
-
           <template v-else>
             <!-- if date type -->
             <td
@@ -115,6 +127,7 @@
 
 <script setup lang="ts">
 import TableGridCard from './TableGridCard.vue';
+import TableActions from './TableActions.vue';
 
 import { date, useQuasar } from 'quasar';
 import { computed } from 'vue';
