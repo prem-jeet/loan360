@@ -1,4 +1,5 @@
 <template>
+  <!-- drop down menu for larger screens -->
   <q-btn-dropdown
     v-if="!mobileMenu"
     v-model="isOptionsDialogActive"
@@ -12,93 +13,114 @@
     :content-class="[`${isDark ? 'drop-down-dark' : 'drop-down-light'}`]"
   >
     <q-list style="min-width: 170px" class="text-table-card-dropdown">
-      <template v-for="(item, index) in dropDownItems" :key="item.label">
-        <q-item clickable v-close-popup>
+      <template v-for="(value, key, index) in options" :key="key">
+        <q-item clickable v-close-popup @click="emits(value.emit)">
           <q-item-section avatar>
             <q-avatar
-              :icon="item.icon"
-              :color="item.color"
+              :icon="value.icon"
+              :color="value.color"
               text-color="white"
               :size="optionsIconsize"
             />
           </q-item-section>
           <q-item-section>
             <q-item-label>
-              <div style="white-space: nowrap">{{ item.label }}</div>
+              <div style="white-space: nowrap">{{ key }}</div>
             </q-item-label>
           </q-item-section>
         </q-item>
-        <q-separator v-if="index < dropDownItems.length - 1" />
+        <q-separator v-if="index < Object.keys(options).length - 1" />
+      </template>
+      <template v-if="deleteOption">
+        <q-separator />
+        <q-item clickable v-close-popup @click="emits('delete')">
+          <q-item-section avatar>
+            <q-avatar
+              icon="delete"
+              color="red-7"
+              text-color="white"
+              :size="optionsIconsize"
+            />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>
+              <div style="white-space: nowrap">Delete</div>
+            </q-item-label>
+          </q-item-section>
+        </q-item>
       </template>
     </q-list>
   </q-btn-dropdown>
-  <q-btn
-    v-if="mobileMenu"
-    icon="manage_accounts"
-    flat
-    round
-    dense
-    class="cursor-pointer"
-    @click="
-      () => {
-        test();
-        isOptionsDialogActive = !isOptionsDialogActive;
-      }
-    "
-  />
-  <q-dialog v-model="isOptionsDialogActive" position="bottom" v-if="mobileMenu">
-    <q-card
-      style="border-radius: 30px 30px 0px 0px; letter-spacing: 1px"
-      :class="[
-        `text-${isDark ? 'white' : 'black'}`,
-        `table-row-operations-dialog-${isDark ? 'dark' : 'light'}`,
-        'text-weight-medium text-body1',
-      ]"
-    >
-      <q-card-section class="q-pa-xs q-mb-md">
-        <div class="row">
-          <div class="col-4 q-mx-auto">
-            <q-linear-progress :value="1" color="pink" />
-          </div>
-        </div>
-      </q-card-section>
-
-      <q-card-section class="q-py-sm q-px-lg">
-        <div
-          class="column flex-center q-px-md"
-          :class="[`dialog-style-${isDark ? 'dark' : 'light'}`]"
-          style="border-radius: 20px"
-        >
-          <template v-for="(item, index) in dropDownItems" :key="item.label">
-            <div
-              class="q-pa-md self-stretch justify-between flex cursor-pointer items-center"
-              :class="[
-                index < dropDownItems.length - 1 &&
-                  `dialog-style-border-bottom-${isDark ? 'dark' : 'light'}`,
-              ]"
-            >
-              <span>{{ item.label }}</span>
-              <q-icon :name="item.icon" />
+  <!-- dialog type menu for mobile -->
+  <template v-else>
+    <q-btn
+      icon="manage_accounts"
+      flat
+      round
+      dense
+      class="cursor-pointer"
+      @click="closeDialog"
+    />
+    <q-dialog v-model="isOptionsDialogActive" position="bottom">
+      <q-card
+        style="border-radius: 30px 30px 0px 0px; letter-spacing: 1px"
+        :class="[
+          `text-${isDark ? 'white' : 'black'}`,
+          `table-row-operations-dialog-${isDark ? 'dark' : 'light'}`,
+          'text-weight-medium text-body1',
+        ]"
+      >
+        <q-card-section class="q-pa-xs q-mb-md">
+          <div class="row">
+            <div class="col-4 q-mx-auto">
+              <q-linear-progress :value="1" color="pink" />
             </div>
-          </template>
-        </div>
-      </q-card-section>
-      <q-card-section class="q-mb-md q-px-lg">
-        <div
-          class="column flex-center q-px-md"
-          :class="[`dialog-style-${isDark ? 'dark' : 'light'}`]"
-          style="border-radius: 20px"
+          </div>
+        </q-card-section>
+
+        <q-card-section class="q-py-sm q-px-lg" v-close-popup>
+          <div
+            class="column flex-center q-px-md cursor-pointer"
+            :class="[`dialog-style-${isDark ? 'dark' : 'light'}`]"
+            style="border-radius: 20px"
+          >
+            <template v-for="(value, key, index) in options" :key="key">
+              <div
+                @click="emits(value.emit)"
+                class="q-pa-md self-stretch justify-between flex items-center"
+                :class="[
+                  index < Object.keys(options).length - 1 &&
+                    `dialog-style-border-bottom-${isDark ? 'dark' : 'light'}`,
+                ]"
+              >
+                <span>{{ key }}</span>
+                <q-icon :name="value.icon" />
+              </div>
+            </template>
+          </div>
+        </q-card-section>
+        <q-card-section
+          class="q-mb-md q-px-lg"
+          v-if="deleteOption"
+          @click="emits('delete')"
+          v-close-popup
         >
           <div
-            class="text-red-10 q-pa-md self-stretch justify-between flex items-center cursor-pointer"
+            class="column flex-center q-px-md cursor-pointer"
+            :class="[`dialog-style-${isDark ? 'dark' : 'light'}`]"
+            style="border-radius: 20px"
           >
-            <span>Delete</span>
-            <q-icon name="delete" />
+            <div
+              class="text-red-10 q-pa-md self-stretch justify-between flex items-center"
+            >
+              <span>Delete</span>
+              <q-icon name="delete" />
+            </div>
           </div>
-        </div>
-      </q-card-section>
-    </q-card>
-  </q-dialog>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+  </template>
 </template>
 
 <script setup lang="ts">
@@ -108,29 +130,41 @@ import { computed, ref } from 'vue';
 interface Props {
   iconSize?: string;
   optionsIconsize?: string;
-  mobileMenu: boolean;
+  mobileMenu?: boolean;
+  deleteOption?: boolean;
+  inactive: boolean;
 }
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   iconSize: 'md',
   optionsIconsize: 'md',
   mobileMenu: false,
+  deleteOption: false,
 });
 
-const test = () => console.log('clicked test');
+const emits = defineEmits(['edit', 'toggleActivateState', 'delete']);
 
-const dropDownItems = [
-  { label: 'Edit', icon: 'edit', color: 'blue-7' },
-  { label: 'Activate', icon: 'toggle_on', color: 'green-7' },
-  { label: 'De-Activate', icon: 'toggle_off', color: 'red-7' },
-  { label: 'Delete', icon: 'delete', color: 'red-7' },
-];
-// { label: 'Delete', icon: 'delete', color: 'red-7' },
+const options = computed(() => ({
+  Edit: {
+    icon: 'edit',
+    color: 'blue-7',
+    emit: 'edit' as 'edit' | 'toggleActivateState' | 'delete',
+  },
+
+  [`${props.inactive ? '' : 'De-'}Activate`]: {
+    icon: `toggle_${props.inactive ? 'on' : 'off'}`,
+    color: `${props.inactive ? 'green' : 'red'}-7`,
+    emit: 'toggleActivateState' as 'edit' | 'toggleActivateState' | 'delete',
+  },
+}));
 
 const $q = useQuasar();
 
 const isOptionsDialogActive = ref(false);
 
 const isDark = computed(() => $q.dark.isActive);
+
+const closeDialog = () =>
+  (isOptionsDialogActive.value = !isOptionsDialogActive.value);
 </script>
 
 <style lang="scss">

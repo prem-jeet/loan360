@@ -2,14 +2,30 @@
   <q-card table-data-card>
     <q-card-section class="row items-center" v-if="headerKey">
       <div class="text-h5 text-uppercase">
-        {{ data[headerKey].toLocaleUpperCase() }}
+        {{ data[headerKey].label.toLocaleUpperCase() }}
       </div>
       <q-space />
-      <TableActions icon-size="lg" />
+      <TableActions
+        icon-size="lg"
+        :mobile-menu="screenWidth < 531"
+        :inactive="(data.inactive as boolean)"
+        :delete-option="deleteOption"
+        @edit="() => emits('edit')"
+        @toggle-activate-state="emits('toggleActiveState')"
+        @delete="emits('delete')"
+      />
     </q-card-section>
     <q-card-section>
       <div class="absolute-right">
-        <TableActions icon-size="lg" :mobile-menu="true" />
+        <TableActions
+          icon-size="lg"
+          :mobile-menu="screenWidth < 531"
+          :inactive="(data.inactive as boolean)"
+          :delete-option="deleteOption"
+          @edit="() => emits('edit')"
+          @toggle-activate-state="emits('toggleActiveState')"
+          @delete="emits('delete')"
+        />
       </div>
 
       <div class="row border" v-for="(value, key) of data" :key="key">
@@ -20,7 +36,7 @@
           <div
             class="col-auto q-pl-sm q-py-sm flex items-center text-weight-medium text-subtitle1"
             style="letter-spacing: 0.6px"
-            :style="{ width: screen < 930 ? '49vw' : '23vw' }"
+            :style="{ width: screenWidth < 930 ? '49vw' : '23vw' }"
           >
             <template v-if="Date.parse(value)">
               {{ date.formatDate(new Date(value), 'D MMM, YYYY') }}
@@ -33,7 +49,7 @@
               <div class="flex flex-center">
                 <q-icon
                   size="sm"
-                  :name="value ? 'cancel' : 'check_circle'"
+                  :name="value ? 'check_circle' : 'cancel'"
                   :color="
                     value
                       ? `red-${isDark ? '10' : '6'}`
@@ -57,18 +73,24 @@ import TableActions from './TableActions.vue';
 // import ExpandingTextArea from 'src/components/ExpandingTextArea.vue';
 
 import { date, useQuasar } from 'quasar';
+import { useScreenSize } from 'src/composables/utilComposibles';
 
 interface Props {
-  data: { [key: string]: string };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: { [key: string]: any };
+  // eslint-enable-next-line @typescript-eslint/no-explicit-any
   colsMap: { [key: string]: { [key: string]: string; label: string } };
   headerKey?: string;
   hideNullData?: boolean;
+  deleteOption?: boolean;
 }
+
 defineProps<Props>();
+const emits = defineEmits(['edit', 'toggleActiveState', 'delete']);
 
 const $q = useQuasar();
+const { screenWidth } = useScreenSize();
 const isDark = computed(() => $q.dark.isActive);
-const screen = computed(() => $q.screen.width);
 </script>
 
 <style lang="scss" scoped>

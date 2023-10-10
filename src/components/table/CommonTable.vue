@@ -56,9 +56,18 @@
               </q-btn-group>
             </div>
           </td> -->
-          <td v-if="key === 'actions'" style="width: 10ch">
+          <td v-if="key === 'actions'" style="width: 10ch" :props="props">
             <div class="flex flex-center">
-              <TableActions icon-size="md" options-iconsize="sm" />
+              <TableActions
+                icon-size="md"
+                options-iconsize="sm"
+                :delete="false"
+                :inactive="props.row.inactive"
+                :delete-option="deleteOption"
+                @edit="emits('edit', props.row)"
+                @toggle-activate-state="emits('toggleActiveState', props.row)"
+                @delete="emits('delete', props.row)"
+              />
             </div>
           </td>
           <template v-else>
@@ -93,7 +102,7 @@
               <div class="flex flex-center">
                 <q-icon
                   size="sm"
-                  :name="props.row[key] ? 'cancel' : 'check_circle'"
+                  :name="props.row[key] ? 'check_circle' : 'cancel'"
                   :color="
                     props.row[key]
                       ? `red-${isDark ? '5' : '10'}`
@@ -119,7 +128,14 @@
     <!-- card for grid layout screens < 800px -->
     <template v-slot:item="props">
       <div class="q-pa-sm" :class="[screenWidth < 950 ? 'col-12' : 'col-sm-6']">
-        <TableGridCard :data="props.row" :colsMap="props.colsMap" />
+        <TableGridCard
+          :data="props.row"
+          :colsMap="props.colsMap"
+          :delete-option="deleteOption"
+          @edit="emits('edit', props.row)"
+          @toggle-active-state="emits('toggleActiveState', props.row)"
+          @delete="emits('delete', props.row)"
+        />
       </div>
     </template>
   </q-table>
@@ -141,11 +157,12 @@ interface Props {
   rows: { [key: string]: any }[];
   columns: TableColumn[];
   fetchingData: boolean;
+  deleteOption?: boolean;
 }
 
 defineProps<Props>();
 
-const emits = defineEmits(['edit', 'toggleActiveState']);
+const emits = defineEmits(['edit', 'toggleActiveState', 'delete']);
 
 const $q = useQuasar();
 const { screenWidth } = useScreenSize();
