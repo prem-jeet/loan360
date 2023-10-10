@@ -117,4 +117,50 @@ watch(drawerLeft, () => {
   left: 490px;
   top: 10px;
 }
+[bg-page] {
+  background-color: hsla(205, 0%, 100%, 1);
+  background-image: radial-gradient(
+      at 15% 23%,
+      hsla(197, 97%, 47%, 0.12) 0px,
+      transparent 50%
+    ),
+    radial-gradient(at 37% 92%, hsla(207, 100%, 95%, 0.27) 0px, transparent 50%),
+    radial-gradient(at 80% 100%, hsla(206, 76%, 84%, 0.51) 0px, transparent 50%);
+  background-size: 150% 150% !important;
+  animation: gradient-animation 10s ease-in-out infinite alternate both;
+}
+
+@keyframes gradient-animation {
+  0% {
+    background-position: 0% 0%;
+  }
+  25% {
+    background-position: 50% 50%;
+  }
+  50% {
+    background-position: 20% 20%;
+  }
+  75% {
+    background-position: 5% 5%;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
+}
+.body--dark [bg-page] {
+  background-image: linear-gradient(
+    10deg,
+    hsl(199deg 11% 28%) 0%,
+    hsl(203deg 17% 23%) 1%,
+    hsl(208deg 23% 19%) 7%,
+    hsl(213deg 30% 15%) 21%,
+    hsl(220deg 37% 12%) 46%,
+    hsl(237deg 48% 8%) 68%,
+    hsl(238deg 55% 7%) 81%,
+    hsl(239deg 65% 7%) 89%,
+    hsl(239deg 79% 6%) 95%,
+    hsl(239deg 98% 5%) 98%,
+    hsl(0deg 0% 0%) 100%
+  );
+}
 </style>

@@ -21,7 +21,11 @@
       <q-th
         :props="props"
         class="text-black"
-        style="font-size: 1rem; background-color: #e7f4ff"
+        style="
+          font-size: 1rem;
+          background-color: #aee0f4d2;
+          letter-spacing: 0.3px;
+        "
       >
         {{ props.col.label }}
       </q-th>
@@ -34,28 +38,6 @@
         :class="[isDark ? 'table-row-dark' : 'table-row-light']"
       >
         <template :key="key" v-for="key in Object.keys(props.colsMap)">
-          <!-- <td v-if="key === 'actions'" style="width: 10ch">
-            <div class="flex flex-center">
-              <q-btn-group push unelevated>
-                <q-btn
-                  icon="edit"
-                  size="xs"
-                  outline
-                  rounded
-                  color="accent"
-                  @click="() => emits('edit', props.row)"
-                />
-                <q-btn
-                  size="xs"
-                  outline
-                  rounded
-                  color="red-5"
-                  :label="props.row.inactive ? 'Activate' : 'De-Activate'"
-                  @click="() => emits('toggleActiveState', props.row)"
-                />
-              </q-btn-group>
-            </div>
-          </td> -->
           <td v-if="key === 'actions'" style="width: 10ch" :props="props">
             <div class="flex flex-center">
               <TableActions
@@ -155,6 +137,7 @@ import { TableColumn } from 'src/types/Common';
 interface Props {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   rows: { [key: string]: any }[];
+  // eslint-enable-next-line @typescript-eslint/no-explicit-any
   columns: TableColumn[];
   fetchingData: boolean;
   deleteOption?: boolean;

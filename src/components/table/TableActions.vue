@@ -12,7 +12,7 @@
     no-icon-animation
     :content-class="[`${isDark ? 'drop-down-dark' : 'drop-down-light'}`]"
   >
-    <q-list style="min-width: 170px" class="text-table-card-dropdown">
+    <q-list style="min-width: 170px">
       <template v-for="(value, key, index) in options" :key="key">
         <q-item clickable v-close-popup @click="emits(value.emit)">
           <q-item-section avatar>
@@ -175,10 +175,13 @@ const closeDialog = () =>
   border: 1px solid rgba(35, 102, 134, 0.225);
 }
 .drop-down-light {
-  background: rgba(99, 255, 250, 0.2);
+  background: rgba(131, 149, 255, 0.2);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(99, 255, 250, 0.1);
+  font-size: max(calc(1vw * 1.05), calc(var(--c-font-size) * 0.8));
+  font-weight: 500;
+  letter-spacing: 0.7px;
 }
 
 .dialog-style-border-bottom-light {

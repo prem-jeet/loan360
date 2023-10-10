@@ -136,7 +136,7 @@ const columns: TableColumn[] = [
     required: true,
     align: 'center',
     field: 'inactive',
-    label: 'InActive',
+    label: 'In-Active',
   },
   {
     name: 'createdOn',

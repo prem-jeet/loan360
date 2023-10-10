@@ -95,12 +95,7 @@ const isDark = computed(() => $q.dark.isActive);
 
 <style lang="scss" scoped>
 [table-data-card] {
-  // background: #56c3fb73;
-  // -webkit-backdrop-filter: blur(14px);
-  // backdrop-filter: blur(14px);
-  // border: 1px solid rgba(86, 195, 251, 0.225);
-
-  background: rgba(85, 195, 250, 0.3);
+  background: #e7f4ff;
   -webkit-backdrop-filter: blur(1px);
   backdrop-filter: blur(1px);
   border: 1px solid rgba(85, 195, 250, 0.15);
