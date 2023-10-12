@@ -24,16 +24,6 @@
             <q-icon name="search" v-else />
           </template>
         </q-input>
-        <q-btn
-          icon="close"
-          rounded
-          size="xs"
-          padding="sm sm"
-          class="q-ml-md text-weight-bold"
-          color="red-5"
-          @click="close"
-          v-if="route.name !== 'module' && screenWidth < 560"
-        />
       </div>
 
       <q-scroll-area
@@ -84,7 +74,6 @@ import { MenuItem } from 'src/stores/menu/menuStoreTypes';
 import { debounce } from 'quasar';
 import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
-import { useScreenSize } from 'src/composables/utilComposibles';
 
 interface TreeNode {
   name: string;
@@ -101,12 +90,11 @@ const iconSet = {
   MP: 'fa-regular fa-pen-to-square',
   MW: 'fa-regular fa-circle-check',
 };
-const emits = defineEmits(['close']);
-const close = () => emits('close');
+
 const scrollbarVisible = ref(false);
 const menuStore = useMenuStore();
 const { topLevelMenu } = storeToRefs(menuStore);
-const { screenWidth } = useScreenSize();
+
 const resetFilter = () => {
   filter.value = '';
 };
