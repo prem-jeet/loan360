@@ -25,28 +25,29 @@
             </q-input>
           </div>
 
-          <div class="col-12 q-mt-md col-sm-auto q-mt-sm-none q-ml-sm-md">
+          <div
+            class="col-12 q-mt-md col-sm-auto q-mt-sm-none q-ml-sm-md"
+            style="font-size: min(20px, calc(3.5vw))"
+          >
             <q-checkbox v-model="filter.inactive" label="In-Active" />
           </div>
         </div>
       </TablePageFilterLayout>
     </div>
-    <div class="row q-mt-lg q-pb-xl">
-      <div class="col">
-        <CommonTable
-          :fetching-data="fetchingData"
-          :rows="filteredSource"
-          :columns="columns"
-          @edit="
-            (row) => {
-              editingRowId = row.id;
-              formData.name = row.name;
-              isSourceFormActive = true;
-            }
-          "
-          @toggle-active-state="toggleActiveState"
-        />
-      </div>
+    <div class="q-mt-lg q-pb-xl q-mb-lg">
+      <CommonTable
+        :fetching-data="fetchingData"
+        :rows="filteredSource"
+        :columns="columns"
+        @edit="
+          (row) => {
+            editingRowId = row.id;
+            formData.name = row.name;
+            isSourceFormActive = true;
+          }
+        "
+        @toggle-active-state="toggleActiveState"
+      />
     </div>
   </div>
 
