@@ -28,15 +28,26 @@
         />
       </div>
 
-      <div class="row border" v-for="(value, key) of data" :key="key">
+      <div
+        class="row items-center"
+        v-for="(value, key, index) of data"
+        :key="key"
+        :class="{
+          'q-pt-md': index > 0,
+        }"
+        style="font-size: min(calc(3vw), 18px)"
+      >
         <template v-if="colsMap[key] && (!hideNullData || value !== null)">
-          <div class="col-4 q-pa-xs q-py-sm text-uppercase flex items-center">
+          <div class="col-4 text-uppercase flex items-center">
             {{ colsMap[key].label }}
           </div>
           <div
-            class="col-auto q-pl-sm q-py-sm flex items-center text-weight-medium text-subtitle1"
+            class="col-auto q-pl-sm flex items-center text-weight-medium"
             style="letter-spacing: 0.6px"
-            :style="{ width: screenWidth < 930 ? '49vw' : '23vw' }"
+            :style="{
+              fontSize: 'min(calc(3.1vw), 22px)',
+              width: screenWidth < 930 ? '49vw' : '28vw',
+            }"
           >
             <template v-if="Date.parse(value)">
               {{ date.formatDate(new Date(value), 'D MMM, YYYY') }}
@@ -48,7 +59,7 @@
             <template v-else-if="typeof value === 'boolean'">
               <div class="flex flex-center">
                 <q-icon
-                  size="sm"
+                  :size="screenWidth < 700 ? 'xs' : 'sm'"
                   :name="value ? 'check_circle' : 'cancel'"
                   :color="
                     value
@@ -58,7 +69,7 @@
                 />
               </div>
             </template>
-            <div v-else>{{ value }}</div>
+            <div v-else>{{ value && capitalCase(value) }}</div>
           </div>
         </template>
       </div>
@@ -74,6 +85,7 @@ import TableActions from './TableActions.vue';
 
 import { date, useQuasar } from 'quasar';
 import { useScreenSize } from 'src/composables/utilComposibles';
+import { capitalCase } from 'src/utils/string';
 
 interface Props {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
