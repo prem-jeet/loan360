@@ -147,10 +147,9 @@ import EligibilityCalculator from 'src/components/RightMenuDropDown/RightMenuDro
 import { useUserStore } from 'src/stores/user/userStore';
 import { asyncConfirmDialog } from 'src/utils/notification';
 
-const userStore = useUserStore();
-
 const showEligibilityCalculator = ref(false);
 
+const userStore = useUserStore();
 const userAvatar = computed(() =>
   userStore.decodedIdToken.given_name
     ? userStore.decodedIdToken.given_name.charAt(0).toUpperCase()

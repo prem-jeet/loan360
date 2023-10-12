@@ -4,33 +4,68 @@
       class="transparent"
       :style="{ transition: 'top 250ms', top: `${hideHeader ? '-12%' : 0}` }"
     >
-      <NavBar @openMenu="openMenu" />
+      <NavBar @open-drawer="openDrawer" />
     </q-header>
 
     <q-page-container bg-page class="overflow-auto" style="max-height: 100vh">
       <q-page v-scroll="toggleHeaderVisibility" ref="page">
-        <RouterView @openMenu="openMenu"></RouterView>
+        <RouterView></RouterView>
       </q-page>
     </q-page-container>
     <q-drawer
-      v-model="drawerLeft"
+      v-model="isDrawerActive"
       overlay
       elevated
       :width="screenWidth < 560 ? screenWidth : 480"
       class="bg-white"
     >
-      <LeftMenu :key="menuStore.currentModule" @close="drawerLeft = false" />
-      <div v-if="drawerLeft" @click="drawerLeft = false" drawer-overlay />
-      <q-btn
-        drawer-close
-        color="red-10 text-white"
-        size="md"
-        round
-        icon="close"
-        v-if="screenWidth > 560 && drawerLeft"
-        @click="drawerLeft = false"
+      <div class="q-pa-sm items-center flex" style="background: #6ec2ff36">
+        <q-tabs
+          v-model="tab"
+          class="text-black col-grow"
+          active-color="indigo-10"
+          indicator-color="primary"
+          align="center"
+          narrow-indicator
+        >
+          <q-tab icon="search" name="menu" v-if="shouldShowMenuTab" />
+          <q-tab icon="notifications" name="notification" />
+          <q-tab icon="person" name="account" />
+        </q-tabs>
+        <q-space />
+        <q-btn
+          icon="keyboard_double_arrow_left"
+          flat
+          size="md"
+          padding="sm sm"
+          class="text-weight-bold"
+          color="black"
+          @click="isDrawerActive = false"
+        />
+      </div>
+      <q-tab-panels
+        v-model="tab"
+        animated
+        style="height: 90vh; overflow-y: auto"
       >
-      </q-btn>
+        <q-tab-panel name="menu" v-if="shouldShowMenuTab">
+          <ModuleSearchMenu
+            :key="menuStore.currentModule"
+            @close="isDrawerActive = false"
+          />
+        </q-tab-panel>
+
+        <q-tab-panel name="notification">
+          <div class="text-h6">No notification</div>
+        </q-tab-panel>
+
+        <q-tab-panel name="account"></q-tab-panel>
+      </q-tab-panels>
+      <div
+        v-if="isDrawerActive"
+        @click="isDrawerActive = false"
+        drawer-overlay
+      />
     </q-drawer>
     <CompanyAndBranchSelectorModal
       v-if="isCompanyAndBranchSelectorModalActive"
@@ -39,27 +74,35 @@
 </template>
 <script setup lang="ts">
 import NavBar from 'src/components/ui/header/NavBar.vue';
-import LeftMenu from 'src/components/LeftMenu.vue';
+import ModuleSearchMenu from 'src/components/ModuleSearchMenu.vue';
 import { watch, ref, onBeforeMount, computed } from 'vue';
 import { useMenuStore } from 'src/stores/menu/menuStore';
 import { useUserStore } from 'src/stores/user/userStore';
 import CompanyAndBranchSelectorModal from 'src/components/modals/CompanyAndBranchSelectorModal.vue';
 import { useScreenSize } from 'src/composables/utilComposibles';
+import { useRoute } from 'vue-router';
 
 const userStore = useUserStore();
 
-const drawerLeft = ref(false);
+const isDrawerActive = ref(false);
 const menuStore = useMenuStore();
 const hideHeader = ref(false);
+const route = useRoute();
 
+const tab = ref('');
 const { screenWidth } = useScreenSize();
-const openMenu = () => {
-  drawerLeft.value = !drawerLeft.value;
-};
+const shouldShowMenuTab = computed(
+  () => !['moduleSelector', 'module'].includes(route.name as string)
+);
 
 const isCompanyAndBranchSelectorModalActive = computed(
   () => userStore.companyModal
 );
+
+const openDrawer = (state: 'menu' | 'notification' | 'account') => {
+  tab.value = state;
+  isDrawerActive.value = !isDrawerActive.value;
+};
 
 const getDataOnRefresh = async () => {
   // Header Set for loggedIn user
@@ -88,9 +131,9 @@ const toggleHeaderVisibility = (position: number) => {
   }
 };
 
-watch(drawerLeft, () => {
+watch(isDrawerActive, () => {
   const element = document.querySelector('#q-app');
-  if (drawerLeft.value) {
+  if (isDrawerActive.value) {
     element?.classList.add('no-scroll');
   } else {
     element?.classList.remove('no-scroll');
