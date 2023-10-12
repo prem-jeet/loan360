@@ -47,6 +47,7 @@
         v-model="tab"
         animated
         style="height: 90vh; overflow-y: auto"
+        left-drawer
       >
         <q-tab-panel name="menu" v-if="shouldShowMenuTab">
           <ModuleSearchMenu
@@ -59,7 +60,21 @@
           <div class="text-h6">No notification</div>
         </q-tab-panel>
 
-        <q-tab-panel name="account"></q-tab-panel>
+        <q-tab-panel name="account">
+          <div class="full-height column">
+            <div class="col-grow">
+              <AccountMenu />
+            </div>
+            <q-btn
+              label="logout"
+              icon="logout"
+              size="lg"
+              padding="md sm"
+              @click="logout"
+              color="red-7"
+            />
+          </div>
+        </q-tab-panel>
       </q-tab-panels>
       <div
         v-if="isDrawerActive"
@@ -81,6 +96,8 @@ import { useUserStore } from 'src/stores/user/userStore';
 import CompanyAndBranchSelectorModal from 'src/components/modals/CompanyAndBranchSelectorModal.vue';
 import { useScreenSize } from 'src/composables/utilComposibles';
 import { useRoute } from 'vue-router';
+import AccountMenu from 'src/components/AccountMenu.vue';
+import { asyncConfirmDialog } from 'src/utils/notification';
 
 const userStore = useUserStore();
 
@@ -131,6 +148,17 @@ const toggleHeaderVisibility = (position: number) => {
   }
 };
 
+const logout = async () => {
+  const confirm = await asyncConfirmDialog({
+    title: 'Logout ?',
+    msg: 'Are you sure you want to logout ?',
+  });
+
+  if (confirm) {
+    localStorage.clear();
+    window.location.assign('/');
+  }
+};
 watch(isDrawerActive, () => {
   const element = document.querySelector('#q-app');
   if (isDrawerActive.value) {
@@ -142,6 +170,9 @@ watch(isDrawerActive, () => {
 </script>
 
 <style>
+[left-drawer] {
+  font-size: calc(var(--c-font-size) * 0.85);
+}
 [drawer-overlay] {
   background: red;
   position: absolute;

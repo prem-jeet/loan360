@@ -20,7 +20,10 @@
           screenWidth < 560 ? '90vw' : screenWidth < 1000 ? '70vw' : '50vw',
       }"
     >
-      <LeftMenu :key="menuStore.currentModule" />
+      <ModuleSearchMenu
+        style="font-size: calc(var(--c-font-size) * 0.85)"
+        :key="menuStore.currentModule"
+      />
     </div>
   </div>
   <RouterView />
@@ -32,7 +35,7 @@ import { onMounted, computed } from 'vue';
 import { Modules } from 'src/stores/menu/menuStoreTypes';
 import logo from 'src/assets/img/jaguarlogo.png';
 
-import LeftMenu from 'src/components/LeftMenu.vue';
+import ModuleSearchMenu from 'src/components/ModuleSearchMenu.vue';
 import { useRoute } from 'vue-router';
 import { useScreenSize } from 'src/composables/utilComposibles';
 

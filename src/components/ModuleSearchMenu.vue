@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md q-gutter-y-lg fit" left-drawer>
+  <div class="q-pa-md q-gutter-y-lg fit">
     <template v-if="!treeStructure.length">
       <div class="column items-center q-mt-xl q-pt-xl">
         <div id="atom-loader"></div>
@@ -164,9 +164,6 @@ watch(treeFilter, () => {
 <style scoped>
 .no-scroll {
   overflow: hidden !important;
-}
-[left-drawer] {
-  font-size: calc(var(--c-font-size) * 0.85);
 }
 
 /* HTML: <div class="loader"></div> */
