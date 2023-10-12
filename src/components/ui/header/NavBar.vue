@@ -11,7 +11,7 @@
           round
           unelevated
           :ripple="false"
-          @click="openMenu"
+          @click="() => emits('openDrawer', 'menu')"
           icon="menu_open"
           size="22px"
           v-if="!['moduleSelector', 'module'].includes(route.name as string)"
@@ -35,7 +35,16 @@
       </div>
 
       <div class="flex items-center q-ml-auto">
-        <RightMenuDropDown />
+        <q-btn
+          round
+          color="grey-5"
+          text-color="blue-grey-10"
+          class="text-weight-bold text-h5"
+          size="25px"
+          padding="sm md"
+          :label="(userAvatar as string)"
+          @click="() => emits('openDrawer', 'account')"
+        />
       </div>
     </div>
   </div>
@@ -48,7 +57,7 @@
       class="cursor-pointer"
       name="menu"
       size="md"
-      @click="openMenu"
+      @click="() => emits('openDrawer', 'menu')"
       v-if="!['moduleSelector', 'module'].includes(route.name as string)"
     />
     <router-link
@@ -57,22 +66,38 @@
     >
       <q-icon class="cursor-pointer" name="home" size="md" />
     </router-link>
-    <q-icon class="cursor-pointer" name="notifications" size="md" />
-    <q-icon class="cursor-pointer" name="person" size="md" />
+    <q-icon
+      class="cursor-pointer"
+      name="notifications"
+      size="md"
+      @click="() => emits('openDrawer', 'notification')"
+    />
+    <q-icon
+      class="cursor-pointer"
+      name="person"
+      size="md"
+      @click="() => emits('openDrawer', 'account')"
+    />
   </div>
 </template>
 <script setup lang="ts">
-import RightMenuDropDown from 'src/components/RightMenuDropDown/RightMenuDropDown.vue';
 import logo from 'src/assets/img/jaguarlogo.png';
 import { useRoute } from 'vue-router';
 import { computed } from 'vue';
 import { useQuasar } from 'quasar';
+import { useUserStore } from 'src/stores/user/userStore';
 
-const emits = defineEmits(['openMenu']);
+const userStore = useUserStore();
+const userAvatar = computed(() =>
+  userStore.decodedIdToken.given_name
+    ? userStore.decodedIdToken.given_name.charAt(0).toUpperCase()
+    : null
+);
+
+const emits = defineEmits(['openDrawer']);
 const route = useRoute();
 const $q = useQuasar();
 const screenWidth = computed(() => $q.screen.width);
-const openMenu = () => emits('openMenu');
 </script>
 <style lang="scss">
 [navbar] {
