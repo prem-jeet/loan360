@@ -8,7 +8,7 @@
       <q-item-section>Full Screen</q-item-section>
     </q-item>
 
-    <q-item to="/moduleselector" active-class="bg-red">
+    <q-item to="/moduleselector">
       <q-item-section thumbnail>
         <q-icon size="md" name="view_module" />
       </q-item-section>
