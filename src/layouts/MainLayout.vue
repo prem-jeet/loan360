@@ -65,14 +65,7 @@
             <div class="col-grow">
               <AccountMenu />
             </div>
-            <q-btn
-              label="logout"
-              icon="logout"
-              size="lg"
-              padding="md sm"
-              @click="logout"
-              color="red-7"
-            />
+            <LogoutButton />
           </div>
         </q-tab-panel>
       </q-tab-panels>
@@ -94,10 +87,10 @@ import { watch, ref, onBeforeMount, computed } from 'vue';
 import { useMenuStore } from 'src/stores/menu/menuStore';
 import { useUserStore } from 'src/stores/user/userStore';
 import CompanyAndBranchSelectorModal from 'src/components/modals/CompanyAndBranchSelectorModal.vue';
+import LogoutButton from 'src/components/ui/LogoutButton.vue';
 import { useScreenSize } from 'src/composables/utilComposibles';
 import { useRoute } from 'vue-router';
 import AccountMenu from 'src/components/AccountMenu.vue';
-import { asyncConfirmDialog } from 'src/utils/notification';
 
 const userStore = useUserStore();
 
@@ -148,17 +141,6 @@ const toggleHeaderVisibility = (position: number) => {
   }
 };
 
-const logout = async () => {
-  const confirm = await asyncConfirmDialog({
-    title: 'Logout ?',
-    msg: 'Are you sure you want to logout ?',
-  });
-
-  if (confirm) {
-    localStorage.clear();
-    window.location.assign('/');
-  }
-};
 watch(isDrawerActive, () => {
   const element = document.querySelector('#q-app');
   if (isDrawerActive.value) {

@@ -1,5 +1,5 @@
 <template>
-  <q-list style="letter-spacing: 0.6px" account-menu>
+  <q-list style="letter-spacing: 0.6px" account-menu class="text-weight-medium">
     <q-item @click="toggleFullscreen" clickable>
       <q-item-section thumbnail>
         <q-icon size="md" name="open_in_full" />
@@ -12,7 +12,7 @@
       <q-item-section thumbnail>
         <q-icon size="md" name="view_module" />
       </q-item-section>
-      <q-item-section thumbnail> Modules</q-item-section>
+      <q-item-section thumbnail style="color: black"> Modules</q-item-section>
     </q-item>
 
     <q-item clickable>
