@@ -1,6 +1,9 @@
 <template>
-  <q-card class="column" :style="{ 'min-width': cardWidth }">
-    <q-card-section class="q-py-none row justify-between items-center">
+  <q-card class="column transparent" :style="{ 'min-width': cardWidth }">
+    <q-card-section
+      class="q-py-none row justify-between items-center"
+      card-header-section
+    >
       <div class="col-10">
         <span add-edit-form-header class="text-h4 text-weight-medium">
           {{ isEditing ? 'Edit ' : 'Add ' }}{{ label }}
@@ -21,6 +24,7 @@
       class="col-grow column"
       @submit.prevent="emits('submit')"
       @reset="emits('reset', { ...initialData })"
+      card-main-section
     >
       <q-card-section
         class="col-grow q-pb-xl q-mb-lg"
@@ -32,7 +36,11 @@
       >
         <slot />
       </q-card-section>
-      <q-card-actions align="right" class="q-pa-lg absolute-bottom">
+      <q-card-actions
+        align="right"
+        class="q-px-lg q-py-md absolute-bottom"
+        card-bottom-section
+      >
         <q-btn
           type="submit"
           v-if="isEditing"
@@ -90,8 +98,22 @@ const cardWidth = computed(() =>
 );
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 [add-edit-form-header] {
   font-size: min(calc(var(--c-font-size) + 2vw), 2rem);
+}
+
+[card-main-section] {
+  background: rgba(255, 255, 255, 0.85);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+[card-header-section] {
+  background: #c5dcf0;
+}
+[card-bottom-section] {
+  background: rgba(255, 255, 255, 0.2);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
 }
 </style>
