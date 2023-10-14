@@ -1,5 +1,5 @@
 <template>
-  <q-card class="column" :style="{ minWidth: minWidth, minHeight: minHeight }">
+  <q-card class="column" :style="{ 'min-width': cardWidth }">
     <q-card-section class="q-py-none row justify-between items-center">
       <div class="col-10">
         <span add-edit-form-header class="text-h4 text-weight-medium">
@@ -23,10 +23,10 @@
       @reset="emits('reset', { ...initialData })"
     >
       <q-card-section
-        class="col-grow"
+        class="col-grow q-pb-xl q-mb-lg"
         :style="{
-          'max-height': `${screenWidth < 600 ? '85vh' : '65vh'}`,
-          'min-height': '200px',
+          'max-height': mainSectionHeight,
+
           'overflow-Y': 'auto',
         }"
       >
@@ -56,24 +56,38 @@
 
 <script setup lang="ts">
 import { useScreenSize } from 'src/composables/utilComposibles';
+import { computed } from 'vue';
 
 interface Props {
   label: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   initialObject: { [key: string]: any };
-  minWidth?: string;
-  minHeight?: string;
+
   isEditing: boolean;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  minHeight: 'auto',
-  minWidth: '375px',
-});
+const props = defineProps<Props>();
 
 const initialData = { ...props.initialObject };
 const emits = defineEmits(['close', 'submit', 'reset']);
 const { screenWidth } = useScreenSize();
+
+const mainSectionHeight = computed(() =>
+  screenWidth.value < 450 ? '88vh' : screenWidth.value < 600 ? '80vh' : '65vh'
+);
+const cardWidth = computed(() =>
+  screenWidth.value < 450
+    ? 'auto'
+    : screenWidth.value < 600
+    ? '90vw'
+    : screenWidth.value < 950
+    ? '70vw'
+    : screenWidth.value < 1250
+    ? '50vw'
+    : screenWidth.value < 1850
+    ? '40vw'
+    : '30vw'
+);
 </script>
 
 <style scoped>
