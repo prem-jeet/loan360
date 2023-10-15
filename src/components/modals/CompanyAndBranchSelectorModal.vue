@@ -65,6 +65,7 @@ import { useRoute } from 'vue-router';
 
 import { useUserStore } from 'src/stores/user/userStore';
 import { Branch, Company, FinancialYear } from 'src/stores/user/userStoreTypes';
+import { onSuccess } from 'src/utils/notification';
 
 const emit = defineEmits(['close']);
 
@@ -96,10 +97,14 @@ const submit = () => {
     selectedBranch.value,
     selectedFinancialYear.value
   );
+  onSuccess({
+    msg: 'Data changed successfully',
+  });
+  userStore.openCompanySelectModal(false);
+  setTimeout(close, 250);
 };
 
 const close = () => {
-  userStore.openCompanySelectModal(false);
   emit('close');
 };
 

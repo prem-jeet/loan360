@@ -35,12 +35,22 @@
       </div>
 
       <div class="flex items-center q-ml-auto">
+        <CompanyAndBranchSelectorModal
+          v-if="isCompanyAndBranchSelectorModalActive"
+          @close="isCompanyAndBranchSelectorModalActive = false"
+        />
         <q-btn
+          :size="screenWidth < 650 ? '20px' : '25px'"
+          icon="location_on"
+          flat
+          @click="isCompanyAndBranchSelectorModalActive = true"
+        />
+        <q-btn
+          :size="screenWidth < 650 ? '22px' : '25px'"
           round
           color="grey-5"
           text-color="blue-grey-10"
-          class="text-weight-bold text-h5"
-          size="25px"
+          class="q-ml-md text-weight-bold text-h6"
           padding="sm md"
           :label="(userAvatar as string)"
           @click="() => emits('openDrawer', 'account')"
@@ -83,9 +93,11 @@
 <script setup lang="ts">
 import logo from 'src/assets/img/jaguarlogo.png';
 import { useRoute } from 'vue-router';
-import { computed } from 'vue';
-import { useQuasar } from 'quasar';
+import { computed, ref } from 'vue';
+
 import { useUserStore } from 'src/stores/user/userStore';
+import CompanyAndBranchSelectorModal from 'src/components/modals/CompanyAndBranchSelectorModal.vue';
+import { useScreenSize } from 'src/composables/utilComposibles';
 
 const userStore = useUserStore();
 const userAvatar = computed(() =>
@@ -93,11 +105,12 @@ const userAvatar = computed(() =>
     ? userStore.decodedIdToken.given_name.charAt(0).toUpperCase()
     : null
 );
+const { screenWidth } = useScreenSize();
 
 const emits = defineEmits(['openDrawer']);
 const route = useRoute();
-const $q = useQuasar();
-const screenWidth = computed(() => $q.screen.width);
+
+const isCompanyAndBranchSelectorModalActive = ref(false);
 </script>
 <style lang="scss">
 [navbar] {
