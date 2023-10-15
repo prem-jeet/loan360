@@ -99,7 +99,7 @@
   />
 </template>
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import EligibilityCalculator from 'src/components/calculators/EligibilityCalculator.vue';
 import { useScreenSize } from 'src/composables/utilComposibles';
 import CompanyAndBranchSelectorModal from './modals/CompanyAndBranchSelectorModal.vue';
@@ -125,8 +125,6 @@ const toggleFullscreen = () => {
     }
   }
 };
-
-onMounted(() => console.log('mounted account menu'));
 </script>
 <style scoped>
 [account-menu] > .q-item {
