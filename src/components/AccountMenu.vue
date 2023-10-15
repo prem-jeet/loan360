@@ -15,6 +15,17 @@
       <q-item-section thumbnail style="color: black"> Modules</q-item-section>
     </q-item>
 
+    <q-item
+      clickable
+      v-if="screenWidth <= 540"
+      @click="isCompanyAndBranchSelectorModalActive = true"
+    >
+      <q-item-section thumbnail>
+        <q-icon size="md" name="location_on" />
+      </q-item-section>
+      <q-item-section>Company and Branch</q-item-section>
+    </q-item>
+
     <q-item clickable>
       <q-item-section thumbnail>
         <q-icon size="md" name="calendar_month" />
@@ -82,13 +93,21 @@
   <q-dialog v-model="showEligibilityCalculator">
     <EligibilityCalculator />
   </q-dialog>
+  <CompanyAndBranchSelectorModal
+    v-if="isCompanyAndBranchSelectorModalActive"
+    @close="isCompanyAndBranchSelectorModalActive = false"
+  />
 </template>
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import EligibilityCalculator from 'src/components/calculators/EligibilityCalculator.vue';
+import { useScreenSize } from 'src/composables/utilComposibles';
+import CompanyAndBranchSelectorModal from './modals/CompanyAndBranchSelectorModal.vue';
+
+const { screenWidth } = useScreenSize();
 
 const showEligibilityCalculator = ref(false);
-
+const isCompanyAndBranchSelectorModalActive = ref(false);
 const toggleFullscreen = () => {
   const doc = window.document;
   const docEl = doc.documentElement;
@@ -111,7 +130,7 @@ onMounted(() => console.log('mounted account menu'));
 </script>
 <style scoped>
 [account-menu] > .q-item {
-  min-height: calc(100vh / 15);
+  min-height: calc(100vh / 16);
   padding-left: 20px;
 }
 </style>

@@ -98,7 +98,7 @@ const submit = () => {
     selectedFinancialYear.value
   );
   onSuccess({
-    msg: 'Data changed successfully',
+    msg: 'Saved successfully',
   });
   userStore.openCompanySelectModal(false);
   setTimeout(close, 250);
